@@ -1,0 +1,304 @@
+.navbar_container {
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 3%;
+}
+
+.navbar_container figure {
+  margin-right: 3%;
+}
+
+.navLinks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5rem;
+}
+.navLinks > li {
+  list-style: none;
+  font-size: 1.4rem;
+}
+
+.navLinks > li > a {
+  text-decoration: none;
+  color: #9f9f9f;
+
+  &:hover {
+    color: #383737;
+  }
+}
+
+.hidden {
+  display: none;
+}
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+.categories-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding: 20px;
+  background-color: white;
+  height: 50vh;
+}
+
+.category section:first-of-type {
+  display: block;
+  column-count: 2;
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-gap: 1rem;
+  -webkit-column-gap: 1rem;
+  -moz-column-gap: 1rem;
+  height: 100%;
+  background-color: #2f855a;
+}
+
+.category h1 {
+  color: #2f855a;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.category ul {
+  list-style: none;
+  padding: 0;
+}
+
+.category li {
+  margin-bottom: 10px;
+}
+
+.category ul ul {
+  padding-left: 20px;
+}
+
+.category ul ul li {
+  margin-bottom: 6px;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+.hide {
+  display: none;
+}
+
+.navbar_container > div:nth-of-type(2) {
+  display: flex;
+  align-items: center;
+}
+
+.navbar_container > div:nth-of-type(1) {
+  display: flex;
+  align-items: center;
+}
+
+.profileBox {
+  display: flex;
+  align-items: center;
+  margin: 0 2rem;
+}
+
+.mobileNavClose {
+  display: none;
+}
+
+.mobileNavOpen {
+  display: flex;
+}
+
+/* ----------------------------------------------------- Burger Icon ---------------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------SEARCH BAR---------------------------------------------------------------------------------- */
+
+.form button {
+  border: none;
+  background: none;
+  color: #8b8ba7;
+}
+
+.form {
+  --timing: 0.3s;
+  --width-of-input: 220px;
+  --height-of-input: 5vh;
+  --border-height: 2px;
+  --input-bg: #fff;
+  --border-color: #6d001d;
+  --after-border-radius: 1px;
+  position: relative;
+  width: var(--width-of-input);
+  height: var(--height-of-input);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 5%;
+  transition: border-radius 0.5s ease;
+  background: var(--input-bg, #fff);
+}
+
+.input {
+  position: static;
+  font-size: 1.4rem;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0 0.5rem 0 0.5rem;
+  border-radius: 0;
+}
+
+.input::placeholder {
+  color: #bbbbbb;
+  font-size: 1.4rem;
+}
+
+.form:before {
+  content: "";
+  position: absolute;
+  background: var(--border-color);
+  transform: scaleX(0);
+  transform-origin: center;
+  width: 100%;
+  height: var(--border-height);
+  left: 0;
+  bottom: 0;
+  border-radius: 1px;
+  transition: transform var(--timing) ease;
+}
+
+.form:focus-within {
+  border-radius: var(--after-border-radius);
+}
+
+input:focus {
+  outline: none;
+}
+
+.form:focus-within:before {
+  transform: scale(1);
+}
+
+.reset {
+  position: absolute;
+  right: 0rem;
+
+  border: none;
+  background: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+input:not(:placeholder-shown) ~ .reset {
+  opacity: 1;
+  visibility: visible;
+}
+
+.form svg {
+  width: 17px;
+  margin-top: 3px;
+}
+
+.nav-mobile {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+@media screen and (max-width: 1580px) {
+  .navLinks {
+    margin-right: auto;
+    gap: 3rem;
+  }
+}
+@media screen and (max-width: 1210px) {
+  .navbar_container figure {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  .navLinks {
+    flex-direction: column;
+    position: absolute;
+    left: 50%;
+    top: 10vh;
+    padding: 5rem 2rem;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 999;
+    background-color: #ad3f38;
+  }
+
+  .navbar_container {
+    padding: 2rem 5%;
+  }
+
+  .navbar_container #burgerIcon {
+    display: block;
+  }
+  .nav-mobile {
+    background: transparent;
+    display: block;
+  }
+
+  #navbar-toggle {
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+    z-index: 99;
+    background-color: transparent;
+    border: none;
+  }
+  #navbar-toggle span,
+  #navbar-toggle span:before,
+  #navbar-toggle span:after {
+    cursor: pointer;
+    border-radius: 1px;
+    height: 3px;
+    width: 30px;
+    background-color: #000000;
+    position: absolute;
+    display: block;
+    content: "";
+    transition: all 300ms ease-in-out;
+  }
+  #navbar-toggle span:before {
+    top: -10px;
+  }
+  #navbar-toggle span:after {
+    bottom: -10px;
+  }
+  #navbar-toggle.active span {
+    background-color: transparent;
+  }
+  #navbar-toggle.active span:before,
+  #navbar-toggle.active span:after {
+    top: 0;
+  }
+  #navbar-toggle.active span:before {
+    transform: rotate(45deg);
+  }
+  #navbar-toggle.active span:after {
+    transform: rotate(-45deg);
+  }
+}
+@media screen and (max-width: 650px) {
+  .navbar_container > div:nth-of-type(1) {
+    position: absolute;
+    top: 10vh;
+    left: 0;
+    z-index: 800;
+    width: 100%;
+  }
+  .reset {
+    right: 1rem;
+  }
+  .navbar_container > div:nth-of-type(1) form {
+    border-radius: 0;
+    width: 100%;
+  }
+
+  .navLinks {
+    top: 15vh;
+  }
+}

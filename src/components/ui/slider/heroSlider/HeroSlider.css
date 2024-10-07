@@ -1,0 +1,24 @@
+.heroSlideContainer {
+  position: relative;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100dvw;
+}
+
+.heroSlideContainer img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+@media screen and (max-width: 1024px) {
+  .heroSlideContainer div {
+    width: 70%;
+  }
+}
+@media screen and (max-width: 768px) {
+  .heroSlideContainer div {
+    width: 100%;
+  }
+}

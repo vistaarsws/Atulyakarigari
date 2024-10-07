@@ -1,0 +1,47 @@
+.productCategorySection_container {
+  background-color: #f4f4f4;
+  padding: 5%;
+}
+
+.productCategorySection_container > h1 {
+  font-size: 3.2rem;
+}
+
+.productCategorySection_container > h2 {
+  font-weight: 1.6rem;
+}
+
+.productCategorySection_container > h2,
+.productCategorySection_container > h1 {
+  font-weight: 300;
+  color: #383737;
+  text-align: center;
+}
+
+.productCategorySection_container > section > div:first-of-type {
+  display: flex;
+  justify-content: end;
+
+  button {
+    border: none;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: #60a487;
+    cursor: pointer;
+    padding: 1rem 2rem;
+    background-color: transparent;
+
+    &:hover,
+    &:focus,
+    &:link {
+      color: #6dbd9a;
+    }
+  }
+}
+
+.productCategorySection_container > figure {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0 2.5rem;
+}
