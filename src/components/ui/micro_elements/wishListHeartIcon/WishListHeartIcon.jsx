@@ -7,7 +7,6 @@ export default function WishListHeartIcon() {
         className="wishListHeart_box"
         onClick={(e) => {
           e.stopPropagation();
-          console.log("added");
         }}
       >
         <input
