@@ -8,6 +8,7 @@ export default function Navbar() {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -149,7 +150,15 @@ export default function Navbar() {
       { name: "BLOGS", path: "/blogs" },
     ],
   };
-
+  const menuItems = [
+    { name: "Wishlist", link: "/wishlist" },
+    { name: "Orders", link: "/orders" },
+    { name: "Address", link: "/address" },
+    { name: "Contact Us", link: "/contact" },
+    { name: "Terms of use", link: "/terms" },
+    { name: "Privacy Policy", link: "/privacy" },
+    { name: "Log Out", link: "/logout" },
+  ];
   return (
     <nav className="navbar_container">
       <figure>
@@ -185,7 +194,7 @@ export default function Navbar() {
                   <div className="categories-container">
                     <div className="category">
                       <h1>HANDLOOM</h1>
-                      <section >
+                      <section>
                         <div>
                           <h2>
                             <strong>Lehenga</strong>
@@ -338,22 +347,41 @@ export default function Navbar() {
           </button>
         </form>
       </div>
-      <div>
-        <div className="profileBox">
-          <img src={userProfile} alt="" />
-        </div>
-
-        <div className="nav-mobile">
-          <button
-            id="navbar-toggle"
-            onClick={() => {
-              setIsNavVisible(!isNavVisible);
-            }}
-            className={isNavVisible ? "active" : ""}
-          >
-            <span></span>
-          </button>
-        </div>
+      <div
+        className="profileBox"
+        onMouseEnter={() => setIsProfileHovered(true)}
+        onMouseLeave={() => setIsProfileHovered(false)}
+      >
+        <img src={userProfile} alt="User Profile" />
+        {isProfileHovered && (
+          <div className="profile-dropdown">
+            <p>Hello, Savvy Srivastava</p>
+            <p>8175961513</p>
+            <ul>
+              {menuItems.map((item, index) => (
+                <li key={index}>
+                  <Link
+                    onClick={() => setIsProfileHovered(false)}
+                    to={item.link}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+      <div className="nav-mobile">
+        <button
+          id="navbar-toggle"
+          onClick={() => {
+            setIsNavVisible(!isNavVisible);
+          }}
+          className={isNavVisible ? "active" : ""}
+        >
+          <span></span>
+        </button>
       </div>
     </nav>
   );
