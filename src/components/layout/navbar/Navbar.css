@@ -327,7 +327,7 @@ input:not(:placeholder-shown) ~ .reset {
   font-family: Arial, sans-serif;
 }
 
-.profile-dropdown::before {
+/* .profile-dropdown::before {
   content: "";
   position: absolute;
   top: -10px;
@@ -335,7 +335,7 @@ input:not(:placeholder-shown) ~ .reset {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid #ffffff;
-}
+} */
 
 .profile-dropdown p {
   margin: 0;

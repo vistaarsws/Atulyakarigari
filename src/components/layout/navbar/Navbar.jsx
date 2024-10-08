@@ -1,6 +1,6 @@
 import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.png";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
 
@@ -9,6 +9,7 @@ export default function Navbar() {
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -20,7 +21,6 @@ export default function Navbar() {
         setIsNavVisible(true);
       }
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
 
@@ -151,13 +151,13 @@ export default function Navbar() {
     ],
   };
   const menuItems = [
-    { name: "Wishlist", link: "/wishlist" },
-    { name: "Orders", link: "/orders" },
-    { name: "Address", link: "/address" },
-    { name: "Contact Us", link: "/contact" },
-    { name: "Terms of use", link: "/terms" },
-    { name: "Privacy Policy", link: "/privacy" },
-    { name: "Log Out", link: "/logout" },
+    { name: "Wishlist", link: "/user/wishlist" },
+    { name: "Orders", link: "/user/orders" },
+    { name: "Address", link: "/user/address" },
+    { name: "Contact Us", link: "/user/contact" },
+    { name: "Terms of use", link: "/user/terms" },
+    { name: "Privacy Policy", link: "/user/privacy" },
+    { name: "Log Out", link: "/user/logout" },
   ];
   return (
     <nav className="navbar_container">
@@ -302,7 +302,6 @@ export default function Navbar() {
           );
         })}
       </ul>
-
       <div>
         <form className="form">
           <button>
@@ -355,8 +354,15 @@ export default function Navbar() {
         <img src={userProfile} alt="User Profile" />
         {isProfileHovered && (
           <div className="profile-dropdown">
-            <p>Hello, Savvy Srivastava</p>
-            <p>8175961513</p>
+            <div
+              onClick={() => {
+                navigate("/user/profile");
+                setIsProfileHovered(false);
+              }}
+            >
+              <p>Hello, Savvy Srivastava</p>
+              <p>8175961513</p>
+            </div>
             <ul>
               {menuItems.map((item, index) => (
                 <li key={index}>
