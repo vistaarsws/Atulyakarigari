@@ -7,22 +7,41 @@ import { BreadCrumb } from "primereact/breadcrumb";
 
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
+import { useState } from "react";
 
 export default function Product() {
   let { userId } = useParams();
+
+  const [productQuantity, setProductQuantity] = useState(0);
+
   const items = [{ label: "Banarsi Silk" }, { label: "Banarasi Nikhaar" }];
   const back = { icon: "pi pi-home", url: "https://primereact.org" };
+
+  const product_description = {
+    properties: [
+      { type: "Occasion", value: "Festive/ Party/ Corporate" },
+      { type: "Saree Length", value: "5.50 meter" },
+      { type: "Fabric Care", value: "Dry clean only" },
+      { type: "Colour", value: "Red (Sindoor)" },
+      { type: "Fabric", value: "Pure Raw Silk" },
+      { type: "Style", value: "Floral pattern with gota patti pallu" },
+      { type: "Type", value: "Pure Silk" },
+      { type: "Weight", value: "500 gm" },
+      { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
+      { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
+    ],
+  };
 
   return (
     <div className="product_container">
       <div>
         <BreadCrumb model={items} home={back} />
       </div>
-      <section>
-        <div>
+      <div>
+        <section>
           <ProductView />
-        </div>
-        <article className="product_detials_section">
+        </section>
+        <section className="product_details_header">
           <div>
             <h1>Banarsi Nikhaar</h1>
             <div>
@@ -50,7 +69,12 @@ export default function Product() {
               </div>
               <div className="pincodeBox">
                 <div>
-                  <input type="number" name="pincode" id="pincode" />
+                  <input
+                    type="number"
+                    name="pincode"
+                    id="pincode"
+                    placeholder="Enter Pincode"
+                  />
                 </div>
                 <div>
                   <button type="button">Check Pincode</button>
@@ -58,8 +82,27 @@ export default function Product() {
               </div>
             </div>
           </div>
-        </article>
-      </section>
+          <article className="product_details_description">
+            <h2>Product Description</h2>
+            <ul>
+              {product_description.properties.map((property, index) => {
+                return (
+                  <li key={index}>
+                    <div>{property.type}</div>
+                    <div>{property.value}</div>
+                    <div className="bottomLine"></div>
+                  </li>
+                );
+              })}
+            </ul>
+          </article>
+          <article>
+            <div onClick={() => setProductQuantity(productQuantity + 1)}>+</div>
+            <div>{productQuantity}</div>
+            <div onClick={() =>prod setProductQuantity(productQuantity - 1)}>-</div>
+          </article>
+        </section>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,10 @@
 .product_container {
   padding: 2% 5%;
-  section:first-of-type {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
 
-  div:first-of-type {
-    padding: 1rem 0;
+  & > div:nth-of-type(1) {
+    nav {
+      margin-bottom: 2rem;
+    }
 
     span {
       font-size: 2rem;
@@ -17,18 +15,25 @@
       height: 1.5rem;
     }
   }
-}
 
-.product_detials_section {
+  & > div:nth-of-type(2) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+.product_details_header {
   margin: 0 2.5rem;
 
   div:first-of-type {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     h1 {
       font-size: 2.4rem;
       font-weight: 600;
+      height: max-content;
     }
 
     h1 + div {
@@ -36,13 +41,18 @@
       align-items: center;
       gap: 1.5rem;
     }
+
+    div {
+      position: relative;
+    }
   }
 
   p:first-of-type {
     font-size: 1.4rem;
+    line-height: 2.1rem;
     font-weight: 400;
     color: #383737;
-    margin: 1.5rem 0 1rem;
+    margin: 1.2rem 0 1rem;
   }
 
   .priceRatingContainer {
@@ -61,9 +71,9 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        margin-left: 1rem;
+        margin-left: 1.5rem;
         background-color: #60a4871a;
-        padding: 0.5rem 1rem;
+        padding: 1.2rem 1rem;
         border-radius: 0.5rem;
         font-size: 1.4rem;
         font-weight: 500;
@@ -80,30 +90,73 @@
       }
 
       .pincodeBox {
-        display: flex;
-        justify-content: space-between;
-        width: 30rem;
-        border: 1px solid red;
+        display: grid;
+        width: 35%;
+        grid-template-columns: 1fr 1fr;
+
+        border: 1px solid #6f6f6f33;
+        border-radius: 0.4rem;
+        overflow: hidden;
+        margin-left: auto;
 
         div:first-of-type {
-          width: 10rem;
-          border: 1px solid green;
-
           #pincode {
-            border-radius: 0;
+            height: 100%;
+            width: 100%;
+            padding: 1.2rem;
+            border: none;
+            font-size: 1.4rem;
           }
         }
 
         div:nth-of-type(2) {
-          width: 12rem;
-          background-color: #ad3f380d;
-          color: #ad3f38;
+          button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #ad3f380d;
+            color: #ad3f38;
+          }
         }
       }
     }
   }
 }
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
+.product_details_description {
+  border-top: 1px dashed black;
+  padding: 2.5rem 0;
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  & ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    list-style: none;
+    margin: 2rem 0;
+    li {
+      padding: 1rem 0;
+      & > div:first-of-type {
+        font-size: 1rem;
+        color: #6f6f6f;
+        margin-bottom: 0.5rem;
+      }
+      & > div:nth-of-type(2) {
+        font-size: 1.4rem;
+      }
+      & > .bottomLine {
+        border-bottom: 1px solid #f4f4f4;
+        width: 50%;
+        height: 1rem;
+      }
+    }
+  }
+}
 .p-breadcrumb {
   border: none;
 }
