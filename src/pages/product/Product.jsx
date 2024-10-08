@@ -99,7 +99,13 @@ export default function Product() {
           <article>
             <div onClick={() => setProductQuantity(productQuantity + 1)}>+</div>
             <div>{productQuantity}</div>
-            <div onClick={() =>prod setProductQuantity(productQuantity - 1)}>-</div>
+            <div
+              onClick={() =>
+                productQuantity > 1 && setProductQuantity(productQuantity - 1)
+              }
+            >
+              -
+            </div>
           </article>
         </section>
       </div>
