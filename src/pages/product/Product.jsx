@@ -11,7 +11,7 @@ import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartI
 export default function Product() {
   let { userId } = useParams();
   const items = [{ label: "Banarsi Silk" }, { label: "Banarasi Nikhaar" }];
-  const back = { icon: "pi pi-arrow-left", url: "https://primereact.org" };
+  const back = { icon: "pi pi-home", url: "https://primereact.org" };
 
   return (
     <div className="product_container">
@@ -41,12 +41,20 @@ export default function Product() {
           </p>
           <div className="priceRatingContainer">
             <div>
-              <div>26,700</div>
-              <div>
+              <div className="priceBox"> ₹ 26,700</div>
+              <div className="ratingBox">
                 <div>
                   4 <img src={star} alt="Star" />
                 </div>
                 <div>161 Rating</div>
+              </div>
+              <div className="pincodeBox">
+                <div>
+                  <input type="number" name="pincode" id="pincode" />
+                </div>
+                <div>
+                  <button type="button">Check Pincode</button>
+                </div>
               </div>
             </div>
           </div>

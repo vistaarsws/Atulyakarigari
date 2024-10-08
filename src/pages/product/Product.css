@@ -4,9 +4,24 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
+
+  div:first-of-type {
+    padding: 1rem 0;
+
+    span {
+      font-size: 2rem;
+    }
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
 }
 
 .product_detials_section {
+  margin: 0 2.5rem;
+
   div:first-of-type {
     display: flex;
     justify-content: space-between;
@@ -22,4 +37,73 @@
       gap: 1.5rem;
     }
   }
+
+  p:first-of-type {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #383737;
+    margin: 1.5rem 0 1rem;
+  }
+
+  .priceRatingContainer {
+    margin: 2rem 0;
+
+    div:first-of-type {
+      display: flex;
+      align-items: center;
+      justify-content: start;
+
+      .priceBox {
+        font-size: 2.4rem;
+      }
+
+      .ratingBox {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-left: 1rem;
+        background-color: #60a4871a;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: #6f6f6f;
+
+        div:first-of-type {
+          gap: 0.2rem;
+        }
+
+        div:nth-of-type(2) {
+          border-left: 1px solid #c0c0c0;
+          padding-left: 1rem;
+        }
+      }
+
+      .pincodeBox {
+        display: flex;
+        justify-content: space-between;
+        width: 30rem;
+        border: 1px solid red;
+
+        div:first-of-type {
+          width: 10rem;
+          border: 1px solid green;
+
+          #pincode {
+            border-radius: 0;
+          }
+        }
+
+        div:nth-of-type(2) {
+          width: 12rem;
+          background-color: #ad3f380d;
+          color: #ad3f38;
+        }
+      }
+    }
+  }
+}
+
+.p-breadcrumb {
+  border: none;
 }

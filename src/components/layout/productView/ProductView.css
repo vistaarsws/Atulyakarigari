@@ -1,6 +1,5 @@
 .slideshow {
   display: flex;
-  gap: 20px; /* Add space between thumbnails and main image */
 }
 
 .thumbnails-container {

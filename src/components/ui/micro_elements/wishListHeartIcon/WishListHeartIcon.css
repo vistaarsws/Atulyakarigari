@@ -1,3 +1,7 @@
+.wishListHeart_box {
+  position: relative;
+}
+
 label {
   display: flex;
   align-items: center;
@@ -8,7 +12,7 @@ label {
   color: black;
 }
 
-input {
+#favorite {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -23,7 +27,7 @@ label svg {
   fill: #6f6f6f;
 }
 
-input:checked + label svg {
+#favorite:checked + label svg {
   fill: hsl(0deg 100% 50%);
   animation: heartButton 800ms;
 }
@@ -66,13 +70,13 @@ input:checked + label svg {
   }
 }
 
-input + label .action {
+#favorite + label .action {
   position: relative;
   overflow: hidden;
   display: grid;
 }
 
-input + label .action span {
+#favorite + label .action span {
   grid-column-start: 1;
   grid-column-end: 1;
   grid-row-start: 1;
@@ -80,22 +84,22 @@ input + label .action span {
   transition: all 0.5s;
 }
 
-input + label .action span.option-1 {
+#favorite + label .action span.option-1 {
   transform: translate(0px, 0%);
   opacity: 1;
 }
 
-input:checked + label .action span.option-1 {
+#favorite:checked + label .action span.option-1 {
   transform: translate(0px, -100%);
   opacity: 0;
 }
 
-input + label .action span.option-2 {
+#favorite + label .action span.option-2 {
   transform: translate(0px, 100%);
   opacity: 0;
 }
 
-input:checked + label .action span.option-2 {
+#favorite:checked + label .action span.option-2 {
   transform: translate(0px, 0%);
   opacity: 1;
 }

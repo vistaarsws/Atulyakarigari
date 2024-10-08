@@ -20,6 +20,7 @@ export function EmblaSlider({
     dragFree: true,
     draggable: false,
     preventScrollOnTouch: true,
+    delay: 2000,
   },
   slides = [],
   plugins = [],
@@ -39,8 +40,7 @@ export function EmblaSlider({
     if (plugin.toLowerCase() === "autoscroll")
       return AutoScroll({ play: true, stopOnInteraction: false });
     if (plugin.toLowerCase() === "autoplay") {
-      const { delay = 2000 } = options;
-      return Autoplay({ delay, stopOnInteraction: false });
+      return Autoplay({ delay: options.delay, stopOnInteraction: false });
     }
     if (plugin.toLowerCase() === "classname") return ClassNames();
     return plugin;

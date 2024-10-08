@@ -37,7 +37,7 @@ export default function ProductSection({
           <EmblaSlider
             plugins={["autoplay"]}
             slides_in_view={{ xl: 5, lg: 4, md: 3, sm: 2, xs: 2 }}
-            options={{ delay: 2000, dragFree: true }}
+            options={{ delay: 8000, dragFree: true }}
             slides={productCategorySection_products}
             no_of_slides={5}
             navigationDots={false}
