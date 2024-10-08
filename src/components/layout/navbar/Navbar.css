@@ -302,3 +302,103 @@ input:not(:placeholder-shown) ~ .reset {
     top: 15vh;
   }
 }
+/* -------------------------------------------------------------------------IMAGE SETTING HOVER--------------------------------------------------------------------------- */
+.profileBox {
+  position: relative;
+  cursor: pointer;
+}
+
+.profileBox img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0px);
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 175px;
+  font-family: Arial, sans-serif;
+}
+
+.profile-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #ffffff;
+}
+
+.profile-dropdown p {
+  margin: 0;
+  padding: 0;
+}
+
+.profile-dropdown p:first-child {
+  font-family: Lato;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 21px;
+  text-align: left;
+}
+
+.profile-dropdown p:nth-child(2) {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* Hover effect for the mobile number */
+.profile-dropdown p:nth-child(2):hover {
+  color: #000000;
+  transform: scale(1.03);
+  font-weight: 600;
+}
+
+.profile-dropdown ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.profile-dropdown li {
+  padding: 12px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  color: #6f6f6f;
+  border-bottom: 1px solid #e0e0e0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.profile-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.profile-dropdown li:hover {
+  color: #000000;
+  transform: scale(1.03);
+  font-weight: 600;
+}
+.profile-dropdown a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.profile-dropdown a:hover {
+  color: #000000;
+  transform: scale(1.03);
+  font-weight: 600;
+}
