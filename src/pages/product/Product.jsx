@@ -3,8 +3,6 @@ import ProductView from "../../components/layout/productView/productView";
 import share from "../../assets/images/share.svg";
 import star from "../../assets/images/reviewStar.svg";
 
-import { BreadCrumb } from "primereact/breadcrumb";
-
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
 import { useState } from "react";
@@ -34,9 +32,7 @@ export default function Product() {
 
   return (
     <div className="product_container">
-      <div>
-        <BreadCrumb model={items} home={back} />
-      </div>
+      <div>{/* <BreadCrumb model={items} home={back} /> */}</div>
       <div>
         <section>
           <ProductView />
@@ -96,17 +92,28 @@ export default function Product() {
               })}
             </ul>
           </article>
-          <article>
-            <div onClick={() => setProductQuantity(productQuantity + 1)}>+</div>
-            <div>{productQuantity}</div>
-            <div
-              onClick={() =>
-                productQuantity > 1 && setProductQuantity(productQuantity - 1)
-              }
-            >
-              -
+          <article className="product_details_userInputs">
+            <div className="productQuantityCounter_container">
+              <button onClick={() => setProductQuantity(productQuantity + 1)}>
+                +
+              </button>
+              <div>{productQuantity}</div>
+              <button
+                onClick={() =>
+                  productQuantity > 1 && setProductQuantity(productQuantity - 1)
+                }
+              >
+                -
+              </button>
+            </div>
+            <div>
+              <button>Buy Now</button>
+            </div>
+            <div>
+              <button>Add To Cart</button>
             </div>
           </article>
+          <article className="tabView_container"></article>
         </section>
       </div>
     </div>

@@ -1,25 +1,17 @@
-import { useState } from "react";
-import { Calendar } from "primereact/calendar";
-
-import "primereact/resources/themes/saga-blue/theme.css";
-import "primereact/resources/primereact.min.css";
-import "primeicons/primeicons.css";
-
+import { DatePicker, Space } from "antd";
 import "./DatePicker.css";
+const { RangePicker } = DatePicker;
 
-export default function RangeDemo() {
-  const [dates, setDates] = useState(null);
+const App = () => (
+  <Space
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "5px",
+    }}
+  >
+    <RangePicker />
+  </Space>
+);
 
-  return (
-    <div className="datePicker_container">
-      <Calendar
-        value={dates}
-        onChange={(e) => setDates(e.value)}
-        selectionMode="range"
-        readOnlyInput
-        hideOnRangeSelection
-        placeholder="Pick a Date"
-      />
-    </div>
-  );
-}
+export default App;
