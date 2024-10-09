@@ -1,7 +1,6 @@
 import BlogCard from "../../components/ui/cards/blogCard/BlogCard";
 import DatePicker from "../../components/ui/datePicker/DatePicker";
 import { blogs_array } from "../../utils/Constant";
-import { Dropdown } from "primereact/dropdown";
 import { useState } from "react";
 
 import "./Blogs.css";
@@ -57,13 +56,13 @@ export default function Blogs() {
         </div>
         <div className="blogFilter_container">
           <div>
-            <Dropdown
+            {/* <Dropdown
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.value)}
               options={cities}
               optionLabel="name"
               placeholder="Categories"
-            />
+            /> */}
           </div>
           <div>
             <DatePicker />
