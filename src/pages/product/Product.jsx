@@ -2,18 +2,57 @@ import { useParams } from "react-router-dom";
 import ProductView from "../../components/layout/productView/productView";
 import share from "../../assets/images/share.svg";
 import star from "../../assets/images/reviewStar.svg";
+import { HomeOutlined } from "@ant-design/icons";
+import { Breadcrumb } from "antd";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import PropTypes from "prop-types";
 
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
 import { useState } from "react";
+
+// ----------------------------------------------------------------------------------------
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+// ----------------------------------------------------------------------------------------
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 
 export default function Product() {
   let { userId } = useParams();
 
   const [productQuantity, setProductQuantity] = useState(0);
 
-  const items = [{ label: "Banarsi Silk" }, { label: "Banarasi Nikhaar" }];
-  const back = { icon: "pi pi-home", url: "https://primereact.org" };
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const product_description = {
     properties: [
@@ -30,9 +69,40 @@ export default function Product() {
     ],
   };
 
+  const breadcrumbItems = [
+    {
+      href: "/",
+      title: <HomeOutlined />,
+    },
+    {
+      href: "",
+      title: "Handloom",
+    },
+    {
+      href: "",
+      title: "Lehenga",
+    },
+    {
+      href: "",
+      title: "Banarsi",
+    },
+  ];
+
   return (
     <div className="product_container">
-      <div>{/* <BreadCrumb model={items} home={back} /> */}</div>
+      <div>
+        <Breadcrumb>
+          {breadcrumbItems.map((item, index) => (
+            <Breadcrumb.Item key={index} href={item.href}>
+              {index === breadcrumbItems.length - 1 ? (
+                <span style={{ color: "#1890ff" }}>{item.title}</span> // Highlight the last item
+              ) : (
+                item.title
+              )}
+            </Breadcrumb.Item>
+          ))}
+        </Breadcrumb>
+      </div>
       <div>
         <section>
           <ProductView />
@@ -113,7 +183,29 @@ export default function Product() {
               <button>Add To Cart</button>
             </div>
           </article>
-          <article className="tabView_container"></article>
+          <article className="tabView_container">
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={value}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+              >
+                <Tab label="About Artisan" {...a11yProps(0)} />
+                <Tab label="Detail Description" {...a11yProps(1)} />
+                <Tab label="Reviews" {...a11yProps(2)} />
+                <Tab label="Questions" {...a11yProps(3)} />
+              </Tabs>
+            </Box>
+            <CustomTabPanel value={value} index={0}>
+              Item One
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={1}>
+              Item Two
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={2}>
+              Item Three
+            </CustomTabPanel>
+          </article>
         </section>
       </div>
     </div>

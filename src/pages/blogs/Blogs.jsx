@@ -2,6 +2,10 @@ import BlogCard from "../../components/ui/cards/blogCard/BlogCard";
 import DatePicker from "../../components/ui/datePicker/DatePicker";
 import { blogs_array } from "../../utils/Constant";
 import { useState } from "react";
+import { Select, Space } from "antd";
+
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 import "./Blogs.css";
 
@@ -14,6 +18,12 @@ export default function Blogs() {
     { name: "Istanbul", code: "IST" },
     { name: "Paris", code: "PRS" },
   ];
+
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
+  };
+
+  const categories = ["Handloom", "HANDICRAFT", "JEWELLERY"];
 
   const topBlogs = [
     {
@@ -56,13 +66,35 @@ export default function Blogs() {
         </div>
         <div className="blogFilter_container">
           <div>
-            {/* <Dropdown
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.value)}
-              options={cities}
-              optionLabel="name"
-              placeholder="Categories"
-            /> */}
+            <Space wrap>
+              <Select
+                showSearch
+                style={{ fontSize: "1.4rem" }}
+                onChange={handleChange}
+                allowClear
+                placeholder="Category"
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? "")
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? "").toLowerCase())
+                }
+                options={[
+                  {
+                    value: "1",
+                    label: "Handloom",
+                  },
+                  {
+                    value: "2",
+                    label: "HANDICRAFT",
+                  },
+                  {
+                    value: "3",
+                    label: "JEWELLERY",
+                  },
+                ]}
+              />
+            </Space>
           </div>
           <div>
             <DatePicker />
@@ -94,6 +126,11 @@ export default function Blogs() {
               />
             );
           })}
+        </div>
+        <div>
+          <Stack spacing={2}>
+            <Pagination count={10} size="large" />
+          </Stack>
         </div>
       </section>
     </div>
