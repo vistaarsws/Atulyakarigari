@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import "./ProductCard.css";
 import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro_elements/wishListHeartIcon/wishListHeartIcon";
+import { useEffect, useState } from "react";
 
 // const productReference = {
 //     _id: "aaaaa",
@@ -17,13 +18,20 @@ import WishListHeartIcon from "../../micro_elements/wishListHeartIcon/wishListHe
 
 function ProductCard({ title, picture, price, id }) {
   const navigate = useNavigate();
-
+  const [isHover, setIsHover] = useState(false);
   // const [isAddedToWishList, setIsAddedToWishList] = useState(false);
-
   // const addToWishListHandler = () => {
   //   setIsAddedToWishList(!isAddedToWishList);
   // };
-
+  useEffect(() => {
+    // Check if the URL contains "user/wishlist"
+    const path = window.location.pathname;
+    if (path.includes("user/wishlist")) {
+      setIsHover(true);
+    } else {
+      setIsHover(false);
+    }
+  }, []);
   return (
     <>
       <div
@@ -33,7 +41,8 @@ function ProductCard({ title, picture, price, id }) {
         }}
       >
         <section>
-          <div>
+          <div style={{ display: isHover && "none" }}>
+            {" "}
             <WishListHeartIcon />
           </div>
 

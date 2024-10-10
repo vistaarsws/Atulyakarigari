@@ -1,7 +1,33 @@
 import React from "react";
+import ProductCard from "../../../components/ui/cards/productCard/ProductCard";
+import { top_product_list_from_category } from "../../../utils/Constant";
 
 const Wishlist = () => {
-  return <div>Wishlist Wishlist</div>;
+  console.log(top_product_list_from_category.products[0]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        border: "2px solid red",
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "30px",
+      }}
+    >
+      {top_product_list_from_category.products.map((ele) => (
+        <ProductCard
+          key={ele.key}
+          id={ele.key}
+          title={ele.title}
+          picture={ele.picture}
+          price={ele.price}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default Wishlist;

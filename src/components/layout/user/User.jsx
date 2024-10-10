@@ -1,5 +1,7 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import "./user.css";
+import { Button } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -37,6 +39,13 @@ export default function Sidebar() {
         </nav>
       </aside>
       <div className="content-container">
+        <ArrowBackIcon
+          className="arrow-icon"
+          style={{ fontSize: 30 }}
+          onClick={() => {
+            window.history.back();
+          }}
+        />
         <Outlet />
       </div>
     </div>

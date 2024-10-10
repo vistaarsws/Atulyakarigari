@@ -1,5 +1,6 @@
 .sidebar-container {
   display: flex;
+  width: 100%;
 }
 
 .sidebar {
@@ -37,5 +38,16 @@
 }
 
 .content-container {
-  margin-top: 20px;
+  margin-top: 25px;
+  width: -webkit-fill-available;
+}
+@media screen and (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+@media screen and (min-width: 768px) {
+  .arrow-icon {
+    display: none !important;
+  }
 }
