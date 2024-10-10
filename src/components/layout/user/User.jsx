@@ -44,13 +44,13 @@ export default function Sidebar() {
           style={{
             // border: "2px solid red",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "start",
             alignItems: "center",
           }}
         >
           <ArrowBackIcon
             className="arrow-icon"
-            style={{ fontSize: 30 }}
+            style={{ fontSize: 30, margin: "0 1rem 0" }}
             onClick={() => {
               window.history.back();
             }}
@@ -59,8 +59,8 @@ export default function Sidebar() {
             className="arrow-icon"
             variant="h4"
             sx={{
-              marginLeft: "auto",
-              marginRight: "auto",
+              // marginLeft: "auto",
+              // marginRight: "auto",
               color: "#423739",
               fontWeight: 500,
               textTransform: "capitalize",
