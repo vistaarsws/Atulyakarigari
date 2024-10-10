@@ -10,7 +10,6 @@ const Wishlist = () => {
       style={{
         display: "flex",
         flexWrap: "wrap",
-        border: "2px solid red",
         width: "100%",
         justifyContent: "center",
         alignItems: "center",

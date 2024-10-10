@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 function ProductCard({ title, picture, price, id }) {
   const navigate = useNavigate();
   const [isHover, setIsHover] = useState(false);
+
   // const [isAddedToWishList, setIsAddedToWishList] = useState(false);
   // const addToWishListHandler = () => {
   //   setIsAddedToWishList(!isAddedToWishList);
@@ -35,7 +36,13 @@ function ProductCard({ title, picture, price, id }) {
   return (
     <>
       <div
-        className="productCard_container"
+        style={{
+          backgroundColor: isHover === true ? "white" : "",
+          boxShadow:
+            isHover === true ? "rgba(149, 157, 165, 0.2) 0px 8px 24px" : "none",
+          borderRadius: isHover === true ? "0.4rem" : "0rem",
+        }}
+        className={"productCard_container"}
         onClick={() => {
           navigate(`/product/${id}`);
         }}
@@ -46,7 +53,7 @@ function ProductCard({ title, picture, price, id }) {
             <WishListHeartIcon />
           </div>
 
-          <div>
+          {/* <div>
             <input
               type="checkbox"
               id="quickView"
@@ -67,10 +74,14 @@ function ProductCard({ title, picture, price, id }) {
                 />
               </svg>
             </label>
-          </div>
+          </div> */}
         </section>
         <figure>
-          <img src={picture} alt="" />
+          <img
+            style={{ transform: isHover === true && "scale(1.5)" }}
+            src={picture}
+            alt=""
+          />
         </figure>
         <article>
           <h1>{title}</h1>
@@ -78,7 +89,9 @@ function ProductCard({ title, picture, price, id }) {
           <h2>₹{price}</h2>
         </article>
         <div>
-          <button>Add to cart</button>
+          <button style={{ visibility: isHover === true && "visible" }}>
+            Add to cart
+          </button>
         </div>
       </div>
     </>
