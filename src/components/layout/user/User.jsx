@@ -42,7 +42,7 @@ export default function Sidebar() {
       <div className="content-container">
         <div
           style={{
-            border: "2px solid red",
+            // border: "2px solid red",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
