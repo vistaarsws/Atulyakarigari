@@ -48,7 +48,7 @@ function ProductCard({ title, picture, price, id }) {
         }}
       >
         <section>
-          <div style={{ display: isHover && "none" }}>
+          <div style={{}}>
             {" "}
             <WishListHeartIcon />
           </div>
