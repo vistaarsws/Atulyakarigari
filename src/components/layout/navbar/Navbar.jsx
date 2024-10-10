@@ -32,7 +32,7 @@ export default function Navbar() {
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
-      { name: "SHOP", path: "/shop" },
+      // { name: "SHOP", path: "/shop" },
       {
         name: "CATEGORIES",
         path: "/collection",

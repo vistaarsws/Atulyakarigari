@@ -1,5 +1,7 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import "./user.css";
+import { Button, Typography } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -13,6 +15,7 @@ export default function Sidebar() {
     { key: "privacy-policy", label: "Privacy Policy" },
     { key: "user/logout", label: "Log Out" },
   ];
+  console.log(location.pathname);
 
   const isActive = (itemKey) => {
     return location.pathname.includes(`/${itemKey}`);
@@ -37,6 +40,35 @@ export default function Sidebar() {
         </nav>
       </aside>
       <div className="content-container">
+        <div
+          style={{
+            // border: "2px solid red",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <ArrowBackIcon
+            className="arrow-icon"
+            style={{ fontSize: 30 }}
+            onClick={() => {
+              window.history.back();
+            }}
+          />
+          <Typography
+            className="arrow-icon"
+            variant="h4"
+            sx={{
+              marginLeft: "auto",
+              marginRight: "auto",
+              color: "#423739",
+              fontWeight: 500,
+              textTransform: "capitalize",
+            }}
+          >
+            {location.pathname.replace("/user/", "")}
+          </Typography>
+        </div>
         <Outlet />
       </div>
     </div>
