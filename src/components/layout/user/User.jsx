@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import "./user.css";
-import { Button, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Sidebar() {
@@ -50,7 +50,7 @@ export default function Sidebar() {
         >
           <ArrowBackIcon
             className="arrow-icon"
-            style={{ fontSize: 30, margin: "0 1rem 0" }}
+            style={{ fontSize: 20, margin: "0 1rem 0" }}
             onClick={() => {
               window.history.back();
             }}
@@ -62,14 +62,24 @@ export default function Sidebar() {
               // marginLeft: "auto",
               // marginRight: "auto",
               color: "#423739",
-              fontWeight: 500,
+              fontWeight: 400,
               textTransform: "capitalize",
+              fontSize: "16px",
             }}
           >
             {location.pathname.replace("/user/", "")}
           </Typography>
         </div>
-        <Outlet />
+        <Box
+          sx={{
+            height: "88vh",
+            outline: "1px solid black",
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+          }}
+        >
+          <Outlet />
+        </Box>
       </div>
     </div>
   );

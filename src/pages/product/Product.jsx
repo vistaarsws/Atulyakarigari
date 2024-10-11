@@ -6,8 +6,18 @@ import { HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb } from "antd";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Box from "@mui/material/Box";
+// import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
+import about_artisan from "../../assets/images/about_artisan.png";
+import review_person from "../../assets/images/reviewPerson.png";
+import {
+  Avatar,
+  Box,
+  Typography,
+  Rating,
+  Stack,
+  useMediaQuery,
+} from "@mui/material";
 
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
@@ -54,6 +64,22 @@ export default function Product() {
     setValue(newValue);
   };
 
+  const breadcrumbItems = [
+    { title: "Home", href: "/" },
+    { title: "Category", href: "/category" },
+    { title: "Subcategory", href: "/subcategory" },
+  ];
+
+  const items = breadcrumbItems.map((item, index) => ({
+    title:
+      index === breadcrumbItems.length - 1 ? (
+        <span style={{ color: "#1890ff" }}>{item.title}</span> // Highlight the last item
+      ) : (
+        item.title
+      ),
+    href: item.href,
+  }));
+
   const product_description = {
     properties: [
       { type: "Occasion", value: "Festive/ Party/ Corporate" },
@@ -69,39 +95,10 @@ export default function Product() {
     ],
   };
 
-  const breadcrumbItems = [
-    {
-      href: "/",
-      title: <HomeOutlined />,
-    },
-    {
-      href: "",
-      title: "Handloom",
-    },
-    {
-      href: "",
-      title: "Lehenga",
-    },
-    {
-      href: "",
-      title: "Banarsi",
-    },
-  ];
-
   return (
     <div className="product_container">
       <div>
-        <Breadcrumb>
-          {breadcrumbItems.map((item, index) => (
-            <Breadcrumb.Item key={index} href={item.href}>
-              {index === breadcrumbItems.length - 1 ? (
-                <span style={{ color: "#1890ff" }}>{item.title}</span> // Highlight the last item
-              ) : (
-                item.title
-              )}
-            </Breadcrumb.Item>
-          ))}
-        </Breadcrumb>
+        <Breadcrumb items={items} />
       </div>
       <div>
         <section>
@@ -184,11 +181,23 @@ export default function Product() {
             </div>
           </article>
           <article className="tabView_container">
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Box
+              sx={{
+                borderBottom: 1,
+                borderColor: "divider",
+                overflow: "scroll",
+                scrollbarWidth: "none",
+
+                width: useMediaQuery("(max-width:600px)") ? "80vw" : "100%",
+              }}
+            >
               <Tabs
                 value={value}
+                variant="scrollable"
+                scrollButtons="auto"
                 onChange={handleChange}
                 aria-label="basic tabs example"
+                className="Product_tab_items"
               >
                 <Tab label="About Artisan" {...a11yProps(0)} />
                 <Tab label="Detail Description" {...a11yProps(1)} />
@@ -197,13 +206,109 @@ export default function Product() {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              Item One
+              <div className="about_artisan">
+                <figure>
+                  <img src={about_artisan} alt="About Artisan" />
+                </figure>
+                <div>
+                  <h3>Khilesh Sahu</h3>
+                  <p>
+                    Khilesh Sahu is a master artisan specializing in the
+                    intricate art of sari-making. With over [number] years of
+                    experience, Khilesh has developed a signature style that
+                    blends traditional craftsmanship with contemporary design.
+                    Each sari is handwoven using fine materials such as silk,
+                    cotton, and linen, showcasing exquisite patterns inspired by
+                    [cultural references or regions]. Passionate about
+                    preserving the rich heritage of Indian textiles,{" "}
+                  </p>
+                </div>
+              </div>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              Item Two
+              <div className="detail_description">
+                <ul>
+                  <li>
+                    <h3>Wash Care</h3>
+                    <p>
+                      Cotton Fabric -First wash dry clean and after that gentle
+                      machine wash. Silk Fabric- Dry clean only. Home decor
+                      -clean with a dry/damp cloth. For any other product -
+                      Please find the wash care in the product description.
+                    </p>
+                  </li>
+                  <li>
+                    <h3>7 Days free return</h3>
+                    <p>
+                      Product(s) can be exchanged within 7 days from the date of
+                      purchase. On SALE and CUSTOMISED product - No Return
+                      /Refund
+                    </p>
+                  </li>
+                  <li>
+                    <h3>Shipping</h3>
+                    <p>
+                      Free shipping within India. Shipping out of India is as
+                      per weight calculation at checkout. Packing: Atulya
+                      Karigari ensures to provide the finest packing with proper
+                      safety of the products intact.
+                    </p>
+                  </li>
+                </ul>
+              </div>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              Item Three
+              <div className="reviews_section">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "start",
+                    borderBottom: "1px solid #e0e0e0",
+
+                    width: "100%",
+                  }}
+                >
+                  <Avatar
+                    alt="Priya Sharma"
+                    src={review_person}
+                    sx={{ width: 56, height: 56, marginBottom: "auto" }}
+                  />
+
+                  <Box sx={{ ml: 2, flex: 1 }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Rating name="read-only" value={5} readOnly />
+
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontSize: "1.2rem" }}
+                      >
+                        - Priya Sharma, 30-09-2024
+                      </Typography>
+                    </Stack>
+
+                    <Typography variant="body1" sx={{ mt: 1 }}>
+                      Wearing a Banarsi sari feels like draping a piece of
+                      heritage. The craftsmanship and elegance are unmatched.
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Soluta eum officiis, facere libero esse sit commodi odio
+                      autem nihil aliquid odit atque minus possimus magni
+                    </Typography>
+                  </Box>
+                </Box>
+              </div>
+            </CustomTabPanel>
+
+            <CustomTabPanel value={value} index={3}>
+              <div className="ask_question">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Ask any question here"
+                  ></input>
+                  <button>Submit</button>
+                </div>
+              </div>
             </CustomTabPanel>
           </article>
         </section>

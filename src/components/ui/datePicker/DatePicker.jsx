@@ -10,7 +10,7 @@ const App = () => (
       gap: "5px",
     }}
   >
-    <RangePicker />
+    <RangePicker inputReadOnly />
   </Space>
 );
 

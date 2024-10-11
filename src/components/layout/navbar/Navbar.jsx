@@ -32,7 +32,7 @@ export default function Navbar() {
   useEffect(() => {
     // Check if the URL contains "user/wishlist"
     const path = window.location.pathname;
-    if (path.includes("user/")) {
+    if (path.includes("user/") || path.includes("/blogs")) {
       setIsProfileView(true);
     } else {
       setIsProfileView(false);
