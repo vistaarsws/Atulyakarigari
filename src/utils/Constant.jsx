@@ -3,11 +3,14 @@ import TeamSlider from "../components/ui/slider/teamSlider/TeamSlider";
 import banner1 from "../assets/images/banner_1.png";
 import team_1 from "../assets/images/team_1.png";
 
+import artisan_1 from "../assets/images/artisan_1.png";
+import artisan_2 from "../assets/images/artisan_2.png";
+
 import ourCollections_1 from "../assets/images/ourCollections_1.png";
 import ourCollections_2 from "../assets/images/ourCollections_2.png";
 import ourCollections_3 from "../assets/images/ourCollections_3.png";
 
-import product_1 from "../assets/images/product_1.png";
+import product_1 from "../assets/images/cat5_5.png";
 
 import blog_img from "../assets/images/blogImg.png";
 
@@ -268,10 +271,30 @@ const top_product_list_from_category = {
 
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+const artisans = [
+  {
+    fullName: "Radhika Kumari",
+    designation: "The Weaver of Tradition",
+    picture: artisan_1,
+    story:
+      "Hailing from a small village in West Bengal, Radhika Kumari learned the intricate art of handloom weaving at an early age. Her delicate touch and attention to detail are reflected in every saree she weaves. Passionate about preserving traditional techniques, Radhika collaborates with Atulya Karigari to bring ancient weaving styles to a global audience. Each piece she creates not only embodies elegance but also supports her mission to keep her community's heritage alive.",
+  },
+  {
+    fullName: "Ajay Patel",
+    designation: "The Master Jeweler",
+    picture: artisan_2,
+    story:
+      "Ajay Patel, a master jeweler from Rajasthan, specializes in traditional Kundan jewelry. With over 20 years of experience, his artistry lies in crafting intricate designs that blend timeless elegance with modern aesthetics. Ajay’s collaboration with Atulya Karigari has enabled him to showcase his exquisite craftsmanship to a wider audience, ensuring the legacy of Kundan jewelry continues to thrive.",
+  },
+];
+
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 export {
   HeroBanner_array,
   ourTeam_array,
   ourCollections,
   blogs_array,
   top_product_list_from_category,
+  artisans,
 };

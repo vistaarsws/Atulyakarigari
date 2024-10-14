@@ -126,7 +126,7 @@ export default function Product() {
               <div className="priceBox"> ₹ 26,700</div>
               <div className="ratingBox">
                 <div>
-                  4 <img src={star} alt="Star" />
+                  <span>4</span> <img src={star} alt="Star" />
                 </div>
                 <div>161 Rating</div>
               </div>

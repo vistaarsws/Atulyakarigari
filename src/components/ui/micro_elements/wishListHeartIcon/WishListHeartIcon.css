@@ -1,3 +1,7 @@
+.wishListHeart_box {
+  position: relative;
+}
+
 label {
   display: flex;
   align-items: center;
