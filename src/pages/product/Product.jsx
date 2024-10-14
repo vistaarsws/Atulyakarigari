@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useNavigation, useParams } from "react-router-dom";
 import ProductView from "../../components/layout/productView/productView";
 import share from "../../assets/images/share.svg";
 import star from "../../assets/images/reviewStar.svg";
@@ -55,15 +55,14 @@ function a11yProps(index) {
 
 export default function Product() {
   let { userId } = useParams();
-
   const [productQuantity, setProductQuantity] = useState(0);
+  const navigate = useNavigate();
 
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
   const breadcrumbItems = [
     { title: "Home", href: "/" },
     { title: "Category", href: "/category" },
@@ -174,10 +173,10 @@ export default function Product() {
               </button>
             </div>
             <div>
-              <button>Buy Now</button>
+              <button onClick={() => navigate("/buy-now")}>Buy Now</button>
             </div>
             <div>
-              <button>Add To Cart</button>
+              <button onClick={() => navigate("/buy-now")}>Add To Cart</button>
             </div>
           </article>
           <article className="tabView_container">

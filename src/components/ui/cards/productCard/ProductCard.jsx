@@ -17,9 +17,8 @@ import { useEffect, useState } from "react";
 //     bestseller:true}
 
 function ProductCard({ title, picture, price, id }) {
-  const navigate = useNavigate();
   const [isHover, setIsHover] = useState(false);
-
+  const navigate = useNavigate();
   // const [isAddedToWishList, setIsAddedToWishList] = useState(false);
   // const addToWishListHandler = () => {
   //   setIsAddedToWishList(!isAddedToWishList);
@@ -89,7 +88,13 @@ function ProductCard({ title, picture, price, id }) {
           <h2>₹{price}</h2>
         </article>
         <div>
-          <button style={{ visibility: isHover === true && "visible" }}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate("/buy-now");
+            }}
+            style={{ visibility: isHover === true && "visible" }}
+          >
             Add to cart
           </button>
         </div>

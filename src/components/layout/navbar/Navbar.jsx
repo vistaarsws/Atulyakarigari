@@ -1,3 +1,4 @@
+import CART from "../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.png";
 import { NavLink, Link, useNavigate } from "react-router-dom";
@@ -288,6 +289,9 @@ export default function Navbar() {
           </form>
         )}
       </div>
+      <figure>
+        <img height={24} src={CART} alt="cart" />
+      </figure>
       <div
         className="profileBox"
         onMouseEnter={() => setIsProfileHovered(true)}
