@@ -17,8 +17,9 @@ const Payment = () => {
         justifyContent: "center",
         backgroundColor: "#f3f4f6",
         // border: "2px solid red",
-        boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
-        mr: 1,
+        // boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+        mr: { xs: 0 },
+
         height: "75vh",
         overflow: "scroll",
         scrollbarWidth: "none",
@@ -30,8 +31,8 @@ const Payment = () => {
           padding: 4,
           borderRadius: 2,
           boxShadow: 1,
-          maxWidth: "500px",
-          width: { md: "300px", lg: "500px" },
+          // maxWidth: "500px",
+          width: { md: "100%", lg: "500px" },
         }}
       >
         <Box sx={{ marginBottom: 3 }}>

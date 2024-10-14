@@ -38,6 +38,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   borderRadius: 8,
   backgroundColor: "#f4f4f4",
+
   maxWidth: "lg",
 }));
 
