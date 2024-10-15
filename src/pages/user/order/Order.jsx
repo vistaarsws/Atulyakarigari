@@ -209,6 +209,18 @@ export default function Component() {
                       (breakpoints.max768 && "0px") ||
                       (breakpoints.min769Max1024 && "0rem") ||
                       "3.2rem",
+                    boxShadow:
+                      currentImageIndex === index
+                        ? "0px 4px 10px rgba(0, 0, 0, 0.1)"
+                        : "none",
+                    // MODIFIED: Added transition for smooth shadow effect
+                    transition: "box-shadow 0.3s ease",
+                    // MODIFIED: Added border radius for consistent shadow shape
+                    borderRadius: "8px",
+                    // MODIFIED: Added padding to prevent content touching edges
+                    padding: "16px",
+                    // MODIFIED: Added cursor style to indicate clickable
+                    cursor: "pointer",
                   }}
                   onClick={() => handleArrowClick(index)}
                 >
