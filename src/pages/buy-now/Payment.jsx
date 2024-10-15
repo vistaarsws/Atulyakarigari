@@ -20,19 +20,24 @@ const Payment = () => {
         // boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
         mr: { xs: 0 },
 
-        height: "75vh",
-        overflow: "scroll",
+        // height: "75vh",
+        // overflow: "scroll",
+        height: { xs: "auto", md: "75vh" },
+        overflow: "auto",
         scrollbarWidth: "none",
       }}
     >
       <Box
         sx={{
           backgroundColor: "white",
-          padding: 4,
+          // padding: 4,
           borderRadius: 2,
           boxShadow: 1,
           // maxWidth: "500px",
-          width: { md: "100%", lg: "500px" },
+          // width: { md: "100%", lg: "500px" },
+          padding: { xs: 2, md: 4 },
+          // Full width on mobile, max-width on larger screens
+          width: "100%",
         }}
       >
         <Box sx={{ marginBottom: 3 }}>

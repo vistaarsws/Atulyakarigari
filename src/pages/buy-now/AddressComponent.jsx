@@ -1,24 +1,27 @@
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import React from "react";
 
 const AddressComponent = () => {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: "flex",
+        flexDirection: { xs: "column", sm: "row" },
         justifyContent: "space-between",
-        alignItems: "center",
+        alignItems: { xs: "flex-start", sm: "center" },
+        // alignItems: "center",
         backgroundColor: "#fff",
         marginBottom: "1rem",
         // border: "1px solid #e0e0e0",
       }}
     >
-      <div
-        style={{
+      <Box
+        sx={{
           fontSize: "14px",
           color: "#6f6f6f",
           lineHeight: "25px",
           fontWeight: 500,
+          mb: { xs: 2, sm: 0 },
         }}
       >
         <p>
@@ -33,7 +36,7 @@ const AddressComponent = () => {
           </strong>
         </p>
         <p>House number 140 Puja shree nagar cto Bairagarh, Bhopal</p>
-      </div>
+      </Box>
 
       <Button
         variant="outlined"
@@ -45,6 +48,7 @@ const AddressComponent = () => {
           fontSize: "16px",
           fontWeight: 400,
           textAlign: "left",
+          width: { xs: "100%", sm: "auto" },
           textTransform: "capitalize",
           "&:hover": {
             color: "#ffffff",
@@ -55,7 +59,7 @@ const AddressComponent = () => {
       >
         Change Address
       </Button>
-    </div>
+    </Box>
   );
 };
 

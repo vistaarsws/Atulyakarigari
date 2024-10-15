@@ -9,7 +9,7 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, useMediaQuery } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import TEST_IMG1 from "../../assets/images/banarshi sharee.png";
@@ -40,6 +40,9 @@ const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: "#f4f4f4",
 
   maxWidth: "lg",
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+  },
 }));
 
 const CloseButton = styled(IconButton)({
@@ -66,7 +69,19 @@ const QuantityButton = styled(Button)({
     backgroundColor: "#f5f5f5",
   },
 });
-
+const ProductImage = styled("img")(({ theme }) => ({
+  margin: "2rem",
+  objectFit: "contain",
+  height: "183px",
+  width: "149px",
+  // Added responsive styling for mobile
+  [theme.breakpoints.down("sm")]: {
+    height: "auto",
+    width: "100%",
+    maxHeight: "200px",
+    margin: "1rem 0",
+  },
+}));
 const productData = [
   {
     id: 1,
@@ -115,99 +130,110 @@ const productData = [
   // Add more product objects here if needed
 ];
 
-const ProductCard = ({ product }) => (
-  <StyledCard>
-    <img
-      style={{ margin: "2rem", objectFit: "contain" }}
-      height="183px"
-      width="149px"
-      src={product?.image}
-      alt={product?.name}
-    />
-    <CardContent sx={{ flex: 1 }}>
-      <CloseButton size="small">
-        <CloseIcon fontSize="small" />
-      </CloseButton>
-      <Typography
-        sx={{ fontWeight: 600, fontSize: "14px", color: "rgba(56, 55, 55, 1)" }}
-      >
-        {product?.name}
-      </Typography>
-      <Typography
-        variant="body2"
-        sx={{
-          color: "#6f6f6f",
-          fontSize: 12,
-          my: 1,
-          fontWeight: 400,
-          lineHeight: "18px",
-        }}
-      >
-        {product?.description}
-      </Typography>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 4, my: 2 }}>
+const ProductCard = ({ product }) => {
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  return (
+    <StyledCard>
+      <ProductImage src={product?.image} alt={product?.name} />{" "}
+      <CardContent sx={{ flex: 1 }}>
+        <CloseButton size="small">
+          <CloseIcon fontSize="small" />
+        </CloseButton>
         <Typography
           sx={{
-            color: "rgba(56, 55, 55, 1)",
             fontWeight: 600,
-            fontSize: "16px",
-            lineHeight: "21px",
+            // fontSize: "14px",
+            fontSize: isMobile ? "16px" : "14px",
+            color: "rgba(56, 55, 55, 1)",
           }}
         >
-          {product?.price?.toLocaleString()}
+          {product?.name}
         </Typography>
-        <QuantityContainer>
-          <QuantityButton variant="outlined">-</QuantityButton>
-          <Typography variant="outlined" fontSize="14px">
-            {product?.quantity}
-          </Typography>
-          <QuantityButton variant="outlined">+</QuantityButton>
-        </QuantityContainer>
-      </Box>
-      <Typography
-        variant="body2"
-        sx={{
-          mt: 1.5,
-          color: "text.secondary",
-          fontSize: "12px",
-          lineHeight: "21px",
-          fontWeight: 400,
-        }}
-      >
-        <span
-          style={{
-            fontWeight: 900,
-            color: "rgb(56, 55, 55)",
-            fontSize: "12px",
-          }}
-        >
-          {product.returnPeriod} Days{" "}
-        </span>
-        return available
-      </Typography>
-      <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-        <CheckIcon color="success" sx={{ fontSize: 18 }} />
         <Typography
           variant="body2"
-          sx={{ ml: 1, color: "#6f6f6f", fontSize: "12px", fontWeight: 400 }}
+          sx={{
+            color: "#6f6f6f",
+            // fontSize: 12,
+            fontSize: isMobile ? "14px" : "12px",
+            my: 1,
+            fontWeight: 400,
+            lineHeight: "18px",
+          }}
         >
-          Delivery Between
+          {product?.description}
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "flex-start" : "center",
+            gap: isMobile ? 2 : 4,
+            my: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              color: "rgba(56, 55, 55, 1)",
+              fontWeight: 600,
+              fontSize: "16px",
+              lineHeight: "21px",
+            }}
+          >
+            {product?.price?.toLocaleString()}
+          </Typography>
+          <QuantityContainer>
+            <QuantityButton variant="outlined">-</QuantityButton>
+            <Typography variant="outlined" fontSize="14px">
+              {product?.quantity}
+            </Typography>
+            <QuantityButton variant="outlined">+</QuantityButton>
+          </QuantityContainer>
+        </Box>
+        <Typography
+          variant="body2"
+          sx={{
+            mt: 1.5,
+            color: "text.secondary",
+            fontSize: "12px",
+            lineHeight: "21px",
+            fontWeight: 400,
+          }}
+        >
           <span
             style={{
               fontWeight: 900,
               color: "rgb(56, 55, 55)",
-              lineHeight: "21px",
               fontSize: "12px",
             }}
           >
-            {" "}
-            {product.deliveryDates}
+            {product.returnPeriod} Days{" "}
           </span>
+          return available
         </Typography>
-      </Box>
-    </CardContent>
-  </StyledCard>
-);
+        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+          <CheckIcon color="success" sx={{ fontSize: 18 }} />
+          <Typography
+            variant="body2"
+            sx={{ ml: 1, color: "#6f6f6f", fontSize: "12px", fontWeight: 400 }}
+          >
+            Delivery Between
+            <span
+              style={{
+                fontWeight: 900,
+                color: "rgb(56, 55, 55)",
+                lineHeight: "21px",
+                fontSize: "12px",
+              }}
+            >
+              {" "}
+              {product.deliveryDates}
+            </span>
+          </Typography>
+        </Box>
+      </CardContent>
+    </StyledCard>
+  );
+};
 
 const OrderCard = () => {
   return (
@@ -218,7 +244,8 @@ const OrderCard = () => {
           margin: "auto",
           padding: 2,
           bgcolor: "#fff",
-          height: "65vh",
+          // height: "65vh"
+          height: { xs: "auto", sm: "65vh" },
           overflow: "scroll",
           scrollbarWidth: "none",
         }}
