@@ -46,7 +46,7 @@ const Payment = () => {
           >
             Support Hardworking Artisans In India
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
+          {/* <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
             <FormControlLabel
               control={<Checkbox defaultChecked />}
               label="Donate and make a difference"
@@ -57,6 +57,41 @@ const Payment = () => {
                   lineHeight: "25px",
                   color: "rgb(56, 55, 55)",
                   backgroundColor: "fff",
+                },
+              }}
+            />
+          </Box> */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginTop: 1,
+              // No boxShadow property, so no shadow is applied
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  defaultChecked
+                  sx={{
+                    color: "rgb(56, 55, 55)", // default color for unchecked state
+                    "&.Mui-checked": {
+                      color: "rgb(76, 175, 80)", // green color for the checkmark
+                    },
+                    "& .MuiSvgIcon-root": {
+                      fontSize: 16, // adjust checkbox size to be smaller like the image
+                      boxShadow: "none",
+                    },
+                  }}
+                />
+              }
+              label="Donate and make a difference"
+              sx={{
+                ".MuiFormControlLabel-label": {
+                  fontSize: "13px", // adjust font size to closely match the image
+                  fontWeight: 400,
+                  lineHeight: "25px",
+                  color: "rgb(56, 55, 55)", // dark grey label color
                 },
               }}
             />
