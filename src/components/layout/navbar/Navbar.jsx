@@ -289,7 +289,7 @@ export default function Navbar() {
           </form>
         )}
       </div>
-      <figure>
+      <figure id="cartIcon_container">
         <img height={24} src={CART} alt="cart" />
       </figure>
       <div
