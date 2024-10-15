@@ -21,6 +21,10 @@
 
   &:hover {
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
+    article div:nth-of-type(3) svg path {
+      fill: #60a487;
+    }
   }
 
   article {
