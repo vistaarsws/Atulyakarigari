@@ -73,7 +73,7 @@ export default function Sidebar() {
         <Box
           sx={{
             height: "88vh",
-            outline: "1px solid black",
+            // outline: "1px solid black",
             overflowY: "scroll",
             scrollbarWidth: "none",
           }}
