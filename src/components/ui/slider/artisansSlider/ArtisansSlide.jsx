@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import "./ArtisansSlide.css";
+import leftQuote from "../../../../assets/images/quote-left-svgrepo-com.svg";
 
 function ArtisansSlide({ fullName, designation, story, picture }) {
   return (
@@ -13,6 +14,9 @@ function ArtisansSlide({ fullName, designation, story, picture }) {
           <img src={picture} alt="Artisan Picture" />
         </figure>
         <article>
+          <span>
+            <img src={leftQuote} alt="Quotation Mark" />
+          </span>
           <h3>Story</h3>
           <p>{story}</p>
         </article>
