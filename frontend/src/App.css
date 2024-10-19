@@ -1,0 +1,18 @@
+/* ------------------------------Carousel Style----------------------------------------------------- */
+.centerStyle > div:first-of-type {
+  transform: scale(1.2);
+  cursor: pointer;
+  z-index: 900 !important;
+  article:first-of-type {
+    background: transparent;
+  }
+
+  &:hover article:nth-of-type(2) {
+    background-color: #ad3f38;
+    color: white;
+    padding: 2rem;
+    z-index: 350;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------- */

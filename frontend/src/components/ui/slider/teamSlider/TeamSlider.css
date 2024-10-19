@@ -1,0 +1,80 @@
+.teamSlider_card {
+  position: relative;
+  height: 34rem;
+  width: 28rem;
+  transform: scale(0.75);
+  transition: 0.3s ease-in, width 0.3s ease-in, height 0.3s ease-in;
+}
+
+.teamSlider_card article:nth-of-type(2) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+.teamSlider_card article:nth-of-type(2) > div:first-of-type {
+  height: 1px;
+  width: 8rem;
+  background-color: rgba(109, 0, 29, 1);
+  margin: 1.3rem;
+}
+
+.teamSlider_card > article:first-of-type {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.6)
+  );
+}
+
+.teamSlider_card > article:first-of-type div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 5rem;
+  width: 100vw;
+  background-color: #ad3f38;
+  color: white;
+  z-index: 55;
+  padding: 1rem 2rem;
+}
+
+.teamSlider_card > article:first-of-type img {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.teamSlider_card > article:first-of-type div h1,
+.teamSlider_card > article:nth-of-type(2) h1 {
+  font-size: 3.2rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+}
+.teamSlider_card > article:first-of-type div h2,
+.teamSlider_card > article:nth-of-type(2) em {
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.teamSlider_card article:nth-of-type(2) p {
+  font-size: 1.4rem;
+  line-height: 2.1rem;
+}
+
+@media screen and (max-width: 1200px) {
+}
