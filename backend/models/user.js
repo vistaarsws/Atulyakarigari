@@ -79,7 +79,7 @@ userSchema.pre("save", async function (next) {
         next();
     } catch (error) {
         console.error("Error hashing password:", error);
-        next(new Error("Password hashing failed")); // Custom error message
+        next(new Error("Password hashing failed"));
     }
 });
 

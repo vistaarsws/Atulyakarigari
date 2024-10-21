@@ -27,7 +27,6 @@ export const badRequest = (request, response, err, message) => {
     });
 };
 
-
 export const unauthorized = (req, res, error = null, message = "Unauthorized access") => {
     res.status(401).json({
         error: true,
