@@ -1,12 +1,59 @@
+import otpGenerator from "otp-generator"
 import { success, badRequest, internalServerError, unauthorized } from "../../helpers/api-response.js";
 import User from "../../models/user.js";
+import Otp from "../../models/otp.js";
+
+// otp generator
+export const sendOtp = async (req, res) => {
+    try {
+        // fetch email
+        const { email } = req.body
+
+        // check if user is already exits
+        const checkUserPresent = await User.findOne({ email })
+
+        // if user already exit , return response
+        if (checkUserPresent) {
+            return badRequest(req, res, null, "Email already in use");
+        }
+
+        // generate otp
+        let otp = otpGenerator.generate(4, {
+            upperCaseAlphabets: false,
+            lowerCaseAlphabets: false,
+            specialChars: false
+        });
+        console.log(`generated otp are  : - > ${otp}`);
+
+        // check unique otp or not
+        let result = await Otp.findOne({ otp: otp })
+        while (result) {
+            otp = otpGenerator.generate(4, {
+                upperCaseAlphabets: false,
+                lowerCaseAlphabets: false,
+                specialChars: false
+            });
+            result = await Otp.findOne({ otp: otp })
+        }
+
+        // create an entry in db
+        const otpBody = await Otp.create({ email, otp })
+        return success(req, res, "otp sent successfully", {
+            email: otpBody.email,
+        })
+
+    } catch (err) {
+        console.log(`not able to generate otp  ${err}`)
+        return internalServerError(req, res, err, "unable to generate OTP")
+    }
+}
 
 export const register = async (req, res) => {
-    const { fullName, email, password, accountType } = req.body;
+    const { fullName, email, password, accountType, otp } = req.body;
 
     try {
         // Check if all required fields are provided
-        if (!fullName || !email || !password) {
+        if (!fullName || !email || !password || !otp) {
             return badRequest(req, res, null, "All required fields must be provided");
         }
 
@@ -23,6 +70,22 @@ export const register = async (req, res) => {
             return internalServerError(req, res, err, "Database query failed");
         }
 
+        // find most resent otp stored for the user 
+        const resentOtp = await Otp.find({ email }).sort({ createdAt: -1 }).limit(1)
+        console.log(`resentOtp : -> ${resentOtp}`);
+
+        // validate otp 
+        if (resentOtp.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "otp not found"
+            })
+        } else if (otp != resentOtp[0].otp) {
+            return res.status(400).json({
+                success: false,
+                message: "invalid otp"
+            })
+        }
 
         // Create a new user
         const newUser = new User({
