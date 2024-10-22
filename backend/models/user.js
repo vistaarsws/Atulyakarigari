@@ -11,15 +11,24 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true,
         trim: true,
-        unique: true
+        unique: true,
+        sparse: true
     },
-    password: {
+    phone: {
         type: String,
-        required: true,
-        trim: true
+        unique: true,
+        sparse: true
     },
+    isPhoneVerified: {
+        type: Boolean,
+        default: false
+    },
+    // password: {
+    //     type: String,
+    //     required: true,
+    //     trim: true
+    // },
     accountType: {
         type: String,
         required: true,
@@ -71,27 +80,26 @@ const userSchema = new mongoose.Schema({
     }
 )
 
-userSchema.pre("save", async function (next) {
-    console.log("pass word hash");
-    if (!this.isModified("password")) return next();
-    try {
-        this.password = await bcrypt.hash(this.password, 10);
-        next();
-    } catch (error) {
-        console.error("Error hashing password:", error);
-        next(new Error("Password hashing failed"));
-    }
-});
+// userSchema.pre("save", async function (next) {
+//     if (!this.isModified("password")) return next();
+//     try {
+//         this.password = await bcrypt.hash(this.password, 10);
+//         next();
+//     } catch (error) {
+//         console.error("Error hashing password:", error);
+//         next(new Error("Password hashing failed"));
+//     }
+// });
 
 userSchema.methods = {
-    comparePassword: async function (password) {
-        try {
-            return await bcrypt.compare(password, this.password);
-        } catch (error) {
-            console.error("Error comparing password:", error);
-            throw new Error("Password comparison failed");
-        }
-    },
+    // comparePassword: async function (password) {
+    //     try {
+    //         return await bcrypt.compare(password, this.password);
+    //     } catch (error) {
+    //         console.error("Error comparing password:", error);
+    //         throw new Error("Password comparison failed");
+    //     }
+    // },
     generateAuthToken: function () {
         try {
             const payload = {
@@ -106,7 +114,7 @@ userSchema.methods = {
             );
         } catch (error) {
             console.error("Error generating token:", error);
-            throw new Error("Auth token generation failed"); // Custom error message
+            throw new Error("Auth token generation failed");
         }
     },
     generateTemporaryToken: function () {
@@ -119,7 +127,7 @@ userSchema.methods = {
             return token;
         } catch (error) {
             console.error("Error generating temporary token:", error);
-            throw new Error("Temporary token generation failed"); // Custom error message
+            throw new Error("Temporary token generation failed");
         }
     }
 };
