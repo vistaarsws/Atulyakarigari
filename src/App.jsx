@@ -19,6 +19,8 @@ import Wishlist from "./pages/user/wishlist/Wishlist";
 import Logout from "./pages/user/logout/Logout";
 import Artisans from "./pages/artisans/Artisans";
 import BuyNow from "./pages/buy-now/index";
+import Login from "./pages/user/login/login";
+
 export default function App() {
   return (
     <>
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="/artisans" element={<Artisans />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/buy-now" element={<BuyNow />} />
+
+          <Route path="/login" element={<Login />} />
 
           <Route path="/user" element={<User />}>
             <Route path="orders" element={<Order />} />
