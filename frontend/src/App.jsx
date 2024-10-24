@@ -7,6 +7,7 @@ import Footer from "./components/layout/footer/Footer";
 
 import Home from "./pages/home/Home";
 import About from "./pages/about/About";
+import Categories from "./pages/categories/index";
 import Blogs from "./pages/blogs/Blogs";
 import Product from "./pages/product/Product";
 
@@ -32,6 +33,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/categories" element={<Categories />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/artisans" element={<Artisans />} />
           <Route path="/product/:id" element={<Product />} />
