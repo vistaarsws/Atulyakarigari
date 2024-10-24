@@ -1,8 +1,10 @@
-import otpGenerator from "otp-generator"
 import { success, badRequest, internalServerError, unauthorized } from "../../helpers/api-response.js";
 import User from "../../models/user.js";
 import Otp from "../../models/emailOtp.js";
 import SmsOtp from "../../models/smsOtp.js";
+import { ensureUniqueOtp } from "../../utils/otp/index.js";
+
+
 
 // EMAIL OTP generator
 export const sendEmailOtp = async (req, res) => {
@@ -21,23 +23,8 @@ export const sendEmailOtp = async (req, res) => {
         }
 
         // generate otp
-        let otp = otpGenerator.generate(4, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false
-        });
-        console.log(`generated otp are  : - > ${otp}`);
-
-        // check unique otp or not
-        let result = await Otp.findOne({ otp: otp })
-        while (result) {
-            otp = otpGenerator.generate(4, {
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets: false,
-                specialChars: false
-            });
-            result = await Otp.findOne({ otp: otp })
-        }
+        const otp = await ensureUniqueOtp(Otp);
+        console.log(`Generated OTP is: -> ${otp}`);
 
         // create an entry in db
         let otpBody
@@ -45,8 +32,8 @@ export const sendEmailOtp = async (req, res) => {
             otpBody = await Otp.create({ email, otp })
         } catch (error) {
             return badRequest(req, res, error, "Email service error");
-
         }
+
         return success(req, res, "otp sent successfully", {
             email: otpBody.email,
         })
@@ -141,9 +128,18 @@ export const login = async (req, res) => {
                 const user = await User.findOne({ phone: loginId });
                 if (user) {
                     // Generate OTP here (this is just a placeholder)
-                    const otp = Math.floor(100000 + Math.random() * 900000);
+                    const otp = await ensureUniqueOtp(SmsOtp);
                     // Send OTP via SMS logic goes here
-                    return res.status(200).json({ message: 'OTP generated', otp });
+                    let otpBody
+                    try {
+                        otpBody = await SmsOtp.create({ phone, otp });
+                    } catch (err) {
+                        return internalServerError(req, res, err, "SMS service error");
+                    }
+
+                    return success(req, res, "OTP sent successfully", {
+                        phone: otpBody.phone,
+                    });
                 } else {
                     return res.status(404).json({ message: 'Please register first' });
                 }
@@ -154,16 +150,29 @@ export const login = async (req, res) => {
             // Email case
             try {
                 const user = await User.findOne({ email: loginId });
+                console.log(user);
+
                 if (user) {
                     // Generate OTP here (this is just a placeholder)
-                    const otp = Math.floor(100000 + Math.random() * 900000);
+                    const otp = await ensureUniqueOtp(Otp);
+                    try {
+                        otpBody = await Otp.create({ loginId, otp });
+                    } catch (err) {
+                        console.log(err);
+
+                        return internalServerError(req, res, err, "SMS service error");
+                    }
                     // Send OTP via email logic goes here
-                    return res.status(200).json({ message: 'OTP generated', otp });
+                    return success(req, res, "OTP sent successfully", {
+                        email: otpBody.email,
+                    });
                 } else {
-                    return res.status(404).json({ message: 'Please register first' });
+                    return unauthorized(req, res, error, 'Please register first');
                 }
             } catch (error) {
-                return res.status(500).json({ message: 'Server error' });
+                console.log(error);
+
+                return internalServerError(req, res, error, "server error");
             }
         } else {
             return internalServerError(req, res, null, "Invalid login Id format")
@@ -191,23 +200,8 @@ export const sendSmsOtp = async (req, res) => {
         }
 
         // generate otp
-        let otp = otpGenerator.generate(4, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false
-        });
+        const otp = await ensureUniqueOtp(Otp);
         console.log(`Generated OTP is: -> ${otp}`);
-
-        // check unique otp
-        let result = await SmsOtp.findOne({ otp: otp });
-        while (result) {
-            otp = otpGenerator.generate(4, {
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets: false,
-                specialChars: false
-            });
-            result = await SmsOtp.findOne({ otp: otp });
-        }
 
         // create an entry in db
         let otpBody
