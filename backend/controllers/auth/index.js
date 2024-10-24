@@ -1,8 +1,10 @@
-import otpGenerator from "otp-generator"
 import { success, badRequest, internalServerError, unauthorized } from "../../helpers/api-response.js";
 import User from "../../models/user.js";
 import Otp from "../../models/emailOtp.js";
 import SmsOtp from "../../models/smsOtp.js";
+import { ensureUniqueOtp } from "../../utils/otp/index.js";
+
+
 
 // EMAIL OTP generator
 export const sendEmailOtp = async (req, res) => {
@@ -21,23 +23,8 @@ export const sendEmailOtp = async (req, res) => {
         }
 
         // generate otp
-        let otp = otpGenerator.generate(4, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false
-        });
-        console.log(`generated otp are  : - > ${otp}`);
-
-        // check unique otp or not
-        let result = await Otp.findOne({ otp: otp })
-        while (result) {
-            otp = otpGenerator.generate(4, {
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets: false,
-                specialChars: false
-            });
-            result = await Otp.findOne({ otp: otp })
-        }
+        const otp = await ensureUniqueOtp(Otp);
+        console.log(`Generated OTP is: -> ${otp}`);
 
         // create an entry in db
         let otpBody
@@ -45,8 +32,8 @@ export const sendEmailOtp = async (req, res) => {
             otpBody = await Otp.create({ email, otp })
         } catch (error) {
             return badRequest(req, res, error, "Email service error");
-
         }
+
         return success(req, res, "otp sent successfully", {
             email: otpBody.email,
         })
@@ -58,11 +45,11 @@ export const sendEmailOtp = async (req, res) => {
 }
 // Register with EMAIL OTP
 export const registerWithEmail = async (req, res) => {
-    const { fullName, email, password, accountType, otp } = req.body;
+    const { fullName, email, accountType, otp } = req.body;
 
     try {
         // Check if all required fields are provided
-        if (!fullName || !email || !password || !otp || !accountType) {
+        if (!fullName || !email || !otp || !accountType) {
             return badRequest(req, res, null, "All required fields must be provided");
         }
 
@@ -94,7 +81,6 @@ export const registerWithEmail = async (req, res) => {
         const newUser = new User({
             fullName,
             email,
-            password,
             accountType,
         });
 
@@ -126,66 +112,77 @@ export const registerWithEmail = async (req, res) => {
         return internalServerError(req, res, err, "User registration failed");
     }
 };
+const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+};
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
-
     try {
-        // Check if both email and password are provided
-        if (!email || !password) {
-            return badRequest(req, res, null, "Email and password must be provided");
-        }
+        const { loginId } = req.body;
 
-        // Check if the user exists
-        let user;
-        try {
-            user = await User.findOne({ email });
-            if (!user) {
-                console.log(`User not found for email: ${email}`);
-                return unauthorized(req, res, null, "Invalid email ");
+        // Check if loginId is a mobile number or email
+        if (loginId.startsWith('+91') && loginId.length === 13) {
+            // Mobile number case
+            try {
+                const user = await User.findOne({ phone: loginId });
+                if (user) {
+                    // Generate OTP here (this is just a placeholder)
+                    const otp = await ensureUniqueOtp(SmsOtp);
+                    // Send OTP via SMS logic goes here
+                    let otpBody
+                    try {
+                        otpBody = await SmsOtp.create({ phone, otp });
+                    } catch (err) {
+                        return internalServerError(req, res, err, "SMS service error");
+                    }
+
+                    return success(req, res, "OTP sent successfully", {
+                        phone: otpBody.phone,
+                    });
+                } else {
+                    return res.status(404).json({ message: 'Please register first' });
+                }
+            } catch (error) {
+                return res.status(500).json({ message: 'Server error' });
             }
-        } catch (err) {
-            console.error("Error querying user from database:", err);
-            return internalServerError(req, res, err, "Database query failed");
-        }
+        } else if (validateEmail(loginId)) {
+            // Email case
+            try {
+                const user = await User.findOne({ email: loginId });
+                console.log(user);
 
-        // Compare the provided password with the hashed password in the database
-        let isPasswordValid;
-        try {
-            isPasswordValid = await user.comparePassword(password, user.password);
-            if (!isPasswordValid) {
-                console.log("Invalid password attempt for user:", email);
-                return unauthorized(req, res, null, "Invalid password");
+                if (user) {
+                    // Generate OTP here (this is just a placeholder)
+                    const otp = await ensureUniqueOtp(Otp);
+                    try {
+                        otpBody = await Otp.create({ loginId, otp });
+                    } catch (err) {
+                        console.log(err);
+
+                        return internalServerError(req, res, err, "SMS service error");
+                    }
+                    // Send OTP via email logic goes here
+                    return success(req, res, "OTP sent successfully", {
+                        email: otpBody.email,
+                    });
+                } else {
+                    return unauthorized(req, res, error, 'Please register first');
+                }
+            } catch (error) {
+                console.log(error);
+
+                return internalServerError(req, res, error, "server error");
             }
-        } catch (err) {
-            console.error("Error comparing passwords:", err);
-            return internalServerError(req, res, err, "Password comparison failed");
+        } else {
+            return internalServerError(req, res, null, "Invalid login Id format")
         }
-
-        // Generate JWT token
-        let token;
-        try {
-            token = user.generateAuthToken();
-        } catch (err) {
-            console.error("Error generating JWT token:", err);
-            return internalServerError(req, res, err, "Token generation failed");
-        }
-
-        // Return success response with token
-        return success(req, res, "successfully login", {
-            user: {
-                _id: user?._id,
-                fullName: user?.fullName,
-                email: user?.email,
-                accountType: user?.accountType,
-                token
-            }
-        });
     } catch (err) {
-        console.error("Unexpected error in login:", err);
-        return internalServerError(req, res, err, "Login failed");
+        return internalServerError(req, res, err, "Unable to Login");
     }
-};
+
+}
+
 
 // SMS OTP generator
 export const sendSmsOtp = async (req, res) => {
@@ -203,23 +200,8 @@ export const sendSmsOtp = async (req, res) => {
         }
 
         // generate otp
-        let otp = otpGenerator.generate(4, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false
-        });
+        const otp = await ensureUniqueOtp(Otp);
         console.log(`Generated OTP is: -> ${otp}`);
-
-        // check unique otp
-        let result = await SmsOtp.findOne({ otp: otp });
-        while (result) {
-            otp = otpGenerator.generate(4, {
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets: false,
-                specialChars: false
-            });
-            result = await SmsOtp.findOne({ otp: otp });
-        }
 
         // create an entry in db
         let otpBody
@@ -241,11 +223,11 @@ export const sendSmsOtp = async (req, res) => {
 
 // Register with SMS OTP
 export const registerWithPhone = async (req, res) => {
-    const { fullName, phone, password, accountType, otp } = req.body;
+    const { fullName, phone, accountType, otp } = req.body;
 
     try {
         // Check if all required fields are provided
-        if (!fullName || !phone || !password || !otp || !accountType) {
+        if (!fullName || !phone || !otp || !accountType) {
             return badRequest(req, res, null, "All required fields must be provided");
         }
 
@@ -277,7 +259,6 @@ export const registerWithPhone = async (req, res) => {
         const newUser = new User({
             fullName,
             phone,
-            password,
             accountType,
             isPhoneVerified: true
         });
