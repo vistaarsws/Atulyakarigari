@@ -1,0 +1,75 @@
+.artisans_container {
+  & > section:first-of-type {
+    background-color: #60a487;
+    color: white;
+    padding: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    figure {
+      margin: 2.4rem 1rem;
+    }
+
+    h2 {
+      font-size: 3.2rem;
+      font-weight: 300;
+    }
+
+    p {
+      font-size: 1.6rem;
+      font-weight: 500;
+      width: 80%;
+      text-align: center;
+      line-height: 2.2rem;
+    }
+  }
+
+  section:nth-of-type(2) {
+    .navigationArrows_container {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      padding: 0 3%;
+
+      button {
+        border: none;
+      }
+    }
+
+    .embla__dots {
+      position: absolute;
+      top: 5%;
+      height: max-content;
+    }
+  }
+
+  section:nth-of-type(3) {
+    margin: 5% auto;
+    h2 {
+      font-size: 3.2rem;
+      font-weight: 300;
+      margin: 3rem 1rem;
+      text-align: center;
+    }
+
+    div {
+      height: 80vh;
+    }
+  }
+}
+
+.artisans_heroBanner {
+  background-image: url(../../assets/images/artisansBanner.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center top;
+  height: 34vw;
+  display: flex;
+  justify-content: center;
+  align-items: top;
+  padding-top: 13%;
+}
