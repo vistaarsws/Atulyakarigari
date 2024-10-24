@@ -19,7 +19,7 @@ import Wishlist from "./pages/user/wishlist/Wishlist";
 import Logout from "./pages/user/logout/Logout";
 import Artisans from "./pages/artisans/Artisans";
 import BuyNow from "./pages/buy-now/index";
-import Login from "./pages/user/login/login";
+import Login from "./pages/auth/login/login";
 
 export default function App() {
   return (
