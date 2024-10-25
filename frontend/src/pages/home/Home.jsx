@@ -1,7 +1,7 @@
 import "./Home.css";
 import { EmblaSlider } from "../../components/ui/slider/EmblaSlider";
 import { HeroBanner_array } from "../../utils/Constant";
-import artistry_1 from "../../assets/images/artistry_1.png";
+import artistry_1 from "../../assets/images/cat5_2.png";
 import artistry_2 from "../../assets/images/artistry_2.png";
 import artistry_3 from "../../assets/images/artistry_3.png";
 import bg_pattern from "../../assets/images/bgSidePattern.svg";

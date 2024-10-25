@@ -3,6 +3,7 @@ import "./ProductCard.css";
 import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro_elements/wishListHeartIcon/wishListHeartIcon";
 import { useEffect, useState } from "react";
+import rating_star from "../../../../assets/images/ratingStar.svg";
 
 // const productReference = {
 //     _id: "aaaaa",
@@ -16,7 +17,14 @@ import { useEffect, useState } from "react";
 //     date: 1716634345448,
 //     bestseller:true}
 
-function ProductCard({ title, picture, price, id }) {
+function ProductCard({
+  title,
+  shortDescription = "Traditional Banarasi elegance for a glow.",
+  picture,
+  price,
+  offer_inPercent = 12,
+  id,
+}) {
   const [isHover, setIsHover] = useState(false);
   const navigate = useNavigate();
   // const [isAddedToWishList, setIsAddedToWishList] = useState(false);
@@ -46,13 +54,17 @@ function ProductCard({ title, picture, price, id }) {
           navigate(`/product/${id}`);
         }}
       >
+        <div className="rating_box">
+          <div>4.5</div>
+          <figure>
+            <img src={rating_star} alt="Rating Star" />
+          </figure>
+        </div>
         <section>
-          <div style={{}}>
-            {" "}
+          <div>
             <WishListHeartIcon />
           </div>
-
-          {/* <div>
+          <div>
             <input
               type="checkbox"
               id="quickView"
@@ -73,7 +85,7 @@ function ProductCard({ title, picture, price, id }) {
                 />
               </svg>
             </label>
-          </div> */}
+          </div>
         </section>
         <figure>
           <img
@@ -84,8 +96,12 @@ function ProductCard({ title, picture, price, id }) {
         </figure>
         <article>
           <h1>{title}</h1>
-          <hr />
-          <h2>₹{price}</h2>
+          <p>{shortDescription}</p>
+          <div>
+            <h2>₹{price - price * offer_inPercent * 0.01}</h2>
+            <strike>₹{price}</strike>
+            <h4>({offer_inPercent} % OFF)</h4>
+          </div>
         </article>
         <div>
           <button

@@ -3,105 +3,137 @@
   max-width: max-content;
   width: 100%;
   height: max-content;
-  padding: 2rem;
+  padding: 1rem;
   background-color: #f4f4f4;
+  border-radius: 0.6rem !important;
+  &:hover {
+    background-color: #fff;
+    box-shadow: rgb(149 157 165 / 0.2) 0 8px 24px;
+    & > figure:first-of-type img {
+      transform: scale(1.5);
+    }
+    section {
+      display: flex;
+    }
+    & > div button {
+      visibility: visible;
+    }
+    article {
+      & > p {
+        visibility: hidden;
+      }
+      div {
+        visibility: hidden;
+      }
+    }
+  }
 }
-
-.productCard_container:hover {
-  background-color: white;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+.rating_box {
+  background-color: rgb(0 0 0 / 0.3);
+  backdrop-filter: blur(4px);
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 100;
   border-radius: 0.4rem;
-
-  figure img {
-    transform: scale(1.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  font-size: 1.2rem;
+  padding: 0.6rem 0.6rem;
+  & > div:first-of-type {
+    font-weight: 500;
+    color: #fff;
   }
-
-  section {
+  & > figure {
     display: flex;
-  }
-
-  > div:first-of-type {
-    visibility: visible;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
   }
 }
-.productCard_container figure {
+.productCard_container > figure:first-of-type {
   height: 70%;
   overflow: hidden;
+  & > img {
+    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
-
-.productCard_container figure img {
-  transition: transform 0.3s ease;
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
-.productCard_container article {
+.productCard_container > article {
   height: 20%;
   font-weight: 400;
   letter-spacing: 3%;
   color: #383737;
-}
-.productCard_container article h1 {
-  font-size: 1.4rem;
-  margin-top: 0.9rem;
-}
-
-.productCard_container article hr {
-  margin: 1.5rem 0;
-  height: 0.5px;
-  border: none;
-  background-color: #f7dfd4;
-}
-.productCard_container article h2 {
-  font-size: 1.8rem;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
-}
-
-.productCard_container > div:first-of-type {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 10%;
-  visibility: hidden;
-}
-
-.productCard_container div button {
-  background-color: #60a487;
-  font-size: 1.4rem;
-  width: 100%;
-  padding: 1.4rem 2.5rem;
-  border-radius: 0.6rem;
-  border: none;
-  cursor: pointer;
-  color: white;
-
-  &:hover {
-    background-color: rgb(20, 175, 108);
+  & > h1 {
+    font-size: 1.4rem;
+    margin-top: 0.9rem;
+  }
+  & > p {
+    font-size: 1.4rem;
+    margin: 1rem auto;
   }
 }
-
-.productCard_container section {
+.productCard_container article > div {
+  display: flex;
   align-items: center;
+  gap: 1rem;
+  & > h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+  }
+  & > strike {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: silver;
+  }
+  & > h4 {
+    font-size: 1.2rem;
+    color: rgb(96 164 135);
+  }
+}
+.productCard_container > div:last-of-type {
   position: absolute;
-  top: 3rem;
-  right: 3rem;
+  bottom: 1rem;
+  visibility: hidden;
+  width: 100%;
+  button {
+    background-color: #60a487;
+    font-size: 1.4rem;
+    width: calc(100% - 20px);
+    padding: 1.4rem 2.5rem;
+    border-radius: 0.6rem;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    &:hover {
+      background-color: #46846a;
+    }
+  }
+}
+.productCard_container > section:first-of-type {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
   z-index: 100;
 }
-.productCard_container section > div {
+.productCard_container > section > div {
+  background-color: #f4f4f4;
   height: 2.4rem;
   width: 2.4rem;
   position: relative;
   border-radius: 3rem;
-  background-color: rgb(255, 255, 255);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0.5rem;
   cursor: pointer;
 }
-
 @media screen and (max-width: 425px) {
   .productCard_container {
     padding: 1rem;

@@ -18,7 +18,7 @@
   text-align: center;
 }
 
-.productCategorySection_container > section > div:first-of-type {
+.productCategorySection_container > div:first-of-type {
   display: flex;
   justify-content: end;
 
