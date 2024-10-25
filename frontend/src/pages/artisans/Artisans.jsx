@@ -1,5 +1,4 @@
 import "./Artisans.css";
-import wingPattern from "../../assets/images/wingPattern_white.svg";
 import { EmblaSlider } from "../../components/ui/slider/EmblaSlider";
 import ArtisansSlide from "../../components/ui/slider/artisansSlider/ArtisansSlide";
 import { artisans } from "../../utils/Constant";
@@ -22,9 +21,7 @@ export default function Artisans() {
       <figure className="artisans_heroBanner"></figure>
       <section>
         <h2>Meet Our Artisans: The Heart of Atulya Karigari</h2>
-        <figure>
-          <img src={wingPattern} alt="Design Pattern" />
-        </figure>
+        <figure>{/* <img src={wingPattern} alt="Design Pattern" /> */}</figure>
         <p>
           At Atulya Karigari, our artisans are the soul behind every
           masterpiece. Each piece they create tells a story of heritage,

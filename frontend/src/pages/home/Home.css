@@ -98,7 +98,7 @@ button {
   flex: 1 !important;
 }
 
-.product_section_1 div {
+.product_section_1 > div {
   background-color: #f4f4f4;
 }
 
