@@ -18,7 +18,7 @@ const Index = () => {
             minWidth: "250px",
           }}
         >
-          <BanarsiSilkFilter style={{ width: "500px" }} />
+          <BanarsiSilkFilter />
         </div>
         <div
           style={{
@@ -27,7 +27,7 @@ const Index = () => {
             width: "100%",
             justifyContent: "center",
             alignItems: "center",
-            gap: "30px",
+            // gap: "30px",
             height: "89vh",
             overflow: "scroll",
             scrollbarWidth: "none",
