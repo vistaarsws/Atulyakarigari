@@ -237,17 +237,24 @@
   font-weight: 300;
 }
 
-@media screen and (max-width: 1644px) {
+@media screen and (max-width: 1200px) {
   .about_sec-2 {
     display: grid;
     grid-template-columns: 1fr;
+
+    &::after,
+    &::before {
+      display: none;
+    }
   }
   .about_sec-2 > div:first-of-type {
     order: 2;
     gap: 2rem;
+    width: 100%;
   }
   .about_sec-2 > div:nth-of-type(2) {
     order: 1;
+    width: 100%;
   }
 }
 
