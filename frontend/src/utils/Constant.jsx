@@ -6,7 +6,7 @@ import team_1 from "../assets/images/team_1.png";
 import artisan_1 from "../assets/images/artisan_1.png";
 import artisan_2 from "../assets/images/artisan_2.png";
 
-import ourCollections_1 from "../assets/images/ourCollections_1.png";
+import ourCollections_1 from "../assets/images/cat5_2.png";
 import ourCollections_2 from "../assets/images/ourCollections_2.png";
 import ourCollections_3 from "../assets/images/ourCollections_3.png";
 
@@ -137,7 +137,7 @@ const ourCollections = [
     collection_description:
       "Intricate designs crafted by artisans, celebrating the timeless elegance.",
     picture: ourCollections_3,
-    hoverBgColor: "rgba(211, 170, 157, 1)",
+    hoverBgColor: "#d3aa9d",
   },
 ];
 

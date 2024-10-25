@@ -4,9 +4,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 2rem 3%;
+  background-color: rgba(109, 0, 29, 1);
 
-  figure {
+  & > figure {
     margin-right: 3%;
+  }
+
+  & > figure:nth-of-type(2) {
+    margin-left: auto;
   }
 
   & > div:nth-of-type(2) {
@@ -32,14 +37,18 @@
 
       & > a {
         text-decoration: none;
-        color: #9f9f9f;
+        color: rgba(181, 111, 130, 1);
 
         &:hover {
-          color: #383737;
+          color: rgba(255, 255, 240, 1);
         }
       }
     }
   }
+}
+
+#cartIcon_container {
+  margin-inline: 1.5rem;
 }
 
 .hidden {
@@ -150,7 +159,7 @@
 .form button {
   border: none;
   background: none;
-  color: #8b8ba7;
+  color: rgba(181, 111, 130, 1);
 }
 
 .form {
@@ -158,7 +167,7 @@
   --width-of-input: 220px;
   --height-of-input: 5vh;
   --border-height: 2px;
-  --input-bg: #fff;
+  --input-bg: transparent;
   --border-color: #6d001d;
   --after-border-radius: 1px;
   position: relative;
@@ -180,10 +189,11 @@
   border: none;
   padding: 0 0.5rem 0 0.5rem;
   border-radius: 0;
+  color: white;
 }
 
 .input::placeholder {
-  color: #bbbbbb;
+  color: rgba(181, 111, 130, 1);
   font-size: 1.4rem;
 }
 

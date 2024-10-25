@@ -32,6 +32,7 @@ import cat5_3 from "../../assets/images/cat5_3.png";
 import cat5_4 from "../../assets/images/cat5_4.png";
 import cat5_5 from "../../assets/images/cat5_5.png";
 import cat5_6 from "../../assets/images/cat5_1.png";
+import CategoryView from "../../components/layout/categoryView/CategoryView";
 
 export default function Home() {
   const top_product_list_from_category_1 = {
@@ -237,6 +238,7 @@ export default function Home() {
           navigationDots={true}
         />
       </section>
+      <CategoryView />
 
       <section className="product_section_1">
         <ProductSection
