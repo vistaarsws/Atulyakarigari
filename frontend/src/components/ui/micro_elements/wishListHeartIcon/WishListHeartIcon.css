@@ -2,7 +2,7 @@
   position: relative;
 }
 
-label {
+.wishListHeart_box > label {
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -12,7 +12,7 @@ label {
   color: black;
 }
 
-input[type="checkbox"] {
+.wishListHeart_box > input[type="checkbox"] {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -27,12 +27,12 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-label svg {
+.wishListHeart_box > label svg {
   fill: #6f6f6f;
   background-color: white;
 }
 
-input[type="checkbox"]:checked + label svg {
+.wishListHeart_box > input[type="checkbox"]:checked + label svg {
   fill: hsl(0deg 100% 50%);
   animation: heartButton 800ms;
 }
@@ -75,13 +75,13 @@ input[type="checkbox"]:checked + label svg {
   }
 } */
 
-input[type="checkbox"] + label .action {
+.wishListHeart_box > input[type="checkbox"] + label .action {
   position: relative;
   overflow: hidden;
   display: grid;
 }
 
-input[type="checkbox"] + label .action span {
+.wishListHeart_box > input[type="checkbox"] + label .action span {
   grid-column-start: 1;
   grid-column-end: 1;
   grid-row-start: 1;
@@ -89,22 +89,30 @@ input[type="checkbox"] + label .action span {
   transition: all 0.5s;
 }
 
-input[type="checkbox"] + label .action span.option-1 {
+.wishListHeart_box > input[type="checkbox"] + label .action span.option-1 {
   transform: translate(0px, 0%);
   opacity: 1;
 }
 
-input[type="checkbox"]:checked + label .action span.option-1 {
+.wishListHeart_box
+  > input[type="checkbox"]:checked
+  + label
+  .action
+  span.option-1 {
   transform: translate(0px, -100%);
   opacity: 0;
 }
 
-input[type="checkbox"] + label .action span.option-2 {
+.wishListHeart_box > input[type="checkbox"] + label .action span.option-2 {
   transform: translate(0px, 100%);
   opacity: 0;
 }
 
-input[type="checkbox"]:checked + label .action span.option-2 {
+.wishListHeart_box
+  > input[type="checkbox"]:checked
+  + label
+  .action
+  span.option-2 {
   transform: translate(0px, 0%);
   opacity: 1;
 }

@@ -1,6 +1,6 @@
 import CART from "../../../assets/images/cart.svg";
 import "./Navbar.css";
-import headerLogo from "../../../assets/images/headerLogo.png";
+import headerLogo from "../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
@@ -289,41 +289,44 @@ export default function Navbar() {
           </form>
         )}
       </div>
-      <figure id="cartIcon_container">
-        <img height={24} src={CART} alt="cart" />
-      </figure>
-      <div
-        className="profileBox"
-        onMouseEnter={() => setIsProfileHovered(true)}
-        onMouseLeave={() => setIsProfileHovered(false)}
-      >
-        <img src={userProfile} alt="User Profile" />
-        {isProfileHovered && (
-          <div className="profile-dropdown">
-            <div
-              onClick={() => {
-                navigate("/user/profile");
-                setIsProfileHovered(false);
-              }}
-            >
-              <p>Hello, Savvy Srivastava</p>
-              <p>8175961513</p>
+      <div>
+        <figure id="cartIcon_container">
+          <img height={24} src={CART} alt="cart" />
+        </figure>
+        <div
+          className="profileBox"
+          onMouseEnter={() => setIsProfileHovered(true)}
+          onMouseLeave={() => setIsProfileHovered(false)}
+        >
+          <img src={userProfile} alt="User Profile" />
+          {isProfileHovered && (
+            <div className="profile-dropdown">
+              <div
+                onClick={() => {
+                  navigate("/user/profile");
+                  setIsProfileHovered(false);
+                }}
+              >
+                <p>Hello, Savvy Srivastava</p>
+                <p>8175961513</p>
+              </div>
+              <ul>
+                {menuItems.map((item, index) => (
+                  <li key={index}>
+                    <Link
+                      onClick={() => setIsProfileHovered(false)}
+                      to={item.link}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul>
-              {menuItems.map((item, index) => (
-                <li key={index}>
-                  <Link
-                    onClick={() => setIsProfileHovered(false)}
-                    to={item.link}
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
       <div className="nav-mobile">
         <button
           id="navbar-toggle"
