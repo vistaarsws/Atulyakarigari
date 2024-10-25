@@ -26,15 +26,17 @@
     border: none;
     font-size: 1.6rem;
     font-weight: 500;
-    color: #60a487;
+    color: rgba(109, 0, 29, 1);
     cursor: pointer;
     padding: 1rem 2rem;
-    background-color: transparent;
+    background-color: rgba(244, 244, 244, 1);
+    border: 1px solid rgba(244, 244, 244, 1);
+    border-radius: 0.4rem;
 
     &:hover,
     &:focus,
     &:link {
-      color: #6dbd9a;
+      border: 1px solid rgba(109, 0, 29, 0.2);
     }
   }
 }

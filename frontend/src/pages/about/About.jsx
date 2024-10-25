@@ -2,8 +2,8 @@ import "./About.css";
 import aboutImg_1 from "../../assets/images/aboutImg_1.png";
 import aboutImg_2 from "../../assets/images/aboutImg_2.png";
 import { EmblaSlider } from "../../components/ui/slider/EmblaSlider";
-import { ourTeam_array, ourCollections } from "../../utils/Constant";
-import rightArrow from "../../assets/images/rightArrow.svg";
+import { ourTeam_array } from "../../utils/Constant";
+import CategoryView from "../../components/layout/categoryView/CategoryView";
 
 export default function About() {
   return (
@@ -44,31 +44,29 @@ export default function About() {
       </article>
       <article className="about_sec-2">
         <div>
-          <div>
-            <h2>Our Journey</h2>
-            <p>
-              Atulyakarigari invites you to join us on a remarkable journey, a
-              celebration of SILK in its purest form. Our collection includes
-              handcrafted wedding outfits made from the finest Khandua SILK,
-              adorned with intricate pattachitra paintings, as well as exquisite
-              Banarsi SILK Lehengas, complemented by pure organza silk, and
-              crowned with the elegance of Zardozi Lehengas.
-            </p>
-          </div>
-          <div>
-            <h2>Why Choose Us?</h2>
-            <p>
-              By choosing Atulyakarigari, you become a part of our mission to
-              bring smiles to the faces of immensely talented weavers and
-              artisans. Together, we can make a difference in preserving India’s
-              artistic heritage and empowering its female artisans.
-            </p>
-          </div>
+          <h2>Our Journey</h2>
+          <p>
+            Atulyakarigari invites you to join us on a remarkable journey, a
+            celebration of SILK in its purest form. Our collection includes
+            handcrafted wedding outfits made from the finest Khandua SILK,
+            adorned with intricate pattachitra paintings, as well as exquisite
+            Banarsi SILK Lehengas, complemented by pure organza silk, and
+            crowned with the elegance of Zardozi Lehengas.
+          </p>
         </div>
+
+        <figure>
+          <img src={aboutImg_2} alt="" />
+        </figure>
+
         <div>
-          <figure>
-            <img src={aboutImg_2} alt="" />
-          </figure>
+          <h2>Why Choose Us?</h2>
+          <p>
+            By choosing Atulyakarigari, you become a part of our mission to
+            bring smiles to the faces of immensely talented weavers and
+            artisans. Together, we can make a difference in preserving India’s
+            artistic heritage and empowering its female artisans.
+          </p>
         </div>
       </article>
       <article className="about_sec-3">
@@ -100,7 +98,7 @@ export default function About() {
       </article>
       <article className="about_sec-4">
         <h2>Our Collections</h2>
-        <div className="collection_container">
+        {/* <div className="collection_container">
           {ourCollections.map((collection, index) => {
             return (
               <div key={index}>
@@ -122,7 +120,8 @@ export default function About() {
               </div>
             );
           })}
-        </div>
+        </div> */}
+        <CategoryView />
       </article>
       <article className="about-sec-5">
         <div>#Our Sustainability Practices</div>

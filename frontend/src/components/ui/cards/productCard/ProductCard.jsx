@@ -64,7 +64,7 @@ function ProductCard({
           <div>
             <WishListHeartIcon />
           </div>
-          <div>
+          {/* <div>
             <input
               type="checkbox"
               id="quickView"
@@ -85,7 +85,7 @@ function ProductCard({
                 />
               </svg>
             </label>
-          </div>
+          </div> */}
         </section>
         <figure>
           <img
