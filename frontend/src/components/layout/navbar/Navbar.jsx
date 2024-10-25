@@ -48,7 +48,7 @@ export default function Navbar() {
       // { name: "SHOP", path: "/shop" },
       {
         name: "CATEGORIES",
-        path: "/collection",
+        path: "/categories",
         dropdown: [
           {
             category: "HANDLOOM",
