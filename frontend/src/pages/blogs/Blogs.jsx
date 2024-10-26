@@ -86,11 +86,11 @@ export default function Blogs() {
                   },
                   {
                     value: "2",
-                    label: "HANDICRAFT",
+                    label: "Handicraft",
                   },
                   {
                     value: "3",
-                    label: "JEWELLERY",
+                    label: "Jewellery",
                   },
                 ]}
               />
