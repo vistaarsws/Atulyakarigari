@@ -30,7 +30,7 @@ export default function login() {
             </form>
           </div>
           <p>
-            Don&apos;t have an account yet? <span>Sign up</span>
+            Don&apos;t have an account yet? <span> Sign up</span>
           </p>
         </article>
       </section>
