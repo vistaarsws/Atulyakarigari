@@ -10,21 +10,22 @@
 
 .about_heroBanner {
   background-image: url(../../assets/images/aboutBanner.png);
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: top;
+  align-items: center;
   padding-top: 10vh;
   &:hover {
     transform: scale(1.2);
     filter: grayscale(100%);
     -webkit-filter: grayscale(100%);
-    transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+    transition: 0.3s ease-in-out;
 
     & > div {
+      transition: 0.4s ease-in-out;
       transform: scale(2);
     }
   }
