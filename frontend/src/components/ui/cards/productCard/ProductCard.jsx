@@ -24,6 +24,7 @@ function ProductCard({
   price,
   offer_inPercent = 12,
   id,
+  isAddedToWislist,
 }) {
   const [isHover, setIsHover] = useState(false);
   const navigate = useNavigate();
@@ -100,10 +101,10 @@ function ProductCard({
           <div>
             <h2>₹{price - price * offer_inPercent * 0.01}</h2>
             <strike>₹{price}</strike>
-            <h4>({offer_inPercent} % OFF)</h4>
+            <h4>(-{offer_inPercent}%)</h4>
           </div>
         </article>
-        <div>
+        <div className={`${isAddedToWislist ? "wistListBtnStyle" : ""}`}>
           <button
             onClick={(e) => {
               e.stopPropagation();

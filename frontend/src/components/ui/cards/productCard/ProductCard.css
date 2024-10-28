@@ -6,6 +6,21 @@
   padding: 1rem;
   background-color: #f4f4f4;
   border-radius: 0.6rem !important;
+
+  &:has(.wistListBtnStyle) {
+    article {
+      & > p {
+        display: none;
+      }
+      div {
+        margin: 1rem auto;
+      }
+    }
+    & > figure:first-of-type img {
+      transform: none !important;
+    }
+  }
+
   &:hover {
     background-color: #fff;
     box-shadow: rgb(149 157 165 / 0.2) 0 8px 24px;
@@ -24,6 +39,13 @@
       }
       div {
         visibility: hidden;
+      }
+    }
+    &:has(.wistListBtnStyle) {
+      article {
+        div {
+          visibility: visible;
+        }
       }
     }
   }
@@ -111,6 +133,21 @@
     color: #fff;
     &:hover {
       background-color: #46846a;
+    }
+  }
+}
+
+.wistListBtnStyle {
+  position: relative !important;
+  bottom: 0 !important;
+  & > button {
+    width: 100% !important;
+    background-color: white !important;
+    border: 1.5px solid rgba(96, 164, 135, 0.39) !important;
+    color: rgba(96, 164, 135, 1) !important;
+    &:hover {
+      background-color: #46846a !important;
+      color: white !important;
     }
   }
 }
