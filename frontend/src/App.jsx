@@ -30,7 +30,7 @@ export default function App() {
       <header>
         <Navbar />
       </header>
-      <main style={{ marginTop: "9vh" }}>
+      <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

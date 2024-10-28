@@ -166,7 +166,8 @@ export default function Navbar() {
         </Link>
       </figure>
       <ul
-        className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
+        // className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
+        className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"}`}
       >
         {navigation.links.map((link, index) => {
           return (
@@ -331,11 +332,11 @@ export default function Navbar() {
         <button
           id="navbar-toggle"
           onClick={() => {
-            setIsNavVisible(!isNavVisible);
+            setIsNavVisible((prevIsNavVisible) => !prevIsNavVisible);
           }}
           className={isNavVisible ? "active" : ""}
         >
-          <span></span>
+          <span> </span>
         </button>
       </div>
     </nav>
