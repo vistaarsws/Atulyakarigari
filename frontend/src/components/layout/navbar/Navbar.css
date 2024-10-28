@@ -269,7 +269,7 @@ input:not(:placeholder-shown) ~ .reset {
     flex-direction: column;
     position: absolute;
     left: 50%;
-    top: 10vh;
+    top: 9vh;
     padding: 5rem 2rem;
     transform: translateX(-50%);
     width: 100%;
@@ -278,7 +278,7 @@ input:not(:placeholder-shown) ~ .reset {
   }
 
   .navbar_container {
-    padding: 2rem 5%;
+    padding: 1rem 5%;
   }
 
   .navbar_container #burgerIcon {
@@ -304,7 +304,7 @@ input:not(:placeholder-shown) ~ .reset {
     border-radius: 1px;
     height: 3px;
     width: 30px;
-    background-color: #000000;
+    background-color: #b56f82;
     position: absolute;
     display: block;
     content: "";
@@ -333,10 +333,17 @@ input:not(:placeholder-shown) ~ .reset {
 @media screen and (max-width: 650px) {
   .navbar_container > div:nth-of-type(1) {
     position: absolute;
-    top: 10vh;
+    top: 9vh;
     left: 0;
     z-index: 800;
     width: 100%;
+  }
+
+  .form {
+    background-color: white;
+    & > input {
+      color: black;
+    }
   }
   .reset {
     right: 1rem;
@@ -347,7 +354,7 @@ input:not(:placeholder-shown) ~ .reset {
   }
 
   .navLinks {
-    top: 15vh;
+    top: 14vh;
   }
 }
 /* -------------------------------------------------------------------------IMAGE SETTING HOVER--------------------------------------------------------------------------- */
@@ -449,4 +456,17 @@ input:not(:placeholder-shown) ~ .reset {
   color: #000000;
   transform: scale(1.03);
   font-weight: 600;
+}
+
+@media screen and (max-width: 375px) {
+  .navbar_container {
+    & > div:nth-of-type(2) {
+      margin-left: 0;
+    }
+  }
+  .navbar_container figure {
+    & > a img {
+      width: 12rem;
+    }
+  }
 }

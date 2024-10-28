@@ -1,6 +1,9 @@
 import HeroSlider from "../components/ui/slider/heroSlider/HeroSlider";
 import TeamSlider from "../components/ui/slider/teamSlider/TeamSlider";
 import banner1 from "../assets/images/banner_1.png";
+import banner2 from "../assets/images/homeBanner2.png";
+import banner3 from "../assets/images/homeBanner3.png";
+
 import team_1 from "../assets/images/team_1.png";
 
 import artisan_1 from "../assets/images/artisan_1.png";
@@ -17,6 +20,12 @@ import blog_img from "../assets/images/blogImg.png";
 const heroBanners = [
   {
     banner: banner1,
+  },
+  {
+    banner: banner2,
+  },
+  {
+    banner: banner3,
   },
 ];
 const HeroBanner_array = heroBanners.map((e, index) => (

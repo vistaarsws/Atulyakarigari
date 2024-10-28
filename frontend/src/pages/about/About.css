@@ -168,10 +168,13 @@
 .about_sec-2 > div h2 {
   font-size: 3.2rem;
   margin-bottom: 1.5rem;
+  font-weight: 300;
 }
 .about_sec-2 > div p {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   line-height: 2.1rem;
+  font-weight: 300;
+  color: #383737;
 }
 
 .about_sec-6 {

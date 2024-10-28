@@ -234,8 +234,9 @@ export default function Home() {
       <section className="heroSection">
         <EmblaSlider
           slides={HeroBanner_array}
-          options={{ delay: 5000 }}
-          navigationDots={true}
+          options={{ delay: 3000, loop: true }}
+          navigationDots={false}
+          plugins={["autoplay"]}
         />
       </section>
       <CategoryView />
