@@ -8,11 +8,14 @@ import CategoryView from "../../components/layout/categoryView/CategoryView";
 export default function About() {
   return (
     <div className="about_container">
-      <figure className="about_heroBanner">
-        <div>
-          <h1>About Us</h1>
-        </div>
-      </figure>
+      <div>
+        <figure className="about_heroBanner">
+          <div>
+            <h1>About Us</h1>
+          </div>
+        </figure>
+      </div>
+
       <article className="about_sec-1">
         <figure>
           <img src={aboutImg_1} alt="" />

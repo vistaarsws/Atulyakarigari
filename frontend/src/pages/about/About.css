@@ -1,28 +1,44 @@
 .about_container {
   background-color: #f4f4f4;
   height: auto;
+
+  & > div:first-of-type {
+    overflow: hidden;
+    height: 90vh;
+  }
 }
 
 .about_heroBanner {
   background-image: url(../../assets/images/aboutBanner.png);
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center top;
-  height: 47vw;
+  background-position: center;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: top;
-  padding-top: 13%;
+  padding-top: 10vh;
+  &:hover {
+    transform: scale(1.2);
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+    transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+
+    & > div {
+      transform: scale(2);
+    }
+  }
 }
 
 .about_heroBanner > div {
+  margin: 5%;
   background-color: rgba(56, 55, 55, 0.4);
   font-family: "Kalnia", serif;
-  padding: 4.5rem 6.5rem;
+  padding: 3.6rem 3.2rem;
   height: max-content;
 }
 .about_heroBanner > div h1 {
-  font-size: clamp(3.2rem, 9vw, 17.2rem);
+  font-size: clamp(3.6rem, 8vw, 4.8rem);
   font-weight: 400;
   color: white;
 }
