@@ -14,12 +14,13 @@
 
   &:hover .collection_descriptionCard {
     visibility: visible;
+    transition: 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 }
 
 .collection_container > div:hover img {
   transform: scale(1.2);
-  transition: 0.3s ease-in-out;
+  transition: 0.3s linear;
 }
 
 .collection_container > div > img {
