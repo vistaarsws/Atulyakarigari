@@ -245,6 +245,7 @@ button {
 
   &:hover {
     background-color: #60a487;
+    transition: 0.35s cubic-bezier(0.645, 0.045, 0.355, 1);
     p {
       color: white;
     }
