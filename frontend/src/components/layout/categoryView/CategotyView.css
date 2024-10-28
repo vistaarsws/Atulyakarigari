@@ -10,10 +10,16 @@
   min-width: 30rem;
   height: 60vh;
   position: relative;
+  overflow: hidden;
 
   &:hover .collection_descriptionCard {
     visibility: visible;
   }
+}
+
+.collection_container > div:hover img {
+  transform: scale(1.2);
+  transition: 0.3s ease-in-out;
 }
 
 .collection_container > div > img {

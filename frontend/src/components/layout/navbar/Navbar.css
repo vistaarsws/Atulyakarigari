@@ -1,9 +1,13 @@
 .navbar_container {
-  height: 10vh;
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+  height: 9vh;
+  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2rem 3%;
+  padding: 1.5rem 3%;
   background-color: rgba(109, 0, 29, 1);
 
   & > figure {

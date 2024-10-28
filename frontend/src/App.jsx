@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import ScrollToTop from "./hooks/ScrollToTop";
 
-import Navbar from "./components/layout/Navbar/Navbar";
+import Navbar from "./components/layout/navbar/Navbar";
 import Footer from "./components/layout/footer/Footer";
 
 import Home from "./pages/home/Home";
@@ -30,7 +30,7 @@ export default function App() {
       <header>
         <Navbar />
       </header>
-      <main>
+      <main style={{ marginTop: "9vh" }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
