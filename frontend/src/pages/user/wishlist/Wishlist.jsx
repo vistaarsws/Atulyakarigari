@@ -23,6 +23,7 @@ const Wishlist = () => {
           title={ele.title}
           picture={ele.picture}
           price={ele.price}
+          isAddedToWislist={true}
         />
       ))}
     </div>
