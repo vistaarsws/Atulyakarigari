@@ -6,6 +6,8 @@ import { ourTeam_array } from "../../utils/Constant";
 import CategoryView from "../../components/layout/categoryView/CategoryView";
 
 export default function About() {
+  const isMobile = useMediaQuery("(max-width:768px)");
+
   return (
     <div className="about_container">
       <div>

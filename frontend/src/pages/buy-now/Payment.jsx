@@ -6,8 +6,10 @@ import {
   FormControlLabel,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Payment = () => {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -17,14 +19,15 @@ const Payment = () => {
         justifyContent: "center",
         backgroundColor: "#f3f4f6",
         // border: "2px solid red",
-        // boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+        boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
         mr: { xs: 0 },
-
-        // height: "75vh",
-        // overflow: "scroll",
-        height: { xs: "auto", md: "75vh" },
+        height: {
+          xs: "auto",
+          //  md: "75vh"
+        },
         overflow: "auto",
         scrollbarWidth: "none",
+        mb: 2,
       }}
     >
       <Box
@@ -325,6 +328,9 @@ const Payment = () => {
             borderRadius: 1,
             textTransform: "capitalize",
             fontSize: "12px",
+          }}
+          onClick={() => {
+            navigate("/place-order");
           }}
         >
           Place Order

@@ -346,10 +346,31 @@
   }
 
   .about_heroBanner > div {
-    padding: 2.5rem 3.5rem;
+    padding: 1rem 2rem;
   }
 
   .about-sec-5 div:nth-of-type(2) > div h2 {
     font-size: 1.8rem;
+  }
+
+  .about_heroBanner {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    justify-content: center;
+    align-items: top;
+    &:hover {
+      transform: none;
+      filter: none;
+
+      & > div {
+        transform: none;
+      }
+    }
+  }
+  .about_container {
+    & > div:first-of-type {
+      height: max-content;
+    }
   }
 }

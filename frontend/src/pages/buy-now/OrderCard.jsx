@@ -165,8 +165,8 @@ const ProductCard = ({ product }) => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            alignItems: isMobile ? "flex-start" : "center",
+            flexDirection: "row",
+            alignItems: "center",
             gap: isMobile ? 2 : 4,
             my: 2,
           }}
