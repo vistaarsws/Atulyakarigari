@@ -13,6 +13,7 @@ import TEST_01 from "../../../assets/images/order-img.png";
 import TEST_02 from "../../../assets/images/aboutBanner.png";
 import TEST_03 from "../../../assets/images/artistry_1.png";
 import TEST_04 from "../../../assets/images/ourCollections_2.png";
+import EditAddressModal from "./FilterModal";
 
 export default function Component() {
   const orders = [
@@ -59,7 +60,10 @@ export default function Component() {
   ];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [filterModal, setFilterModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   const breakpoints = {
     max768: useMediaQuery("(max-width:768px)"),
@@ -179,7 +183,7 @@ export default function Component() {
                       borderColor: "#bdbdbd",
                     },
                   }}
-                  onClick={() => setFilterModal(true)}
+                  onClick={handleOpenModal}
                 >
                   Filter
                 </Button>
@@ -371,12 +375,20 @@ export default function Component() {
           }}
         >
           <img
-            style={{ objectFit: "cover", width: "100%", height: "100%" }}
+            style={{
+              objectFit: "cover",
+              width: "100%",
+              height: "100%",
+              paddingTop: "20px",
+              paddingBottom: "20px",
+              marginBottom: "20px",
+            }}
             src={orders[currentImageIndex].image}
             alt={orders[currentImageIndex].product}
           />
         </Box>
       </Box>
+      <EditAddressModal open={isModalOpen} handleClose={handleCloseModal} />
     </>
   );
 }
