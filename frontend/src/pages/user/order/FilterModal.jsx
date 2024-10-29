@@ -7,6 +7,7 @@ import {
   Button,
   Modal,
   IconButton,
+  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -51,7 +52,7 @@ const FilterModal = ({ open, handleClose }) => {
     { label: "Last 6 months", value: "last6months" },
     { label: "Last Year", value: "lastyear" },
   ];
-
+  const isMobile = useMediaQuery("(max-width:768px)");
   return (
     <Modal
       open={open}
@@ -67,7 +68,7 @@ const FilterModal = ({ open, handleClose }) => {
           bgcolor: "background.paper",
           borderRadius: "8px",
           width: "100%",
-          maxWidth: "300px",
+          maxWidth: isMobile ? "300px" : "350px",
           p: 3,
           outline: "none",
         }}

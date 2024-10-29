@@ -22,6 +22,7 @@ import Artisans from "./pages/artisans/Artisans";
 import BuyNow from "./pages/buy-now/index";
 import Login from "./pages/auth/login/login";
 import SignUp from "./pages/auth/signup/SignUp";
+import PlaceOrder from "./pages/place-order";
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="/artisans" element={<Artisans />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/buy-now" element={<BuyNow />} />
+          <Route path="/place-order" element={<PlaceOrder />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

@@ -156,7 +156,6 @@ export default function Navbar() {
     { name: "Privacy Policy", link: "/user/privacy" },
     { name: "Log Out", link: "/user/logout" },
   ];
-  console.log(isProfileView);
 
   return (
     <nav className="navbar_container">

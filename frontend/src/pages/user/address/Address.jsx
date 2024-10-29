@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditAddressModal from "./AddressModal";
+import { useLocation } from "react-router-dom";
 
 const theme = createTheme({
   typography: {
@@ -41,6 +42,7 @@ const AddressCard = ({
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+  const isPlaceOrder = useLocation()?.pathname === "/place-order";
 
   return (
     <>
@@ -183,7 +185,7 @@ const AddressCard = ({
               },
             }}
           >
-            Save
+            {isPlaceOrder ? "Remove" : "Save"}{" "}
           </Button>
         </Box>
       </Box>
@@ -219,7 +221,7 @@ const AddressUI = () => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              ml: { md: "6rem" },
+              ml: { md: "8rem" },
               alignItems: "center",
               mb: "12px",
             }}
@@ -254,8 +256,8 @@ const AddressUI = () => {
                 borderColor: "#e2e2e2",
                 // fontSize: "16px",
                 fontSize: {
-                  xs: "12px", // small devices
-                  md: "16px", // large devices
+                  xs: "12px",
+                  md: "16px",
                 },
                 fontWeight: 400,
                 textAlign: "left",
@@ -265,7 +267,7 @@ const AddressUI = () => {
                   borderColor: "#60a487",
                   backgroundColor: "#60a487",
                   "& .MuiSvgIcon-root": {
-                    color: "#ffffff", // Change the icon color to red on hover
+                    color: "#ffffff",
                   },
                 },
               }}
@@ -323,7 +325,6 @@ const AddressUI = () => {
             />
           </Box>
         </Box>
-        {/* <AddressModal /> */}
       </ThemeProvider>
     </>
   );

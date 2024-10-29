@@ -93,8 +93,9 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           width: isMobile ? "90%" : "100%",
           maxWidth: isMobile ? "90%" : "52rem",
-          maxHeight: "90vh",
+          maxHeight: "60vh",
           overflowY: "auto",
+          scrollbarWidth: "none",
         }}
       >
         <Typography
