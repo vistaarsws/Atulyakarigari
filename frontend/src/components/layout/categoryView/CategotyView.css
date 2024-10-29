@@ -77,3 +77,9 @@
     height: 50vh;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .collection_descriptionCard {
+    visibility: visible;
+  }
+}
