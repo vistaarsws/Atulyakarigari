@@ -27,11 +27,13 @@ function ProductCard({
   isAddedToWislist,
 }) {
   const [isHover, setIsHover] = useState(false);
+  const [isMobileView, setIsMobileView] = useState();
   const navigate = useNavigate();
   // const [isAddedToWishList, setIsAddedToWishList] = useState(false);
   // const addToWishListHandler = () => {
   //   setIsAddedToWishList(!isAddedToWishList);
   // };
+
   useEffect(() => {
     // Check if the URL contains "user/wishlist"
     const path = window.location.pathname;
@@ -41,6 +43,7 @@ function ProductCard({
       setIsHover(false);
     }
   }, []);
+
   return (
     <>
       <div
@@ -104,7 +107,7 @@ function ProductCard({
             <h4>(-{offer_inPercent}%)</h4>
           </div>
         </article>
-        <div className={`${isAddedToWislist ? "wistListBtnStyle" : ""}`}>
+        <div className={`${isAddedToWislist ? "wistListBtnStyle" : ""} `}>
           <button
             onClick={(e) => {
               e.stopPropagation();

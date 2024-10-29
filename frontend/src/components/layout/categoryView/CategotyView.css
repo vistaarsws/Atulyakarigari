@@ -2,7 +2,6 @@
   display: flex;
   justify-content: space-between;
   margin: 2rem 5%;
-  gap: 3.8rem;
 }
 
 .collection_container > div {
