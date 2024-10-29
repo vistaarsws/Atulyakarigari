@@ -275,6 +275,54 @@ const top_product_list_from_category = {
       picture: product_1,
       price: 12000,
     },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
+    {
+      key: "1",
+      title: "Silken Splendor",
+      picture: product_1,
+      price: 12000,
+    },
   ],
 };
 
