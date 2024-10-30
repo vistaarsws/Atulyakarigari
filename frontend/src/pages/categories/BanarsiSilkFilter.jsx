@@ -4,7 +4,7 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
-  Pagination,
+  
 } from "@mui/material";
 import PriceRangeSlider from "./PriceRangeSlider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -221,7 +221,6 @@ export default function SidebarFilter() {
               ))}
             </Box>
           </Box>
-          <Pagination count={4} />
         </Box>
       </Box>
       <div

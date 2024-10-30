@@ -6,8 +6,6 @@ import { ourTeam_array } from "../../utils/Constant";
 import CategoryView from "../../components/layout/categoryView/CategoryView";
 
 export default function About() {
-  const isMobile = useMediaQuery("(max-width:768px)");
-
   return (
     <div className="about_container">
       <div>
@@ -60,10 +58,21 @@ export default function About() {
           </p>
         </div>
 
-        <figure>
+        {/* <figure>
           <img src={aboutImg_2} alt="" />
-        </figure>
-
+        </figure> */}
+        <article>
+          <iframe
+            width="100%"
+            height="315"
+            src="https://www.youtube.com/embed/wVHC8FIktdc?si=6wDt8ff2JUx7ZRmR&autoplay=1&mute=1"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </article>
         <div>
           <h2>Why Choose Us?</h2>
           <p>
