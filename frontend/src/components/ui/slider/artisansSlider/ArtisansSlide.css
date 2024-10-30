@@ -46,6 +46,14 @@
   font-weight: 300;
 }
 
+@media screen and (max-width: 1200px) {
+  .artisansSlider_container > section:first-of-type article:nth-of-type(2) {
+    span {
+      display: none;
+    }
+  }
+}
+
 @media screen and (max-width: 768px) {
   .artisansSlider_container > section:first-of-type {
     grid-template-columns: 1fr 1fr;
