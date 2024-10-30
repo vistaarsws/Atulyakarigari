@@ -33,6 +33,7 @@ import cat5_4 from "../../assets/images/cat5_4.png";
 import cat5_5 from "../../assets/images/cat5_5.png";
 import cat5_6 from "../../assets/images/cat5_1.png";
 import CategoryView from "../../components/layout/categoryView/CategoryView";
+import { useMediaQuery } from "@mui/material";
 
 export default function Home() {
   const top_product_list_from_category_1 = {
@@ -228,7 +229,7 @@ export default function Home() {
       },
     ],
   };
-
+  const isMobile = useMediaQuery("(max-width:768px)");
   return (
     <>
       <section className="heroSection">
@@ -239,7 +240,9 @@ export default function Home() {
           plugins={["autoplay"]}
         />
       </section>
-      <CategoryView />
+      <div style={{ marginInline: isMobile ? "1rem" : "4rem" }}>
+        <CategoryView />
+      </div>
 
       <section className="product_section_1">
         <ProductSection
