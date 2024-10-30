@@ -24,6 +24,7 @@ const Index = () => {
           ))}
         </div>
       </section>
+      <div style={{ height: "20vh" }}></div>
     </div>
   );
 };
