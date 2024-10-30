@@ -374,3 +374,20 @@
     }
   }
 }
+
+@media screen and (max-width: 425px) {
+  .about_sec-6 div h2 {
+    font-size: 2.4rem;
+  }
+
+  .about_sec-6 div p {
+    font-size: 1.6rem;
+  }
+
+  .about_sec-6 div button {
+    padding: 1rem;
+  }
+  .about-sec-6 div {
+    margin: 1rem;
+  }
+}

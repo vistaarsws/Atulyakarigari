@@ -37,6 +37,14 @@
 
       button {
         border: none;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        background-color: transparent;
+        backdrop-filter: blur(4px);
+        padding: 1rem;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
     }
 
@@ -72,4 +80,28 @@
   justify-content: center;
   align-items: top;
   padding-top: 13%;
+}
+
+@media screen and (max-width: 768px) {
+  .artisans_container {
+    & > section:first-of-type {
+      align-items: start;
+
+      h2 {
+        font-size: 3.2rem;
+        font-weight: 300;
+      }
+
+      p {
+        font-size: 1.6rem;
+        font-weight: 500;
+        width: 100%;
+        text-align: start;
+        line-height: 2.2rem;
+      }
+    }
+  }
+  .navigationArrows_container {
+    display: none;
+  }
 }
