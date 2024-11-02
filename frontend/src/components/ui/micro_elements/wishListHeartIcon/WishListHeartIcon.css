@@ -1,0 +1,118 @@
+.wishListHeart_box {
+  position: relative;
+}
+
+.wishListHeart_box > label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 10px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  color: black;
+}
+
+.wishListHeart_box > input[type="checkbox"] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  /* background-color: rgb(247, 31, 31); */
+  border-radius: 50%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.wishListHeart_box > label svg {
+  fill: #6f6f6f;
+  background-color: white;
+}
+
+.wishListHeart_box > input[type="checkbox"]:checked + label svg {
+  fill: hsl(0deg 100% 50%);
+  animation: heartButton 800ms;
+}
+
+/* #quickView:checked + label svg {
+  fill: hsl(17, 100%, 18%) !important;
+  animation: quickViewButton 500ms;
+} */
+
+@keyframes heartButton {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* @keyframes quickViewButton {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+} */
+
+.wishListHeart_box > input[type="checkbox"] + label .action {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+}
+
+.wishListHeart_box > input[type="checkbox"] + label .action span {
+  grid-column-start: 1;
+  grid-column-end: 1;
+  grid-row-start: 1;
+  grid-row-end: 1;
+  transition: all 0.5s;
+}
+
+.wishListHeart_box > input[type="checkbox"] + label .action span.option-1 {
+  transform: translate(0px, 0%);
+  opacity: 1;
+}
+
+.wishListHeart_box
+  > input[type="checkbox"]:checked
+  + label
+  .action
+  span.option-1 {
+  transform: translate(0px, -100%);
+  opacity: 0;
+}
+
+.wishListHeart_box > input[type="checkbox"] + label .action span.option-2 {
+  transform: translate(0px, 100%);
+  opacity: 0;
+}
+
+.wishListHeart_box
+  > input[type="checkbox"]:checked
+  + label
+  .action
+  span.option-2 {
+  transform: translate(0px, 0%);
+  opacity: 1;
+}
