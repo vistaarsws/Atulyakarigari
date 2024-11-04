@@ -23,7 +23,6 @@ async function sendVerificationSMS(phone, otp) {
             phone,
             `Your verification code is: ${otp}. Valid for 5 minutes.`
         );
-        console.log(`Successfully sent verification SMS: -> ${smsResponse}`);
     } catch (err) {
         console.log("Not able to send verification SMS");
         throw err
