@@ -7,7 +7,14 @@ import DeliveryEstimate from "./DeliveryEstimate";
 const PlaceOrder = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   return (
-    <div>
+    <Box
+      sx={{
+        pt: {
+          xs: "4vh",
+          sm: "0",
+        },
+      }}
+    >
       <Progress />
       <Box
         sx={{
@@ -31,7 +38,7 @@ const PlaceOrder = () => {
           <Payment />
         </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
 

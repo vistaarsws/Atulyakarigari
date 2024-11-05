@@ -5,7 +5,7 @@ const Progress = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const routes = useLocation().pathname;
-
+  const isSmallScreen = useMediaQuery("(max-width:420px)");
   return (
     <Box
       sx={{
@@ -18,23 +18,54 @@ const Progress = () => {
         flexWrap: isMobile ? "wrap" : "nowrap",
       }}
     >
-      <Typography sx={{ color: "#60a487", mx: 1 }}>Bag</Typography>
       <Typography
-        sx={{ color: "#888888", mx: 1, display: { xs: "none", sm: "inline" } }}
+        sx={{
+          color: "#60a487",
+          mx: 1,
+          fontSize: isSmallScreen ? "11px" : "16px",
+        }}
+      >
+        Bag
+      </Typography>
+      <Typography
+        sx={{
+          color: routes == "/place-order" ? "#60a487" : "#888888",
+          mx: 1,
+          display: "inline",
+          fontSize: isSmallScreen ? "11px" : "16px",
+        }}
       >
         ...............
       </Typography>
       <Typography
-        sx={{ color: routes == "/place-order" ? "#60a487" : "#888888", mx: 1 }}
+        sx={{
+          color: routes == "/place-order" ? "#60a487" : "#888888",
+          mx: 1,
+          fontSize: isSmallScreen ? "11px" : "16px",
+        }}
       >
         Address
       </Typography>
       <Typography
-        sx={{ color: "#888888", mx: 1, display: { xs: "none", sm: "inline" } }}
+        sx={{
+          color: "#888888",
+          mx: 1,
+          display: "inline",
+          fontSize: isSmallScreen ? "11px" : "16px",
+          alignItems: "center",
+        }}
       >
         ................
       </Typography>
-      <Typography sx={{ color: "#888888", mx: 1 }}>Payment</Typography>
+      <Typography
+        sx={{
+          color: "#888888",
+          mx: 1,
+          fontSize: isSmallScreen ? "11px" : "16px",
+        }}
+      >
+        Payment
+      </Typography>
     </Box>
   );
 };

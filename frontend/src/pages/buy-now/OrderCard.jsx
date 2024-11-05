@@ -8,6 +8,7 @@ import {
   CardContent,
   createTheme,
   ThemeProvider,
+  Checkbox,
 } from "@mui/material";
 import { styled, useMediaQuery } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,9 +18,7 @@ import TEST_IMG2 from "../../assets/images/Necklace.png";
 import TEST_IMG3 from "../../assets/images/Necklace1.png";
 
 const theme = createTheme({
-  typography: {
-    fontFamily: "Arial, sans-serif",
-  },
+  typography: { fontFamily: "Lato" },
   palette: {
     primary: {
       main: "#1976d2",
@@ -77,10 +76,13 @@ const ProductImage = styled("img")(({ theme }) => ({
   // Added responsive styling for mobile
   [theme.breakpoints.down("sm")]: {
     height: "auto",
-    width: "100%",
+    // width: "100%",
     maxHeight: "200px",
-    margin: "1rem 0",
+    margin: "2rem 2rem 0",
   },
+}));
+const ProductImageWrapper = styled(Box)(({ theme }) => ({
+  position: "relative",
 }));
 const productData = [
   {
@@ -134,7 +136,27 @@ const ProductCard = ({ product }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <StyledCard>
-      <ProductImage src={product?.image} alt={product?.name} />{" "}
+      <ProductImageWrapper>
+        <ProductImage src={product?.image} alt={product?.name} />
+        <Checkbox
+          sx={{
+            position: "absolute",
+            top: 28,
+            left: 28,
+            padding: 0,
+            color: "white",
+            zIndex: 1,
+            "&.Mui-checked": {
+              color: "#6d001d",
+            },
+            // [theme.breakpoints.down("sm")]: {
+            //   top: 20,
+            //   left: 8,
+            // },
+          }}
+          size="large"
+        />
+      </ProductImageWrapper>{" "}
       <CardContent sx={{ flex: 1 }}>
         <CloseButton size="small">
           <CloseIcon fontSize="small" />

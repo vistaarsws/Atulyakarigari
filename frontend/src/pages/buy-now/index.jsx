@@ -6,16 +6,21 @@ import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
 
 const Index = () => {
-  const isMobile = useMediaQuery("(max-width:900px)");
   return (
-    <Box>
+    <Box
+      sx={{
+        pt: {
+          xs: "4vh",
+          sm: "0",
+        },
+      }}
+    >
       <Stepper />
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-around",
           marginTop: "2rem",
-          // flexDirection: isMobile ? "column" : "row",
           flexDirection: { xs: "column", md: "row" },
           px: { xs: 2, md: 4 },
         }}
@@ -23,8 +28,10 @@ const Index = () => {
         <Box
           sx={{
             width: { xs: "100%", md: "60%" },
-            // Add bottom margin on mobile
             mb: { xs: 4, md: 0 },
+            height: { xs: "75vh", sm: "auto" },
+            overflow: "scroll",
+            scrollbarWidth: "none",
           }}
         >
           <AddressComponent />

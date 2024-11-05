@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Checkbox,
 } from "@mui/material";
 import ORDER_IMG from "../../assets/images/order-img.png";
 
@@ -64,6 +65,7 @@ const DeliveryEstimate = () => {
             image={item.imageUrl}
             alt={item.title}
           />
+
           <Box sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}>
             <CardContent>
               <Typography
