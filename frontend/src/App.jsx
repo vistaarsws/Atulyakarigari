@@ -1,6 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 
 import ScrollToTop from "./hooks/ScrollToTop";
+import "./App.css";
+
+import { useLocation } from "react-router-dom";
 
 import Navbar from "./components/layout/navbar/Navbar";
 import Footer from "./components/layout/footer/Footer";
@@ -11,7 +14,6 @@ import Categories from "./pages/categories/index";
 import Blogs from "./pages/blogs/Blogs";
 import Product from "./pages/product/Product";
 
-import "./App.css";
 import User from "./components/layout/user/User";
 import Order from "./pages/user/order/Order";
 import Address from "./pages/user/address/Address";
@@ -20,18 +22,22 @@ import Wishlist from "./pages/user/wishlist/Wishlist";
 import Logout from "./pages/user/logout/Logout";
 import Artisans from "./pages/artisans/Artisans";
 import BuyNow from "./pages/buy-now/index";
-import Login from "./pages/auth/login/login";
-import SignUp from "./pages/auth/signup/SignUp";
 import PlaceOrder from "./pages/place-order";
+import AuthTemplate from "./pages/auth/authTemplate";
 
 export default function App() {
+  const location = useLocation();
+  console.log("sfds", location);
+
+  const hideFromHere = ["/login", "/signup/1", "/signup/2", "/otp"].includes(
+    location.pathname
+  );
+
   return (
     <>
       <ScrollToTop />
-      <header>
-        <Navbar />
-      </header>
-      <main>
+      <header>{!hideFromHere && <Navbar />}</header>
+      <main className={hideFromHere ? "" : "marginTop"}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -42,8 +48,12 @@ export default function App() {
           <Route path="/buy-now" element={<BuyNow />} />
           <Route path="/place-order" element={<PlaceOrder />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<AuthTemplate page={"login"} />} />
+          <Route
+            path="/signup/:page"
+            element={<AuthTemplate page={"signup"} />}
+          />
+          <Route path="/otp" element={<AuthTemplate page={"otp"} />} />
 
           <Route path="/user" element={<User />}>
             <Route path="orders" element={<Order />} />
@@ -54,9 +64,7 @@ export default function App() {
           </Route>
         </Routes>
       </main>
-      <footer>
-        <Footer />
-      </footer>
+      <footer>{!hideFromHere && <Footer />}</footer>
     </>
   );
 }
