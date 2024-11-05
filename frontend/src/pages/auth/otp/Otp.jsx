@@ -1,9 +1,8 @@
-import "./login.css";
-import loginIcon from "../../../assets/images/loginIcon.svg";
+import "./Otp.css";
 
-export default function login() {
+export default function Otp() {
   return (
-    <div className="login_container">
+    <div className="Otp_container">
       <section>
         <article>
           <h1>Atulyakarigari</h1>
@@ -12,7 +11,7 @@ export default function login() {
               <img src={loginIcon} alt="Login Icon" />
             </figure>
             <h2>Log in</h2>
-            <h3>Use your email or phone number to log in</h3>
+            <h3>Use your email or phone number to log in </h3>
 
             <form>
               <div>
