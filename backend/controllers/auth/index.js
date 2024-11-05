@@ -6,120 +6,215 @@ import { ensureUniqueOtp, isEmail, isPhoneNumber, verifyOtp } from "../../utils/
 
 
 
-// EMAIL OTP generator
-export const sendEmailOtp = async (req, res) => {
+//  OTP generator
+export const sendOtp = async (req, res) => {
     try {
         // fetch email
-        const { email } = req.body
-        if (!email) {
-            badRequest(req, res, null, "Please Provide Email")
+        const { loginId } = req.body
+        if (!loginId) {
+            return badRequest(req, res, null, "fields are missing");
         }
-        // check if user is already exits
-        const checkUserPresent = await User.findOne({ email })
-
-        // if user already exit , return response
-        if (checkUserPresent) {
-            return badRequest(req, res, null, "Email already in use");
+        const isEmailLogin = isEmail(loginId);
+        const isPhoneNumberLogin = isPhoneNumber(loginId);
+        if (!isEmailLogin && !isPhoneNumberLogin) {
+            return badRequest(req, res, null, "Invalid login Id format");
         }
+        if (isEmailLogin) {
+            try {
+                // check if user is already exits
+                const checkUserPresent = await User.findOne({ email: loginId });
 
-        // generate otp
-        const otp = await ensureUniqueOtp(Otp);
-        console.log(`Generated OTP is: -> ${otp}`);
+                // if user already exit , return response
+                if (checkUserPresent) {
+                    return badRequest(req, res, null, "Email already in use Please login");
+                }
 
-        // create an entry in db
-        let otpBody
-        try {
-            otpBody = await Otp.create({ email, otp })
-        } catch (error) {
-            return badRequest(req, res, error, "Unable to cfeate OTP");
+                // generate otp
+                const otp = await ensureUniqueOtp(Otp);
+                console.log(`Generated OTP is: -> ${otp}`);
+
+                // create an entry in db
+                let otpBody
+                try {
+                    otpBody = await Otp.create({ email: loginId, otp })
+                } catch (error) {
+                    return badRequest(req, res, error, "Unable to create OTP");
+                }
+
+                return success(req, res, "otp sent successfully", {
+                    email: otpBody.email,
+                })
+            } catch (error) {
+                log(`Not able to generate OTP: ${error}`);
+                return internalServerError(req, res, err, "unable to generate Email OTP")
+            }
+
+        } else {
+            try {
+                // check if user already exists
+                const checkUserPresent = await User.findOne({ phone: loginId });
+                if (checkUserPresent) {
+                    return badRequest(req, res, null, "Phone number already in use Please login");
+                }
+
+                // generate otp
+                const otp = await ensureUniqueOtp(Otp);
+                console.log(`Generated OTP is: -> ${otp}`);
+
+                // create an entry in db
+                let otpBody
+                try {
+                    otpBody = await SmsOtp.create({ phone: loginId, otp });
+                } catch (err) {
+                    return internalServerError(req, res, err, "SMS service error");
+                }
+                return success(req, res, "OTP sent successfully", {
+                    phone: otpBody.phone,
+                });
+
+            } catch (err) {
+                console.log(`Not able to generate OTP: ${err}`);
+                return internalServerError(req, res, err, "unable to generate SMS OTP");
+            }
         }
-
-        return success(req, res, "otp sent successfully", {
-            email: otpBody.email,
-        })
-
     } catch (err) {
         console.log(`not able to generate otp  ${err}`)
         return internalServerError(req, res, err, "unable to generate OTP")
     }
 }
-// Register with EMAIL OTP
-export const registerWithEmail = async (req, res) => {
-    const { fullName, email, accountType, otp } = req.body;
+// Register user
+export const register = async (req, res) => {
+    const { fullName, loginId, accountType, otp } = req.body;
 
     try {
         // Check if all required fields are provided
-        if (!fullName || !email || !otp || !accountType) {
+        if (!fullName || !loginId || !otp || !accountType) {
             return badRequest(req, res, null, "All required fields must be provided");
         }
-
-        // Check if user with this email already exists
-        let existingUser;
-        try {
-            existingUser = await User.findOne({ email });
-            if (existingUser) {
-                console.log(`Email already in use: ${email}`);
-                return badRequest(req, res, null, "Email already in use");
+        const isEmailLogin = isEmail(loginId);
+        const isPhoneNumberLogin = isPhoneNumber(loginId);
+        if (!isEmailLogin && !isPhoneNumberLogin) {
+            return badRequest(req, res, null, "Invalid login Id format");
+        }
+        if (isEmailLogin) {
+            let existingUser;
+            try {
+                existingUser = await User.findOne({ email: loginId });
+                if (existingUser) {
+                    console.log(`Email already in use: ${existingUser.email}`);
+                    return badRequest(req, res, null, "Email already in use");
+                }
+            } catch (err) {
+                console.error("Error checking existing user:", err);
+                return internalServerError(req, res, err, "Database query failed");
             }
-        } catch (err) {
-            console.error("Error checking existing user:", err);
-            return internalServerError(req, res, err, "Database query failed");
+            // Verify OTP
+            const otpVerification = await verifyOtp(loginId, otp, Otp, 'email');
+            if (!otpVerification.isValid) {
+                return badRequest(req, res, null, otpVerification.error);
+            }
+
+            // Create a new user
+            const newUser = new User({
+                fullName,
+                email: loginId,
+                accountType,
+            });
+
+            // Save the new user to the database
+            try {
+                await newUser.save();
+            } catch (err) {
+                console.error("Error saving new user to database:", err);
+                return internalServerError(req, res, err, "User registration failed");
+            }
+            // Generate auth token for the new user
+            let token
+            try {
+                token = newUser.generateAuthToken();
+            } catch (error) {
+                console.error("Token generation error:", error);
+                return internalServerError(req, res, error, "Token generation failed");
+            }
+
+            // Return success response with token
+            return success(req, res, "User registered successfully", {
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                accountType: newUser.accountType,
+                token
+            });
+        } else {
+            try {
+
+                // Check if user with this phone already exists
+                let existingUser;
+                try {
+                    existingUser = await User.findOne({ phone: loginId });
+                    if (existingUser) {
+                        console.log(`Phone number already in use: ${loginId}`);
+                        return badRequest(req, res, null, "Phone number already in use");
+                    }
+                } catch (err) {
+                    console.error("Error checking existing user:", err);
+                    return internalServerError(req, res, err, "Database query failed");
+                }
+
+                // find most recent otp stored for the user
+                const recentOtp = await SmsOtp.find({ phone: loginId }).sort({ createdAt: -1 }).limit(1);
+
+                // validate otp
+                if (recentOtp.length === 0) {
+                    return badRequest(req, res, null, "Please generate OTP first");
+                } else if (otp !== recentOtp[0].otp) {
+                    return badRequest(req, res, null, "Invalid OTP");
+                }
+
+                // Create a new user
+                const newUser = new User({
+                    fullName,
+                    phone: loginId,
+                    accountType,
+                    isPhoneVerified: true
+                });
+
+                // Save the new user
+                try {
+                    await newUser.save();
+                } catch (err) {
+                    console.error("Error saving new user to database:", err);
+                    return internalServerError(req, res, err, "User registration failed");
+                }
+
+                // Generate auth token
+                let token;
+                try {
+                    token = newUser.generateAuthToken();
+                } catch (error) {
+                    console.error("Token generation error:", error);
+                    return internalServerError(req, res, error, "Token generation failed");
+                }
+
+                // Return success response
+                return success(req, res, "User registered successfully", {
+                    _id: newUser._id,
+                    fullName: newUser.fullName,
+                    phone: newUser.phone,
+                    accountType: newUser.accountType,
+                    token
+                });
+            } catch (err) {
+                return internalServerError(req, res, err, "User registration failed");
+            }
         }
+        // Check if user with this email already exists
 
-        // // find most resent otp stored for the user 
-        // const resentOtp = await Otp.find({ email }).sort({ createdAt: -1 }).limit(1)
-        // console.log(`resentOtp : -> ${resentOtp}`);
-
-        // // validate otp 
-        // if (resentOtp.length === 0) {
-        //     return badRequest(req, res, null, "please generate otp first");
-        // } else if (otp != resentOtp[0].otp) {
-        //     return badRequest(req, res, null, "invalid OTP");
-        // }
-
-
-        // Verify OTP
-        const otpVerification = await verifyOtp(email, otp, Otp, 'email');
-        if (!otpVerification.isValid) {
-            return badRequest(req, res, null, otpVerification.error);
-        }
-
-        // Create a new user
-        const newUser = new User({
-            fullName,
-            email,
-            accountType,
-        });
-
-        // Save the new user to the database
-        try {
-            await newUser.save();
-        } catch (err) {
-            console.error("Error saving new user to database:", err);
-            return internalServerError(req, res, err, "User registration failed");
-        }
-        // Generate auth token for the new user
-        let token
-        try {
-            token = newUser.generateAuthToken();
-        } catch (error) {
-            console.error("Token generation error:", error);
-            return internalServerError(req, res, error, "Token generation failed");
-        }
-
-        // Return success response with token
-        return success(req, res, "User registered successfully", {
-            _id: newUser._id,
-            fullName: newUser.fullName,
-            email: newUser.email,
-            accountType: newUser.accountType,
-            token
-        });
     } catch (err) {
         return internalServerError(req, res, err, "User registration failed");
     }
 };
-
+// login
 export const login = async (req, res) => {
     try {
         const { loginId } = req.body;
@@ -235,111 +330,3 @@ export const validateOtp = async (req, res) => {
         return internalServerError(req, res, err, "Unable to validate OTP");
     }
 }
-// SMS OTP generator
-export const sendSmsOtp = async (req, res) => {
-    try {
-        // fetch phone number
-        const { phone } = req.body;
-        if (!phone) {
-            return badRequest(req, res, null, "Please Provide Phone Number");
-        }
-
-        // check if user already exists
-        const checkUserPresent = await User.findOne({ phone });
-        if (checkUserPresent) {
-            return badRequest(req, res, null, "Phone number already in use");
-        }
-
-        // generate otp
-        const otp = await ensureUniqueOtp(Otp);
-        console.log(`Generated OTP is: -> ${otp}`);
-
-        // create an entry in db
-        let otpBody
-        try {
-            otpBody = await SmsOtp.create({ phone, otp });
-        } catch (err) {
-            return internalServerError(req, res, err, "SMS service error");
-        }
-
-        return success(req, res, "OTP sent successfully", {
-            phone: otpBody.phone,
-        });
-
-    } catch (err) {
-        console.log(`Not able to generate OTP: ${err}`);
-        return internalServerError(req, res, err, "Unable to generate OTP");
-    }
-};
-
-// Register with SMS OTP
-export const registerWithPhone = async (req, res) => {
-    const { fullName, phone, accountType, otp } = req.body;
-
-    try {
-        // Check if all required fields are provided
-        if (!fullName || !phone || !otp || !accountType) {
-            return badRequest(req, res, null, "All required fields must be provided");
-        }
-
-        // Check if user with this phone already exists
-        let existingUser;
-        try {
-            existingUser = await User.findOne({ phone });
-            if (existingUser) {
-                console.log(`Phone number already in use: ${phone}`);
-                return badRequest(req, res, null, "Phone number already in use");
-            }
-        } catch (err) {
-            console.error("Error checking existing user:", err);
-            return internalServerError(req, res, err, "Database query failed");
-        }
-
-        // find most recent otp stored for the user
-        const recentOtp = await SmsOtp.find({ phone }).sort({ createdAt: -1 }).limit(1);
-        console.log(`Recent OTP: -> ${recentOtp}`);
-
-        // validate otp
-        if (recentOtp.length === 0) {
-            return badRequest(req, res, null, "Please generate OTP first");
-        } else if (otp !== recentOtp[0].otp) {
-            return badRequest(req, res, null, "Invalid OTP");
-        }
-
-        // Create a new user
-        const newUser = new User({
-            fullName,
-            phone,
-            accountType,
-            isPhoneVerified: true
-        });
-
-        // Save the new user
-        try {
-            await newUser.save();
-        } catch (err) {
-            console.error("Error saving new user to database:", err);
-            return internalServerError(req, res, err, "User registration failed");
-        }
-
-        // Generate auth token
-        let token;
-        try {
-            token = newUser.generateAuthToken();
-        } catch (error) {
-            console.error("Token generation error:", error);
-            return internalServerError(req, res, error, "Token generation failed");
-        }
-
-        // Return success response
-        return success(req, res, "User registered successfully", {
-            _id: newUser._id,
-            fullName: newUser.fullName,
-            phone: newUser.phone,
-            accountType: newUser.accountType,
-            token
-        });
-    } catch (err) {
-        return internalServerError(req, res, err, "User registration failed");
-    }
-};
