@@ -21,7 +21,7 @@ export default function Artisans() {
       <figure className="artisans_heroBanner"></figure>
       <section>
         <h2>Meet Our Artisans: The Heart of Atulya Karigari</h2>
-        <figure>{/* <img src={wingPattern} alt="Design Pattern" /> */}</figure>
+        <br />
         <p>
           At Atulya Karigari, our artisans are the soul behind every
           masterpiece. Each piece they create tells a story of heritage,

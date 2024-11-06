@@ -14,6 +14,15 @@ export default function AuthTemplate({ page }) {
   // -------------------------------------------------------------------------------------------------------------------------
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
+  const [userDetails, setUserDetails] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    hintName: "",
+    gender: "",
+    dob: "",
+    location: "",
+  });
 
   const url = useParams();
   const navigate = useNavigate();
@@ -81,6 +90,8 @@ export default function AuthTemplate({ page }) {
     setTimer(30); // Reset the timer to 30 seconds (or desired time)
   };
 
+  const userDetailsHandler = (e) => {};
+
   return (
     <>
       <div className="authTemplate_container">
@@ -140,6 +151,7 @@ export default function AuthTemplate({ page }) {
                         name="fullName"
                         id="fullName"
                         placeholder="Enter Your Name"
+                        onChange={userDetailsHandler}
                       />
                     </div>
                     <div>
@@ -151,7 +163,12 @@ export default function AuthTemplate({ page }) {
                     </div>
                     <div className="dobInputBox">
                       <label htmlFor="id">Date Of Birth</label>
-                      <input type="date" id="date" name="dob" />
+                      <input
+                        type="date"
+                        id="date"
+                        name="dob"
+                        onChange={userDetailsHandler}
+                      />
                     </div>
                     <div>
                       <label htmlFor="">Location</label>
@@ -159,6 +176,7 @@ export default function AuthTemplate({ page }) {
                         type="text"
                         name="location"
                         placeholder="Enter Your Location"
+                        onChange={userDetailsHandler}
                       />
                     </div>
                     <div>
@@ -176,6 +194,7 @@ export default function AuthTemplate({ page }) {
                         name="fullName"
                         id="fullName"
                         placeholder="Enter Your Name"
+                        onChange={userDetailsHandler}
                       />
                     </div>
                     <div>
@@ -185,6 +204,7 @@ export default function AuthTemplate({ page }) {
                         name="email"
                         id="email"
                         placeholder="Enter Your Email "
+                        onChange={userDetailsHandler}
                       />
                     </div>
                     <div>
@@ -194,6 +214,7 @@ export default function AuthTemplate({ page }) {
                         name="email"
                         id="email"
                         placeholder="Enter Your Email "
+                        onChange={userDetailsHandler}
                       />
                     </div>
                     <div>

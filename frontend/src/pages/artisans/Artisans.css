@@ -2,7 +2,7 @@
   & > section:first-of-type {
     background-color: #60a487;
     color: white;
-    padding: 4rem;
+    padding: 4rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -100,7 +100,21 @@
         line-height: 2.2rem;
       }
     }
+
+    & > section:nth-of-type(2) > div > div:last-of-type {
+      display: none;
+    }
+
+    section:nth-of-type(3) {
+      h2 {
+        font-size: 2.4rem;
+      }
+      div {
+        height: 50vh;
+      }
+    }
   }
+
   .navigationArrows_container {
     display: none;
   }

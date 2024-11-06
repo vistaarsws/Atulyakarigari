@@ -9,6 +9,7 @@
 
 .productCategorySection_container > h2 {
   font-weight: 1.6rem;
+  margin-inline: 5%;
 }
 
 .productCategorySection_container > h2,
@@ -24,8 +25,8 @@
 
   button {
     border: none;
-    font-size: 1.6rem;
-    font-weight: 500;
+    font-size: 1.4rem;
+    font-weight: 400;
     color: rgba(109, 0, 29, 1);
     cursor: pointer;
     padding: 1rem 2rem;
@@ -45,5 +46,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2rem 0 2.5rem;
+  margin: 1rem 0 0;
+}
+
+@media screen and (max-width: 425px) {
+  .productCategorySection_container {
+    padding: 5% 0;
+  }
 }

@@ -191,6 +191,14 @@
 @media screen and (max-width: 425px) {
   .productCard_container {
     padding: 1rem;
+
+    &:hover {
+      background-color: unset;
+      box-shadow: none;
+      & > figure:first-of-type img {
+        transform: none;
+      }
+    }
   }
   .productCard_container div button {
     padding: 1rem 2rem;
@@ -198,6 +206,12 @@
   .productCard_container section {
     top: 1.5rem;
     right: 1.5rem;
+  }
+
+  .productCard_container:hover section,
+  .productCard_container:hover article > p,
+  .productCard_container:hover article div {
+    visibility: visible !important;
   }
 
   /* .productCard_container article > div {
