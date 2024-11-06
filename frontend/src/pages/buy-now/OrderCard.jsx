@@ -261,7 +261,7 @@ const OrderCard = () => {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          maxWidth: "md",
+          // maxWidth: "md",
           // margin: "auto",
           padding: "2 2 2 0",
           bgcolor: "#fff",

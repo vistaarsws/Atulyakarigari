@@ -65,7 +65,7 @@ const AddressCard = ({
           <Box
             display="flex"
             justifyContent="space-between"
-            alignItems="center"
+            border="1px solid red"
             mb={2}
           >
             <Box>
