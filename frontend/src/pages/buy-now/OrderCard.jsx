@@ -37,7 +37,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   borderRadius: 8,
   backgroundColor: "#f4f4f4",
-
   maxWidth: "lg",
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
@@ -263,8 +262,8 @@ const OrderCard = () => {
       <Box
         sx={{
           maxWidth: "md",
-          margin: "auto",
-          padding: 2,
+          // margin: "auto",
+          padding: "2 2 2 0",
           bgcolor: "#fff",
           // height: "65vh"
           height: { xs: "auto", sm: "65vh" },
