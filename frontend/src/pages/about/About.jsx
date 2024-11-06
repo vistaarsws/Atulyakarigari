@@ -23,6 +23,9 @@ export default function About() {
 
         <div>
           <h2>Who We Are</h2>
+          <figure>
+            <img src={aboutImg_1} alt="" />
+          </figure>
           <p>
             Atulyakarigari India is a brand of handloom and handicrafts
             established as a CSR initiative by Annapurna Finance Pvt Ltd. Our

@@ -302,8 +302,8 @@ input:not(:placeholder-shown) ~ .reset {
   #navbar-toggle span:after {
     cursor: pointer;
     border-radius: 1px;
-    height: 3px;
-    width: 30px;
+    height: 2px;
+    width: 24px;
     background-color: #b56f82;
     position: absolute;
     display: block;
@@ -311,10 +311,10 @@ input:not(:placeholder-shown) ~ .reset {
     transition: all 300ms ease-in-out;
   }
   #navbar-toggle span:before {
-    top: -10px;
+    top: -8px;
   }
   #navbar-toggle span:after {
-    bottom: -10px;
+    bottom: -8px;
   }
   #navbar-toggle.active span {
     background-color: transparent;

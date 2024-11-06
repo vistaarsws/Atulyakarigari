@@ -24,6 +24,7 @@ import Artisans from "./pages/artisans/Artisans";
 import BuyNow from "./pages/buy-now/index";
 import PlaceOrder from "./pages/place-order";
 import AuthTemplate from "./pages/auth/authTemplate";
+import { createTheme, ThemeProvider } from "@mui/material";
 
 export default function App() {
   const location = useLocation();
@@ -32,9 +33,12 @@ export default function App() {
   const hideFromHere = ["/login", "/signup/1", "/signup/2", "/otp"].includes(
     location.pathname
   );
+  const theme = createTheme({
+    typography: { fontFamily: "Lato" },
+  });
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <ScrollToTop />
       <header>{!hideFromHere && <Navbar />}</header>
       <main className={hideFromHere ? "" : "marginTop"}>
@@ -65,6 +69,6 @@ export default function App() {
         </Routes>
       </main>
       <footer>{!hideFromHere && <Footer />}</footer>
-    </>
+    </ThemeProvider>
   );
 }

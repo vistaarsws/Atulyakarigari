@@ -89,6 +89,10 @@
 .about_sec-1 > div:nth-of-type(1) {
   grid-row: 1/2;
   grid-column: 2/3;
+
+  & > figure {
+    display: none;
+  }
 }
 
 .about_sec-1 > div:nth-of-type(2) {
@@ -371,6 +375,19 @@
   .about_container {
     & > div:first-of-type {
       height: max-content;
+    }
+  }
+
+  .about_sec-1 {
+    padding-top: 0rem;
+    figure {
+      display: none;
+    }
+    & > div:nth-of-type(1) {
+      & > figure {
+        display: block;
+        margin-bottom: 1rem;
+      }
     }
   }
 }
