@@ -9,6 +9,9 @@ import {
   ThemeProvider,
   createTheme,
   IconButton,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditAddressModal from "./AddressModal";
@@ -16,7 +19,7 @@ import { useLocation } from "react-router-dom";
 
 const theme = createTheme({
   typography: {
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "Lato",
   },
   palette: {
     primary: {
@@ -37,6 +40,9 @@ const AddressCard = ({
   city,
   state,
   mobile,
+  isSelected,
+  onSelect,
+  addressId,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -63,14 +69,32 @@ const AddressCard = ({
             mb={2}
           >
             <Box>
-              <Typography
-                color="rgba(96, 164, 135, 1)"
-                fontWeight={700}
-                fontSize="14px"
-                lineHeight="21px"
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  border: "2px solid red",
+                  justifyContent: "start",
+                }}
               >
-                {isDefault ? "Default Address" : "Other Address"}
-              </Typography>
+                {" "}
+                <FormControlLabel
+                  sx={{ mr: 1 }}
+                  value={addressId}
+                  control={<Radio />}
+                  checked={isSelected}
+                  onChange={() => onSelect(addressId)}
+                />
+                <Typography
+                  color="rgba(96, 164, 135, 1)"
+                  fontWeight={700}
+                  fontSize="14px"
+                  lineHeight="21px"
+                >
+                  {isDefault ? "Default Address" : "Other Address"}
+                </Typography>
+              </Box>
+
               <Typography
                 fontWeight={400}
                 color="rgba(56, 55, 55, 1)"
@@ -207,6 +231,68 @@ const AddressCard = ({
 };
 
 const AddressUI = () => {
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  const handleAddressSelection = (addressId) => {
+    setSelectedAddress(addressId === selectedAddress ? null : addressId);
+  };
+  const addresses = [
+    {
+      id: "addr1",
+      isDefault: true,
+      date: "Wed, 3 Apr 2024",
+      type: "Home",
+      name: "MAYURI SRIVASTAVA",
+      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+      city: "Bhopal - 462030",
+      state: "Madhya Pradesh",
+      mobile: "817596153315",
+    },
+    {
+      id: "addr2",
+      isDefault: false,
+      date: "Wed, 3 Apr 2024",
+      type: "Office",
+      name: "MAYURI SRIVASTAVA",
+      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+      city: "Bhopal - 462030",
+      state: "Madhya Pradesh",
+      mobile: "817596153315",
+    },
+    {
+      id: "addr3",
+      isDefault: false,
+      date: "Wed, 3 Apr 2024",
+      type: "Office",
+      name: "MAYURI SRIVASTAVA",
+      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+      city: "Bhopal - 462030",
+      state: "Madhya Pradesh",
+      mobile: "817596153315",
+    },
+    {
+      id: "addr4",
+      isDefault: false,
+      date: "Wed, 3 Apr 2024",
+      type: "Office",
+      name: "MAYURI SRIVASTAVA",
+      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+      city: "Bhopal - 462030",
+      state: "Madhya Pradesh",
+      mobile: "817596153315",
+    },
+    {
+      id: "addr5",
+      isDefault: false,
+      date: "Wed, 3 Apr 2024",
+      type: "Office",
+      name: "MAYURI SRIVASTAVA",
+      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+      city: "Bhopal - 462030",
+      state: "Madhya Pradesh",
+      mobile: "817596153315",
+    },
+  ];
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -283,46 +369,20 @@ const AddressUI = () => {
               ml: { md: "8rem" },
             }}
           >
-            <AddressCard
-              isDefault={true}
-              date="Wed, 3 Apr 2024"
-              type="Home"
-              name="MAYURI SRIVASTAVA"
-              address="House no. 140, puja shree nagar cto, bairagarh, Bhopal"
-              city="Bhopal - 462030"
-              state="Madhya Pradesh"
-              mobile="817596153315"
-            />
-            <AddressCard
-              isDefault={false}
-              date="Wed, 3 Apr 2024"
-              type="Office"
-              name="MAYURI SRIVASTAVA"
-              address="House no. 140, puja shree nagar cto, bairagarh, Bhopal "
-              city="Bhopal - 462030"
-              state="Madhya Pradesh"
-              mobile="817596153315"
-            />
-            <AddressCard
-              isDefault={true}
-              date="Wed, 3 Apr 2024"
-              type="Home"
-              name="MAYURI SRIVASTAVA"
-              address="House no. 140, puja shree nagar cto, bairagarh, Bhopal"
-              city="Bhopal - 462030"
-              state="Madhya Pradesh"
-              mobile="817596153315"
-            />
-            <AddressCard
-              isDefault={false}
-              date="Wed, 3 Apr 2024"
-              type="Office"
-              name="MAYURI SRIVASTAVA"
-              address="House no. 140, puja shree nagar cto, bairagarh, Bhopal "
-              city="Bhopal - 462030"
-              state="Madhya Pradesh"
-              mobile="817596153315"
-            />
+            <RadioGroup
+              value={selectedAddress || ""}
+              onChange={(e) => handleAddressSelection(e.target.value)}
+            >
+              {addresses.map((addr) => (
+                <AddressCard
+                  key={addr.id}
+                  {...addr}
+                  isSelected={selectedAddress === addr.id}
+                  onSelect={handleAddressSelection}
+                  addressId={addr.id}
+                />
+              ))}
+            </RadioGroup>
           </Box>
         </Box>
       </ThemeProvider>
