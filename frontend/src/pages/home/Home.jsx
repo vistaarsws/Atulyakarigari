@@ -240,7 +240,7 @@ export default function Home() {
           plugins={["autoplay"]}
         />
       </section>
-      <div style={{ marginInline: isMobile ? "1rem" : "4rem" }}>
+      <div style={{ marginInline: isMobile ? "0" : "4rem" }}>
         <CategoryView />
       </div>
 
@@ -272,6 +272,17 @@ export default function Home() {
           <h1>
             Celebrate Artistry:<em>Handicrafts, Handlooms, and Jewellery</em>
           </h1>
+          <article id="mobileView_loopAnimation">
+            <div className="card-item ">
+              <img src={artistry_1} alt="Artistry" />
+            </div>
+            <div className="card-item ">
+              <img src={artistry_2} alt="Artistry" />
+            </div>
+            <div className="card-item active">
+              <img src={artistry_3} alt="Artistry" />
+            </div>
+          </article>
           <p>
             Discover a world where timeless handicrafts, exquisite handloom
             fabrics, and artisanal jewelry come together. Each piece is a
@@ -295,6 +306,7 @@ export default function Home() {
       </section>
       <section className="noDiscount_container">
         <img src={bg_pattern} alt="Background Pattern" />
+
         <figure>
           <div>
             <h2>Your Purchase is Empowering Artisans Directly</h2>
