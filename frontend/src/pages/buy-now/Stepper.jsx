@@ -12,10 +12,10 @@ const Progress = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: { xs: "auto", md: "10vh" },
         backgroundColor: "#f7f7f7",
-        p: 2,
+        // p: 2,
         flexWrap: isMobile ? "wrap" : "nowrap",
+        height: "7vh",
       }}
     >
       <Typography
@@ -27,16 +27,21 @@ const Progress = () => {
       >
         Bag
       </Typography>
-      <Typography
+      <Box
         sx={{
           color: routes == "/place-order" ? "#60a487" : "#888888",
           mx: 1,
-          display: "inline",
-          fontSize: isSmallScreen ? "11px" : "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        ...............
-      </Typography>
+        <Typography
+          sx={{ fontSize: isSmallScreen ? "11px" : "16px", pb: "10%" }}
+        >
+          .......................
+        </Typography>
+      </Box>
       <Typography
         sx={{
           color: routes == "/place-order" ? "#60a487" : "#888888",
@@ -46,17 +51,21 @@ const Progress = () => {
       >
         Address
       </Typography>
-      <Typography
+      <Box
         sx={{
           color: "#888888",
           mx: 1,
           display: "inline",
-          fontSize: isSmallScreen ? "11px" : "16px",
           alignItems: "center",
         }}
       >
-        ................
-      </Typography>
+        <Typography
+          sx={{ fontSize: isSmallScreen ? "11px" : "16px", pb: "10%" }}
+        >
+          ........................
+        </Typography>
+      </Box>
+
       <Typography
         sx={{
           color: "#888888",

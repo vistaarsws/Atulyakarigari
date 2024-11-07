@@ -62,18 +62,12 @@ const AddressCard = ({
             boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
           }}
         >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
+          <Box display="flex" justifyContent="space-between" mb={2}>
             <Box>
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  border: "2px solid red",
                   justifyContent: "start",
                 }}
               >

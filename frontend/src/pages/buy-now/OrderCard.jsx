@@ -10,12 +10,13 @@ import {
   ThemeProvider,
   Checkbox,
 } from "@mui/material";
-import { styled, useMediaQuery } from "@mui/system";
+import { margin, styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import TEST_IMG1 from "../../assets/images/banarshi sharee.png";
 import TEST_IMG2 from "../../assets/images/Necklace.png";
 import TEST_IMG3 from "../../assets/images/Necklace1.png";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
@@ -32,15 +33,15 @@ const theme = createTheme({
 
 const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
-  marginBottom: theme.spacing(2),
+  padding: useMediaQuery("(max-width: 458px)") ? "1rem !important" : "2rem",
+  marginBottom: useMediaQuery("(max-width: 458px)") ? "2rem" : theme.spacing(2),
   position: "relative",
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   borderRadius: 8,
   backgroundColor: "#f4f4f4",
   maxWidth: "lg",
-  [theme.breakpoints.down("sm")]: {
-    flexDirection: "column",
-  },
+  height: useMediaQuery("(max-width: 458px)") ? "13rem" : "23rem",
+  alignItems: useMediaQuery("(max-width: 458px)") ? "start" : "center",
 }));
 
 const CloseButton = styled(IconButton)({
@@ -68,20 +69,17 @@ const QuantityButton = styled(Button)({
   },
 });
 const ProductImage = styled("img")(({ theme }) => ({
-  margin: "2rem",
   objectFit: "contain",
-  height: "183px",
-  width: "149px",
+  objectPosition: "center",
+  height: "100%",
+  width: useMediaQuery("(max-width: 458px)") ? "100%" : "",
+
   // Added responsive styling for mobile
-  [theme.breakpoints.down("sm")]: {
-    height: "auto",
-    // width: "100%",
-    maxHeight: "200px",
-    margin: "2rem 2rem 0",
-  },
+  [theme.breakpoints.down("sm")]: {},
 }));
 const ProductImageWrapper = styled(Box)(({ theme }) => ({
-  position: "relative",
+  height: "100%",
+  flexBasis: useMediaQuery("(max-width: 458px)") ? "30%" : "25%",
 }));
 const productData = [
   {
@@ -130,9 +128,9 @@ const productData = [
   },
   // Add more product objects here if needed
 ];
-
 const ProductCard = ({ product }) => {
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const is458px = useMediaQuery("(min-width: 458px)");
+
   return (
     <StyledCard>
       <ProductImageWrapper>
@@ -140,31 +138,34 @@ const ProductCard = ({ product }) => {
         <Checkbox
           sx={{
             position: "absolute",
-            top: 28,
-            left: 28,
+            top: useMediaQuery("(max-width: 458px)") ? "1rem" : 28,
+            left: useMediaQuery("(max-width: 458px)") ? "1rem" : 28,
             padding: 0,
             color: "white",
             zIndex: 1,
             "&.Mui-checked": {
               color: "#6d001d",
             },
-            // [theme.breakpoints.down("sm")]: {
-            //   top: 20,
-            //   left: 8,
-            // },
           }}
           size="large"
         />
       </ProductImageWrapper>{" "}
-      <CardContent sx={{ flex: 1 }}>
+      <CardContent
+        sx={{
+          ml: useMediaQuery("(max-width: 458px)") ? "" : "1rem",
+          flexBasis: useMediaQuery("(max-width: 458px)") ? "70%" : "",
+          // padding: "1rem 1rem 1rem 0", // paddingBottom: 0, // Optional, already handled by padding: 0,
+          // pb: "1rem !important",
+          padding: "0 0 0  1rem!important",
+        }}
+      >
         <CloseButton size="small">
           <CloseIcon fontSize="small" />
         </CloseButton>
         <Typography
           sx={{
             fontWeight: 600,
-            // fontSize: "14px",
-            fontSize: isMobile ? "16px" : "14px",
+            fontSize: "14px",
             color: "rgba(56, 55, 55, 1)",
           }}
         >
@@ -174,11 +175,16 @@ const ProductCard = ({ product }) => {
           variant="body2"
           sx={{
             color: "#6f6f6f",
-            // fontSize: 12,
-            fontSize: isMobile ? "14px" : "12px",
-            my: 1,
+            fontSize: useMediaQuery("(max-width: 458px)") ? "1rem" : "12px",
+            my: useMediaQuery("(max-width: 458px)") ? "" : 1,
             fontWeight: 400,
             lineHeight: "18px",
+            height: "2rem", // You can adjust the height based on how many lines you want to show
+            overflow: "hidden", // Hides the overflowed content
+            textOverflow: "ellipsis", // Adds the ellipsis after the text is truncated
+            display: "-webkit-box", // Creates a multi-line box for truncation
+            WebkitBoxOrient: "vertical", // Ensures text wraps vertically
+            WebkitLineClamp: 1, // Limits the number of lines (change this number to suit your needs)
           }}
         >
           {product?.description}
@@ -186,70 +192,94 @@ const ProductCard = ({ product }) => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: isMobile ? 2 : 4,
-            my: 2,
+            flexDirection: "column",
+            alignItems: "start",
+            justifyContent: "space-between",
+            gap: useMediaQuery("(max-width: 458px)") ? 0 : 4,
+
+            height: "100%",
           }}
         >
-          <Typography
+          <Box
             sx={{
-              color: "rgba(56, 55, 55, 1)",
-              fontWeight: 600,
-              fontSize: "16px",
-              lineHeight: "21px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: useMediaQuery("(max-width: 458px)") ? "" : 4,
+              // my: isMobile ? 0 : 2,
             }}
           >
-            {product?.price?.toLocaleString()}
-          </Typography>
-          <QuantityContainer>
-            <QuantityButton variant="outlined">-</QuantityButton>
-            <Typography variant="outlined" fontSize="14px">
-              {product?.quantity}
-            </Typography>
-            <QuantityButton variant="outlined">+</QuantityButton>
-          </QuantityContainer>
-        </Box>
-        <Typography
-          variant="body2"
-          sx={{
-            mt: 1.5,
-            color: "text.secondary",
-            fontSize: "12px",
-            lineHeight: "21px",
-            fontWeight: 400,
-          }}
-        >
-          <span
-            style={{
-              fontWeight: 900,
-              color: "rgb(56, 55, 55)",
-              fontSize: "12px",
-            }}
-          >
-            {product.returnPeriod} Days{" "}
-          </span>
-          return available
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <CheckIcon color="success" sx={{ fontSize: 18 }} />
-          <Typography
-            variant="body2"
-            sx={{ ml: 1, color: "#6f6f6f", fontSize: "12px", fontWeight: 400 }}
-          >
-            Delivery Between
-            <span
-              style={{
-                fontWeight: 900,
-                color: "rgb(56, 55, 55)",
-                lineHeight: "21px",
-                fontSize: "12px",
+            <Typography
+              sx={{
+                color: "rgba(56, 55, 55, 1)",
+                fontWeight: 600,
+                fontSize: "16px",
               }}
             >
-              {" "}
-              {product.deliveryDates}
-            </span>
-          </Typography>
+              {product?.price?.toLocaleString()}
+            </Typography>
+            <QuantityContainer>
+              <QuantityButton variant="outlined">-</QuantityButton>
+              <Typography variant="outlined" fontSize="14px">
+                {product?.quantity}
+              </Typography>
+              <QuantityButton variant="outlined">+</QuantityButton>
+            </QuantityContainer>
+          </Box>
+          <Box>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                fontSize: "12px",
+                fontWeight: 400,
+              }}
+            >
+              <span
+                style={{
+                  fontWeight: 900,
+                  color: "rgb(56, 55, 55)",
+                  fontSize: "12px",
+                }}
+              >
+                {product.returnPeriod} Days{" "}
+              </span>
+              return available
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
+              }}
+            >
+              <CheckIcon color="success" sx={{ fontSize: 18 }} />
+              <Typography
+                variant="body2"
+                sx={{
+                  ml: useMediaQuery("(max-width: 458px)") ? "0.2rem" : 1,
+                  color: "#6f6f6f",
+                  fontSize: useMediaQuery("(max-width: 330px)")
+                    ? "10px"
+                    : "12px",
+                  fontWeight: 400,
+                }}
+              >
+                Delivery Between
+                <span
+                  style={{
+                    fontWeight: 900,
+                    color: "rgb(56, 55, 55)",
+                    lineHeight: "21px",
+                    fontSize: "12px",
+                  }}
+                >
+                  {" "}
+                  {product.deliveryDates}
+                </span>
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </CardContent>
     </StyledCard>
@@ -261,7 +291,7 @@ const OrderCard = () => {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          maxWidth: "md",
+          // maxWidth: "md",
           // margin: "auto",
           padding: "2 2 2 0",
           bgcolor: "#fff",

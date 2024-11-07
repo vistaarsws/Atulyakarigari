@@ -10,7 +10,7 @@ const Index = () => {
     <Box
       sx={{
         pt: {
-          xs: "4vh",
+          // xs: "4vh",
           sm: "0",
         },
       }}
@@ -20,7 +20,7 @@ const Index = () => {
         sx={{
           display: "flex",
           justifyContent: "space-around",
-          marginTop: "2rem",
+          // marginTop: "2rem",
           flexDirection: { xs: "column", md: "row" },
           px: { xs: 2, md: 4 },
         }}

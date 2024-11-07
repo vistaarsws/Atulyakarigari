@@ -16,20 +16,20 @@ const Payment = () => {
         display: "flex",
         justifyContent: "center",
         backgroundColor: "#f3f4f6",
-        boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+        boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
         mr: { xs: 0 },
         height: {
           xs: "auto",
         },
-        overflow: "auto",
+        overflow: "hidden",
         scrollbarWidth: "none",
         mb: 2,
+        borderRadius: 2,
       }}
     >
       <Box
         sx={{
           backgroundColor: "white",
-          borderRadius: 2,
           boxShadow: 1,
           padding: { xs: 2, md: 4 },
           width: "100%",

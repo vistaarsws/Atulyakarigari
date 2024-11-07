@@ -141,7 +141,7 @@ export default function About() {
         <CategoryView />
       </article>
       <article className="about-sec-5">
-        <div>#Our Sustainability Practices</div>
+        {/* <div>#Our Sustainability Practices</div> */}
         <div>
           <div>
             <h2>🌿 Ethically Sourced & Handmade</h2>
