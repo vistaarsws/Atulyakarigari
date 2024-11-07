@@ -16,9 +16,7 @@
     overflow-y: scroll;
     scrollbar-width: none;
     z-index: 99;
-    position: sticky;
-    top: 9vh;
-    min-width: 15vw;
+    min-width: 20vw;
   }
 
   & > div:nth-of-type(2) {
@@ -30,6 +28,7 @@
     align-items: start;
     margin: 0 2rem 2%;
     gap: 2rem 1rem;
+    padding-top: 1rem;
   }
 
   & > figure {
@@ -43,6 +42,18 @@
 
 /* ----------------------------------------------Filter Section Styles ---------------------------------------------------------- */
 
+.filterIconBox {
+  margin-left: auto;
+}
+.filterIconBox figure {
+  padding-right: 1rem;
+}
+
+.categoryHeader {
+  height: 10rem;
+  background-color: rgb(216, 237, 255);
+}
+
 .filterSection_container {
   position: relative;
   display: flex;
@@ -55,7 +66,7 @@
 
 .toggleImg_container {
   display: none;
-  padding: 0.8rem 0.5rem 0.5rem 0.5rem;
+  /* padding: 0.8rem 0.5rem 0.5rem 0.5rem; */
   & > img {
     border-radius: 0.4rem;
   }
@@ -71,35 +82,35 @@
     width: 100vw;
   }
   .categoryPage_container > section:first-of-type {
+    flex-direction: column;
     & > div:first-of-type {
-      position: absolute;
+      height: 5rem;
+      position: relative;
+      width: 100%;
+      /* margin-top: 1rem; */
+    }
+    & > div:nth-of-type(2) {
+      margin: 0;
     }
   }
 
   .toggleSideBar {
-    left: -24.8rem;
     border-right: none;
+    right: 0%;
+    z-index: 99;
   }
   .toggleImg_container {
     display: block;
     height: 100%;
   }
-  .toggleSideBar {
-    left: -85%;
-
-    z-index: 99;
-  }
 }
 
-@media screen and (max-width: 650px) {
+@media screen and (max-width: 1012px) {
   .categoryPage_container > section:first-of-type {
     & > div:first-of-type {
-      top: 0;
+      min-width: 30vw;
     }
-  }
-}
-@media screen and (max-width: 1003px) {
-  .categoryPage_container > section:first-of-type {
+
     & > div:nth-of-type(2) {
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
@@ -109,7 +120,7 @@
   .categoryPage_container > section:first-of-type {
     & > div:nth-of-type(2) {
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      margin: 0 0rem 2%;
+      margin: 0;
       gap: 2rem 0rem;
     }
   }

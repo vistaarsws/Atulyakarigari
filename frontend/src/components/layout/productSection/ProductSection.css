@@ -3,22 +3,21 @@
   padding: 5%;
 }
 
+.productCategorySection_container > h2,
+.productCategorySection_container > h1 {
+  color: #383737;
+  text-align: center;
+  font-weight: 400;
+}
 .productCategorySection_container > h1 {
   font-size: 3.2rem;
 }
 
 .productCategorySection_container > h2 {
-  font-weight: 1.6rem;
+  font-size: 1.6rem;
   margin-inline: 5%;
-}
-
-.productCategorySection_container > h2,
-.productCategorySection_container > h1 {
   font-weight: 300;
-  color: #383737;
-  text-align: center;
 }
-
 .productCategorySection_container > div:first-of-type {
   display: flex;
   justify-content: end;

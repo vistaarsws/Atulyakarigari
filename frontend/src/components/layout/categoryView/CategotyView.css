@@ -91,6 +91,9 @@
     width: 100%;
     height: 50vh;
   }
+  .collection_container {
+    gap: 1rem;
+  }
 }
 
 @media screen and (max-width: 768px) {

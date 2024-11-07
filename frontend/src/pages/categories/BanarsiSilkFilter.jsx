@@ -4,7 +4,6 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
-  
 } from "@mui/material";
 import PriceRangeSlider from "./PriceRangeSlider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -124,6 +123,19 @@ export default function SidebarFilter() {
             />
           </IconButton>
           <Typography sx={sidebarStyles.title}>Banarsi Silk</Typography>
+          <div
+            className={`filterIconBox ${
+              isToggled ? "filterIconBoxClosed" : "filterIconBoxOpened"
+            }`}
+          >
+            <figure className={`toggleImg_container `}>
+              <img
+                src={isToggled ? toggleFilter : toggleArrow}
+                alt="Toggle Arrow"
+                onClick={() => setIsToggled(!isToggled)}
+              />
+            </figure>
+          </div>
         </Box>
         <Box sx={{ marginLeft: "2rem" }}>
           {/* Stock Filter */}
@@ -223,19 +235,6 @@ export default function SidebarFilter() {
           </Box>
         </Box>
       </Box>
-      <div
-        className={`${
-          isToggled ? "filterIconBoxClosed" : "filterIconBoxOpened"
-        }`}
-      >
-        <figure className={`toggleImg_container `}>
-          <img
-            src={isToggled ? toggleFilter : toggleArrow}
-            alt="Toggle Arrow"
-            onClick={() => setIsToggled(!isToggled)}
-          />
-        </figure>
-      </div>
     </div>
   );
 }

@@ -6,17 +6,19 @@ import {
   FormControlLabel,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Payment = () => {
   const navigate = useNavigate();
+  const isPlaceOrder = useLocation()?.pathname === "/place-order";
+
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         backgroundColor: "#f3f4f6",
-        boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+        boxShadow: isPlaceOrder ? "" : "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
         mr: { xs: 0 },
         height: {
           xs: "auto",

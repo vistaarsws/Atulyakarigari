@@ -52,7 +52,7 @@ const DeliveryEstimate = () => {
             display: "flex",
             mb: 2,
             alignItems: "center",
-            boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+            boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 1px",
             // border: "2px solid red",
           }}
         >
@@ -76,7 +76,8 @@ const DeliveryEstimate = () => {
               <Typography
                 sx={{ fontWeight: 400, fontSize: "12px", color: "#383737" }}
               >
-                Delivery by <strong>{item.deliveryDate}</strong>
+                Delivery by{" "}
+                <strong style={{ fontWeight: 800 }}>{item.deliveryDate}</strong>
               </Typography>
             </Box>
           </Box>
