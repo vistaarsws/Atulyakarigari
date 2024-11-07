@@ -66,6 +66,25 @@
   justify-content: flex-end;
 }
 
+.ourSusPractices div {
+  padding: 1.5rem;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  color: #383737;
+  width: 28vw;
+  min-width: 30rem;
+}
+.ourSusPractices h2 {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 400;
+}
+.ourSusPractices p {
+  font-size: 1.4rem;
+  font-weight: 300;
+}
+
 @media screen and (max-width: 1024px) {
   .collection_container > div {
     flex-grow: 1;
