@@ -11,7 +11,7 @@ const AddressComponent = () => {
         alignItems: { xs: "flex-start", sm: "flex-start" },
         // alignItems: "center",
         backgroundColor: "#fff",
-        marginBottom: "1rem",
+        margin: "1rem 0",
         // border: "1px solid #e0e0e0",
       }}
     >
