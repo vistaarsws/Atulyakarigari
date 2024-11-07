@@ -34,10 +34,15 @@
 
     div:nth-of-type(1) {
       margin-bottom: 1rem;
+      font-size: 14px;
+      font-weight: 400;
+      color: #383737;
     }
 
     div:nth-of-type(2) {
       font-weight: 300;
+      font-size: 1.4rem;
+      color: #383737;
     }
 
     div:nth-of-type(3) {
