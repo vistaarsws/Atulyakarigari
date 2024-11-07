@@ -49,7 +49,6 @@ const AddressCard = ({
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
-
   return (
     <>
       <Box position="relative" mb={8}>
@@ -73,7 +72,7 @@ const AddressCard = ({
               >
                 {" "}
                 <FormControlLabel
-                  sx={{ mr: 1 }}
+                  sx={{ mr: 1, display: isPlaceOrder ? "" : "none" }}
                   value={addressId}
                   control={<Radio />}
                   checked={isSelected}
@@ -98,7 +97,7 @@ const AddressCard = ({
                 Added on {date}
               </Typography>
             </Box>
-            <Button
+            {/* <Button
               variant="outlined"
               sx={{
                 color: "#6B7280",
@@ -106,6 +105,25 @@ const AddressCard = ({
                 textTransform: "capitalize",
                 fontWeight: 400,
                 fontSize: "14px",
+              }}
+            >
+              {type}
+            </Button> */}
+            <Button
+              variant="outlined"
+              sx={{
+                height: "35px",
+                padding: "9px 20px",
+                color: "#9f9f9f",
+                borderColor: "#e2e2e2",
+                // fontSize: "16px",
+                fontSize: {
+                  xs: "12px",
+                  md: "16px",
+                },
+                fontWeight: 400,
+                textAlign: "left",
+                textTransform: "capitalize",
               }}
             >
               {type}
@@ -158,53 +176,107 @@ const AddressCard = ({
           display="flex"
           gap={2}
         >
-          <Button
-            variant="outlined"
-            color="success"
-            sx={{
-              width: "102px",
-              height: "35px",
-              padding: "9px 20px",
-              color: "#73af96",
-              borderColor: "#73af96",
-              fontSize: "16px",
-              fontWeight: 400,
-              textAlign: "left",
-              textTransform: "capitalize",
-              "&:hover": {
-                color: "#ffffff",
-                borderColor: "#60a487",
-                backgroundColor: "#60a487",
-              },
-            }}
-            onClick={handleOpenModal}
-          >
-            Edit
-          </Button>
+          {isPlaceOrder ? (
+            <>
+              <Button
+                variant="outlined"
+                color="success"
+                sx={{
+                  width: "102px",
+                  height: "35px",
+                  padding: "9px 20px",
+                  color: "#73af96",
+                  borderColor: "#73af96",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  textAlign: "left",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    color: "#ffffff",
+                    borderColor: "#60a487",
+                    backgroundColor: "#60a487",
+                  },
+                }}
+                onClick={handleOpenModal}
+              >
+                Remove
+              </Button>
 
-          <Button
-            variant="contained"
-            color="error"
-            sx={{
-              width: "102px",
-              height: "35px",
-              padding: "9px 20px",
-              fontSize: "16px",
-              fontWeight: 400,
-              textAlign: "left",
-              color: "#ffffff",
-              textTransform: "capitalize",
-              backgroundColor: "rgba(173, 63, 56, 1)",
-              border: "none",
-              "&:hover": {
-                color: "#ffffff",
-                borderColor: "#6d001d",
-                backgroundColor: "#6d001d",
-              },
-            }}
-          >
-            {isPlaceOrder ? "Remove" : "Save"}{" "}
-          </Button>
+              <Button
+                variant="contained"
+                color="error"
+                sx={{
+                  width: "102px",
+                  height: "35px",
+                  padding: "9px 20px",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  textAlign: "left",
+                  color: "#ffffff",
+                  textTransform: "capitalize",
+                  backgroundColor: "rgba(173, 63, 56, 1)",
+                  border: "none",
+                  "&:hover": {
+                    color: "#ffffff",
+                    borderColor: "#6d001d",
+                    backgroundColor: "#6d001d",
+                  },
+                }}
+              >
+                Edit
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                color="success"
+                sx={{
+                  width: "102px",
+                  height: "35px",
+                  padding: "9px 20px",
+                  color: "#73af96",
+                  borderColor: "#73af96",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  textAlign: "left",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    color: "#ffffff",
+                    borderColor: "#60a487",
+                    backgroundColor: "#60a487",
+                  },
+                }}
+                onClick={handleOpenModal}
+              >
+                Edit
+              </Button>
+
+              <Button
+                variant="contained"
+                color="error"
+                sx={{
+                  width: "102px",
+                  height: "35px",
+                  padding: "9px 20px",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  textAlign: "left",
+                  color: "#ffffff",
+                  textTransform: "capitalize",
+                  backgroundColor: "rgba(173, 63, 56, 1)",
+                  border: "none",
+                  "&:hover": {
+                    color: "#ffffff",
+                    borderColor: "#6d001d",
+                    backgroundColor: "#6d001d",
+                  },
+                }}
+              >
+                Save
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
       <EditAddressModal
@@ -226,6 +298,7 @@ const AddressCard = ({
 
 const AddressUI = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const isPlaceOrder = useLocation()?.pathname === "/place-order";
 
   const handleAddressSelection = (addressId) => {
     setSelectedAddress(addressId === selectedAddress ? null : addressId);
@@ -291,10 +364,11 @@ const AddressUI = () => {
     <>
       <ThemeProvider theme={theme}>
         <Box
-          maxWidth="md"
+          maxWidth={isPlaceOrder ? "auto" : "md"}
           sx={{
             py: 4,
             ml: 2,
+            mr: 6,
           }}
         >
           <Box
