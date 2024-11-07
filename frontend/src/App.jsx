@@ -33,6 +33,9 @@ export default function App() {
   const hideFromHere = ["/login", "/signup/1", "/signup/2", "/otp"].includes(
     location.pathname
   );
+
+  const navWithoutSearchBar_list = ["/blogs"].includes(location.pathname);
+
   const theme = createTheme({
     typography: { fontFamily: "Lato" },
   });
@@ -41,7 +44,11 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <ScrollToTop />
       <header>{!hideFromHere && <Navbar />}</header>
-      <main className={hideFromHere ? "" : "marginTop"}>
+      <main
+        className={`${hideFromHere ? "" : "marginTop"} ${
+          navWithoutSearchBar_list ? "removeExtraMargin" : ""
+        }`}
+      >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
