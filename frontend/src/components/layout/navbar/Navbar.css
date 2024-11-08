@@ -53,6 +53,7 @@
 
 #cartIcon_container {
   margin-inline: 1.5rem;
+  cursor: pointer;
 }
 
 .hidden {
@@ -259,7 +260,7 @@ input:not(:placeholder-shown) ~ .reset {
     gap: 3rem;
   }
 }
-@media screen and (max-width: 1210px) {
+@media screen and (max-width: 1209px) {
   .navbar_container figure {
     margin-right: auto;
     margin-left: 0;

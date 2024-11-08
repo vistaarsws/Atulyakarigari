@@ -191,7 +191,9 @@
 
 @media screen and (max-width: 425px) {
   .productCard_container {
+    border-radius: 0px !important;
     padding: 1rem;
+    background-color: white;
 
     &:hover {
       background-color: unset;

@@ -120,13 +120,13 @@
         font-size: 1.6rem;
         margin-bottom: 1rem;
         font-weight: 400;
-        color: #383737;
+        /* color: #383737; */
       }
       p {
         font-size: 1.4rem;
         font-weight: 300;
         line-height: 2.1rem;
-        color: #383737;
+        /* color: #383737; */
       }
 
       &:hover {
