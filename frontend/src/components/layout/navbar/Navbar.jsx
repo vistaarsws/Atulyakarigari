@@ -5,7 +5,7 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
 
-export default function Navbar() {
+export default function Navbar(navWithoutSearchBar_list) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
@@ -166,7 +166,9 @@ export default function Navbar() {
       </figure>
       <ul
         // className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
-        className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"}`}
+        className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"} ${
+          navWithoutSearchBar_list ? "navWithoutSearchBar_list" : ""
+        }`}
       >
         {navigation.links.map((link, index) => {
           return (

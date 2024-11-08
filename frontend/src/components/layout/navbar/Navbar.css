@@ -357,6 +357,10 @@ input:not(:placeholder-shown) ~ .reset {
   .navLinks {
     top: 14vh;
   }
+
+  .navWithoutSearchBar_list {
+    top: 9vh !important;
+  }
 }
 /* -------------------------------------------------------------------------IMAGE SETTING HOVER--------------------------------------------------------------------------- */
 .profileBox {

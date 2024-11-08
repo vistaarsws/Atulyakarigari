@@ -53,7 +53,7 @@
 
 .profile-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: end;
   margin-top: 20px;
   gap: 20px;
 }
@@ -102,6 +102,7 @@
 @media screen and (max-width: 958px) {
   .profile-container {
     margin-left: 30px;
+    margin-right: 30px;
   }
   .profile-image-container {
     display: flex;
@@ -124,11 +125,6 @@
   .profile-input {
     width: 100%;
     font-size: 13px;
-  }
-
-  .profile-buttons {
-    justify-content: center;
-    gap: 10px;
   }
 }
 
@@ -166,8 +162,7 @@
 
   .profile-buttons {
     /* flex-direction: column; */
-    align-items: center;
-    gap: 10px;
+
     margin-top: 15px;
   }
 
@@ -176,5 +171,13 @@
     width: 80px !important;
     height: 30px !important;
     font-size: 14px !important;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .profile-buttons {
+    & > button {
+      flex-basis: 50%;
+    }
   }
 }
