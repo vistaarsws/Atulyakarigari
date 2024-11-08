@@ -34,7 +34,13 @@ export default function App() {
     location.pathname
   );
 
-  const navWithoutSearchBar_list = ["/blogs"].includes(location.pathname);
+  const navWithoutSearchBar_list = [
+    "/blogs",
+    "/user/profile",
+    "/user/wishlist",
+    "/user/orders",
+    "/user/address",
+  ].includes(location.pathname);
 
   const theme = createTheme({
     typography: { fontFamily: "Lato" },
@@ -43,7 +49,11 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <ScrollToTop />
-      <header>{!hideFromHere && <Navbar />}</header>
+      <header>
+        {!hideFromHere && (
+          <Navbar navWithoutSearchBar={navWithoutSearchBar_list} />
+        )}
+      </header>
       <main
         className={`${hideFromHere ? "" : "marginTop"} ${
           navWithoutSearchBar_list ? "removeExtraMargin" : ""

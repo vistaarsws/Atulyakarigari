@@ -55,6 +55,7 @@ const CloseButton = styled(IconButton)({
 const QuantityContainer = styled(Box)({
   display: "flex",
   alignItems: "center",
+  border: "1px solid #e0e0e0",
 });
 
 const QuantityButton = styled(Button)({

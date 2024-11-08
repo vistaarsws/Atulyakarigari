@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  useMediaQuery,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditAddressModal from "./AddressModal";
@@ -169,13 +170,7 @@ const AddressCard = ({
             </Typography>
           </Box>
         </Paper>
-        <Box
-          position="absolute"
-          bottom="-50px"
-          right="16px"
-          display="flex"
-          gap={2}
-        >
+        <Box display="flex" justifyContent={"end"}>
           {isPlaceOrder ? (
             <>
               <Button
@@ -227,12 +222,20 @@ const AddressCard = ({
               </Button>
             </>
           ) : (
-            <>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+                gap: 2,
+                mt: 2,
+                width: "100%",
+              }}
+            >
               <Button
                 variant="outlined"
                 color="success"
                 sx={{
-                  width: "102px",
+                  width: useMediaQuery("(max-width:425px)") ? "100%" : "102px",
                   height: "35px",
                   padding: "9px 20px",
                   color: "#73af96",
@@ -246,17 +249,18 @@ const AddressCard = ({
                     borderColor: "#60a487",
                     backgroundColor: "#60a487",
                   },
+
+                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                 }}
                 onClick={handleOpenModal}
               >
                 Edit
               </Button>
-
               <Button
                 variant="contained"
                 color="error"
                 sx={{
-                  width: "102px",
+                  width: useMediaQuery("(max-width:425px)") ? "100%" : "102px",
                   height: "35px",
                   padding: "9px 20px",
                   fontSize: "16px",
@@ -271,11 +275,12 @@ const AddressCard = ({
                     borderColor: "#6d001d",
                     backgroundColor: "#6d001d",
                   },
+                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                 }}
               >
                 Save
               </Button>
-            </>
+            </Box>
           )}
         </Box>
       </Box>
@@ -368,7 +373,7 @@ const AddressUI = () => {
           sx={{
             py: 4,
             ml: 2,
-            mr: 6,
+            mr: useMediaQuery("( max-width: 768px )") ? 2 : 6,
           }}
         >
           <Box
@@ -397,6 +402,8 @@ const AddressUI = () => {
                 <AddIcon
                   sx={{
                     color: "#73af96",
+                    color: "#ffffff",
+
                     "&:hover": {
                       color: "#ffffff",
                     },
@@ -406,9 +413,9 @@ const AddressUI = () => {
               sx={{
                 height: "35px",
                 padding: "9px 20px",
-                color: "#9f9f9f",
-                borderColor: "#e2e2e2",
-                // fontSize: "16px",
+                borderColor: "#60a487",
+                backgroundColor: "#60a487",
+                color: "#ffffff",
                 fontSize: {
                   xs: "12px",
                   md: "16px",
@@ -418,8 +425,8 @@ const AddressUI = () => {
                 textTransform: "capitalize",
                 "&:hover": {
                   color: "#ffffff",
-                  borderColor: "#60a487",
-                  backgroundColor: "#60a487",
+                  borderColor: "#46846A",
+                  backgroundColor: "#46846A",
                   "& .MuiSvgIcon-root": {
                     color: "#ffffff",
                   },

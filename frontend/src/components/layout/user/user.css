@@ -47,6 +47,9 @@
   .sidebar {
     display: none;
   }
+  /* .content-container {
+    margin-top: 25px;
+  } */
 }
 @media screen and (min-width: 769px) {
   .arrow-icon {
