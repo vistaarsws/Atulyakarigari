@@ -63,11 +63,11 @@
   font-weight: 300;
   font-size: 3.2rem;
   margin-bottom: 2.5rem;
-  color: #383737;
+  /* color: #383737; */
 }
 .about_sec-1 > div p,
 .about_sec-3 > p:first-of-type {
-  color: #383737;
+  /* color: #383737; */
   font-weight: 300;
   font-size: 1.6rem;
   line-height: 2.1rem;
