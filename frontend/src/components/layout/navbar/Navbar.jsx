@@ -291,7 +291,12 @@ export default function Navbar() {
       </div>
       <div>
         <figure id="cartIcon_container">
-          <img height={24} src={CART} alt="cart" />
+          <img
+            height={24}
+            src={CART}
+            alt="cart"
+            onClick={() => navigate("/user/wishlist")}
+          />
         </figure>
         <div
           className="profileBox"

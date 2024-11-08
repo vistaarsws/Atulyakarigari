@@ -8,6 +8,7 @@
   padding: 2% 5%;
   background-image: url(../../assets/images/background_artistry.png);
   background-repeat: no-repeat;
+  background-position: 45% 100%;
   background-size: cover;
 }
 
@@ -43,6 +44,7 @@ button {
 .celebrate_artistry_container article:nth-of-type(2) {
   padding: 2rem 6rem;
   padding-right: 0;
+  padding-left: 0;
 }
 
 .card-item {
@@ -113,7 +115,8 @@ button {
 }
 .celebrate_artistry_container article:nth-of-type(2) h1 em {
   color: black;
-  font-weight: 400;
+  font-weight: 300;
+  border: "1px solid black";
 }
 .celebrate_artistry_container article:nth-of-type(2) p {
   font-weight: 300;
@@ -161,6 +164,7 @@ button {
   }
   .celebrate_artistry_container article:first-of-type {
     width: 100%;
+    padding-inline: 0;
   }
 }
 
@@ -314,9 +318,11 @@ button {
 .noDiscount_container article h1 {
   font-size: 3.2rem;
   font-weight: 300;
+  color: #6f6f6f;
 }
 .noDiscount_container article h1 em {
   font-weight: 400;
+  color: #383737;
 }
 
 .noDiscount_container article hr {
