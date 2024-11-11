@@ -246,7 +246,6 @@ const AddressCard = ({
                 color="success"
                 sx={{
                   width: "102px",
-                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   height: "35px",
                   padding: "9px 20px",
                   color: "#73af96",
@@ -273,7 +272,6 @@ const AddressCard = ({
                 sx={{
                   width: useMediaQuery("(max-width:425px)") ? "100%" : "102px",
                   height: "35px",
-                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   padding: "9px 20px",
                   fontSize: "16px",
                   fontWeight: 400,

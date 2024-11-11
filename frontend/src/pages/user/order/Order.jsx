@@ -195,34 +195,17 @@ export default function Component() {
                 <div
                   key={order.id}
                   style={{
-                    border: "1px solid #eee",
                     paddingTop: "24px",
                     marginBottom: "24px",
                     display: "flex",
                     padding: "2.4rem",
                     gap: "24px",
-                    // marginLeft:
-                    //   (breakpoints.max768 && "0px") ||
-                    //   (breakpoints.min769Max1024 && "1rem") ||
-                    //   "3.2rem",
-                    // marginRight:
-                    //   (breakpoints.max768 && "0px") ||
-                    //   (breakpoints.min769Max1024 && "0rem") ||
-                    //   "3.2rem",
                     border:
                       currentImageIndex === index
                         ? "1.5px solid #60a487"
                         : "1px solid #eee",
-                    // boxShadow:
-                    //   currentImageIndex === index
-                    //     ? " rgba(17, 17, 26, 0.05) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px"
-                    //     : "none",
-
                     transition: "box-shadow 0.3s ease",
-
                     borderRadius: "8px",
-                    // padding: "16px",
-
                     cursor: "pointer",
                   }}
                   onClick={() => handleArrowClick(index)}
