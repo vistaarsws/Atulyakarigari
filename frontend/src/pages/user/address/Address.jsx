@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  useMediaQuery,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditAddressModal from "./AddressModal";
@@ -51,7 +52,7 @@ const AddressCard = ({
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   return (
     <>
-      <Box position="relative" mb={8}>
+      <Box position="relative" mb={2}>
         <Paper
           elevation={0}
           sx={{
@@ -78,14 +79,14 @@ const AddressCard = ({
                   checked={isSelected}
                   onChange={() => onSelect(addressId)}
                 />
-                <Typography
+                {/* <Typography
                   color="rgba(96, 164, 135, 1)"
                   fontWeight={700}
                   fontSize="14px"
                   lineHeight="21px"
                 >
                   {isDefault ? "Default Address" : "Other Address"}
-                </Typography>
+                </Typography> */}
               </Box>
 
               <Typography
@@ -170,11 +171,13 @@ const AddressCard = ({
           </Box>
         </Paper>
         <Box
-          position="absolute"
-          bottom="-50px"
-          right="16px"
-          display="flex"
           gap={2}
+          sx={{
+            mt: "1rem",
+            mb: "2rem",
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
         >
           {isPlaceOrder ? (
             <>
@@ -183,6 +186,7 @@ const AddressCard = ({
                 color="success"
                 sx={{
                   width: "102px",
+                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   height: "35px",
                   padding: "9px 20px",
                   color: "#73af96",
@@ -207,6 +211,7 @@ const AddressCard = ({
                 color="error"
                 sx={{
                   width: "102px",
+                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   height: "35px",
                   padding: "9px 20px",
                   fontSize: "16px",
@@ -233,6 +238,7 @@ const AddressCard = ({
                 color="success"
                 sx={{
                   width: "102px",
+                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   height: "35px",
                   padding: "9px 20px",
                   color: "#73af96",
@@ -258,6 +264,7 @@ const AddressCard = ({
                 sx={{
                   width: "102px",
                   height: "35px",
+                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   padding: "9px 20px",
                   fontSize: "16px",
                   fontWeight: 400,
@@ -303,8 +310,8 @@ const AddressUI = () => {
   const handleAddressSelection = (addressId) => {
     setSelectedAddress(addressId === selectedAddress ? null : addressId);
   };
-  const addresses = [
-    {
+  const addresses = {
+    defaultAddress: {
       id: "addr1",
       isDefault: true,
       date: "Wed, 3 Apr 2024",
@@ -315,67 +322,80 @@ const AddressUI = () => {
       state: "Madhya Pradesh",
       mobile: "817596153315",
     },
-    {
-      id: "addr2",
-      isDefault: false,
-      date: "Wed, 3 Apr 2024",
-      type: "Office",
-      name: "MAYURI SRIVASTAVA",
-      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-      city: "Bhopal - 462030",
-      state: "Madhya Pradesh",
-      mobile: "817596153315",
-    },
-    {
-      id: "addr3",
-      isDefault: false,
-      date: "Wed, 3 Apr 2024",
-      type: "Office",
-      name: "MAYURI SRIVASTAVA",
-      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-      city: "Bhopal - 462030",
-      state: "Madhya Pradesh",
-      mobile: "817596153315",
-    },
-    {
-      id: "addr4",
-      isDefault: false,
-      date: "Wed, 3 Apr 2024",
-      type: "Office",
-      name: "MAYURI SRIVASTAVA",
-      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-      city: "Bhopal - 462030",
-      state: "Madhya Pradesh",
-      mobile: "817596153315",
-    },
-    {
-      id: "addr5",
-      isDefault: false,
-      date: "Wed, 3 Apr 2024",
-      type: "Office",
-      name: "MAYURI SRIVASTAVA",
-      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-      city: "Bhopal - 462030",
-      state: "Madhya Pradesh",
-      mobile: "817596153315",
-    },
-  ];
+    otherAddress: [
+      {
+        id: "addr1",
+        isDefault: true,
+        date: "Wed, 3 Apr 2024",
+        type: "Home",
+        name: "MAYURI SRIVASTAVA",
+        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+        city: "Bhopal - 462030",
+        state: "Madhya Pradesh",
+        mobile: "817596153315",
+      },
+      {
+        id: "addr2",
+        isDefault: false,
+        date: "Wed, 3 Apr 2024",
+        type: "Office",
+        name: "MAYURI SRIVASTAVA",
+        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+        city: "Bhopal - 462030",
+        state: "Madhya Pradesh",
+        mobile: "817596153315",
+      },
+      {
+        id: "addr3",
+        isDefault: false,
+        date: "Wed, 3 Apr 2024",
+        type: "Office",
+        name: "MAYURI SRIVASTAVA",
+        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+        city: "Bhopal - 462030",
+        state: "Madhya Pradesh",
+        mobile: "817596153315",
+      },
+      {
+        id: "addr4",
+        isDefault: false,
+        date: "Wed, 3 Apr 2024",
+        type: "Office",
+        name: "MAYURI SRIVASTAVA",
+        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+        city: "Bhopal - 462030",
+        state: "Madhya Pradesh",
+        mobile: "817596153315",
+      },
+      {
+        id: "addr5",
+        isDefault: false,
+        date: "Wed, 3 Apr 2024",
+        type: "Office",
+        name: "MAYURI SRIVASTAVA",
+        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
+        city: "Bhopal - 462030",
+        state: "Madhya Pradesh",
+        mobile: "817596153315",
+      },
+    ],
+  };
+
   return (
     <>
       <ThemeProvider theme={theme}>
         <Box
           maxWidth={isPlaceOrder ? "auto" : "md"}
           sx={{
-            py: 4,
-            ml: 2,
-            mr: 6,
+            mt: "2%",
+            marginInline: "5%",
           }}
         >
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              ml: { md: "8rem" },
+
               alignItems: "center",
               mb: "12px",
             }}
@@ -431,17 +451,43 @@ const AddressUI = () => {
           </Box>
           <Box
             sx={{
-              height: "74vh",
+              height: "80vh",
               overflowY: "scroll",
               scrollbarWidth: "none",
-              ml: { md: "8rem" },
             }}
           >
             <RadioGroup
               value={selectedAddress || ""}
               onChange={(e) => handleAddressSelection(e.target.value)}
             >
-              {addresses.map((addr) => (
+              <Typography
+                color="rgba(96, 164, 135, 1)"
+                fontWeight={700}
+                fontSize="14px"
+                lineHeight="21px"
+                mb={"1rem"}
+              >
+                Default Address
+              </Typography>
+
+              <AddressCard
+                key={addresses.defaultAddress.id}
+                {...addresses.defaultAddress}
+                isSelected={selectedAddress === addresses.defaultAddress.id}
+                onSelect={handleAddressSelection}
+                addressId={addresses.defaultAddress.id}
+              />
+
+              <Typography
+                color="rgba(96, 164, 135, 1)"
+                fontWeight={700}
+                fontSize="14px"
+                lineHeight="21px"
+                mb={"1rem"}
+              >
+                Other Address
+              </Typography>
+              {addresses.otherAddress.map((addr) => (
                 <AddressCard
                   key={addr.id}
                   {...addr}

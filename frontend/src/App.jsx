@@ -28,13 +28,31 @@ import { createTheme, ThemeProvider } from "@mui/material";
 
 export default function App() {
   const location = useLocation();
-  console.log("sfds", location);
+  const url = location.pathname;
 
-  const hideFromHere = ["/login", "/signup/1", "/signup/2", "/otp"].includes(
-    location.pathname
-  );
+  const hide_nav = ["/login", "/signup/1", "/signup/2", "/otp"].includes(url);
 
-  const navWithoutSearchBar_list = ["/blogs"].includes(location.pathname);
+  const hide_footer = [
+    "/buy-now",
+    "/user/profile",
+    "/login",
+    "/signup/1",
+    "/signup/2",
+    "/otp",
+    "/user/wishlist",
+    "/user/orders",
+    "/user/address",
+    "/place-order",
+  ].includes(url);
+
+  const navWithoutSearchBar_list = [
+    "/blogs",
+    "/user/orders",
+    "/user/wishlist",
+    "/user/address",
+    "/user/profile",
+    "/place-order",
+  ].includes(url);
 
   const theme = createTheme({
     typography: { fontFamily: "Lato" },
@@ -43,9 +61,9 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <ScrollToTop />
-      <header>{!hideFromHere && <Navbar />}</header>
+      <header>{!hide_nav && <Navbar />}</header>
       <main
-        className={`${hideFromHere ? "" : "marginTop"} ${
+        className={`${hide_nav ? "" : "marginTop"} ${
           navWithoutSearchBar_list ? "removeExtraMargin" : ""
         }`}
       >
@@ -75,7 +93,7 @@ export default function App() {
           </Route>
         </Routes>
       </main>
-      <footer>{!hideFromHere && <Footer />}</footer>
+      <footer>{!hide_footer && <Footer />}</footer>
     </ThemeProvider>
   );
 }
