@@ -1,17 +1,21 @@
 import CART from "../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
 
-export default function Navbar(navWithoutSearchBar_list) {
+export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
-  const [isProfileView, setIsProfileView] = useState(false);
+  // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const url = location.pathname;
+
+  console.log("jkhgtfdrfghjk", navWithoutSearchBar_list);
 
   useEffect(() => {
     const handleResize = () => {
@@ -30,18 +34,18 @@ export default function Navbar(navWithoutSearchBar_list) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  useEffect(() => {
-    // Check if the URL contains "user/wishlist"
-    const path = window.location.pathname;
-    if (path.includes("user/") || path.includes("/blogs")) {
-      setIsProfileView(true);
-    } else {
-      setIsProfileView(false);
-    }
-    return () => {
-      setIsProfileView(false);
-    };
-  }, [window.location.pathname]);
+  // useEffect(() => {
+  //   // Check if the URL contains "user/wishlist"
+  //   const path = window.location.pathname;
+  //   if (path.includes("user/") || path.includes("/blogs")) {
+  //     setIsProfileView(true);
+  //   } else {
+  //     setIsProfileView(false);
+  //   }
+  //   return () => {
+  //     setIsProfileView(false);
+  //   };
+  // }, [window.location.pathname]);
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
@@ -245,52 +249,51 @@ export default function Navbar(navWithoutSearchBar_list) {
         })}
       </ul>
       <div>
-        {isProfileView !== true ||
-          (navigate.pathname == "/place-order" && (
-            <form className="form">
-              <button>
-                <svg
-                  width="17"
-                  height="16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-labelledby="search"
-                >
-                  <path
-                    d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
-                    stroke="currentColor"
-                    strokeWidth="1.333"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></path>
-                </svg>
-              </button>
-              <input
-                className="input"
-                placeholder="What are you looking for ?"
-                required=""
-                type="text"
-              />
-              {/* )} */}
-              <button className="reset" type="reset">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
+        {!navWithoutSearchBar_list && (
+          <form className="form">
+            <button>
+              <svg
+                width="17"
+                height="16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-labelledby="search"
+              >
+                <path
+                  d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
                   stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            </form>
-          ))}
+                  strokeWidth="1.333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></path>
+              </svg>
+            </button>
+            <input
+              className="input"
+              placeholder="What are you looking for ?"
+              required=""
+              type="text"
+            />
+            {/* )} */}
+            <button className="reset" type="reset">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </form>
+        )}
       </div>
       <div>
         <figure id="cartIcon_container">
