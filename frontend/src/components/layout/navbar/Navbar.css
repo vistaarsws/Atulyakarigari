@@ -275,7 +275,11 @@ input:not(:placeholder-shown) ~ .reset {
     transform: translateX(-50%);
     width: 100%;
     z-index: 999;
-    background-color: #ad3f38;
+    background-color: #60a487;
+
+    & li > a {
+      color: white !important;
+    }
   }
 
   .navbar_container {
