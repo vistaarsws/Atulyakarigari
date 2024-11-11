@@ -426,7 +426,6 @@ const AddressUI = () => {
               startIcon={
                 <AddIcon
                   sx={{
-                    color: "#73af96",
                     color: "#ffffff",
 
                     "&:hover": {

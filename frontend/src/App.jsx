@@ -31,7 +31,6 @@ export default function App() {
   const url = location.pathname;
 
   const hide_nav = ["/login", "/signup/1", "/signup/2", "/otp"].includes(url);
-
   const hide_footer = [
     "/buy-now",
     "/user/profile",
@@ -52,6 +51,8 @@ export default function App() {
     "/user/address",
     "/user/profile",
     "/place-order",
+    "/artisans",
+    "/about",
   ].includes(url);
 
   const theme = createTheme({
@@ -62,11 +63,16 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <ScrollToTop />
       <header>
-        {!hideFromHere && (
+        <header>
+          {!hide_nav && (
+            <Navbar navWithoutSearchBar_list={navWithoutSearchBar_list} />
+          )}
+        </header>
+        {/* {!hideFromHere && (
           <Navbar navWithoutSearchBar={navWithoutSearchBar_list} />
-        )}
+        )} */}
       </header>
-      <header>{!hide_nav && <Navbar />}</header>
+
       <main
         className={`${hide_nav ? "" : "marginTop"} ${
           navWithoutSearchBar_list ? "removeExtraMargin" : ""

@@ -8,10 +8,10 @@ import {
   FormControlLabel,
   TextField,
   Modal,
-  IconButton,
   useMediaQuery,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 
 const EditAddressModal = ({ open, handleClose, addressData }) => {
   const isMobile = useMediaQuery("(max-width:768px)");
@@ -90,16 +90,14 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           backgroundColor: "white",
-          padding: "2rem",
+          padding: "0",
           borderRadius: "0.75rem",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           width: isMobile ? "90%" : "100%",
           maxWidth: isMobile ? "90%" : "52rem",
-          maxHeight: "60vh",
-          overflowY: "auto",
-          scrollbarWidth: "none",
         }}
       >
+        {/* Fixed header with close icon */}
         <Box
           sx={{
             display: "flex",
@@ -111,6 +109,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
             top: 0,
             backgroundColor: "white",
             zIndex: 1,
+            borderRadius: "0.75rem",
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: "600", color: "#383737" }}>
@@ -127,15 +126,9 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           >
             <CloseIcon />
           </IconButton>
-                  
         </Box>
-        {/* <Typography
-          variant="h5"
-          sx={{ fontWeight: "600", marginBottom: "1.5rem", color: "#383737" }}
-        >
-          Edit Address
-        </Typography> */}
 
+        {/* Scrollable content area */}
         <Box
           sx={{
             padding: "2rem",
@@ -144,6 +137,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
             scrollbarWidth: "none",
           }}
         >
+          {/* Form fields */}
           <Box
             sx={{
               display: "flex",
@@ -342,51 +336,51 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
               />
             </Box>
           </Box>
-        </Box>
-
-        <Box
-          sx={{
-            marginTop: "2rem",
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "1rem",
-            flexDirection: isMobile ? "column" : "row",
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="success"
+          <Box
             sx={{
-              borderRadius: "0.375rem",
-              color: "#73af96",
-              borderColor: "#73af96",
-              "&:hover": {
-                color: "#ffffff",
-                borderColor: "#60a487",
-                backgroundColor: "#60a487",
-              },
+              marginTop: "2rem",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "1rem",
+              flexDirection: isMobile ? "column" : "row",
             }}
-            onClick={handleClose}
           >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              color: "white",
-              borderRadius: "0.375rem",
-              backgroundColor: "rgba(173, 63, 56, 1)",
-              "&:hover": {
-                backgroundColor: "#6d001d",
-              },
-            }}
-            onClick={handleClose}
-          >
-            Save
-          </Button>
+            <Button
+              variant="outlined"
+              color="success"
+              sx={{
+                borderRadius: "0.375rem",
+                color: "#73af96",
+                borderColor: "#73af96",
+                "&:hover": {
+                  color: "#ffffff",
+                  borderColor: "#60a487",
+                  backgroundColor: "#60a487",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                color: "white",
+                borderRadius: "0.375rem",
+                backgroundColor: "rgba(173, 63, 56, 1)",
+                "&:hover": {
+                  backgroundColor: "#6d001d",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Save
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Modal>
   );
 };
+
 export default EditAddressModal;
