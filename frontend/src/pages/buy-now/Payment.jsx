@@ -5,6 +5,7 @@ import {
   Divider,
   FormControlLabel,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -274,6 +275,7 @@ const Payment = () => {
               justifyContent: "space-between",
               fontSize: 16,
               fontWeight: "bold",
+              paddingBottom: useMediaQuery("(max-width:900px)") ? "3.5rem" : "",
             }}
           >
             <Typography
@@ -301,7 +303,6 @@ const Payment = () => {
         <Button
           variant="contained"
           sx={{
-            width: "100%",
             backgroundColor: "rgba(96, 164, 135, 1)",
             color: "white",
             paddingY: 1.5,
@@ -309,6 +310,13 @@ const Payment = () => {
             textTransform: "capitalize",
             fontSize: "16px",
             fontWeight: 400,
+            marginTop: "1rem",
+            position: useMediaQuery("(max-width:900px)") ? "fixed" : "relative",
+            left: "50%",
+            transform: "translateX(-50%)",
+            bottom: "2.5rem",
+            zIndex: 999,
+            width: useMediaQuery("(max-width:900px)") ? "90%" : "100%",
           }}
           onClick={() => {
             navigate("/place-order");
