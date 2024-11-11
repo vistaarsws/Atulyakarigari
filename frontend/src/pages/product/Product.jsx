@@ -24,6 +24,13 @@ import {
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
 import { useState } from "react";
+import ProductSection from "../../components/layout/productSection/ProductSection";
+import cat5_1 from "../../assets/images/cat5_1.png";
+import cat5_2 from "../../assets/images/cat5_2.png";
+import cat5_3 from "../../assets/images/cat5_3.png";
+import cat5_4 from "../../assets/images/cat5_4.png";
+import cat5_5 from "../../assets/images/cat5_5.png";
+import cat5_6 from "../../assets/images/cat5_1.png";
 
 // ----------------------------------------------------------------------------------------
 function CustomTabPanel(props) {
@@ -73,9 +80,9 @@ export default function Product() {
     setValue(newValue);
   };
   const breadcrumbItems = [
-    { title: "Home", href: "/" },
-    { title: "Category", href: "/category" },
-    { title: "Subcategory", href: "/subcategory" },
+    // { title: "Home", href: "/" },
+    { title: "Banarsi Silk ", href: "/categories" },
+    { title: "Banarasi Nikhaar", href: "/categories" },
   ];
 
   const items = breadcrumbItems.map((item, index) => ({
@@ -98,11 +105,106 @@ export default function Product() {
       { type: "Style", value: "Floral pattern with gota patti pallu" },
       { type: "Type", value: "Pure Silk" },
       { type: "Weight", value: "500 gm" },
-      { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
-      { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
+      // { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
+      // { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
     ],
   };
-
+  const similar_product = {
+    title: "Similar Products",
+    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
+    products: [
+      {
+        key: "1",
+        title: "Kashi Kalaa",
+        picture: cat5_1,
+        price: 2000.0,
+      },
+      {
+        key: "2",
+        title: "Kashi Kalaa",
+        picture: cat5_2,
+        price: 4000.0,
+      },
+      {
+        key: "3",
+        title: "Silken Splendor",
+        picture: cat5_3,
+        price: 2000.0,
+      },
+      {
+        key: "4",
+        title: "Silken Splendor",
+        picture: cat5_4,
+        price: 6000.0,
+      },
+      {
+        key: "5",
+        title: "Silken Splendor",
+        picture: cat5_5,
+        price: 3000.0,
+      },
+      {
+        key: "6",
+        title: "Silken Splendor",
+        picture: cat5_1,
+        price: 12000,
+      },
+      {
+        key: "7",
+        title: "Silken Splendor",
+        picture: cat5_2,
+        price: 12000,
+      },
+    ],
+  };
+  const you_may_also_like = {
+    title: "You May Also Like",
+    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
+    products: [
+      {
+        key: "1",
+        title: "Kashi Kalaa",
+        picture: cat5_1,
+        price: 2000.0,
+      },
+      {
+        key: "2",
+        title: "Kashi Kalaa",
+        picture: cat5_2,
+        price: 4000.0,
+      },
+      {
+        key: "3",
+        title: "Silken Splendor",
+        picture: cat5_3,
+        price: 2000.0,
+      },
+      {
+        key: "4",
+        title: "Silken Splendor",
+        picture: cat5_4,
+        price: 6000.0,
+      },
+      {
+        key: "5",
+        title: "Silken Splendor",
+        picture: cat5_5,
+        price: 3000.0,
+      },
+      {
+        key: "6",
+        title: "Silken Splendor",
+        picture: cat5_1,
+        price: 12000,
+      },
+      {
+        key: "7",
+        title: "Silken Splendor",
+        picture: cat5_2,
+        price: 12000,
+      },
+    ],
+  };
   return (
     <ThemeProvider theme={theme}>
       <div className="product_container">
@@ -305,7 +407,10 @@ export default function Product() {
                         </Typography>
                       </Stack>
 
-                      <Typography variant="body1" sx={{ mt: 1 }}>
+                      <Typography
+                        variant="body1"
+                        sx={{ mt: 1, color: "#5d5c5c" }}
+                      >
                         Wearing a Banarsi sari feels like draping a piece of
                         heritage. The craftsmanship and elegance are unmatched.
                         Lorem ipsum dolor, sit amet consectetur adipisicing
@@ -332,6 +437,18 @@ export default function Product() {
             </article>
           </section>
         </div>
+        <section>
+          <ProductSection
+            productCategorySection={similar_product}
+            bgColor={"#fff"}
+          />
+        </section>
+        <section>
+          <ProductSection
+            productCategorySection={you_may_also_like}
+            bgColor={"#fff"}
+          />
+        </section>
       </div>
     </ThemeProvider>
   );
