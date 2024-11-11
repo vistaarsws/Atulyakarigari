@@ -8,8 +8,10 @@ import {
   FormControlLabel,
   TextField,
   Modal,
+  IconButton,
   useMediaQuery,
 } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 
 const EditAddressModal = ({ open, handleClose, addressData }) => {
   const isMobile = useMediaQuery("(max-width:768px)");
@@ -98,18 +100,48 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           scrollbarWidth: "none",
         }}
       >
-        <Typography
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "1.5rem",
+            borderBottom: "1px solid #e0e0e0",
+            position: "sticky",
+            top: 0,
+            backgroundColor: "white",
+            zIndex: 1,
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: "600", color: "#383737" }}>
+            Edit Address
+          </Typography>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              color: "#6b7280",
+              "&:hover": {
+                color: "#383737",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+                  
+        </Box>
+        {/* <Typography
           variant="h5"
           sx={{ fontWeight: "600", marginBottom: "1.5rem", color: "#383737" }}
         >
           Edit Address
-        </Typography>
+        </Typography> */}
 
         <Box
           sx={{
-            gap: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
+            padding: "2rem",
+            maxHeight: "60vh",
+            overflowY: "auto",
+            scrollbarWidth: "none",
           }}
         >
           <Box

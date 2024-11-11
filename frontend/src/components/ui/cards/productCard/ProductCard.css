@@ -4,7 +4,7 @@
   width: 100%;
   height: max-content;
   padding: 1rem;
-  background-color: #f4f4f4;
+  background-color: #ffffff;
   border-radius: 0.6rem !important;
 
   &:has(.wistListBtnStyle) {
