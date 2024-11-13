@@ -22,7 +22,7 @@ const Progress = () => {
         sx={{
           color: "#60a487",
           mx: 1,
-          fontSize: isSmallScreen ? "11px" : "16px",
+          fontSize: isSmallScreen ? "14px" : "16px",
         }}
       >
         Bag
@@ -46,7 +46,7 @@ const Progress = () => {
         sx={{
           color: routes == "/place-order" ? "#60a487" : "#888888",
           mx: 1,
-          fontSize: isSmallScreen ? "11px" : "16px",
+          fontSize: isSmallScreen ? "14px" : "16px",
         }}
       >
         Address
@@ -70,7 +70,7 @@ const Progress = () => {
         sx={{
           color: "#888888",
           mx: 1,
-          fontSize: isSmallScreen ? "11px" : "16px",
+          fontSize: isSmallScreen ? "14px" : "16px",
         }}
       >
         Payment

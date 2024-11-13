@@ -209,9 +209,11 @@
   padding: 4rem;
 }
 .about_sec-6 div h2 {
+  font-weight: 400;
   font-size: 3rem;
 }
 .about_sec-6 div p {
+  font-weight: 400;
   font-size: 2rem;
   margin: 2rem 0;
 }
@@ -219,7 +221,7 @@
 .about_sec-6 div button {
   width: max-content;
   font-size: 1.4rem;
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   border: none;
   background-color: #ad3f38;
   border-radius: 0.6rem;

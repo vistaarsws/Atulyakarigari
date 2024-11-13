@@ -196,7 +196,7 @@ const ProductCard = ({ product }) => {
             flexDirection: "column",
             alignItems: "start",
             justifyContent: "space-between",
-            gap: useMediaQuery("(max-width: 458px)") ? 0 : 4,
+            gap: useMediaQuery("(max-width: 458px)") ? 0 : 2,
 
             height: "100%",
           }}
@@ -204,9 +204,13 @@ const ProductCard = ({ product }) => {
           <Box
             sx={{
               display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: useMediaQuery("(max-width: 458px)") ? "" : 4,
+              flexDirection: useMediaQuery("(max-width: 458px)")
+                ? "row"
+                : "column",
+              alignItems: "start",
+              width: "100%",
+              justifyContent: "space-between",
+              gap: useMediaQuery("(max-width: 458px)") ? "" : 2,
               // my: isMobile ? 0 : 2,
             }}
           >
@@ -217,16 +221,19 @@ const ProductCard = ({ product }) => {
                 fontSize: "16px",
               }}
             >
-              {product?.price?.toLocaleString()}
+              ₹{product?.price?.toLocaleString()}
             </Typography>
-            <QuantityContainer>
-              <QuantityButton variant="outlined">-</QuantityButton>
-              <Typography variant="outlined" fontSize="14px">
-                {product?.quantity}
-              </Typography>
-              <QuantityButton variant="outlined">+</QuantityButton>
+            <QuantityContainer
+              sx={{
+                borderRadius: "0.5rem",
+              }}
+            >
+              <QuantityButton>-</QuantityButton>
+              <Typography>{product?.quantity}</Typography>
+              <QuantityButton>+</QuantityButton>
             </QuantityContainer>
           </Box>
+
           <Box>
             <Typography
               variant="body2"

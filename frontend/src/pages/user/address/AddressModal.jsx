@@ -103,7 +103,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "1.5rem",
+            padding: "1rem",
             borderBottom: "1px solid #e0e0e0",
             position: "sticky",
             top: 0,
@@ -132,7 +132,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
         <Box
           sx={{
             padding: "2rem",
-            maxHeight: "60vh",
+            maxHeight: "80vh",
             overflowY: "auto",
             scrollbarWidth: "none",
           }}
@@ -342,7 +342,6 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
               display: "flex",
               justifyContent: "flex-end",
               gap: "1rem",
-              flexDirection: isMobile ? "column" : "row",
             }}
           >
             <Button
@@ -357,6 +356,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
                   borderColor: "#60a487",
                   backgroundColor: "#60a487",
                 },
+                flexBasis: isMobile ? "50%" : "",
               }}
               onClick={handleClose}
             >
@@ -371,6 +371,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
                 "&:hover": {
                   backgroundColor: "#6d001d",
                 },
+                flexBasis: isMobile ? "50%" : "",
               }}
               onClick={handleClose}
             >
