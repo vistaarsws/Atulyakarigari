@@ -234,7 +234,12 @@ export default function Product() {
             </p>
             <div className="priceRatingContainer">
               <div>
-                <div className="priceBox"> ₹ 26,700</div>
+                <div className="priceBox">
+                  <h2>₹26,700</h2>
+                  <strike>₹32,700</strike>
+                  <h4>(-{15}%)</h4>
+                </div>
+
                 <div className="ratingBox">
                   <div>
                     <span>4</span> <img src={star} alt="Star" />
@@ -301,13 +306,13 @@ export default function Product() {
                   borderColor: "divider",
                   overflow: "scroll",
                   scrollbarWidth: "none",
-                  width: useMediaQuery("(max-width:600px)") ? "80vw" : "100%",
+                  width: useMediaQuery("(max-width:600px)") ? "87vw" : "100%",
                 }}
               >
                 <Tabs
                   value={value}
                   variant="scrollable"
-                  scrollButtons="auto"
+                  scrollButtons="false"
                   onChange={handleChange}
                   className="Product_tab_items"
                   textColor="secondary"
@@ -395,15 +400,36 @@ export default function Product() {
                     />
 
                     <Box sx={{ ml: 2, flex: 1 }}>
-                      <Stack direction="row" alignItems="center" spacing={1}>
+                      <Stack
+                        display="grid"
+                        marginTop="1rem"
+                        gridTemplateColumns="1fr 1fr "
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="start"
+                        spacing={1}
+                      >
                         <Rating name="read-only" value={5} readOnly />
-
+                        <div></div>
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontSize: "1.2rem" }}
+                          sx={{
+                            fontSize: "1.2rem",
+                            marginLeft: "0rem !important",
+                          }}
                         >
-                          - Priya Sharma, 30-09-2024
+                          - Priya Sharma
+                        </Typography>
+
+                        <Typography
+                          sx={{
+                            margin: "0 !important",
+                            textAlign: "right",
+                            fontSize: "1.2rem !important",
+                          }}
+                        >
+                          30-09-2024
                         </Typography>
                       </Stack>
 

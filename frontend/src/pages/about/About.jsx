@@ -22,7 +22,7 @@ export default function About() {
         </figure>
 
         <div>
-          <h2>Who We Are</h2>
+          <h2 style={{ fontWeight: 400 }}>Who We Are</h2>
           <figure>
             <img src={aboutImg_1} alt="" />
           </figure>
@@ -101,6 +101,7 @@ export default function About() {
               delay: 3000,
               draggable: false,
               preventScrollOnTouch: true,
+              // loop: true,
             }}
             navigationDots={false}
             slides_in_view={{ xl: 7, lg: 5, md: 3, sm: 3, xs: 1 }}

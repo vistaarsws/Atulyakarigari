@@ -33,14 +33,7 @@ export default function ProductView({ productImages = images }) {
     <>
       <div className="slideshow" style={{ display: "flex" }}>
         {/* Thumbnail images in a vertical column */}
-        <div
-          className="thumbnails-container"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginRight: "20px",
-          }}
-        >
+        <div className="thumbnails-container">
           {productImages.map((src, index) => (
             <img
               key={`thumbnail-${index}`}
@@ -50,10 +43,6 @@ export default function ProductView({ productImages = images }) {
               }`}
               onClick={() => changeSlide(index)}
               alt={`Thumbnail ${index + 1}`}
-              style={{
-                marginBottom: "10px", // Space between each thumbnail
-                cursor: "pointer",
-              }}
             />
           ))}
         </div>
