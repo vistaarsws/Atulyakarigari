@@ -26,6 +26,8 @@ import PlaceOrder from "./pages/place-order";
 import AuthTemplate from "./pages/auth/authTemplate";
 import { createTheme, ThemeProvider } from "@mui/material";
 
+import { SnackbarProvider } from "notistack";
+
 export default function App() {
   const location = useLocation();
   const url = location.pathname;
@@ -61,50 +63,49 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <ScrollToTop />
-      <header>
+      <SnackbarProvider maxSnack={3}>
+        <ScrollToTop />
         <header>
-          {!hide_nav && (
-            <Navbar navWithoutSearchBar_list={navWithoutSearchBar_list} />
-          )}
-        </header>
-        {/* {!hideFromHere && (
+          <header>
+            {!hide_nav && (
+              <Navbar navWithoutSearchBar_list={navWithoutSearchBar_list} />
+            )}
+          </header>
+          {/* {!hideFromHere && (
           <Navbar navWithoutSearchBar={navWithoutSearchBar_list} />
         )} */}
-      </header>
+        </header>
 
-      <main
-        className={`${hide_nav ? "" : "marginTop"} ${
-          navWithoutSearchBar_list ? "removeExtraMargin" : ""
-        }`}
-      >
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/artisans" element={<Artisans />} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/buy-now" element={<BuyNow />} />
-          <Route path="/place-order" element={<PlaceOrder />} />
+        <main
+          className={`${hide_nav ? "" : "marginTop"} ${
+            navWithoutSearchBar_list ? "removeExtraMargin" : ""
+          }`}
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/artisans" element={<Artisans />} />
+            <Route path="/product/:id" element={<Product />} />
+            <Route path="/buy-now" element={<BuyNow />} />
+            <Route path="/place-order" element={<PlaceOrder />} />
 
-          <Route path="/login" element={<AuthTemplate page={"login"} />} />
-          <Route
-            path="/signup/:page"
-            element={<AuthTemplate page={"signup"} />}
-          />
-          <Route path="/otp" element={<AuthTemplate page={"otp"} />} />
+            <Route path="/login" element={<AuthTemplate page={"login"} />} />
+            <Route path="/signup" element={<AuthTemplate page={"signup"} />} />
+            <Route path="/otp" element={<AuthTemplate page={"otp"} />} />
 
-          <Route path="/user" element={<User />}>
-            <Route path="orders" element={<Order />} />
-            <Route path="address" element={<Address />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="wishlist" element={<Wishlist />} />
-            <Route path="logout" element={<Logout />} />
-          </Route>
-        </Routes>
-      </main>
-      <footer>{!hide_footer && <Footer />}</footer>
+            <Route path="/user" element={<User />}>
+              <Route path="orders" element={<Order />} />
+              <Route path="address" element={<Address />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="wishlist" element={<Wishlist />} />
+              <Route path="logout" element={<Logout />} />
+            </Route>
+          </Routes>
+        </main>
+        <footer>{!hide_footer && <Footer />}</footer>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }
