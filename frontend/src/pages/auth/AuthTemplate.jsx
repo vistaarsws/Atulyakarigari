@@ -3,71 +3,118 @@ import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
 import { useState, useEffect } from "react";
 
-import { message } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { Button, CircularProgress } from "@mui/material";
+import {
+  signUp,
+  sendOtp,
+  login,
+  varifyOtp,
+} from "../../services/operations/authAPI";
 
 dayjs.extend(customParseFormat);
 
 export default function AuthTemplate({ page }) {
+  const { enqueueSnackbar } = useSnackbar();
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
+  const url = useParams();
+  const navigate = useNavigate();
+  const otpType = location.state?.type;
+
   // -------------------------------------------------------------------------------------------------------------------------
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
   const [userDetails, setUserDetails] = useState({
     fullName: "",
-    email: "",
-    phoneNumber: "",
-    hintName: "",
-    gender: "",
-    dob: "",
-    location: "",
+    loginId: "",
   });
 
-  const url = useParams();
-  const navigate = useNavigate();
+  // -----------------------------------------------------Login---------------------------------------------------------------------
 
-  const onChange = (text) => {
-    console.log("onChange:", text);
+  const loginHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await login(userDetails.loginId);
+      if (res?.status === 200) {
+        navigate("/otp", { state: { type: "login" } });
+        enqueueSnackbar(res.data.message || "Login Successful!", {
+          variant: "success",
+        });
+      } else {
+        enqueueSnackbar(res.data.message, {
+          variant: "warning",
+        });
+      }
+    } catch (error) {
+      enqueueSnackbar(error, { variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const sharedProps = {
-    onChange,
+  // --------------------------------------------------------Signup-----------------------------------------------------------------------------------------------------------
+
+  const signupHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await sendOtp(userDetails.loginId);
+      if (res?.status === 200) {
+        navigate("/otp", { state: { type: "signup" } });
+        enqueueSnackbar(res.data.message || "Signup Successful!", {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      enqueueSnackbar(error, { variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOTPChange = (e) => {
-    const numericInput = e.target.value.replace(/\D/g, "");
-    setOtp(numericInput);
+  // ---------------------------------------------------Varify otp-------------------------------------------------------------------------------------------------------------------
+
+  const validateOtpHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const action = otpType === "login" ? varifyOtp : signUp;
+      const args =
+        otpType === "login"
+          ? [userDetails.loginId, otp]
+          : [userDetails.fullName, userDetails.loginId, otp];
+
+      const res = await action(...args);
+
+      if (res.status === 200) {
+        const successMessage =
+          otpType === "login" ? "Login Successful!" : "Signup Successful!";
+        navigate("/", { state: { type: otpType } });
+        enqueueSnackbar(res.data.message || successMessage, {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Error during OTP validation:", error);
+      enqueueSnackbar(error?.message || "An error occurred", {
+        variant: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
   // -----------------------------------------------------------------------------------------------------------------------------
 
-  const handleMenuClick = (e) => {
-    message.info("Click on menu item.");
-    console.log("click", e);
+  const handleOTPChange = (value) => {
+    setOtp(value);
   };
-
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
-
-  const items = [
-    {
-      label: "1st menu item",
-      key: "1",
-    },
-    {
-      label: "2nd menu item",
-      key: "2",
-    },
-    {
-      label: "3rd menu item",
-      key: "3",
-    },
-    {
-      label: "4th menu item",
-      key: "4",
-    },
-  ];
 
   useEffect(() => {
     // Start the countdown when the component is mounted
@@ -86,11 +133,19 @@ export default function AuthTemplate({ page }) {
     return () => clearInterval(countdown);
   }, [timer]);
 
-  const handleResendOtp = () => {
-    setTimer(30); // Reset the timer to 30 seconds (or desired time)
+  const handleResendOtp = async () => {
+    setTimer(30);
+    if (otpType === "login") {
+      await login(userDetails.loginId);
+    } else {
+      await sendOtp(userDetails.loginId);
+    }
   };
 
-  const userDetailsHandler = (e) => {};
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+  };
 
   return (
     <>
@@ -108,22 +163,31 @@ export default function AuthTemplate({ page }) {
                 <h3>Use your email or phone number to log in</h3>
               </div>
 
-              <form>
+              <form onSubmit={loginHandler}>
                 <div>
                   <div>
-                    <label htmlFor="">Email or Phone Number</label>
+                    <label htmlFor="loginId">Email/Phone Number</label>
                     <input
                       type="text"
-                      name="fullName"
-                      id="fullName"
-                      placeholder="Enter Your Name"
+                      name="loginId"
+                      id="loginId"
+                      placeholder="Enter Your Email/Phone Number"
+                      onChange={handleInputChange}
                     />
                   </div>
 
                   <div>
-                    <button type="button" onClick={() => navigate("/otp")}>
-                      Log In
-                    </button>
+                    <Button
+                      variant="contained"
+                      type="submit"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} color="white" />
+                      ) : (
+                        "Login"
+                      )}
+                    </Button>
                   </div>
                 </div>
               </form>
@@ -132,7 +196,7 @@ export default function AuthTemplate({ page }) {
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
           {page === "signup" && (
             <article className="signUp_container">
-              <div className={url.page == 2 ? "hideIt" : ""}>
+              <div>
                 <figure>
                   <img src={authIcon} alt="Auth Icon" />
                 </figure>
@@ -141,92 +205,43 @@ export default function AuthTemplate({ page }) {
                 <h3>Use your email or phone number to sign up</h3>
               </div>
 
-              <form>
-                {url.page == 2 ? (
+              <form onSubmit={signupHandler}>
+                <div>
                   <div>
-                    <div>
-                      <label htmlFor="">Hint Name</label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        id="fullName"
-                        placeholder="Enter Your Name"
-                        onChange={userDetailsHandler}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="gender">Gender</label>
-                      <select name="gender" id="gender">
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                      </select>
-                    </div>
-                    <div className="dobInputBox">
-                      <label htmlFor="id">Date Of Birth</label>
-                      <input
-                        type="date"
-                        id="date"
-                        name="dob"
-                        onChange={userDetailsHandler}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="">Location</label>
-                      <input
-                        type="text"
-                        name="location"
-                        placeholder="Enter Your Location"
-                        onChange={userDetailsHandler}
-                      />
-                    </div>
-                    <div>
-                      <button type="button" onClick={() => navigate("/otp")}>
-                        Sign Up
-                      </button>
-                    </div>
+                    <label htmlFor="fullName">Full Name*</label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      id="fullName"
+                      placeholder="Enter Your Full Name"
+                      onChange={handleInputChange}
+                    />
                   </div>
-                ) : (
+
                   <div>
-                    <div>
-                      <label htmlFor="">Name*</label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        id="fullName"
-                        placeholder="Enter Your Name"
-                        onChange={userDetailsHandler}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="">Email*</label>
-                      <input
-                        type="text"
-                        name="email"
-                        id="email"
-                        placeholder="Enter Your Email "
-                        onChange={userDetailsHandler}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="">Phone Number*</label>
-                      <input
-                        type="text"
-                        name="email"
-                        id="email"
-                        placeholder="Enter Your Email "
-                        onChange={userDetailsHandler}
-                      />
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => navigate("/signup/2")}
-                      >
-                        Next
-                      </button>
-                    </div>
+                    <label>Phone Number or Email*</label>
+                    <input
+                      type="text"
+                      name="loginId"
+                      id="loginId"
+                      placeholder="Enter Phone Number or Email"
+                      onChange={handleInputChange}
+                    />
                   </div>
-                )}
+                  <div>
+                    <Button
+                      variant="contained"
+                      type="submit"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} color="white" />
+                      ) : (
+                        "Sign Up"
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </form>
             </article>
           )}
@@ -244,7 +259,7 @@ export default function AuthTemplate({ page }) {
                 </h3>
               </div>
 
-              <form>
+              <form onSubmit={validateOtpHandler}>
                 <div className="otp_inputBox">
                   <Flex gap="middle" align="flex-center" vertical>
                     <Input.OTP
@@ -253,7 +268,6 @@ export default function AuthTemplate({ page }) {
                       value={otp}
                       onChange={handleOTPChange}
                       length={4}
-                      {...sharedProps}
                     />
                   </Flex>
                 </div>
@@ -268,16 +282,22 @@ export default function AuthTemplate({ page }) {
                 )}
 
                 <div>
-                  <button type="button">Continue</button>
+                  <Button variant="contained" type="submit" disabled={loading}>
+                    {loading ? (
+                      <CircularProgress size={24} color="white" />
+                    ) : (
+                      "Continue"
+                    )}
+                  </Button>
                 </div>
               </form>
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {page === "login" || page === "otp" ? (
+          {page === "login" || otpType === "login" ? (
             <p>
               Don&apos;t have an account yet?{"  "}
-              <span onClick={() => navigate("/signup/1")}>Sign Up</span>
+              <span onClick={() => navigate("/signup")}>Sign Up</span>
             </p>
           ) : (
             <p>
