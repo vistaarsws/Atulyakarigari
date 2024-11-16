@@ -85,7 +85,7 @@ export default function Component() {
         <div
           style={{
             display: "flex",
-            height: useMediaQuery("(max-width:768px)") ? "86vh" : "91vh",
+            height: useMediaQuery("(max-width:768px)") ? "85vh" : "90vh",
             padding: useMediaQuery("(max-width:425px)") ? "2rem" : "2rem 4rem",
             width:
               (breakpoints.max768 && "100%") ||
@@ -354,6 +354,7 @@ export default function Component() {
               "30%",
             display: breakpoints.max768 ? "none" : "block",
             height: "87vh",
+            mr: 4,
           }}
         >
           <img

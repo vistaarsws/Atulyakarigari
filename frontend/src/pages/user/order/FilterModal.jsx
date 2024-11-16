@@ -68,7 +68,7 @@ const FilterModal = ({ open, handleClose }) => {
           bgcolor: "background.paper",
           borderRadius: "8px",
           width: "100%",
-          maxWidth: isMobile ? "300px" : "350px",
+          maxWidth: "273px",
           p: 3,
           outline: "none",
         }}
@@ -85,7 +85,7 @@ const FilterModal = ({ open, handleClose }) => {
           </IconButton>
         </Box>
 
-        <Box sx={{ mb: 3 }}>
+        <Box>
           <Typography
             sx={{
               fontSize: "1.4rem",
@@ -130,8 +130,16 @@ const FilterModal = ({ open, handleClose }) => {
             ))}
           </Box>
         </Box>
-
-        <Box sx={{ mb: 3 }}>
+        <hr
+          style={{
+            marginBottom: "16px",
+            marginTop: "16px",
+            border: "0" /* Remove the default border */,
+            borderTop:
+              "2px solid #F4F4F4" /* Apply a custom color and thickness */,
+          }}
+        />
+        <Box>
           <Typography
             sx={{
               fontSize: "1.4rem",
@@ -142,7 +150,13 @@ const FilterModal = ({ open, handleClose }) => {
           >
             Time
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              mb: 2,
+            }}
+          >
             {timeOptions.map((option) => (
               <FormControlLabel
                 key={option.value}
@@ -182,11 +196,11 @@ const FilterModal = ({ open, handleClose }) => {
             variant="contained"
             fullWidth
             sx={{
-              fontSize: "11px",
-              backgroundColor: "#B22222",
+              fontSize: "12px",
+              backgroundColor: "#AD3F38",
               color: "white",
               textTransform: "none",
-              "&:hover": { backgroundColor: "#8B0000" },
+              "&:hover": { backgroundColor: "#6d001d" },
             }}
             onClick={handleClose}
           >
@@ -196,7 +210,7 @@ const FilterModal = ({ open, handleClose }) => {
             variant="outlined"
             fullWidth
             sx={{
-              fontSize: "11px",
+              fontSize: "12px",
               borderColor: "#60A487",
               color: "#60A487",
               textTransform: "none",

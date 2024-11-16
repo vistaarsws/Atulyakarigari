@@ -22,7 +22,7 @@ export default function About() {
         </figure>
 
         <div>
-          <h2 style={{ fontWeight: 400 }}>Who We Are</h2>
+          <h2>Who We Are</h2>
           <figure>
             <img src={aboutImg_1} alt="" />
           </figure>

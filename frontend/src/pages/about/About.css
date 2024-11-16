@@ -267,7 +267,7 @@
 }
 
 .removeExtraMargin {
-  margin-top: 9vh !important;
+  margin-top: 10vh;
 }
 
 @media screen and (max-width: 1200px) {
@@ -375,6 +375,9 @@
     background-position: center;
     justify-content: center;
     align-items: top;
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+
     &:hover {
       transform: none;
       filter: none;

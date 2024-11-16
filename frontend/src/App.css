@@ -17,11 +17,11 @@
 
 /* ------------------------------------------------------------------------------------------------- */
 .marginTop {
-  margin-top: 9vh;
+  margin-top: 10vh;
 }
 
 @media screen and (max-width: 650px) {
   .marginTop {
-    margin-top: 14vh;
+    margin-top: 16.5vh;
   }
 }

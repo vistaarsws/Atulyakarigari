@@ -71,15 +71,26 @@
 }
 
 .artisans_heroBanner {
-  background-image: url(../../assets/images/artisansBanner.svg);
-  background-size: contain;
+  background-image: url(../../assets/images/artisansBanner2.png);
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center top;
   height: 34vw;
+  min-height: 25vh;
   display: flex;
   justify-content: center;
   align-items: top;
   padding-top: 13%;
+  animation: fade 5s ease-in-out;
+}
+
+@keyframes fade {
+  0% {
+    background-image: url(../../assets/images/artisansBanner.svg);
+    background-blend-mode: overlay;
+  }
+  100% {
+  }
 }
 
 @media screen and (max-width: 768px) {
