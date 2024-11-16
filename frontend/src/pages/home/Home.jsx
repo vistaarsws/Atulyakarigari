@@ -240,7 +240,10 @@ export default function Home() {
           plugins={["autoplay"]}
         />
       </section>
-      <div style={{ marginInline: isMobile ? "0" : "4rem" }}>
+      <div
+        className="categoryView_container"
+        style={{ marginInline: isMobile ? "0rem" : "0rem" }}
+      >
         <CategoryView />
       </div>
 

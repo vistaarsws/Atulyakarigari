@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   height: auto;
-  min-height: 100vh;
+  min-height: 80vh;
   justify-content: center;
   align-items: center;
   padding: 2% 5%;
@@ -14,6 +14,11 @@
 
 button {
   cursor: pointer;
+}
+
+.categoryView_container div > div {
+  height: auto;
+  width: 32vw;
 }
 
 #mobileView_loopAnimation {
@@ -106,6 +111,8 @@ button {
 .celebrate_artistry_container article:nth-of-type(2) h2,
 .celebrate_artistry_container article:nth-of-type(2) p {
   font-size: 1.6rem;
+  color: #6f6f6f;
+  font-weight: 400;
 }
 .celebrate_artistry_container article:nth-of-type(2) h1 {
   color: #ad3f38;
@@ -114,9 +121,8 @@ button {
   font-weight: 300;
 }
 .celebrate_artistry_container article:nth-of-type(2) h1 em {
-  color: black;
-  font-weight: 300;
-  border: "1px solid black";
+  color: #383737;
+  font-weight: 400;
 }
 .celebrate_artistry_container article:nth-of-type(2) p {
   font-weight: 300;
@@ -435,6 +441,11 @@ button {
   }
   .noDiscount_container article {
     margin-left: 0;
+  }
+
+  .categoryView_container div > div {
+    width: 100%;
+    height: auto;
   }
 }
 @media screen and (max-width: 650px) {
