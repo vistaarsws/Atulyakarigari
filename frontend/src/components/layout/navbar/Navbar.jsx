@@ -1,9 +1,10 @@
 import CART from "../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
@@ -12,10 +13,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const url = location.pathname;
 
-  console.log("jkhgtfdrfghjk", navWithoutSearchBar_list);
+  const cookies = Cookies.get("authToken");
 
   useEffect(() => {
     const handleResize = () => {
@@ -49,7 +48,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
-      // { name: "SHOP", path: "/shop" },
+
       {
         name: "CATEGORIES",
         path: "/categories",
@@ -160,6 +159,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     { name: "Privacy Policy", link: "/user/privacy" },
     { name: "Log Out", link: "/user/logout" },
   ];
+
+  const getAuthToken = () => {
+    const token = localStorage.getItem("authToken");
+    return token || null; // Return `null` if the token is not found
+  };
 
   return (
     <nav className="navbar_container">
@@ -295,7 +299,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           </form>
         )}
       </div>
-      <div>
+      <div style={{ display: cookies ? "" : "" }}>
         <figure id="cartIcon_container">
           <img
             height={24}

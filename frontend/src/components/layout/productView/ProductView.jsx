@@ -1,5 +1,5 @@
 import { useState } from "react";
-import productpage_1 from "../../../assets/images/productpage_1.png";
+import productpage_1 from "../../../assets/images/cat5_2.png";
 import productpage_2 from "../../../assets/images/productpage_2.png";
 import productpage_3 from "../../../assets/images/productpage_3.png";
 import productpage_4 from "../../../assets/images/productpage_4.png";

@@ -2,10 +2,10 @@ import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
 import { useState, useEffect } from "react";
-
+import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Button, CircularProgress } from "@mui/material";
 import {
@@ -18,20 +18,32 @@ import {
 dayjs.extend(customParseFormat);
 
 export default function AuthTemplate({ page }) {
-  const { enqueueSnackbar } = useSnackbar();
-  const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const url = useParams();
-  const navigate = useNavigate();
-  const otpType = location.state?.type;
-
-  // -------------------------------------------------------------------------------------------------------------------------
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
   const [userDetails, setUserDetails] = useState({
     fullName: "",
     loginId: "",
   });
+
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const otpType = location.state?.type;
+
+  const setAuthToken = (token) => {
+    if (!token) {
+      console.error("Token is undefined or null.");
+      return;
+    }
+
+    Cookies.set("authToken", token, {
+      expires: 7, // Expires in 7 days
+      sameSite: "Strict", // SameSite policy
+      // secure: true, // Uncomment this in production (requires HTTPS)
+    });
+    console.log("Token set in cookies!");
+  };
 
   // -----------------------------------------------------Login---------------------------------------------------------------------
 
@@ -93,8 +105,15 @@ export default function AuthTemplate({ page }) {
       const res = await action(...args);
 
       if (res.status === 200) {
+        const token = res.data.data.token;
+
+        if (token) {
+          setAuthToken(token);
+        }
+
         const successMessage =
           otpType === "login" ? "Login Successful!" : "Signup Successful!";
+
         navigate("/", { state: { type: otpType } });
         enqueueSnackbar(res.data.message || successMessage, {
           variant: "success",
@@ -135,6 +154,7 @@ export default function AuthTemplate({ page }) {
 
   const handleResendOtp = async () => {
     setTimer(30);
+    setOtp("");
     if (otpType === "login") {
       await login(userDetails.loginId);
     } else {
