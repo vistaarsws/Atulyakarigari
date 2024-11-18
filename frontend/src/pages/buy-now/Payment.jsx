@@ -38,7 +38,7 @@ const Payment = () => {
           width: "100%",
         }}
       >
-        <Box sx={{ marginBottom: 3 }}>
+        <Box>
           <Typography
             sx={{
               fontWeight: 400,
@@ -268,7 +268,7 @@ const Payment = () => {
           </Box>
         </Box>
         <Divider sx={{ marginY: 3 }} />
-        <Box sx={{ marginBottom: 3 }}>
+        <Box sx={{ marginBottom: 2 }}>
           <Box
             sx={{
               display: "flex",
@@ -304,13 +304,14 @@ const Payment = () => {
             position: useMediaQuery("(max-width:900px)") ? "fixed" : "relative",
             left: "50%",
             bottom: "0",
-            padding: "1rem",
             transform: "translateX(-50%)",
-            width: "100vw",
+            width: "100%",
             display: "flex",
             justifyContent: "center",
             bgcolor: "white",
             zIndex: 9999,
+            paddingInline: useMediaQuery("(max-width:900px)") ? "1.6rem" : "",
+            marginBottom: "1rem",
           }}
         >
           <Button
@@ -326,7 +327,7 @@ const Payment = () => {
 
               position: "relative",
 
-              width: useMediaQuery("(max-width:900px)") ? "90%" : "100%",
+              width: "100%",
             }}
             onClick={() => {
               navigate("/place-order");
