@@ -217,6 +217,11 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
                     checked={formData.addressType === "home"}
                     onChange={handleRadioChange}
                     value="home"
+                    sx={{
+                      "&.Mui-checked": {
+                        color: "#10b981 ",
+                      },
+                    }}
                   />
                 }
                 label={
@@ -233,6 +238,11 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
                     onChange={handleRadioChange}
                     value="office"
                     size="large"
+                    sx={{
+                      "&.Mui-checked": {
+                        color: "#10b981 ",
+                      },
+                    }}
                   />
                 }
                 label={
@@ -255,6 +265,11 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
                   checked={formData.isDefault}
                   onChange={handleCheckboxChange}
                   size="large"
+                  sx={{
+                    "&.Mui-checked": {
+                      color: "#10b981 ",
+                    },
+                  }}
                 />
               }
               label={

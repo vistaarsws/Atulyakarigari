@@ -277,10 +277,6 @@ export default function Product() {
             </article>
             <article className="product_details_userInputs">
               <div className="productQuantityCounter_container">
-                <button onClick={() => setProductQuantity(productQuantity + 1)}>
-                  +
-                </button>
-                <div>{productQuantity}</div>
                 <button
                   onClick={() =>
                     productQuantity > 1 &&
@@ -288,6 +284,10 @@ export default function Product() {
                   }
                 >
                   -
+                </button>
+                <div>{productQuantity}</div>
+                <button onClick={() => setProductQuantity(productQuantity + 1)}>
+                  +
                 </button>
               </div>
               <div>
