@@ -40,7 +40,7 @@ const Index = () => {
         <Box
           sx={{
             // Full width on mobile, 35% on larger screens
-            width: { xs: "100%", md: "35%", marginBottom: "8rem" },
+            width: { xs: "100%", md: "35%", marginBottom: "7rem" },
           }}
         >
           <Payment />
