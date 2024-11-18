@@ -154,10 +154,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     { name: "Wishlist", link: "/user/wishlist" },
     { name: "Orders", link: "/user/orders" },
     { name: "Address", link: "/user/address" },
-    { name: "Contact Us", link: "/user/contact" },
-    { name: "Terms of use", link: "/user/terms" },
-    { name: "Privacy Policy", link: "/user/privacy" },
-    { name: "Log Out", link: "/user/logout" },
+    // { name: "Contact Us", link: "/user/contact" },
+    // { name: "Terms of use", link: "/user/terms" },
+    // { name: "Privacy Policy", link: "/user/privacy" },
+    // { name: "Log Out", link: "/user/logout" },
   ];
 
   const getAuthToken = () => {

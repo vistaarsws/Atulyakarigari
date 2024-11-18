@@ -10,10 +10,10 @@ export default function Sidebar() {
     { key: "user/wishlist", label: "Wishlist" },
     { key: "user/orders", label: "Orders" },
     { key: "user/address", label: "Address" },
-    { key: "contact-us", label: "Contact Us" },
-    { key: "terms-of-use", label: "Terms of use" },
-    { key: "privacy-policy", label: "Privacy Policy" },
-    { key: "user/logout", label: "Log Out" },
+    // { key: "contact-us", label: "Contact Us" },
+    // { key: "terms-of-use", label: "Terms of use" },
+    // { key: "privacy-policy", label: "Privacy Policy" },
+    // { key: "user/logout", label: "Log Out" },
   ];
   console.log(location.pathname);
 
