@@ -29,8 +29,8 @@ const Index = () => {
           sx={{
             width: { xs: "100%", md: "60%" },
             mb: { xs: 4, md: 0 },
-            height: { xs: "75vh", sm: "auto" },
-            overflow: "scroll",
+
+            overflow: useMediaQuery("(max-width:768px)") ? "unset" : "scroll",
             scrollbarWidth: "none",
           }}
         >
@@ -40,7 +40,7 @@ const Index = () => {
         <Box
           sx={{
             // Full width on mobile, 35% on larger screens
-            width: { xs: "100%", md: "35%" },
+            width: { xs: "100%", md: "35%", marginBottom: "8rem" },
           }}
         >
           <Payment />

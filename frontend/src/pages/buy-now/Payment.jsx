@@ -26,7 +26,7 @@ const Payment = () => {
         },
         overflow: "hidden",
         scrollbarWidth: "none",
-        mb: 2,
+
         borderRadius: 2,
       }}
     >
@@ -275,7 +275,6 @@ const Payment = () => {
               justifyContent: "space-between",
               fontSize: 16,
               fontWeight: "bold",
-              paddingBottom: useMediaQuery("(max-width:900px)") ? "3.5rem" : "",
             }}
           >
             <Typography
@@ -300,30 +299,42 @@ const Payment = () => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
+        <Box
           sx={{
-            backgroundColor: "rgba(96, 164, 135, 1)",
-            color: "white",
-            paddingY: 1.5,
-            borderRadius: 1,
-            textTransform: "capitalize",
-            fontSize: "16px",
-            fontWeight: 400,
-            marginTop: "1rem",
             position: useMediaQuery("(max-width:900px)") ? "fixed" : "relative",
             left: "50%",
+            bottom: "0",
+            padding: "1rem",
             transform: "translateX(-50%)",
-            bottom: "2.5rem",
-            zIndex: 999,
-            width: useMediaQuery("(max-width:900px)") ? "90%" : "100%",
-          }}
-          onClick={() => {
-            navigate("/place-order");
+            width: "100vw",
+            display: "flex",
+            justifyContent: "center",
+            bgcolor: "white",
+            zIndex: 9999,
           }}
         >
-          Place Order
-        </Button>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "rgba(96, 164, 135, 1)",
+              color: "white",
+              paddingY: 1.5,
+              borderRadius: 1,
+              textTransform: "capitalize",
+              fontSize: "16px",
+              fontWeight: 400,
+
+              position: "relative",
+
+              width: useMediaQuery("(max-width:900px)") ? "90%" : "100%",
+            }}
+            onClick={() => {
+              navigate("/place-order");
+            }}
+          >
+            Place Order
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
