@@ -63,17 +63,19 @@ const AddressCard = ({
           }}
         >
           <Box display="flex" justifyContent="space-between" mb={2}>
-            <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "start",
-                }}
-              >
-                {" "}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "start",
+              }}
+            >
+              <Box>
                 <FormControlLabel
-                  sx={{ mr: 1, display: isPlaceOrder ? "" : "none" }}
+                  sx={{
+                    mr: 0,
+                    display: isPlaceOrder ? "" : "none",
+                  }}
                   value={addressId}
                   control={<Radio />}
                   checked={isSelected}
@@ -169,130 +171,132 @@ const AddressCard = ({
               Mobile: {mobile}
             </Typography>
           </Box>
+          <Box
+            gap={2}
+            sx={{
+              mt: "1rem",
+
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            {isPlaceOrder ? (
+              <>
+                <Button
+                  variant="outlined"
+                  color="success"
+                  sx={{
+                    width: "102px",
+                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
+                    height: "35px",
+                    padding: "9px 20px",
+                    color: "#73af96",
+                    borderColor: "#73af96",
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    textAlign: "left",
+                    textTransform: "capitalize",
+                    "&:hover": {
+                      color: "#ffffff",
+                      borderColor: "#60a487",
+                      backgroundColor: "#60a487",
+                    },
+                  }}
+                >
+                  Remove
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="error"
+                  sx={{
+                    width: "102px",
+                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
+                    height: "35px",
+                    padding: "9px 20px",
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    textAlign: "left",
+                    color: "#ffffff",
+                    textTransform: "capitalize",
+                    backgroundColor: "rgba(173, 63, 56, 1)",
+                    border: "none",
+                    "&:hover": {
+                      color: "#ffffff",
+                      borderColor: "#6d001d",
+                      backgroundColor: "#6d001d",
+                    },
+                  }}
+                  onClick={handleOpenModal}
+                >
+                  Edit
+                </Button>
+              </>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "end",
+                  gap: 2,
+                  mt: 2,
+                  width: "100%",
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  color="success"
+                  sx={{
+                    width: "102px",
+                    height: "35px",
+                    padding: "9px 20px",
+                    color: "#73af96",
+                    borderColor: "#73af96",
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    textAlign: "left",
+                    textTransform: "capitalize",
+                    "&:hover": {
+                      color: "#ffffff",
+                      borderColor: "#60a487",
+                      backgroundColor: "#60a487",
+                    },
+
+                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
+                  }}
+                  onClick={handleOpenModal}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  sx={{
+                    width: useMediaQuery("(max-width:425px)")
+                      ? "100%"
+                      : "102px",
+                    height: "35px",
+                    padding: "9px 20px",
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    textAlign: "left",
+                    color: "#ffffff",
+                    textTransform: "capitalize",
+                    backgroundColor: "rgba(173, 63, 56, 1)",
+                    border: "none",
+                    "&:hover": {
+                      color: "#ffffff",
+                      borderColor: "#6d001d",
+                      backgroundColor: "#6d001d",
+                    },
+                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
+                  }}
+                >
+                  Save
+                </Button>
+              </Box>
+            )}
+          </Box>
         </Paper>
-        <Box
-          gap={2}
-          sx={{
-            mt: "1rem",
-            mb: "2rem",
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-        >
-          {isPlaceOrder ? (
-            <>
-              <Button
-                variant="outlined"
-                color="success"
-                sx={{
-                  width: "102px",
-                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                  height: "35px",
-                  padding: "9px 20px",
-                  color: "#73af96",
-                  borderColor: "#73af96",
-                  fontSize: "16px",
-                  fontWeight: 400,
-                  textAlign: "left",
-                  textTransform: "capitalize",
-                  "&:hover": {
-                    color: "#ffffff",
-                    borderColor: "#60a487",
-                    backgroundColor: "#60a487",
-                  },
-                }}
-                onClick={handleOpenModal}
-              >
-                Remove
-              </Button>
-
-              <Button
-                variant="contained"
-                color="error"
-                sx={{
-                  width: "102px",
-                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                  height: "35px",
-                  padding: "9px 20px",
-                  fontSize: "16px",
-                  fontWeight: 400,
-                  textAlign: "left",
-                  color: "#ffffff",
-                  textTransform: "capitalize",
-                  backgroundColor: "rgba(173, 63, 56, 1)",
-                  border: "none",
-                  "&:hover": {
-                    color: "#ffffff",
-                    borderColor: "#6d001d",
-                    backgroundColor: "#6d001d",
-                  },
-                }}
-              >
-                Edit
-              </Button>
-            </>
-          ) : (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-                gap: 2,
-                mt: 2,
-                width: "100%",
-              }}
-            >
-              <Button
-                variant="outlined"
-                color="success"
-                sx={{
-                  width: "102px",
-                  height: "35px",
-                  padding: "9px 20px",
-                  color: "#73af96",
-                  borderColor: "#73af96",
-                  fontSize: "16px",
-                  fontWeight: 400,
-                  textAlign: "left",
-                  textTransform: "capitalize",
-                  "&:hover": {
-                    color: "#ffffff",
-                    borderColor: "#60a487",
-                    backgroundColor: "#60a487",
-                  },
-
-                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                }}
-                onClick={handleOpenModal}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                sx={{
-                  width: useMediaQuery("(max-width:425px)") ? "100%" : "102px",
-                  height: "35px",
-                  padding: "9px 20px",
-                  fontSize: "16px",
-                  fontWeight: 400,
-                  textAlign: "left",
-                  color: "#ffffff",
-                  textTransform: "capitalize",
-                  backgroundColor: "rgba(173, 63, 56, 1)",
-                  border: "none",
-                  "&:hover": {
-                    color: "#ffffff",
-                    borderColor: "#6d001d",
-                    backgroundColor: "#6d001d",
-                  },
-                  flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                }}
-              >
-                Save
-              </Button>
-            </Box>
-          )}
-        </Box>
       </Box>
       <EditAddressModal
         open={isModalOpen}
@@ -314,6 +318,10 @@ const AddressCard = ({
 const AddressUI = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   const handleAddressSelection = (addressId) => {
     setSelectedAddress(addressId === selectedAddress ? null : addressId);
@@ -454,6 +462,7 @@ const AddressUI = () => {
                   },
                 },
               }}
+              onClick={handleOpenModal}
             >
               Add New Address
             </Button>
@@ -509,6 +518,12 @@ const AddressUI = () => {
           </Box>
         </Box>
       </ThemeProvider>
+      <EditAddressModal
+        open={isModalOpen}
+        handleClose={handleCloseModal}
+        addressData={null}
+        title={"Add New"}
+      />
     </>
   );
 };

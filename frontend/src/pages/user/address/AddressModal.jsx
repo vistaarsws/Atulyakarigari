@@ -13,7 +13,7 @@ import {
 import { Close as CloseIcon } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
-const EditAddressModal = ({ open, handleClose, addressData }) => {
+const EditAddressModal = ({ open, handleClose, addressData, title }) => {
   const isMobile = useMediaQuery("(max-width:768px)");
 
   const [formData, setFormData] = useState({
@@ -21,19 +21,12 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
     mobileNumber: addressData?.mobile || "",
     pincode: addressData?.city?.split(" - ")[1] || "",
     address: addressData?.address || "",
-    locality: "",
+    locality: addressData?.locality || "",
     city: addressData?.city?.split(" - ")[0] || "",
     addressType: addressData?.type?.toLowerCase() || "home",
     isDefault: addressData?.isDefault || false,
   });
 
-  // const handleChange = (event) => {
-  //   const { name, value } = event.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({
@@ -60,26 +53,36 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
       fontSize: "1.2rem",
       color: "#6b7280",
       fontWeight: 500,
+      backgroundColor: "white",
+      padding: "0 4px",
     },
     "& .MuiInputLabel-root.Mui-focused": {
       color: "#46846a",
     },
+    "& .MuiInputLabel-shrink": {
+      transform: "translate(14px, -9px) scale(0.75)",
+      zIndex: 1,
+    },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
         borderColor: "#e0e0e0",
+        borderWidth: "2px",
       },
       "&:hover fieldset": {
         borderColor: "#46846a",
       },
       "&.Mui-focused fieldset": {
         borderColor: "#46846a",
+        borderWidth: "2px",
+      },
+      "& legend": {
+        width: "0px",
       },
     },
     "& .MuiOutlinedInput-input": {
       fontSize: "1.2rem",
     },
   };
-
   return (
     <Modal
       open={open}
@@ -117,7 +120,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: "600", color: "#383737" }}>
-            Edit Address
+            {title ? title : "Edit"} Address
           </Typography>
           <IconButton
             onClick={handleClose}
@@ -132,270 +135,10 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           </IconButton>
         </Box>
 
-        {/* Scrollable content area */}
-        {/* <Box
-          sx={{
-            padding: "2rem",
-            maxHeight: "80vh",
-            overflowY: "auto",
-            scrollbarWidth: "none",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "0" : 0,
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingRight: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <TextField
-                name="fullName"
-                label="Full Name"
-                variant="outlined"
-                fullWidth
-                sx={{ ...textFieldSx, marginBottom: "2rem" }}
-                value={formData.fullName}
-                onChange={handleChange}
-              />
-            </Box>
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingLeft: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <TextField
-                name="mobileNumber"
-                label="Mobile Number"
-                variant="outlined"
-                fullWidth
-                sx={{ ...textFieldSx, marginBottom: "2rem" }}
-                value={formData.mobileNumber}
-                onChange={handleChange}
-              />
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "1rem" : 0,
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingRight: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <TextField
-                name="pincode"
-                label="Pincode"
-                variant="outlined"
-                fullWidth
-                value={formData.pincode}
-                onChange={handleChange}
-                sx={{ ...textFieldSx }}
-              />
-            </Box>
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingLeft: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <TextField
-                name="address"
-                label="Address"
-                variant="outlined"
-                fullWidth
-                sx={{ ...textFieldSx, marginBottom: "2rem" }}
-                value={formData.address}
-                onChange={handleChange}
-              />
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "1rem" : 0,
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingRight: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <TextField
-                name="locality"
-                label="Locality/Town"
-                variant="outlined"
-                fullWidth
-                value={formData.locality}
-                onChange={handleChange}
-                sx={{ ...textFieldSx }}
-              />
-            </Box>
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingLeft: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <TextField
-                name="city"
-                label="City/District"
-                variant="outlined"
-                fullWidth
-                value={formData.city}
-                onChange={handleChange}
-                sx={{ ...textFieldSx, marginBottom: "2rem" }}
-              />
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: "1.2rem",
-                  fontWeight: "500",
-                  color: "#6b7280",
-                  marginBottom: "0.25rem",
-                }}
-              >
-                Type of Address
-              </Typography>
-              <Box
-                sx={{
-                  marginTop: "0.5rem",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Radio
-                      size="large"
-                      checked={formData.addressType === "home"}
-                      onChange={handleRadioChange}
-                      value="home"
-                    />
-                  }
-                  label={
-                    <Typography sx={{ fontSize: "1.4rem", color: "#383737" }}>
-                      Home
-                    </Typography>
-                  }
-                  sx={{ marginRight: "1rem" }}
-                />
-                <FormControlLabel
-                  control={
-                    <Radio
-                      checked={formData.addressType === "office"}
-                      onChange={handleRadioChange}
-                      value="office"
-                      size="large"
-                    />
-                  }
-                  label={
-                    <Typography sx={{ fontSize: "1.4rem", color: "#383737" }}>
-                      Office
-                    </Typography>
-                  }
-                />
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                mx: isMobile ? 0 : 4,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.isDefault}
-                    onChange={handleCheckboxChange}
-                    size="large"
-                  />
-                }
-                label={
-                  <Typography sx={{ fontSize: "1.2rem", color: "#6b7280" }}>
-                    Make this my default Address
-                  </Typography>
-                }
-              />
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              marginTop: "2rem",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "1rem",
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="success"
-              sx={{
-                borderRadius: "0.375rem",
-                color: "#73af96",
-                borderColor: "#73af96",
-                "&:hover": {
-                  color: "#ffffff",
-                  borderColor: "#60a487",
-                  backgroundColor: "#60a487",
-                },
-                flexBasis: isMobile ? "50%" : "",
-              }}
-              onClick={handleClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                color: "white",
-                borderRadius: "0.375rem",
-                backgroundColor: "rgba(173, 63, 56, 1)",
-                "&:hover": {
-                  backgroundColor: "#6d001d",
-                },
-                flexBasis: isMobile ? "50%" : "",
-              }}
-              onClick={handleClose}
-            >
-              Save
-            </Button>
-          </Box>
-        </Box> */}
         <Box
           sx={{
             padding: "2rem",
-            maxHeight: "80vh",
-
+            maxHeight: "50vh",
             overflowY: "scroll",
             scrollbarWidth: "none",
             display: "grid",
@@ -422,39 +165,39 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
             onChange={handleChange}
           />
           <TextField
-            name="fullName"
-            label="Full Name"
+            name="pincode"
+            label="Pincode"
             variant="outlined"
             fullWidth
             sx={{ ...textFieldSx, marginBottom: "2rem" }}
-            value={formData.fullName}
+            value={formData.pincode}
             onChange={handleChange}
           />
           <TextField
-            name="phoneNumber"
-            label="Phone Number"
+            name="address"
+            label="Address"
             variant="outlined"
             fullWidth
             sx={{ ...textFieldSx, marginBottom: "2rem" }}
-            value={formData.phoneNumber}
+            value={formData.address}
             onChange={handleChange}
           />
           <TextField
-            name="fullName"
-            label="Full Name"
+            name="locality"
+            label="Locality / Town"
             variant="outlined"
             fullWidth
             sx={{ ...textFieldSx, marginBottom: "2rem" }}
-            value={formData.fullName}
+            value={formData.locality}
             onChange={handleChange}
           />
           <TextField
-            name="phoneNumber"
-            label="Phone Number"
+            name="city"
+            label="City / Distric"
             variant="outlined"
             fullWidth
             sx={{ ...textFieldSx, marginBottom: "2rem" }}
-            value={formData.phoneNumber}
+            value={formData.city}
             onChange={handleChange}
           />
 
@@ -534,15 +277,22 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
             variant="outlined"
             color="success"
             sx={{
-              borderRadius: "0.375rem",
+              width: "102px",
+              height: "35px",
+              padding: "9px 20px",
               color: "#73af96",
               borderColor: "#73af96",
+              fontSize: "16px",
+              fontWeight: 400,
+              textAlign: "left",
+              textTransform: "capitalize",
               "&:hover": {
                 color: "#ffffff",
                 borderColor: "#60a487",
                 backgroundColor: "#60a487",
               },
-              flexBasis: isMobile ? "50%" : "",
+
+              flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
             }}
             onClick={handleClose}
           >
@@ -550,14 +300,24 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           </Button>
           <Button
             variant="contained"
+            color="error"
             sx={{
-              color: "white",
-              borderRadius: "0.375rem",
+              width: useMediaQuery("(max-width:425px)") ? "100%" : "102px",
+              height: "35px",
+              padding: "9px 20px",
+              fontSize: "16px",
+              fontWeight: 400,
+              textAlign: "left",
+              color: "#ffffff",
+              textTransform: "capitalize",
               backgroundColor: "rgba(173, 63, 56, 1)",
+              border: "none",
               "&:hover": {
+                color: "#ffffff",
+                borderColor: "#6d001d",
                 backgroundColor: "#6d001d",
               },
-              flexBasis: isMobile ? "50%" : "",
+              flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
             }}
             onClick={handleClose}
           >
