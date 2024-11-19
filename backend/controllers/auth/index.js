@@ -153,6 +153,7 @@ export const register = async (req, res) => {
       let token;
       try {
         token = newUser.generateAuthToken();
+        console.log(`Generated token: ${token}`);
       } catch (error) {
         console.error("Token generation error:", error);
         return internalServerError(req, res, error, "Token generation failed");
