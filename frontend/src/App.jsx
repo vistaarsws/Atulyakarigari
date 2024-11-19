@@ -32,13 +32,12 @@ export default function App() {
   const location = useLocation();
   const url = location.pathname;
 
-  const hide_nav = ["/login", "/signup/1", "/signup/2", "/otp"].includes(url);
+  const hide_nav = ["/login", "/signup", "/otp"].includes(url);
   const hide_footer = [
     "/buy-now",
     "/user/profile",
     "/login",
-    "/signup/1",
-    "/signup/2",
+    "/signup",
     "/otp",
     "/user/wishlist",
     "/user/orders",

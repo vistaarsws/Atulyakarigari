@@ -1,10 +1,11 @@
 import CART from "../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import avatar from "../../../assets/images/avatar.svg";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
@@ -13,6 +14,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
+  // const location = useLocation();
 
   const cookies = Cookies.get("authToken");
 
@@ -33,6 +35,18 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const logoutHandler = (isLogout) => {
+    debugger;
+    if (isLogout === "Logout") {
+      debugger;
+      console.log(cookies, "befotre................");
+
+      Cookies.remove("authToken");
+      console.log(cookies, "after................");
+    }
+  };
+
   // useEffect(() => {
   //   // Check if the URL contains "user/wishlist"
   //   const path = window.location.pathname;
@@ -154,16 +168,13 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     { name: "Wishlist", link: "/user/wishlist" },
     { name: "Orders", link: "/user/orders" },
     { name: "Address", link: "/user/address" },
+    { name: "Logout", link: "/" },
+
     // { name: "Contact Us", link: "/user/contact" },
     // { name: "Terms of use", link: "/user/terms" },
     // { name: "Privacy Policy", link: "/user/privacy" },
     // { name: "Log Out", link: "/user/logout" },
   ];
-
-  const getAuthToken = () => {
-    const token = localStorage.getItem("authToken");
-    return token || null; // Return `null` if the token is not found
-  };
 
   return (
     <nav className="navbar_container">
@@ -253,7 +264,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         })}
       </ul>
 
-      <div style={{ display: cookies ? "" : "" }}>
+      <div>
         <div>
           {!navWithoutSearchBar_list && (
             <form className="form">
@@ -301,43 +312,62 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             </form>
           )}
         </div>
-        <figure id="cartIcon_container">
-          <img
-            height={24}
-            src={CART}
-            alt="cart"
-            onClick={() => navigate("/user/wishlist")}
-          />
-        </figure>
+        {cookies && (
+          <figure id="cartIcon_container">
+            <img
+              height={24}
+              src={CART}
+              alt="cart"
+              onClick={() => navigate("/user/wishlist")}
+            />
+          </figure>
+        )}
+
         <div
           className="profileBox"
           onMouseEnter={() => setIsProfileHovered(true)}
           onMouseLeave={() => setIsProfileHovered(false)}
         >
-          <img src={userProfile} alt="User Profile" />
+          <img src={cookies ? userProfile : avatar} alt="User Profile" />
           {isProfileHovered && (
             <div className="profile-dropdown">
-              <div
-                onClick={() => {
-                  navigate("/user/profile");
-                  setIsProfileHovered(false);
-                }}
-              >
-                <p>Hello, Savvy Srivastava</p>
-                <p>8175961513</p>
-              </div>
-              <ul>
-                {menuItems.map((item, index) => (
-                  <li key={index}>
-                    <Link
-                      onClick={() => setIsProfileHovered(false)}
-                      to={item.link}
-                    >
-                      {item.name}
-                    </Link>
+              {cookies && (
+                <div
+                  onClick={() => {
+                    navigate("/user/profile");
+                    setIsProfileHovered(false);
+                  }}
+                >
+                  <p>Hello, Savvy Srivastava</p>
+                  <p>8175961513</p>
+                </div>
+              )}
+              {cookies ? (
+                <ul>
+                  {menuItems.map((item, index) => (
+                    <li key={index}>
+                      <Link
+                        onClick={() => {
+                          setIsProfileHovered(false);
+                          logoutHandler(item.name);
+                        }}
+                        to={item.link}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul>
+                  <li>
+                    <Link to={"/login"}>Login</Link>
                   </li>
-                ))}
-              </ul>
+                  <li>
+                    <Link to={"/signup"}>Sign Up</Link>
+                  </li>
+                </ul>
+              )}
             </div>
           )}
         </div>
