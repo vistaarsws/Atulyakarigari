@@ -41,7 +41,12 @@ const DeliveryEstimate = () => {
   return (
     <Box padding={2}>
       <Typography
-        sx={{ color: "#6F6F6F", fontSize: "14px", fontWeight: 400, mb: 2 }}
+        sx={{
+          color: "#6F6F6F",
+          fontSize: "14px",
+          fontWeight: 400,
+          mb: 2,
+        }}
       >
         Delivery Estimate
       </Typography>

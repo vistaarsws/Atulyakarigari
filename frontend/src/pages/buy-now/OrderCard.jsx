@@ -139,13 +139,16 @@ const ProductCard = ({ product }) => {
         <Checkbox
           sx={{
             position: "absolute",
-            top: useMediaQuery("(max-width: 458px)") ? "1rem" : 28,
-            left: useMediaQuery("(max-width: 458px)") ? "1rem" : 28,
+            top: useMediaQuery("(max-width: 458px)") ? "1.6rem" : 28,
+            left: useMediaQuery("(max-width: 458px)") ? "1.6rem" : 28,
             padding: 0,
             color: "white",
+
             zIndex: 1,
             "&.Mui-checked": {
-              color: "#6d001d",
+              color: "white",
+
+              borderRadius: "2px",
             },
           }}
           size="large"
