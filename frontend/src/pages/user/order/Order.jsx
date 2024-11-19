@@ -85,7 +85,7 @@ export default function Component() {
         <div
           style={{
             display: "flex",
-            height: useMediaQuery("(max-width:768px)") ? "85vh" : "90vh",
+            height: useMediaQuery("(max-width:768px)") ? "auto" : "90vh",
             padding: useMediaQuery("(max-width:425px)") ? "2rem" : "2rem 4rem",
             width:
               (breakpoints.max768 && "100%") ||
@@ -196,7 +196,9 @@ export default function Component() {
                   key={order.id}
                   style={{
                     paddingTop: "24px",
-                    marginBottom: "24px",
+                    marginBottom: useMediaQuery("(max-width:768px)")
+                      ? "2rem"
+                      : "24px",
                     display: "flex",
                     padding: "2.4rem",
                     gap: "24px",

@@ -55,6 +55,7 @@ export default function App() {
     "/place-order",
     "/artisans",
     "/about",
+    "/buy-now",
   ].includes(url);
 
   const theme = createTheme({

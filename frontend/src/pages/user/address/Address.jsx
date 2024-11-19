@@ -469,7 +469,7 @@ const AddressUI = () => {
           </Box>
           <Box
             sx={{
-              height: "80vh",
+              height: "75vh",
               overflowY: "scroll",
               scrollbarWidth: "none",
             }}
@@ -483,7 +483,7 @@ const AddressUI = () => {
                 fontWeight={700}
                 fontSize="14px"
                 lineHeight="21px"
-                mb={"1rem"}
+                mb="1rem"
               >
                 Default Address
               </Typography>

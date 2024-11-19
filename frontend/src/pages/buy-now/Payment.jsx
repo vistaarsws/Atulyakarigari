@@ -28,6 +28,7 @@ const Payment = () => {
         scrollbarWidth: "none",
 
         borderRadius: 2,
+        paddingBottom: isPlaceOrder ? "4rem" : "",
       }}
     >
       <Box
@@ -308,10 +309,10 @@ const Payment = () => {
             width: "100%",
             display: "flex",
             justifyContent: "center",
-            bgcolor: "white",
+            backgroundColor: "white",
             zIndex: 9999,
+            paddingBottom: "1rem",
             paddingInline: useMediaQuery("(max-width:900px)") ? "1.6rem" : "",
-            marginBottom: "1rem",
           }}
         >
           <Button
@@ -324,9 +325,7 @@ const Payment = () => {
               textTransform: "capitalize",
               fontSize: "16px",
               fontWeight: 400,
-
               position: "relative",
-
               width: "100%",
             }}
             onClick={() => {
