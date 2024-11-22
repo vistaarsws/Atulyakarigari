@@ -14,6 +14,7 @@ import {
   login,
   varifyOtp,
 } from "../../services/operations/authAPI";
+import { useAuth } from "../../context/AuthContext";
 
 dayjs.extend(customParseFormat);
 
@@ -39,6 +40,7 @@ export default function AuthTemplate({ page }) {
   const isAdminOtp = page === "admin-otp";
   const isOtp = page === "otp";
 
+  const { loginContext } = useAuth();
   const setAuthToken = (token) => {
     if (!token) {
       console.error("Token is undefined or null.");
@@ -141,6 +143,7 @@ export default function AuthTemplate({ page }) {
 
       if (res.status === 200) {
         const token = res.data.data.token;
+        loginContext(token);
 
         if (token) {
           setAuthToken(token);

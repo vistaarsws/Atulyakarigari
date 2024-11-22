@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  console.count();
   useEffect(() => {
     // Check for the token when the app loads
     const token = Cookies.get("authToken");
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []); // Only run on component mount
 
-  const login = (token) => {
+  const loginContext = (token) => {
     Cookies.set("authToken", token, { expires: 7 }); // Set token with expiration
     setIsAuthenticated(true); // Immediately update the state after setting token
   };
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loginContext, logout }}>
       {children}
     </AuthContext.Provider>
   );
