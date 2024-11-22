@@ -21,6 +21,7 @@ export default function AuthTemplate({ page }) {
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
+
   const [userDetails, setUserDetails] = useState({
     fullName: "",
     loginId: "",
@@ -29,7 +30,14 @@ export default function AuthTemplate({ page }) {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const location = useLocation();
-  const otpType = location.state?.type;
+
+  const [otpType, setOtpType] = useState(location.state?.type);
+
+  const isAdminLoginPage = page === "admin-login";
+  const isLoginPage = page === "login";
+  const isSignupPage = page === "signup";
+  const isAdminOtp = page === "admin-otp";
+  const isOtp = page === "otp";
 
   const setAuthToken = (token) => {
     if (!token) {
@@ -45,15 +53,25 @@ export default function AuthTemplate({ page }) {
     console.log("Token set in cookies!");
   };
 
+  useEffect(() => {
+    setOtpType(location.state?.type);
+  }, [location.state?.type]);
+
   // -----------------------------------------------------Login---------------------------------------------------------------------
 
   const loginHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await login(userDetails.loginId);
       if (res?.status === 200) {
-        navigate("/otp", { state: { type: "login" } });
+        if (isLoginPage) {
+          navigate("/otp", { state: { type: "login" } });
+        } else {
+          navigate("/admin-otp", { state: { type: "admin-otp" } });
+        }
+
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
         });
@@ -63,7 +81,7 @@ export default function AuthTemplate({ page }) {
         });
       }
     } catch (error) {
-      enqueueSnackbar(error, { variant: "error" });
+      enqueueSnackbar(error.response.data.message, { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -77,13 +95,15 @@ export default function AuthTemplate({ page }) {
     try {
       const res = await sendOtp(userDetails.loginId);
       if (res?.status === 200) {
-        navigate("/otp", { state: { type: "signup" } });
+        navigate("/otp", {
+          state: { type: "signup" },
+        });
         enqueueSnackbar(res.data.message || "Signup Successful!", {
           variant: "success",
         });
       }
     } catch (error) {
-      enqueueSnackbar(error, { variant: "error" });
+      enqueueSnackbar(error.response.data.message, { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -96,9 +116,24 @@ export default function AuthTemplate({ page }) {
     setLoading(true);
 
     try {
-      const action = otpType === "login" ? varifyOtp : signUp;
+      let action;
+
+      switch (otpType) {
+        case "login":
+          action = varifyOtp;
+          break;
+        // case "admin-login":
+        //   action = signUp;
+        //   break;
+        case "signup":
+          action = signUp;
+          break;
+        default:
+          return;
+      }
+
       const args =
-        otpType === "login"
+        otpType === "login" || otpType === "admin-login"
           ? [userDetails.loginId, otp]
           : [userDetails.fullName, userDetails.loginId, otp];
 
@@ -112,7 +147,9 @@ export default function AuthTemplate({ page }) {
         }
 
         const successMessage =
-          otpType === "login" ? "Login Successful!" : "Signup Successful!";
+          otpType === "login" || otpType === "admin-login"
+            ? "Login Successful!"
+            : "Signup Successful!";
 
         navigate("/", { state: { type: otpType } });
         enqueueSnackbar(res.data.message || successMessage, {
@@ -120,8 +157,7 @@ export default function AuthTemplate({ page }) {
         });
       }
     } catch (error) {
-      console.error("Error during OTP validation:", error);
-      enqueueSnackbar(error?.message || "An error occurred", {
+      enqueueSnackbar(error.response.data.message || "An error occurred", {
         variant: "error",
       });
     } finally {
@@ -155,7 +191,7 @@ export default function AuthTemplate({ page }) {
   const handleResendOtp = async () => {
     setTimer(30);
     setOtp("");
-    if (otpType === "login") {
+    if (otpType === "login" || otpType === "admin-login") {
       await login(userDetails.loginId);
     } else {
       await sendOtp(userDetails.loginId);
@@ -169,11 +205,16 @@ export default function AuthTemplate({ page }) {
 
   return (
     <>
-      <div className="authTemplate_container">
+      <div
+        className={`authTemplate_container ${
+          isAdminLoginPage || isAdminOtp ? "admin_authTemplate_container" : ""
+        }`}
+      >
         <section>
-          <h1>Atulyakarigari</h1>
+          {isLoginPage && <h1>Atulyakarigari</h1>}
+
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {page === "login" && (
+          {(isLoginPage || isAdminLoginPage) && (
             <article className="logIn_container">
               <div>
                 <figure>
@@ -201,6 +242,9 @@ export default function AuthTemplate({ page }) {
                       variant="contained"
                       type="submit"
                       disabled={loading}
+                      style={{
+                        backgroundColor: isAdminLoginPage ? "#5F3DC3" : "",
+                      }}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="white" />
@@ -214,7 +258,7 @@ export default function AuthTemplate({ page }) {
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {page === "signup" && (
+          {isSignupPage && (
             <article className="signUp_container">
               <div>
                 <figure>
@@ -266,7 +310,7 @@ export default function AuthTemplate({ page }) {
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {page === "otp" && (
+          {(isOtp || isAdminOtp) && (
             <article className="Otp_container">
               <div>
                 <figure>
@@ -296,13 +340,24 @@ export default function AuthTemplate({ page }) {
                     Resent OTP in <span>{timer}s</span>
                   </p>
                 ) : (
-                  <button className="resendBtn" onClick={handleResendOtp}>
+                  <button
+                    type="button"
+                    className="resendBtn"
+                    onClick={handleResendOtp}
+                  >
                     Resend
                   </button>
                 )}
 
                 <div>
-                  <Button variant="contained" type="submit" disabled={loading}>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      backgroundColor: isAdminOtp ? "#5F3DC3" : "",
+                    }}
+                  >
                     {loading ? (
                       <CircularProgress size={24} color="white" />
                     ) : (
@@ -314,19 +369,21 @@ export default function AuthTemplate({ page }) {
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {page === "login" || otpType === "login" ? (
-            <p>
-              Don&apos;t have an account yet?{"  "}
-              <span onClick={() => navigate("/signup")}>Sign Up</span>
-            </p>
-          ) : (
-            <p>
-              Already have account?{"  "}
-              <span onClick={() => navigate("/login")}>Log In</span>
-            </p>
-          )}
+          {!isAdminLoginPage &&
+            !isAdminOtp &&
+            (isLoginPage || otpType === "login" ? (
+              <p>
+                Don&apos;t have an account yet?{"  "}
+                <span onClick={() => navigate("/signup")}>Sign Up</span>
+              </p>
+            ) : (
+              <p>
+                Already have account?{"  "}
+                <span onClick={() => navigate("/login")}>Log In</span>
+              </p>
+            ))}
         </section>
-        <section></section>
+        {!isAdminLoginPage && !isAdminOtp && <section></section>}
       </div>
     </>
   );
