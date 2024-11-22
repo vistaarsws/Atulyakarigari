@@ -4,10 +4,14 @@ import headerLogo from "../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import avatar from "../../../assets/images/avatar.svg";
 
-export default function Navbar({ navWithoutSearchBar_list }) {
+export default function Navbar({
+  navWithoutSearchBar_list,
+  isAuthenticated,
+  onLogout,
+}) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
@@ -16,7 +20,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const navigate = useNavigate();
   // const location = useLocation();
 
-  const cookies = Cookies.get("authToken");
+  // const cookies = Cookies.get("authToken");
+
+  useEffect(() => {
+    console.log("isAuthenticated changed:", isAuthenticated);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,13 +45,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   }, []);
 
   const logoutHandler = (isLogout) => {
-    debugger;
     if (isLogout === "Logout") {
-      debugger;
-      console.log(cookies, "befotre................");
-
-      Cookies.remove("authToken");
-      console.log(cookies, "after................");
+      onLogout();
     }
   };
 
@@ -312,7 +315,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             </form>
           )}
         </div>
-        {cookies && (
+        {isAuthenticated && (
           <figure id="cartIcon_container">
             <img
               height={24}
@@ -328,10 +331,13 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseEnter={() => setIsProfileHovered(true)}
           onMouseLeave={() => setIsProfileHovered(false)}
         >
-          <img src={cookies ? userProfile : avatar} alt="User Profile" />
+          <img
+            src={isAuthenticated ? userProfile : avatar}
+            alt="User Profile"
+          />
           {isProfileHovered && (
             <div className="profile-dropdown">
-              {cookies && (
+              {isAuthenticated && (
                 <div
                   onClick={() => {
                     navigate("/user/profile");
@@ -342,7 +348,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <p>8175961513</p>
                 </div>
               )}
-              {cookies ? (
+              {isAuthenticated ? (
                 <ul>
                   {menuItems.map((item, index) => (
                     <li key={index}>

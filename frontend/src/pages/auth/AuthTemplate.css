@@ -85,7 +85,7 @@
       padding: 1rem 2rem;
       font-size: 1.4rem;
       background-color: #60a487;
-      border: 1px solid #60a487;
+      border: none;
       width: 100%;
       color: white;
       border-radius: 0.6rem;
@@ -127,6 +127,20 @@
   background-color: white;
   color: #60a487;
 }
+
+/* ----------------------------------------------------------Admin page-------------------------------------------------------------------------------- */
+
+.admin_authTemplate_container {
+  grid-template-columns: 1fr;
+
+  & section:first-of-type {
+    article {
+      max-width: 80rem;
+    }
+  }
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------- */
 
 @media screen and (max-width: 1400px) {
   .authTemplate_container {
