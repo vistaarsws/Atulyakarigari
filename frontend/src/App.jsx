@@ -1,10 +1,12 @@
-import { Routes, Route } from "react-router-dom";
-
+import { useMemo, useState, useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { SnackbarProvider } from "notistack";
 import ScrollToTop from "./hooks/ScrollToTop";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 import "./App.css";
 
-import { useLocation } from "react-router-dom";
-
+// Import Pages
 import Navbar from "./components/layout/navbar/Navbar";
 import Footer from "./components/layout/footer/Footer";
 
@@ -13,6 +15,10 @@ import About from "./pages/about/About";
 import Categories from "./pages/categories/index";
 import Blogs from "./pages/blogs/Blogs";
 import Product from "./pages/product/Product";
+import Artisans from "./pages/artisans/Artisans";
+import BuyNow from "./pages/buy-now/index";
+import PlaceOrder from "./pages/place-order";
+import AuthTemplate from "./pages/auth/AuthTemplate";
 
 import User from "./components/layout/user/User";
 import Order from "./pages/user/order/Order";
@@ -20,92 +26,128 @@ import Address from "./pages/user/address/Address";
 import Profile from "./pages/user/profile/Profile";
 import Wishlist from "./pages/user/wishlist/Wishlist";
 import Logout from "./pages/user/logout/Logout";
-import Artisans from "./pages/artisans/Artisans";
-import BuyNow from "./pages/buy-now/index";
-import PlaceOrder from "./pages/place-order";
-import AuthTemplate from "./pages/auth/authTemplate";
-import { createTheme, ThemeProvider } from "@mui/material";
 
-import { SnackbarProvider } from "notistack";
+// Utility Functions
+const getRoutesConfig = () => ({
+  publicRoutes: [
+    { path: "/", element: <Home /> },
+    { path: "/about", element: <About /> },
+    { path: "/categories", element: <Categories /> },
+    { path: "/blogs", element: <Blogs /> },
+    { path: "/artisans", element: <Artisans /> },
+    { path: "/product/:id", element: <Product /> },
+    { path: "/buy-now", element: <BuyNow /> },
+    { path: "/place-order", element: <PlaceOrder /> },
+    { path: "/login", element: <AuthTemplate page="login" /> },
+    { path: "/signup", element: <AuthTemplate page="signup" /> },
+    { path: "/otp", element: <AuthTemplate page="otp" /> },
+    { path: "/admin-login", element: <AuthTemplate page="admin-login" /> },
+    { path: "/admin-otp", element: <AuthTemplate page="admin-otp" /> },
+  ],
+  protectedRoutes: [
+    { path: "orders", element: <Order /> },
+    { path: "address", element: <Address /> },
+    { path: "profile", element: <Profile /> },
+    { path: "wishlist", element: <Wishlist /> },
+    { path: "logout", element: <Logout /> },
+  ],
+});
 
+// Main App Component
 export default function App() {
   const location = useLocation();
-  const url = location.pathname;
+  const routesConfig = getRoutesConfig();
+  const { isAuthenticated, login, logout } = useAuth();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const hide_nav = ["/login", "/signup", "/otp"].includes(url);
-  const hide_footer = [
-    "/buy-now",
-    "/user/profile",
-    "/login",
-    "/signup",
-    "/otp",
-    "/user/wishlist",
-    "/user/orders",
-    "/user/address",
-    "/place-order",
-  ].includes(url);
+  // useEffect(() => {
+  //   const authToken = Cookies.get("authToken");
+  //   setIsAuthenticated(!!authToken);
+  // }, []);
 
-  const navWithoutSearchBar_list = [
-    "/blogs",
-    "/user/orders",
-    "/user/wishlist",
-    "/user/address",
-    "/user/profile",
-    "/place-order",
-    "/artisans",
-    "/about",
-    "/buy-now",
-  ].includes(url);
+  // const handleLogout = () => {
+  //   Cookies.remove("authToken");
+  //   setIsAuthenticated(false);
+  //   navigate("/login");
+  // };
 
-  const theme = createTheme({
-    typography: { fontFamily: "Lato" },
-  });
+  const { hide_nav, hide_footer, navWithoutSearchBar } = useMemo(() => {
+    const path = location.pathname;
+    const hideNavPaths = [
+      "/login",
+      "/signup",
+      "/otp",
+      "/admin-login",
+      "/admin-signup",
+      "/admin-otp",
+    ];
+    const hideFooterPaths = [
+      "/buy-now",
+      "/place-order",
+      "/login",
+      "/signup",
+      "/otp",
+      "/user/wishlist",
+      "/user/orders",
+      "/user/address",
+      "/admin-login",
+      "/admin-signup",
+      "/admin-otp",
+    ];
+    const navWithoutSearchPaths = [
+      "/blogs",
+      "/user/orders",
+      "/user/wishlist",
+      "/user/address",
+      "/user/profile",
+      "/place-order",
+      "/artisans",
+      "/about",
+      "/buy-now",
+    ];
+
+    return {
+      hide_nav: hideNavPaths.includes(path),
+      hide_footer: hideFooterPaths.includes(path),
+      navWithoutSearchBar: navWithoutSearchPaths.includes(path),
+    };
+  }, [location.pathname]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <SnackbarProvider maxSnack={3}>
-        <ScrollToTop />
-        <header>
-          <header>
-            {!hide_nav && (
-              <Navbar navWithoutSearchBar_list={navWithoutSearchBar_list} />
-            )}
-          </header>
-          {/* {!hideFromHere && (
-          <Navbar navWithoutSearchBar={navWithoutSearchBar_list} />
-        )} */}
-        </header>
+    <SnackbarProvider maxSnack={3}>
+      <ScrollToTop />
+      {!hide_nav && (
+        <Navbar
+          navWithoutSearchBar_list={navWithoutSearchBar}
+          isAuthenticated={isAuthenticated}
+          onLogout={logout}
+        />
+      )}
 
-        <main
-          className={`${hide_nav ? "" : "marginTop"} ${
-            navWithoutSearchBar_list ? "removeExtraMargin" : ""
-          }`}
-        >
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/artisans" element={<Artisans />} />
-            <Route path="/product/:id" element={<Product />} />
-            <Route path="/buy-now" element={<BuyNow />} />
-            <Route path="/place-order" element={<PlaceOrder />} />
+      <main className={`${hide_nav ? "" : "marginTop"}`}>
+        <Routes>
+          {/* Public Routes */}
+          {routesConfig.publicRoutes.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
 
-            <Route path="/login" element={<AuthTemplate page={"login"} />} />
-            <Route path="/signup" element={<AuthTemplate page={"signup"} />} />
-            <Route path="/otp" element={<AuthTemplate page={"otp"} />} />
+          {/* Protected Routes */}
+          <Route
+            path="/user/*"
+            element={
+              <ProtectedRoute>
+                <User />
+              </ProtectedRoute>
+            }
+          >
+            {routesConfig.protectedRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Route>
+        </Routes>
+      </main>
 
-            <Route path="/user" element={<User />}>
-              <Route path="orders" element={<Order />} />
-              <Route path="address" element={<Address />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="wishlist" element={<Wishlist />} />
-              <Route path="logout" element={<Logout />} />
-            </Route>
-          </Routes>
-        </main>
-        <footer>{!hide_footer && <Footer />}</footer>
-      </SnackbarProvider>
-    </ThemeProvider>
+      {!hide_footer && <Footer />}
+    </SnackbarProvider>
   );
 }
