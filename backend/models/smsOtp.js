@@ -12,8 +12,8 @@ const smsOtpSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now(),
-    expires: 5 * 60, // 5 minutes
+    default: Date.now,    // Pass the function reference, don't execute it
+    expires: 300,         // 5 minutes in seconds
   },
 });
 
