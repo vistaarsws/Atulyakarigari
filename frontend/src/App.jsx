@@ -26,6 +26,8 @@ import Address from "./pages/user/address/Address";
 import Profile from "./pages/user/profile/Profile";
 import Wishlist from "./pages/user/wishlist/Wishlist";
 import Logout from "./pages/user/logout/Logout";
+import Admin from "./Admin";
+import AdminRoute from "./utils/AdminRoute";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -41,8 +43,8 @@ const getRoutesConfig = () => ({
     { path: "/login", element: <AuthTemplate page="login" /> },
     { path: "/signup", element: <AuthTemplate page="signup" /> },
     { path: "/otp", element: <AuthTemplate page="otp" /> },
-    { path: "/admin-login", element: <AuthTemplate page="admin-login" /> },
-    { path: "/admin-otp", element: <AuthTemplate page="admin-otp" /> },
+    // { path: "/admin-login", element: <AuthTemplate page="admin-login" /> },
+    // { path: "/admin-otp", element: <AuthTemplate page="admin-otp" /> },
   ],
   protectedRoutes: [
     { path: "orders", element: <Order /> },
@@ -51,37 +53,24 @@ const getRoutesConfig = () => ({
     { path: "wishlist", element: <Wishlist /> },
     { path: "logout", element: <Logout /> },
   ],
+  adminRoutes: [
+    { path: "dashboard", element: <Admin /> },
+    // { path: "products", element: <Admin /> },
+  ],
 });
 
 // Main App Component
 export default function App() {
   const location = useLocation();
   const routesConfig = getRoutesConfig();
-  const { isAuthenticated, login, logout } = useAuth();
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { userContext } = useAuth();
 
-  // useEffect(() => {
-  //   const authToken = Cookies.get("authToken");
-  //   setIsAuthenticated(!!authToken);
-  // }, []);
-
-  // const handleLogout = () => {
-  //   Cookies.remove("authToken");
-  //   setIsAuthenticated(false);
-  //   navigate("/login");
-  // };
+  console.log("userContext", userContext?.accountType);
 
   const { hide_nav, hide_footer, navWithoutSearchBar } = useMemo(() => {
     const path = location.pathname;
-    const hideNavPaths = [
-      "/login",
-      "/signup",
-      "/otp",
-      "/admin-login",
-      "/admin-signup",
-      "/admin-otp",
-    ];
-    const hideFooterPaths = [
+    const hideNavBar = ["/login", "/signup", "/otp", "/admin"];
+    const hideFooter = [
       "/buy-now",
       "/place-order",
       "/login",
@@ -90,11 +79,10 @@ export default function App() {
       "/user/wishlist",
       "/user/orders",
       "/user/address",
-      "/admin-login",
-      "/admin-signup",
-      "/admin-otp",
+      "/admin",
     ];
-    const navWithoutSearchPaths = [
+
+    const navWithoutSearchBar = [
       "/blogs",
       "/user/orders",
       "/user/wishlist",
@@ -107,22 +95,16 @@ export default function App() {
     ];
 
     return {
-      hide_nav: hideNavPaths.includes(path),
-      hide_footer: hideFooterPaths.includes(path),
-      navWithoutSearchBar: navWithoutSearchPaths.includes(path),
+      hide_nav: hideNavBar.includes(path),
+      hide_footer: hideFooter.includes(path),
+      navWithoutSearchBar: navWithoutSearchBar.includes(path),
     };
   }, [location.pathname]);
 
   return (
     <SnackbarProvider maxSnack={3}>
       <ScrollToTop />
-      {!hide_nav && (
-        <Navbar
-          navWithoutSearchBar_list={navWithoutSearchBar}
-          isAuthenticated={isAuthenticated}
-          onLogout={logout}
-        />
-      )}
+      {!hide_nav && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
 
       <main className={`${hide_nav ? "" : "marginTop"}`}>
         <Routes>
@@ -141,6 +123,19 @@ export default function App() {
             }
           >
             {routesConfig.protectedRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Route>
+
+          <Route
+            path="/admin/*"
+            element={
+              <AdminRoute>
+                <Admin />
+              </AdminRoute>
+            }
+          >
+            {routesConfig.adminRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
             ))}
           </Route>

@@ -1,31 +1,25 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie"; // Import cookie.js library
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userContext, setUserContext] = useState(false);
   console.count();
-  useEffect(() => {
-    // Check for the token when the app loads
-    const token = Cookies.get("authToken");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []); // Only run on component mount
 
-  const loginContext = (token) => {
-    Cookies.set("authToken", token, { expires: 7 }); // Set token with expiration
-    setIsAuthenticated(true); // Immediately update the state after setting token
+  const loginContext = (data) => {
+    Cookies.set("authToken", data.token, { expires: 7 }); // Set token with expiration
+    setUserContext(data); // Immediately update the state after setting token
   };
 
   const logout = () => {
-    Cookies.remove("authToken"); // Remove token
-    setIsAuthenticated(false); // Immediately update the state after removing token
+    Cookies.remove("authToken");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loginContext, logout }}>
+    <AuthContext.Provider
+      value={{ userContext, setUserContext, loginContext, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

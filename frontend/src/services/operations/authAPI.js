@@ -1,8 +1,6 @@
 import { apiConnector } from "../apiConnector";
 import { endpoints } from "../endPoint";
 
-// const { isAuthenticated, login, logout } = useAuth();
-
 const sendOtp = async (loginId) => {
   const response = await apiConnector("POST", endpoints.SENDOTP_API, {
     loginId,
