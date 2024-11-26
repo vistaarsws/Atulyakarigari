@@ -6,12 +6,11 @@ import userProfile from "../../../assets/images/userProfile.png";
 import { useState, useEffect } from "react";
 // import Cookies from "js-cookie";
 import avatar from "../../../assets/images/avatar.svg";
+import { useAuth } from "../../../context/AuthContext";
+// import { Button } from "@mui/material";
+import { useSnackbar } from "notistack";
 
-export default function Navbar({
-  navWithoutSearchBar_list,
-  isAuthenticated,
-  onLogout,
-}) {
+export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
@@ -19,12 +18,9 @@ export default function Navbar({
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
   // const location = useLocation();
-
+  const { userContext, onLogout } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   // const cookies = Cookies.get("authToken");
-
-  useEffect(() => {
-    console.log("isAuthenticated changed:", isAuthenticated);
-  }, [isAuthenticated]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,6 +42,7 @@ export default function Navbar({
 
   const logoutHandler = (isLogout) => {
     if (isLogout === "Logout") {
+      enqueueSnackbar("Logout Successfully", { variant: "success" });
       onLogout();
     }
   };
@@ -181,6 +178,7 @@ export default function Navbar({
 
   return (
     <nav className="navbar_container">
+      {/* <Button onClick={() => navigate("/admin")}>admin</Button> */}
       <figure>
         <Link to={"/"}>
           <img src={headerLogo} alt="Atulyakarigari Logo" />
@@ -315,7 +313,7 @@ export default function Navbar({
             </form>
           )}
         </div>
-        {isAuthenticated && (
+        {userContext?.token && (
           <figure id="cartIcon_container">
             <img
               height={24}
@@ -332,12 +330,12 @@ export default function Navbar({
           onMouseLeave={() => setIsProfileHovered(false)}
         >
           <img
-            src={isAuthenticated ? userProfile : avatar}
+            src={userContext?.token ? userProfile : avatar}
             alt="User Profile"
           />
           {isProfileHovered && (
             <div className="profile-dropdown">
-              {isAuthenticated && (
+              {userContext?.token && (
                 <div
                   onClick={() => {
                     navigate("/user/profile");
@@ -348,7 +346,7 @@ export default function Navbar({
                   <p>8175961513</p>
                 </div>
               )}
-              {isAuthenticated ? (
+              {userContext?.token ? (
                 <ul>
                   {menuItems.map((item, index) => (
                     <li key={index}>

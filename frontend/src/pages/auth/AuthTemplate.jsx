@@ -34,13 +34,11 @@ export default function AuthTemplate({ page }) {
 
   const [otpType, setOtpType] = useState(location.state?.type);
 
-  const isAdminLoginPage = page === "admin-login";
   const isLoginPage = page === "login";
   const isSignupPage = page === "signup";
-  const isAdminOtp = page === "admin-otp";
   const isOtp = page === "otp";
 
-  const { loginContext } = useAuth();
+  const { setUserContext } = useAuth();
   const setAuthToken = (token) => {
     if (!token) {
       console.error("Token is undefined or null.");
@@ -70,10 +68,7 @@ export default function AuthTemplate({ page }) {
       if (res?.status === 200) {
         if (isLoginPage) {
           navigate("/otp", { state: { type: "login" } });
-        } else {
-          navigate("/admin-otp", { state: { type: "admin-otp" } });
         }
-
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
         });
@@ -124,9 +119,6 @@ export default function AuthTemplate({ page }) {
         case "login":
           action = varifyOtp;
           break;
-        // case "admin-login":
-        //   action = signUp;
-        //   break;
         case "signup":
           action = signUp;
           break;
@@ -135,7 +127,7 @@ export default function AuthTemplate({ page }) {
       }
 
       const args =
-        otpType === "login" || otpType === "admin-login"
+        otpType === "login"
           ? [userDetails.loginId, otp]
           : [userDetails.fullName, userDetails.loginId, otp];
 
@@ -143,18 +135,19 @@ export default function AuthTemplate({ page }) {
 
       if (res.status === 200) {
         const token = res.data.data.token;
-        loginContext(token);
+        setUserContext(res.data.data);
 
         if (token) {
           setAuthToken(token);
         }
 
         const successMessage =
-          otpType === "login" || otpType === "admin-login"
-            ? "Login Successful!"
-            : "Signup Successful!";
-
-        navigate("/", { state: { type: otpType } });
+          otpType === "login" ? "Login Successful!" : "Signup Successful!";
+        if (res.data.data.accountType === "admin") {
+          navigate("/admin", { state: { type: otpType } });
+        } else {
+          navigate("/", { state: { type: otpType } });
+        }
         enqueueSnackbar(res.data.message || successMessage, {
           variant: "success",
         });
@@ -175,7 +168,6 @@ export default function AuthTemplate({ page }) {
   };
 
   useEffect(() => {
-    // Start the countdown when the component is mounted
     const countdown = setInterval(() => {
       setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
     }, 1000);
@@ -194,7 +186,7 @@ export default function AuthTemplate({ page }) {
   const handleResendOtp = async () => {
     setTimer(30);
     setOtp("");
-    if (otpType === "login" || otpType === "admin-login") {
+    if (otpType === "login") {
       await login(userDetails.loginId);
     } else {
       await sendOtp(userDetails.loginId);
@@ -208,16 +200,11 @@ export default function AuthTemplate({ page }) {
 
   return (
     <>
-      <div
-        className={`authTemplate_container ${
-          isAdminLoginPage || isAdminOtp ? "admin_authTemplate_container" : ""
-        }`}
-      >
+      <div className={`authTemplate_container `}>
         <section>
           {isLoginPage && <h1>Atulyakarigari</h1>}
-
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {(isLoginPage || isAdminLoginPage) && (
+          {isLoginPage && (
             <article className="logIn_container">
               <div>
                 <figure>
@@ -245,9 +232,6 @@ export default function AuthTemplate({ page }) {
                       variant="contained"
                       type="submit"
                       disabled={loading}
-                      style={{
-                        backgroundColor: isAdminLoginPage ? "#5F3DC3" : "",
-                      }}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="white" />
@@ -313,7 +297,7 @@ export default function AuthTemplate({ page }) {
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {(isOtp || isAdminOtp) && (
+          {isOtp && (
             <article className="Otp_container">
               <div>
                 <figure>
@@ -353,14 +337,7 @@ export default function AuthTemplate({ page }) {
                 )}
 
                 <div>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={loading}
-                    style={{
-                      backgroundColor: isAdminOtp ? "#5F3DC3" : "",
-                    }}
-                  >
+                  <Button variant="contained" type="submit" disabled={loading}>
                     {loading ? (
                       <CircularProgress size={24} color="white" />
                     ) : (
@@ -372,21 +349,19 @@ export default function AuthTemplate({ page }) {
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
-          {!isAdminLoginPage &&
-            !isAdminOtp &&
-            (isLoginPage || otpType === "login" ? (
-              <p>
-                Don&apos;t have an account yet?{"  "}
-                <span onClick={() => navigate("/signup")}>Sign Up</span>
-              </p>
-            ) : (
-              <p>
-                Already have account?{"  "}
-                <span onClick={() => navigate("/login")}>Log In</span>
-              </p>
-            ))}
+          {isLoginPage || otpType === "login" ? (
+            <p>
+              Don&apos;t have an account yet?{"  "}
+              <span onClick={() => navigate("/signup")}> Sign Up</span>
+            </p>
+          ) : (
+            <p>
+              Already have account?{"  "}
+              <span onClick={() => navigate("/login")}> Log In</span>
+            </p>
+          )}
         </section>
-        {!isAdminLoginPage && !isAdminOtp && <section></section>}
+        <section></section>
       </div>
     </>
   );
