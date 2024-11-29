@@ -3,16 +3,16 @@ import {
   badRequest,
   internalServerError,
   unauthorized,
-} from "../../helpers/api-response.js";
-import User from "../../models/user.js";
-import Otp from "../../models/emailOtp.js";
-import SmsOtp from "../../models/smsOtp.js";
+} from "../helpers/api-response.js";
+import User from "../models/user.js";
+import Otp from "../models/emailOtp.js";
+import SmsOtp from "../models/smsOtp.js";
 import {
   ensureUniqueOtp,
   isEmail,
   isPhoneNumber,
   verifyOtp,
-} from "../../utils/otp/index.js";
+} from "../utils/otp/index.js";
 
 //  OTP generator
 export const sendOtp = async (req, res) => {
