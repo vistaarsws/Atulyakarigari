@@ -35,3 +35,12 @@ export const unauthorized = (req, res, error = null, message = "Unauthorized acc
         success: false
     });
 };
+
+export const notFoundRequest = (request, response, err, message = "Resource not found") => {
+    response.status(400).json({
+        err,
+        message,
+        error: true,
+        success: false,
+    });
+};
