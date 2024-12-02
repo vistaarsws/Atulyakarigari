@@ -3,24 +3,54 @@ import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
+import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
 // import Cookies from "js-cookie";
-import avatar from "../../../assets/images/avatar.svg";
+// import avatar from "../../../assets/images/avatar.svg";
 import { useAuth } from "../../../context/AuthContext";
 // import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
+
+import Badge from "@mui/material/Badge";
+// import { styled } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
+
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
   // const location = useLocation();
   const { userContext, onLogout } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   // const cookies = Cookies.get("authToken");
+
+  // const StyledBadge = styled(Badge)(({ theme }) => ({
+  //   "& .MuiBadge-badge": {
+  //     right: -3,
+  //     top: 13,
+  //     border: `1px solid ${theme.palette.background.paper}`,
+  //     padding: "0 2px",
+  //     backgroundColor: "#b56f82",
+  //     fontSize: "1.2rem",
+  //     width: "1.5rem",
+  //     height: "1.5rem",
+  //   },
+  // }));
+
+  function notificationsLabel(count) {
+    if (count === 0) {
+      return "no notifications";
+    }
+    if (count > 99) {
+      return "more than 99 notifications";
+    }
+    return `${count} notifications`;
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -313,15 +343,25 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             </form>
           )}
         </div>
+
         {userContext?.token && (
-          <figure id="cartIcon_container">
-            <img
-              height={24}
-              src={CART}
-              alt="cart"
-              onClick={() => navigate("/user/wishlist")}
-            />
-          </figure>
+          <IconButton
+            aria-label={notificationsLabel(100)}
+            onClick={() => navigate("/user/wishlist")}
+          >
+            <Badge
+              badgeContent={8}
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: "#b56f82",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                },
+              }}
+            >
+              <ShoppingCartIcon fontSize="large" sx={{ fill: "white" }} />
+            </Badge>
+          </IconButton>
         )}
 
         <div
@@ -329,10 +369,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseEnter={() => setIsProfileHovered(true)}
           onMouseLeave={() => setIsProfileHovered(false)}
         >
-          <img
-            src={userContext?.token ? userProfile : avatar}
-            alt="User Profile"
-          />
+          {userContext?.token ? (
+            <img src={userProfile} alt="User Profile" />
+          ) : (
+            <Avatar src="/broken-image.jpg" />
+          )}
+
           {isProfileHovered && (
             <div className="profile-dropdown">
               {userContext?.token && (

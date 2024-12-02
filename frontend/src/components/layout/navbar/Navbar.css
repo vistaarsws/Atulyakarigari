@@ -15,10 +15,6 @@
     margin-right: 3%;
   }
 
-  & > figure:nth-of-type(2) {
-    margin-left: auto;
-  }
-
   & > div:nth-of-type(2) {
     display: flex;
     align-items: center;
@@ -376,6 +372,7 @@ input:not(:placeholder-shown) ~ .reset {
   cursor: pointer;
   height: 4rem;
   width: 4rem;
+  margin: 0.8rem;
   object-fit: cover;
 }
 
@@ -426,7 +423,9 @@ input:not(:placeholder-shown) ~ .reset {
   margin-bottom: 15px;
   margin-top: 10px;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 /* Hover effect for the mobile number */
@@ -450,7 +449,9 @@ input:not(:placeholder-shown) ~ .reset {
   font-weight: 400;
   color: #6f6f6f;
   border-bottom: 1px solid #e0e0e0;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .profile-dropdown li:last-child {
