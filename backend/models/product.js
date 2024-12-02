@@ -28,6 +28,12 @@ const ProductSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subcategory'
     },
+    attributes: [
+        {
+            key: { type: String, required: true },
+            value: { type: mongoose.Schema.Types.Mixed, required: true },
+        }
+    ],
     images: [{
         type: String,
         validate: {
@@ -42,6 +48,7 @@ const ProductSchema = new mongoose.Schema({
         required: [true, 'Stock quantity is required'],
         min: [0, 'Stock cannot be negative']
     },
+    varients: [],
 }, {
     timestamps: true
 });

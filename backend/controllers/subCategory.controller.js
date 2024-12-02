@@ -65,14 +65,14 @@ export const createSubcategory = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-
         // Abort transaction
         if (session && session.inTransaction()) {
             await session.abortTransaction();
         }
-        // Determine appropriate error response
+        if (error.code === 11000) {
+            return badRequest(req, res, null, "Sub Category already exists");
+        }
         return internalServerError(req, res, error, "Unable To Create Subcategory");
-
     } finally {
         // Ensure session is ended
         if (session) {
@@ -117,17 +117,17 @@ export const getAllSubcategories = async (req, res) => {
 
         // Fetch subcategories with pagination
         const subcategories = await SubCategory.find(searchQuery)
-            .populate('parentCategory')
+            // .populate('parentCategory')
             .sort({ createdAt: -1 })
             .skip(skipValue)
-            .limit(limitNumber);
+            .limit(limitNumber)
+            .select("_id name");
 
         // Calculate pagination metadata
         const totalPages = Math.ceil(totalCount / limitNumber);
 
-        res.status(200).json({
-            success: true,
-            data: subcategories,
+        return success(req, res, "Subcategories retrieved successfully", {
+            subcategories,
             pagination: {
                 totalDocs: totalCount,
                 totalPages: totalPages,
@@ -136,14 +136,10 @@ export const getAllSubcategories = async (req, res) => {
                 hasNextPage: pageNumber < totalPages,
                 hasPrevPage: pageNumber > 1
             }
-        });
+        })
     } catch (error) {
         console.error('Get subcategories error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve subcategories',
-            ...(process.env.NODE_ENV === 'development' && { error: error.toString() })
-        });
+        return internalServerError(req, res, error, "Failed to retrieve subcategories");
     }
 };
 
@@ -165,7 +161,7 @@ export const getSubcategoryById = async (req, res) => {
             return notFoundRequest(req, res, null, "Subcategory not found");
         }
 
-        return success(req, res, "Subcategory retrieved successfully", subcategory);
+        return success(req, res, "Subcategory retrieved successfully", subcategory.toObject());
     } catch (error) {
         return internalServerError(req, res, error, "Failed to retrieve subcategory");
     }
@@ -180,7 +176,7 @@ export const updateSubcategory = async (req, res) => {
 
         // Validate input
         if (!name || !id) {
-            badRequest(req, res, null, "fields are missing");
+            return badRequest(req, res, null, "fields are missing");
         }
 
         // Validate ID format
@@ -246,11 +242,10 @@ export const updateSubcategory = async (req, res) => {
 
         // Commit transaction
         await session.commitTransaction();
-
-        return success(req, res, "Sub Category Updated Successfully", updatedSubcategory);
+        return success(req, res, "Sub Category Updated Successfully", updatedSubcategory.toObject());
     } catch (error) {
         // Abort transaction if it exists
-        if (session) {
+        if (session && session.inTransaction()) {
             await session.abortTransaction();
         }
         return internalServerError(req, res, error, "unable to Update Sub Category");
@@ -296,7 +291,7 @@ export const deleteSubcategory = async (req, res) => {
         // Commit transaction
         await session.commitTransaction();
 
-        return success(req, res, "", "Sub Category Deleted Successfully");
+        return success(req, res, "Sub Category Deleted Successfully",);
     } catch (error) {
         // Abort transaction if it exists
         if (session) {

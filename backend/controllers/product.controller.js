@@ -48,13 +48,16 @@ export const createProduct = async (req, res) => {
             price,
             category,
             subcategory,
+            attributes
         } = req.body;
 
         // Comprehensive input validation
         if (!name || !price || !category) {
             return badRequest(req, res, null, "fields are missing");
         }
-
+        if (!attributes || !Array.isArray(attributes)) {
+            return badRequest(req, res, null, "Invalid Attributes");
+        }
         // Check if category exists
         const existingCategory = await Category.findById(category);
         if (!existingCategory) {
@@ -138,6 +141,9 @@ export const createProduct = async (req, res) => {
         // Abort transaction if it exists
         if (session) {
             await session.abortTransaction();
+        }
+        if (error.code === 11000) {
+            return badRequest(req, res, null, "Product already exists");
         }
         return internalServerError(req, res, error, "unable to create product");
     } finally {
