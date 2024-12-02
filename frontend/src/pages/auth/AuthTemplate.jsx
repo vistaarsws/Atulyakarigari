@@ -144,7 +144,7 @@ export default function AuthTemplate({ page }) {
         const successMessage =
           otpType === "login" ? "Login Successful!" : "Signup Successful!";
         if (res.data.data.accountType === "admin") {
-          navigate("/admin", { state: { type: otpType } });
+          navigate("/admin/dashboard", { state: { type: otpType } });
         } else {
           navigate("/", { state: { type: otpType } });
         }

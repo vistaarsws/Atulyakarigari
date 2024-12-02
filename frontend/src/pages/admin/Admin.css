@@ -1,0 +1,194 @@
+.admin_navbar {
+  height: 10vh;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & > article:first-of-type {
+    display: flex;
+  }
+  & > article:nth-of-type(2) {
+    display: flex;
+    gap: 1rem;
+
+    & > div:first-of-type {
+      background-color: #5f3dc326;
+      padding: 1rem;
+      border-radius: 0.4rem;
+    }
+  }
+}
+
+.rdrDefinedRangesWrapper {
+  display: none; /* Ensures the quick selection options stay hidden */
+}
+
+.rdrCalendarWrapper {
+  margin-left: 0; /* Align the calendar to the left */
+}
+
+.rdrDateRangePickerWrapper {
+  display: flex;
+  justify-content: center; /* Centers the calendar */
+}
+
+.draft-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* ----------------------------------------------------------------- */
+.form-container {
+  padding: 1.5rem;
+  background-color: #f9fafb;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.form-date {
+  color: #6b7280;
+}
+
+.form-main {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 2rem;
+}
+
+.image-upload {
+  flex: 1;
+}
+
+.image-upload-area {
+  border: 2px dashed #d1d5db;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  background-color: white;
+}
+
+.browse-btn {
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.image-thumbnails {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.thumbnail {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+
+.form-fields {
+  flex: 1;
+  & > article:first-of-type {
+    display: flex;
+    gap: 2rem;
+    & > div:first-of-type {
+      flex-basis: 80%;
+    }
+    & > div:nth-of-type(2) {
+      flex-basis: 20%;
+    }
+  }
+
+  & > article:nth-of-type(2) {
+    display: flex;
+    margin: 2rem 0;
+    gap: 2rem;
+    & > div:first-of-type {
+      flex-basis: 90%;
+    }
+    & > div:nth-of-type(2) {
+      flex-basis: 10%;
+    }
+  }
+
+  & > article:nth-of-type(3) {
+    margin: 2rem 0;
+  }
+}
+
+.input-field,
+.textarea-field {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.quantity-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantity-btn {
+  padding: 0.5rem 1rem;
+  background-color: #e5e7eb;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.quantity-input {
+  width: 50px;
+  text-align: center;
+}
+
+.price-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.draft-sidebar {
+  flex: 0.25;
+  padding: 2rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+
+  & h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+.draft-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.draft-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.form-container h2 {
+  margin-bottom: 1rem;
+}
