@@ -1,9 +1,18 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import ScrollToTop from "./hooks/ScrollToTop";
+
 import ProtectedRoute from "./utils/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
+import AdminRoute from "./utils/AdminRoute";
+
+import Products from "./pages/admin/products/Products";
+import Customers from "./pages/admin/customers/Customers";
+import Orders from "./pages/admin/orders/Orders";
+import Team from "./pages/admin/team/Team";
+import AddNewProduct from "./pages/admin/add-new-product/AddNewProduct";
+
+// import { useAuth } from "./context/AuthContext";
 import "./App.css";
 
 // Import Pages
@@ -26,8 +35,7 @@ import Address from "./pages/user/address/Address";
 import Profile from "./pages/user/profile/Profile";
 import Wishlist from "./pages/user/wishlist/Wishlist";
 import Logout from "./pages/user/logout/Logout";
-import Admin from "./Admin";
-import AdminRoute from "./utils/AdminRoute";
+import Admin from "./pages/admin/Admin";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -54,7 +62,11 @@ const getRoutesConfig = () => ({
     { path: "logout", element: <Logout /> },
   ],
   adminRoutes: [
-    { path: "dashboard", element: <Admin /> },
+    { path: "products", element: <Products /> },
+    { path: "add-new-product", element: <AddNewProduct /> },
+    { path: "customers", element: <Customers /> },
+    { path: "orders", element: <Orders /> },
+    { path: "team", element: <Team /> },
     // { path: "products", element: <Admin /> },
   ],
 });
@@ -63,9 +75,9 @@ const getRoutesConfig = () => ({
 export default function App() {
   const location = useLocation();
   const routesConfig = getRoutesConfig();
-  const { userContext } = useAuth();
+  // const { userContext } = useAuth();
 
-  console.log("userContext", userContext?.accountType);
+  // console.log("userContext", userContext?.accountType);
 
   const { hide_nav, hide_footer, navWithoutSearchBar } = useMemo(() => {
     const path = location.pathname;
@@ -94,9 +106,17 @@ export default function App() {
       "/buy-now",
     ];
 
+    const shouldHideNav = hideNavBar.some((hidePath) =>
+      path.startsWith(hidePath)
+    );
+
+    const shouldHideFooter = hideFooter.some((hidePath) =>
+      path.startsWith(hidePath)
+    );
+
     return {
-      hide_nav: hideNavBar.includes(path),
-      hide_footer: hideFooter.includes(path),
+      hide_nav: shouldHideNav,
+      hide_footer: shouldHideFooter,
       navWithoutSearchBar: navWithoutSearchBar.includes(path),
     };
   }, [location.pathname]);
