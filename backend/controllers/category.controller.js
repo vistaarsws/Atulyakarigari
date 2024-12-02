@@ -52,6 +52,9 @@ export const createCategory = async (req, res) => {
         return success(req, res, "category created successfully", category.toObject());
 
     } catch (error) {
+        if (error.code === 11000) {
+            return badRequest(req, res, null, "Category already exists");
+        }
         return internalServerError(req, res, error, "unable to Create Category");
     }
 
@@ -78,7 +81,7 @@ export const getCategoryById = async (req, res) => {
             return notFoundRequest(req, res, null, "Category not found");
         }
 
-        return success(req, res, "category fetched successfully", category);
+        return success(req, res, "category fetched successfully", category.toObject());
     } catch (error) {
         return internalServerError(req, res, error, "unable to Fetch Category");
     }
@@ -95,7 +98,7 @@ export const updateCategory = async (req, res) => {
 
         const category = await Category.findByIdAndUpdate(
             id,
-            name,
+            { name },
             {
                 new: true,
                 runValidators: true
@@ -103,10 +106,10 @@ export const updateCategory = async (req, res) => {
         );
 
         if (!category) {
-            notFoundRequest(req, res, null, "Category not found");
+            return notFoundRequest(req, res, null, "Category not found");
         }
 
-        return success(req, res, "category updated successfully", category);
+        return success(req, res, "category updated successfully", category.toObject());
     } catch (error) {
         return internalServerError(req, res, error, "unable to Update Category");
     }
