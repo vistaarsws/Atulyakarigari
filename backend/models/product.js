@@ -30,7 +30,7 @@ const ProductSchema = new mongoose.Schema({
     },
     attributes: [
         {
-            key: { type: String, required: true },
+            key: { type: mongoose.Schema.Types.Mixed, required: true },
             value: { type: mongoose.Schema.Types.Mixed, required: true },
         }
     ],
@@ -48,7 +48,11 @@ const ProductSchema = new mongoose.Schema({
         required: [true, 'Stock quantity is required'],
         min: [0, 'Stock cannot be negative']
     },
-    varients: [],
+    status: {
+        type: String,
+        enum: ['Draft', 'Published'],
+        required: [true, 'Product status is required'],
+    },
 }, {
     timestamps: true
 });

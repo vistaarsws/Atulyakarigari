@@ -48,11 +48,16 @@ export const createProduct = async (req, res) => {
             price,
             category,
             subcategory,
-            attributes
+            attributes,
+            stock,
+            status
         } = req.body;
+        console.log(req.files);
 
-        // Comprehensive input validation
-        if (!name || !price || !category) {
+        if (!req.files || !req.files.productImage) {
+            return badRequest(req, res, null, "product image is required");
+        }        //  input validation
+        if (!name || !price || !category || !stock) {
             return badRequest(req, res, null, "fields are missing");
         }
         if (!attributes || !Array.isArray(attributes)) {
@@ -61,19 +66,13 @@ export const createProduct = async (req, res) => {
         // Check if category exists
         const existingCategory = await Category.findById(category);
         if (!existingCategory) {
-            return res.status(404).json({
-                success: false,
-                message: 'Category not found'
-            });
+            return badRequest(req, res, null, "Category not found");
         }
 
         // Optional: Validate subcategory if provided
         if (subcategory) {
             if (!mongoose.Types.ObjectId.isValid(subcategory)) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid subcategory ID'
-                });
+                return badRequest(req, res, null, "Invalid subcategory ");
             }
 
             const existingSubcategory = await SubCategory.findById(subcategory);
@@ -98,7 +97,9 @@ export const createProduct = async (req, res) => {
             price,
             category,
             subcategory: subcategory || null,
-            ...otherFields,
+            attributes,
+            stock,
+            status
         };
 
         // Create product
@@ -106,7 +107,7 @@ export const createProduct = async (req, res) => {
 
         // Verify product creation
         if (!product || product.length === 0) {
-            throw new Error('Failed to create product');
+            return internalServerError(req, res, null, "'Failed to create product'");
         }
 
         // Update category references
@@ -134,20 +135,17 @@ export const createProduct = async (req, res) => {
 
         // Commit transaction
         await session.commitTransaction();;
-
+        const response = product[0].toObject();
         // Respond with created product
-        return success(req, res, "product created successfully", product[0]);
+        return success(req, res, "product created successfully", response);
     } catch (error) {
         // Abort transaction if it exists
+        console.log(error);
         if (session) {
             await session.abortTransaction();
         }
-        if (error.code === 11000) {
-            return badRequest(req, res, null, "Product already exists");
-        }
         return internalServerError(req, res, error, "unable to create product");
     } finally {
-        // Ensure session is ended
         if (session) {
             session.endSession();
         }

@@ -143,7 +143,7 @@ export const getAllSubcategories = async (req, res) => {
     }
 };
 
-// Get subcategory by ID
+// Get subcategory by subcategory ID
 export const getSubcategoryById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -155,6 +155,30 @@ export const getSubcategoryById = async (req, res) => {
 
         // Find subcategory with populated parent category
         const subcategory = await SubCategory.findById(id).populate('parentCategory');
+
+        // Check if subcategory exists
+        if (!subcategory) {
+            return notFoundRequest(req, res, null, "Subcategory not found");
+        }
+
+        return success(req, res, "Subcategory retrieved successfully", subcategory.toObject());
+    } catch (error) {
+        return internalServerError(req, res, error, "Failed to retrieve subcategory");
+    }
+};
+
+// Get subcategory by category ID
+export const getSubcategoryByCategoryId = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            badRequest(req, res, null, "Invalid Category ID");
+        }
+
+        // Find subcategory with populated parent category
+        const subcategory = await Category.findById(id).select("name _id")
 
         // Check if subcategory exists
         if (!subcategory) {
