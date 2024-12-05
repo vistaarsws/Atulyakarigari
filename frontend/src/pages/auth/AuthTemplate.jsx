@@ -15,6 +15,7 @@ import {
   varifyOtp,
 } from "../../services/operations/authAPI";
 import { useAuth } from "../../context/AuthContext";
+import  setCustomDimension  from '../../utils/helpers';
 
 dayjs.extend(customParseFormat);
 
@@ -71,7 +72,9 @@ export default function AuthTemplate({ page }) {
         }
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
-        });
+        })
+        setCustomDimension('dimension1', userDetails.role);  // Example: Set user role
+    setCustomDimension('dimension2', userDetails.id);    // Example: Set user ID;
       } else {
         enqueueSnackbar(res.data.message, {
           variant: "warning",
@@ -144,7 +147,7 @@ export default function AuthTemplate({ page }) {
         const successMessage =
           otpType === "login" ? "Login Successful!" : "Signup Successful!";
         if (res.data.data.accountType === "admin") {
-          navigate("/admin/dashboard", { state: { type: otpType } });
+          navigate("/admin", { state: { type: otpType } });
         } else {
           navigate("/", { state: { type: otpType } });
         }

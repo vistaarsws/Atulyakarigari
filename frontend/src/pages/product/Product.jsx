@@ -20,6 +20,8 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { logEvent } from "../../utils/analytics/analytics";
 
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
@@ -205,6 +207,25 @@ export default function Product() {
       },
     ],
   };
+
+  
+  const startTime = useRef(null); // Track when the user enters the page
+
+  useEffect(() => {
+    // Record the time the user enters the page
+    startTime.current = new Date();
+
+    return () => {
+      // Calculate time spent when the user leaves the page
+      const endTime = new Date();
+      const timeSpent = Math.floor((endTime - startTime.current) / 1000); // Time in seconds
+
+      // Log to analytics
+      logEvent("Product", "Time Spent", userId, timeSpent);
+      console.log(`User spent ${timeSpent} seconds on product ${userId}`);
+    };
+  }, [userId]); // Track changes to the product ID in case the route changes
+
   return (
     <ThemeProvider theme={theme}>
       <div className="product_container">
