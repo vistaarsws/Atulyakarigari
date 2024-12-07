@@ -588,7 +588,6 @@ export default function Admin() {
                           sx={{
                             width: "100%",
                             height: "100%",
-                            borderRadius: "0px",
                             backgroundColor: "#5f3dc3",
                             color: "white",
                             borderRadius: "0.4rem",
