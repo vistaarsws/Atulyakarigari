@@ -13,9 +13,12 @@ export const admin_endpoints = {
   CREATE_CATEGORY: BASE_URL + "/api/v1/category/create",
   DELETE_CATEGORY: BASE_URL + "/api/v1/category/delete",
   UPDATE_CATEGORY: BASE_URL + "/api/v1/category/update",
+  GET_CATEGORY_BY_ID: BASE_URL + "/api/v1/category/get",
 
   GET_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/get",
   CREATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/create",
   DELETE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/delete",
   UPDATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/update",
+  GET_SUBCATEGORY_BY_CATEGORY_ID:
+    BASE_URL + "/api/v1/sub-category/get-by-category",
 };
