@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import PROFILE_IMAGE from "../../../assets/images/userProfile.png";
 import { Button } from "@mui/material";
 import "./profile.css";
