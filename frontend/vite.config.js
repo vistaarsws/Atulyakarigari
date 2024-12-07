@@ -8,4 +8,13 @@ export default defineConfig({
     host: true,
     port: 3000,
   },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Log the warning to the console for debugging
+        console.warn(warning.message);
+        warn(warning); // Default warning handler
+      },
+    },
+  },
 });
