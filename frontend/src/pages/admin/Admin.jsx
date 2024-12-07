@@ -51,13 +51,24 @@ import "./Admin.css";
 export default function Admin() {
   const [open, setOpen] = useState(false);
 
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    quantity: 1,
+    description: "",
+    price: "",
+    discount: "",
+    artisanName: "",
+    images: [],
+    subCategory: "",
+    attributes: [],
+    singleImage: null,
+  });
+
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
-  // ------------------------------ react-date-range -------------------------------------------------
-
-  // --------------------------------------------------------------------------------------------------------
   const [isEditing, setIsEditing] = useState(false);
   const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
 
@@ -143,8 +154,6 @@ export default function Admin() {
     }
     // debugger;
 
-    console.log(savedVariants, "m111111111111111111111111111111");
-
     handleCloseDialog();
   };
 
@@ -193,24 +202,21 @@ export default function Admin() {
 
   const [parentCategory, setParentCategory] = useState("");
 
+  const searchCategoryByName = (name) => {
+    return categories.find((category) => category.name === name);
+  };
+
   // ----------------------------------------------Generic Function for deleting category and subcategory-----------------------------
 
   const handleDelete_cat_subCat = async (id, type) => {
     try {
-      await (type === "category" ? deleteCategory(id) : deleteSubCategory(id));
-
       if (type === "category") {
-        setCategories((prev) => prev.filter((category) => category.id !== id));
+        await deleteCategory(id);
+        await get_cat_subCat_Data("category");
       } else {
-        setSubCategories((prev) =>
-          prev.filter((category) => category.id !== id)
-        );
+        await deleteSubCategory(id);
+        await get_cat_subCat_Data("subCategory");
       }
-
-      setData((prev) => ({
-        ...prev,
-        [`${type}s`]: prev[`${type}s`].filter((item) => item.id !== id),
-      }));
     } catch (error) {
       console.error(`Error deleting ${type}:`, error);
     }
@@ -251,7 +257,10 @@ export default function Admin() {
 
         setCategories(categories_arr);
       } else {
-        const response = await getSubCategoryByCategoryId(searchedCategory._id);
+        const enteredCategory = searchCategoryByName(formData.category);
+        console.log(formData, "DDDDFFFFFFFFFF");
+
+        const response = await getSubCategoryByCategoryId(category._id);
 
         const subCategories_array = Object.values(
           response.data.data.subCategory
@@ -266,10 +275,6 @@ export default function Admin() {
 
   // ----------------------------------------------------
 
-  const searchCategoryByName = (name) => {
-    return categories.find((category) => category.name === name);
-  };
-
   const handleEditCategory = async (name, id) => {
     setEditCategoryId(id);
     setEditCategoryName(name);
@@ -278,6 +283,7 @@ export default function Admin() {
   const handleSaveEdit = async (id) => {
     await updateCategory(editCategoryName, id);
     setEditCategoryId(null);
+    await get_cat_subCat_Data("category");
   };
 
   const handleCancelEdit = () => {
@@ -337,20 +343,6 @@ export default function Admin() {
       </List>
     </Box>
   );
-
-  const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    quantity: 1,
-    description: "",
-    price: "",
-    discount: "",
-    artisanName: "",
-    images: [],
-    subCategory: "",
-    attributes: [],
-    singleImage: null,
-  });
 
   useEffect(() => {
     setFormData({ ...formData, attributes: savedVariants });

@@ -1,8 +1,7 @@
-import  { useState } from "react";
+import { useState } from "react";
 import PROFILE_IMAGE from "../../../assets/images/userProfile.png";
 import { Button } from "@mui/material";
-import "./Profile.css";
-
+import "./profile.css";
 
 const ProfileField = ({ label, value, onChange, type }) => {
   return (

@@ -85,7 +85,7 @@ const updateSubCategory = async (name, id) => {
 const getSubCategoryByCategoryId = async (id) => {
   const response = await apiConnector(
     "GET",
-    admin_endpoints.GET_SUBCATEGORY_BY_CATEGORY_ID,
+    `${admin_endpoints.GET_SUBCATEGORY_BY_CATEGORY_ID}/${id}`,
     {
       id,
     }
