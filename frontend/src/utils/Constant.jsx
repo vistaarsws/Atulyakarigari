@@ -150,6 +150,24 @@ const ourCollections = [
   },
 ];
 
+const ourSustainabilityPractices = [
+  {
+    title: "🌿 Ethically Sourced & Handmade",
+    description:
+      "Each product is crafted by hand with natural materials, ensuring ethical sourcing and promoting conscious consumerism.",
+  },
+  {
+    title: "♻️ Sustainable Production",
+    description:
+      " We embrace slow fashion, minimizing our environmental impact through eco-friendly practices at every stage of production.",
+  },
+  {
+    title: "💚 Fair Trade & Artisan Support",
+    description:
+      " We ensure fair wages for artisans, fostering sustainable livelihoods and a production cycle that honors both people and the planet.",
+  },
+];
+
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 const blogs_array = [
@@ -444,4 +462,5 @@ export {
   blogs_array,
   top_product_list_from_category,
   artisans,
+  ourSustainabilityPractices,
 };

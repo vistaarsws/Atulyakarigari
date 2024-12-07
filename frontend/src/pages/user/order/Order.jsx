@@ -85,8 +85,8 @@ export default function Component() {
         <div
           style={{
             display: "flex",
-            height: "87vh",
-            padding: "20px",
+            height: useMediaQuery("(max-width:768px)") ? "auto" : "90vh",
+            padding: useMediaQuery("(max-width:425px)") ? "2rem" : "2rem 4rem",
             width:
               (breakpoints.max768 && "100%") ||
               (breakpoints.min769Max1024 && "60%") ||
@@ -103,8 +103,8 @@ export default function Component() {
           >
             <div
               style={{
-                padding: breakpoints.max768 ? "0px" : "24px",
-                paddingLeft: breakpoints.max768 ? "0px" : "10px",
+                // padding: breakpoints.max768 ? "0px" : "24px",
+                marginBottom: "1.5rem",
                 display: "flex",
                 justifyContent: "space-between",
                 flexDirection:
@@ -113,7 +113,7 @@ export default function Component() {
             >
               <Box
                 sx={{
-                  marginBottom: breakpoints.max768 && "1rem",
+                  marginBottom: breakpoints.max768 ? "1rem" : "1rem",
                 }}
               >
                 <h2
@@ -130,7 +130,7 @@ export default function Component() {
                   style={{
                     fontSize: "12px",
                     color: "rgba(111, 111, 111, 1)",
-                    marginBottom: "20px",
+
                     fontWeight: 400,
                   }}
                 >
@@ -147,11 +147,6 @@ export default function Component() {
                   )
                     ? "start"
                     : "center",
-                  flexDirection: useMediaQuery(
-                    "((min-width:776px) and (max-width:1000px))"
-                  )
-                    ? "column"
-                    : "row",
                 }}
               >
                 <Box
@@ -159,7 +154,7 @@ export default function Component() {
                     display: "flex",
                     alignItems: "center",
                     borderRadius: "4px",
-                    padding: "4px 12px",
+                    padding: "4px 0px",
                     flex: 1,
                   }}
                 >
@@ -191,7 +186,7 @@ export default function Component() {
             </div>
             <div
               style={{
-                height: "65vh",
+                height: useMediaQuery("(max-width:768px)") ? "72vh" : "77vh",
                 overflowY: "scroll",
                 scrollbarWidth: "none",
               }}
@@ -200,30 +195,19 @@ export default function Component() {
                 <div
                   key={order.id}
                   style={{
-                    borderTop: "1px solid #eee",
                     paddingTop: "24px",
-                    marginBottom: "24px",
+                    marginBottom: useMediaQuery("(max-width:768px)")
+                      ? "2rem"
+                      : "24px",
                     display: "flex",
+                    padding: "2.4rem",
                     gap: "24px",
-                    marginLeft:
-                      (breakpoints.max768 && "0px") ||
-                      (breakpoints.min769Max1024 && "1rem") ||
-                      "3.2rem",
-                    marginRight:
-                      (breakpoints.max768 && "0px") ||
-                      (breakpoints.min769Max1024 && "0rem") ||
-                      "3.2rem",
-                    boxShadow:
+                    border:
                       currentImageIndex === index
-                        ? "0px 4px 10px rgba(0, 0, 0, 0.1)"
-                        : "none",
-                    // MODIFIED: Added transition for smooth shadow effect
+                        ? "1.5px solid #60a487"
+                        : "1px solid #eee",
                     transition: "box-shadow 0.3s ease",
-                    // MODIFIED: Added border radius for consistent shadow shape
                     borderRadius: "8px",
-                    // MODIFIED: Added padding to prevent content touching edges
-                    padding: "16px",
-                    // MODIFIED: Added cursor style to indicate clickable
                     cursor: "pointer",
                   }}
                   onClick={() => handleArrowClick(index)}
@@ -372,6 +356,7 @@ export default function Component() {
               "30%",
             display: breakpoints.max768 ? "none" : "block",
             height: "87vh",
+            mr: 4,
           }}
         >
           <img

@@ -4,7 +4,7 @@
   width: 100%;
   height: max-content;
   padding: 1rem;
-  background-color: #f4f4f4;
+  /* background-color: #ffffff; */
   border-radius: 0.6rem !important;
 
   &:has(.wistListBtnStyle) {
@@ -87,16 +87,17 @@
 }
 .productCard_container > article {
   height: 20%;
-  font-weight: 400;
   letter-spacing: 3%;
   color: #383737;
   & > h1 {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     margin-top: 0.9rem;
+    font-weight: 400;
   }
   & > p {
     font-size: 1.4rem;
     margin: 1rem auto;
+    font-weight: 400;
   }
 }
 .productCard_container article > div {
@@ -108,7 +109,7 @@
     font-weight: 900;
   }
   & > strike {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 400;
     color: silver;
   }
@@ -190,7 +191,16 @@
 
 @media screen and (max-width: 425px) {
   .productCard_container {
+    border-radius: 0px !important;
     padding: 1rem;
+    background-color: white;
+
+    box-shadow: none !important;
+    &:hover {
+      & > figure:first-of-type img {
+        transform: none;
+      }
+    }
   }
   .productCard_container div button {
     padding: 1rem 2rem;
@@ -198,6 +208,12 @@
   .productCard_container section {
     top: 1.5rem;
     right: 1.5rem;
+  }
+
+  .productCard_container:hover section,
+  .productCard_container:hover article > p,
+  .productCard_container:hover article div {
+    visibility: visible !important;
   }
 
   /* .productCard_container article > div {

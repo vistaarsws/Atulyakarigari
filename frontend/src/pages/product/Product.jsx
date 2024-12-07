@@ -20,10 +20,19 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { logEvent } from "../../utils/analytics/analytics";
 
 import "./Product.css";
 import WishListHeartIcon from "../../components/ui/micro_elements/wishListHeartIcon/wishListHeartIcon";
 import { useState } from "react";
+import ProductSection from "../../components/layout/productSection/ProductSection";
+import cat5_1 from "../../assets/images/cat5_1.png";
+import cat5_2 from "../../assets/images/cat5_2.png";
+import cat5_3 from "../../assets/images/cat5_3.png";
+import cat5_4 from "../../assets/images/cat5_4.png";
+import cat5_5 from "../../assets/images/cat5_5.png";
+import cat5_6 from "../../assets/images/cat5_1.png";
 
 // ----------------------------------------------------------------------------------------
 function CustomTabPanel(props) {
@@ -73,9 +82,9 @@ export default function Product() {
     setValue(newValue);
   };
   const breadcrumbItems = [
-    { title: "Home", href: "/" },
-    { title: "Category", href: "/category" },
-    { title: "Subcategory", href: "/subcategory" },
+    // { title: "Home", href: "/" },
+    { title: "Banarsi Silk ", href: "/categories" },
+    { title: "Banarasi Nikhaar", href: "/categories" },
   ];
 
   const items = breadcrumbItems.map((item, index) => ({
@@ -98,10 +107,124 @@ export default function Product() {
       { type: "Style", value: "Floral pattern with gota patti pallu" },
       { type: "Type", value: "Pure Silk" },
       { type: "Weight", value: "500 gm" },
-      { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
-      { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
+      // { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
+      // { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
     ],
   };
+  const similar_product = {
+    title: "Similar Products",
+    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
+    products: [
+      {
+        key: "1",
+        title: "Kashi Kalaa",
+        picture: cat5_1,
+        price: 2000.0,
+      },
+      {
+        key: "2",
+        title: "Kashi Kalaa",
+        picture: cat5_2,
+        price: 4000.0,
+      },
+      {
+        key: "3",
+        title: "Silken Splendor",
+        picture: cat5_3,
+        price: 2000.0,
+      },
+      {
+        key: "4",
+        title: "Silken Splendor",
+        picture: cat5_4,
+        price: 6000.0,
+      },
+      {
+        key: "5",
+        title: "Silken Splendor",
+        picture: cat5_5,
+        price: 3000.0,
+      },
+      {
+        key: "6",
+        title: "Silken Splendor",
+        picture: cat5_1,
+        price: 12000,
+      },
+      {
+        key: "7",
+        title: "Silken Splendor",
+        picture: cat5_2,
+        price: 12000,
+      },
+    ],
+  };
+  const you_may_also_like = {
+    title: "You May Also Like",
+    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
+    products: [
+      {
+        key: "1",
+        title: "Kashi Kalaa",
+        picture: cat5_1,
+        price: 2000.0,
+      },
+      {
+        key: "2",
+        title: "Kashi Kalaa",
+        picture: cat5_2,
+        price: 4000.0,
+      },
+      {
+        key: "3",
+        title: "Silken Splendor",
+        picture: cat5_3,
+        price: 2000.0,
+      },
+      {
+        key: "4",
+        title: "Silken Splendor",
+        picture: cat5_4,
+        price: 6000.0,
+      },
+      {
+        key: "5",
+        title: "Silken Splendor",
+        picture: cat5_5,
+        price: 3000.0,
+      },
+      {
+        key: "6",
+        title: "Silken Splendor",
+        picture: cat5_1,
+        price: 12000,
+      },
+      {
+        key: "7",
+        title: "Silken Splendor",
+        picture: cat5_2,
+        price: 12000,
+      },
+    ],
+  };
+
+  
+  const startTime = useRef(null); // Track when the user enters the page
+
+  useEffect(() => {
+    // Record the time the user enters the page
+    startTime.current = new Date();
+
+    return () => {
+      // Calculate time spent when the user leaves the page
+      const endTime = new Date();
+      const timeSpent = Math.floor((endTime - startTime.current) / 1000); // Time in seconds
+
+      // Log to analytics
+      logEvent("Product", "Time Spent", userId, timeSpent);
+      console.log(`User spent ${timeSpent} seconds on product ${userId}`);
+    };
+  }, [userId]); // Track changes to the product ID in case the route changes
 
   return (
     <ThemeProvider theme={theme}>
@@ -132,7 +255,12 @@ export default function Product() {
             </p>
             <div className="priceRatingContainer">
               <div>
-                <div className="priceBox"> ₹ 26,700</div>
+                <div className="priceBox">
+                  <h2>₹26,700</h2>
+                  <strike>₹32,700</strike>
+                  <h4>(-{15}%)</h4>
+                </div>
+
                 <div className="ratingBox">
                   <div>
                     <span>4</span> <img src={star} alt="Star" />
@@ -170,10 +298,6 @@ export default function Product() {
             </article>
             <article className="product_details_userInputs">
               <div className="productQuantityCounter_container">
-                <button onClick={() => setProductQuantity(productQuantity + 1)}>
-                  +
-                </button>
-                <div>{productQuantity}</div>
                 <button
                   onClick={() =>
                     productQuantity > 1 &&
@@ -181,6 +305,10 @@ export default function Product() {
                   }
                 >
                   -
+                </button>
+                <div>{productQuantity}</div>
+                <button onClick={() => setProductQuantity(productQuantity + 1)}>
+                  +
                 </button>
               </div>
               <div>
@@ -199,13 +327,13 @@ export default function Product() {
                   borderColor: "divider",
                   overflow: "scroll",
                   scrollbarWidth: "none",
-                  width: useMediaQuery("(max-width:600px)") ? "80vw" : "100%",
+                  width: useMediaQuery("(max-width:600px)") ? "87vw" : "100%",
                 }}
               >
                 <Tabs
                   value={value}
                   variant="scrollable"
-                  scrollButtons="auto"
+                  scrollButtons="false"
                   onChange={handleChange}
                   className="Product_tab_items"
                   textColor="secondary"
@@ -293,19 +421,43 @@ export default function Product() {
                     />
 
                     <Box sx={{ ml: 2, flex: 1 }}>
-                      <Stack direction="row" alignItems="center" spacing={1}>
+                      <Stack
+                        display="grid"
+                        marginTop="1rem"
+                        gridTemplateColumns="1fr 1fr "
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="start"
+                        spacing={1}
+                      >
                         <Rating name="read-only" value={5} readOnly />
-
+                        <div></div>
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontSize: "1.2rem" }}
+                          sx={{
+                            fontSize: "1.2rem",
+                            marginLeft: "0rem !important",
+                          }}
                         >
-                          - Priya Sharma, 30-09-2024
+                          - Priya Sharma
+                        </Typography>
+
+                        <Typography
+                          sx={{
+                            margin: "0 !important",
+                            textAlign: "right",
+                            fontSize: "1.2rem !important",
+                          }}
+                        >
+                          30-09-2024
                         </Typography>
                       </Stack>
 
-                      <Typography variant="body1" sx={{ mt: 1 }}>
+                      <Typography
+                        variant="body1"
+                        sx={{ mt: 1, color: "#5d5c5c" }}
+                      >
                         Wearing a Banarsi sari feels like draping a piece of
                         heritage. The craftsmanship and elegance are unmatched.
                         Lorem ipsum dolor, sit amet consectetur adipisicing
@@ -332,6 +484,18 @@ export default function Product() {
             </article>
           </section>
         </div>
+        <section>
+          <ProductSection
+            productCategorySection={similar_product}
+            bgColor={"#fff"}
+          />
+        </section>
+        <section>
+          <ProductSection
+            productCategorySection={you_may_also_like}
+            bgColor={"#fff"}
+          />
+        </section>
       </div>
     </ThemeProvider>
   );

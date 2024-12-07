@@ -10,20 +10,9 @@ import Stack from "@mui/material/Stack";
 import "./Blogs.css";
 
 export default function Blogs() {
-  const [selectedCity, setSelectedCity] = useState(null);
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
-
-  const categories = ["Handloom", "HANDICRAFT", "JEWELLERY"];
 
   const topBlogs = [
     {
@@ -129,7 +118,7 @@ export default function Blogs() {
         </div>
         <div>
           <Stack spacing={2}>
-            <Pagination count={10} size="large" />
+            <Pagination count={5} size="large" />
           </Stack>
         </div>
       </section>

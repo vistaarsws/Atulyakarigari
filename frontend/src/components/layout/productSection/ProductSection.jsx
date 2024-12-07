@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 
 export default function ProductSection({
   productCategorySection = top_product_list_from_category,
+  bgColor,
 }) {
   const productCategorySection_products = productCategorySection.products.map(
     (product, index) => {
@@ -23,7 +24,10 @@ export default function ProductSection({
     }
   );
   return (
-    <div className="productCategorySection_container">
+    <div
+      className="productCategorySection_container"
+      style={{ backgroundColor: bgColor ? bgColor : "#f4f4f4" }}
+    >
       <h1>{productCategorySection.title}</h1>
       <h2>{productCategorySection.subtitle}</h2>
       <figure>
@@ -36,7 +40,7 @@ export default function ProductSection({
         <div>
           <EmblaSlider
             plugins={["autoplay"]}
-            slides_in_view={{ xl: 5, lg: 4, md: 3, sm: 2, xs: 2 }}
+            slides_in_view={{ xl: 6, lg: 5, md: 4, sm: 2, xs: 2 }}
             options={{ delay: 8000, dragFree: true }}
             slides={productCategorySection_products}
             no_of_slides={5}

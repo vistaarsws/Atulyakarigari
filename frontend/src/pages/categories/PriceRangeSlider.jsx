@@ -49,13 +49,13 @@ export default function PriceRangeSlider({ min, max, onChange }) {
           aria-label="Price range"
         />
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-          <Typography sx={{ fontSize: "10px" }} color="text.secondary">
+          <Typography sx={{ fontSize: "12px" }} color="text.secondary">
             {min.toLocaleString()}
           </Typography>
-          <Typography sx={{ fontSize: "10px" }} fontWeight="medium">
+          <Typography sx={{ fontSize: "12px" }} fontWeight="500">
             {value.toLocaleString()}
           </Typography>
-          <Typography sx={{ fontSize: "10px" }} color="text.secondary">
+          <Typography sx={{ fontSize: "12px" }} color="text.secondary">
             {max.toLocaleString()}
           </Typography>
         </Box>

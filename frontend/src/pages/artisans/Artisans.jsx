@@ -21,7 +21,7 @@ export default function Artisans() {
       <figure className="artisans_heroBanner"></figure>
       <section>
         <h2>Meet Our Artisans: The Heart of Atulya Karigari</h2>
-        <figure>{/* <img src={wingPattern} alt="Design Pattern" /> */}</figure>
+        <br />
         <p>
           At Atulya Karigari, our artisans are the soul behind every
           masterpiece. Each piece they create tells a story of heritage,
@@ -50,7 +50,7 @@ export default function Artisans() {
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/COxJUmf1udI?si=kwmRr350OVXDJt8t&autoplay=1&mute=1"
+            src="https://www.youtube.com/embed/COxJUmf1udI?si=kwmRr350OVXDJt8t&autoplay=1&mute=1&loop=1&playlist=COxJUmf1udI"
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"

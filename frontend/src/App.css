@@ -16,12 +16,12 @@
 }
 
 /* ------------------------------------------------------------------------------------------------- */
-main {
-  margin-top: 9vh;
+.marginTop {
+  margin-top: 10vh;
 }
 
 @media screen and (max-width: 650px) {
-  main {
-    margin-top: 14vh;
+  .marginTop {
+    margin-top: 16.5vh;
   }
 }

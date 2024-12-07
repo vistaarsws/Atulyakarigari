@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import "./user.css";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, useMediaQuery } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Sidebar() {
@@ -10,10 +10,10 @@ export default function Sidebar() {
     { key: "user/wishlist", label: "Wishlist" },
     { key: "user/orders", label: "Orders" },
     { key: "user/address", label: "Address" },
-    { key: "contact-us", label: "Contact Us" },
-    { key: "terms-of-use", label: "Terms of use" },
-    { key: "privacy-policy", label: "Privacy Policy" },
-    { key: "user/logout", label: "Log Out" },
+    // { key: "contact-us", label: "Contact Us" },
+    // { key: "terms-of-use", label: "Terms of use" },
+    // { key: "privacy-policy", label: "Privacy Policy" },
+    // { key: "user/logout", label: "Log Out" },
   ];
   console.log(location.pathname);
 
@@ -42,10 +42,15 @@ export default function Sidebar() {
       <div className="content-container">
         <div
           style={{
+            marginTop: "1rem",
             // border: "2px solid red",
-            display: "flex",
+            display: useMediaQuery("(max-width:768px)") ? "flex" : "none",
             justifyContent: "start",
             alignItems: "center",
+            padding: "1rem 1rem",
+            borderBottom: "1px solid #eeeeee",
+            // position: "sticky",
+            // top: "14vh",
           }}
         >
           <ArrowBackIcon

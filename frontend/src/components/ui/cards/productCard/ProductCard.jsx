@@ -53,7 +53,7 @@ function ProductCard({
             isHover === true ? "rgba(149, 157, 165, 0.2) 0px 8px 24px" : "none",
           borderRadius: isHover === true ? "0.4rem" : "0rem",
         }}
-        className={"productCard_container"}
+        className="productCard_container"
         onClick={() => {
           navigate(`/product/${id}`);
         }}

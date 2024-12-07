@@ -8,7 +8,8 @@ import "./CategoryPage.css";
 const Index = () => {
   return (
     <div className="categoryPage_container">
-      <img src={BANNER_IMAGE} style={{ width: "100%" }} />
+      {/* <img src={BANNER_IMAGE} style={{ width: "100%" }} /> */}
+      {/* <div className="categoryHeader"></div> */}
       <section>
         <div>
           <BanarsiSilkFilter />
@@ -28,7 +29,6 @@ const Index = () => {
       <div className="paginationContainer">
         <Pagination count={4} />
       </div>
-      {/* <div style={{ height: "20vh" }}></div> */}
     </div>
   );
 };

@@ -23,6 +23,9 @@ export default function About() {
 
         <div>
           <h2>Who We Are</h2>
+          <figure>
+            <img src={aboutImg_1} alt="" />
+          </figure>
           <p>
             Atulyakarigari India is a brand of handloom and handicrafts
             established as a CSR initiative by Annapurna Finance Pvt Ltd. Our
@@ -65,7 +68,7 @@ export default function About() {
           <iframe
             width="100%"
             height="315"
-            src="https://www.youtube.com/embed/wVHC8FIktdc?si=6wDt8ff2JUx7ZRmR&autoplay=1&mute=1"
+            src="https://www.youtube.com/embed/wVHC8FIktdc?si=6wDt8ff2JUx7ZRmR&autoplay=1&mute=1&loop=1&playlist=wVHC8FIktdc"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -86,12 +89,10 @@ export default function About() {
       <article className="about_sec-3">
         <h2>Meet Our Team</h2>
         <p>
-          Atulya Karigari is driven by a passionate team of creators, designers,
-          and innovators who believe in the power of traditional artistry. Our
-          team works hand-in-hand with artisans across India, understanding
-          their craft and creating designs that bring their skills to the
-          forefront. Together, we are on a mission to preserve India’s craft
-          heritage while meeting the evolving tastes of today’s customers.
+          Atulya Karigari unites artisans and designers across India to blend
+          traditional artistry with contemporary appeal. Committed to preserving
+          India’s craft heritage, the team collaborates closely with artisans to
+          create designs that highlight their skills and meet modern tastes.
         </p>
         <div>
           <EmblaSlider
@@ -100,6 +101,7 @@ export default function About() {
               delay: 3000,
               draggable: false,
               preventScrollOnTouch: true,
+              // loop: true,
             }}
             navigationDots={false}
             slides_in_view={{ xl: 7, lg: 5, md: 3, sm: 3, xs: 1 }}

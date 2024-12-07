@@ -2,26 +2,24 @@
   position: fixed;
   top: 0;
   z-index: 9999;
-  height: 9vh;
+  height: 10vh;
   width: 100vw;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 3%;
   background-color: rgba(109, 0, 29, 1);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
   & > figure {
     margin-right: 3%;
-  }
-
-  & > figure:nth-of-type(2) {
-    margin-left: auto;
   }
 
   & > div:nth-of-type(2) {
     display: flex;
     align-items: center;
     margin: 0 2rem;
+    display: none;
   }
 
   & > div:nth-of-type(1) {
@@ -53,6 +51,7 @@
 
 #cartIcon_container {
   margin-inline: 1.5rem;
+  cursor: pointer;
 }
 
 .hidden {
@@ -168,14 +167,15 @@
 
 .form {
   --timing: 0.3s;
-  --width-of-input: 220px;
-  --height-of-input: 5vh;
+  --minWidth-of-input: 22rem;
+  --height-of-input: 6.5vh;
   --border-height: 2px;
   --input-bg: transparent;
   --border-color: #6d001d;
   --after-border-radius: 1px;
   position: relative;
-  width: var(--width-of-input);
+  min-width: var(--minWidth-of-input);
+  width: 100%;
   height: var(--height-of-input);
   display: flex;
   align-items: center;
@@ -247,10 +247,6 @@ input:not(:placeholder-shown) ~ .reset {
   margin-top: 3px;
 }
 
-.nav-mobile {
-  display: none;
-}
-
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------- */
 
 @media screen and (max-width: 1580px) {
@@ -259,7 +255,7 @@ input:not(:placeholder-shown) ~ .reset {
     gap: 3rem;
   }
 }
-@media screen and (max-width: 1210px) {
+@media screen and (max-width: 1209px) {
   .navbar_container figure {
     margin-right: auto;
     margin-left: 0;
@@ -269,24 +265,26 @@ input:not(:placeholder-shown) ~ .reset {
     flex-direction: column;
     position: absolute;
     left: 50%;
-    top: 9vh;
+    top: 10vh;
     padding: 5rem 2rem;
     transform: translateX(-50%);
     width: 100%;
     z-index: 999;
-    background-color: #ad3f38;
+    background-color: #60a487;
+
+    & li > a {
+      color: white !important;
+    }
   }
 
   .navbar_container {
     padding: 1rem 5%;
   }
 
-  .navbar_container #burgerIcon {
-    display: block;
-  }
   .nav-mobile {
     background: transparent;
-    display: block;
+    display: block !important;
+    margin-right: 0 !important;
   }
 
   #navbar-toggle {
@@ -302,8 +300,8 @@ input:not(:placeholder-shown) ~ .reset {
   #navbar-toggle span:after {
     cursor: pointer;
     border-radius: 1px;
-    height: 3px;
-    width: 30px;
+    height: 2px;
+    width: 24px;
     background-color: #b56f82;
     position: absolute;
     display: block;
@@ -311,10 +309,10 @@ input:not(:placeholder-shown) ~ .reset {
     transition: all 300ms ease-in-out;
   }
   #navbar-toggle span:before {
-    top: -10px;
+    top: -8px;
   }
   #navbar-toggle span:after {
-    bottom: -10px;
+    bottom: -8px;
   }
   #navbar-toggle.active span {
     background-color: transparent;
@@ -331,9 +329,10 @@ input:not(:placeholder-shown) ~ .reset {
   }
 }
 @media screen and (max-width: 650px) {
-  .navbar_container > div:nth-of-type(1) {
+  .navbar_container > div:nth-of-type(1) > div:first-of-type {
     position: absolute;
-    top: 9vh;
+
+    top: 10vh;
     left: 0;
     z-index: 800;
     width: 100%;
@@ -343,6 +342,10 @@ input:not(:placeholder-shown) ~ .reset {
     background-color: white;
     & > input {
       color: black;
+    }
+
+    & > button > svg path {
+      stroke: #6d001d;
     }
   }
   .reset {
@@ -354,19 +357,28 @@ input:not(:placeholder-shown) ~ .reset {
   }
 
   .navLinks {
-    top: 14vh;
+    top: 16.5vh;
+  }
+
+  .navWithoutSearchBar_list {
+    top: 10vh !important;
   }
 }
 /* -------------------------------------------------------------------------IMAGE SETTING HOVER--------------------------------------------------------------------------- */
 .profileBox {
+  background-color: white;
+  border-radius: 50%;
   position: relative;
   cursor: pointer;
+  height: 4rem;
+  width: 4rem;
+  margin: 0.8rem;
+  object-fit: cover;
 }
 
 .profileBox img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
 }
 
 .profile-dropdown {
@@ -411,7 +423,9 @@ input:not(:placeholder-shown) ~ .reset {
   margin-bottom: 15px;
   margin-top: 10px;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 /* Hover effect for the mobile number */
@@ -435,7 +449,9 @@ input:not(:placeholder-shown) ~ .reset {
   font-weight: 400;
   color: #6f6f6f;
   border-bottom: 1px solid #e0e0e0;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .profile-dropdown li:last-child {
@@ -459,11 +475,11 @@ input:not(:placeholder-shown) ~ .reset {
 }
 
 @media screen and (max-width: 375px) {
-  .navbar_container {
+  /* .navbar_container {
     & > div:nth-of-type(2) {
       margin-left: 0;
     }
-  }
+  } */
   .navbar_container figure {
     & > a img {
       width: 12rem;

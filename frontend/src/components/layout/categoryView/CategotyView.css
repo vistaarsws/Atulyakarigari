@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   margin: 2rem 0%;
-  gap: 1rem;
+  /* gap: 1rem; */
 }
 
 .collection_container > div {
@@ -64,6 +64,26 @@
 .collection_descriptionCard > div:last-of-type {
   display: flex;
   justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.ourSusPractices div {
+  padding: 1.5rem;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  color: #383737;
+  width: 28vw;
+  min-width: 30rem;
+}
+.ourSusPractices h2 {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 400;
+}
+.ourSusPractices p {
+  font-size: 1.4rem;
+  font-weight: 300;
 }
 
 @media screen and (max-width: 1024px) {
@@ -72,14 +92,25 @@
     width: 100%;
     height: 50vh;
   }
+  .collection_container {
+    /* gap: 1rem; */
+  }
 }
 
 @media screen and (max-width: 768px) {
   .collection_descriptionCard {
     visibility: visible;
   }
+
   .collection_container {
     flex-direction: column;
-    gap: 2rem;
+    /* gap: 2rem; */
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .collection_container > div:hover img {
+    transform: unset;
+    transition: none;
   }
 }

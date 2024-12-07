@@ -10,8 +10,10 @@ import {
   Modal,
   useMediaQuery,
 } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 
-const EditAddressModal = ({ open, handleClose, addressData }) => {
+const EditAddressModal = ({ open, handleClose, addressData, title }) => {
   const isMobile = useMediaQuery("(max-width:768px)");
 
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
     mobileNumber: addressData?.mobile || "",
     pincode: addressData?.city?.split(" - ")[1] || "",
     address: addressData?.address || "",
-    locality: "",
+    locality: addressData?.locality || "",
     city: addressData?.city?.split(" - ")[0] || "",
     addressType: addressData?.type?.toLowerCase() || "home",
     isDefault: addressData?.isDefault || false,
@@ -46,34 +48,41 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
       addressType: event.target.value,
     }));
   };
-
-  const labelStyle = {
-    fontSize: "1.2rem",
-    fontWeight: "500",
-    color: "#6b7280",
-    marginBottom: "0.25rem",
-  };
-
-  const inputStyle = {
-    "& .MuiInputBase-input": {
-      color: "#383737",
-      padding: "0",
-      fontSize: "1.4rem",
-      "&:focus": {
-        backgroundColor: "transparent",
+  const textFieldSx = {
+    "& .MuiInputLabel-root": {
+      fontSize: "1.2rem",
+      color: "#6b7280",
+      fontWeight: 500,
+      backgroundColor: "white",
+      padding: "0 4px",
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: "#46846a",
+    },
+    "& .MuiInputLabel-shrink": {
+      transform: "translate(14px, -9px) scale(0.75)",
+      zIndex: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#e0e0e0",
+        borderWidth: "2px",
+      },
+      "&:hover fieldset": {
+        borderColor: "#46846a",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#46846a",
+        borderWidth: "2px",
+      },
+      "& legend": {
+        width: "0px",
       },
     },
-    "& .MuiInput-underline:before": {
-      borderBottom: "none",
-    },
-    "& .MuiInput-underline:after": {
-      borderBottom: "none",
-    },
-    "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-      borderBottom: "none",
+    "& .MuiOutlinedInput-input": {
+      fontSize: "1.2rem",
     },
   };
-
   return (
     <Modal
       open={open}
@@ -88,251 +97,217 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           backgroundColor: "white",
-          padding: "2rem",
+          padding: "0",
           borderRadius: "0.75rem",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           width: isMobile ? "90%" : "100%",
           maxWidth: isMobile ? "90%" : "52rem",
-          maxHeight: "60vh",
-          overflowY: "auto",
-          scrollbarWidth: "none",
         }}
       >
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: "600", marginBottom: "1.5rem", color: "#383737" }}
+        {/* Fixed header with close icon */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "1rem",
+            borderBottom: "1px solid #e0e0e0",
+            position: "sticky",
+            top: 0,
+            backgroundColor: "white",
+            zIndex: 1,
+            borderRadius: "0.75rem",
+          }}
         >
-          Edit Address
-        </Typography>
+          <Typography variant="h5" sx={{ fontWeight: "600", color: "#383737" }}>
+            {title ? title : "Edit"} Address
+          </Typography>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              color: "#6b7280",
+              "&:hover": {
+                color: "#383737",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
         <Box
           sx={{
-            gap: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
+            padding: "2rem",
+            maxHeight: "50vh",
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "0rem 1rem",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "1rem" : 0,
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingRight: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <Typography sx={labelStyle}>Full Name</Typography>
-              <TextField
-                fullWidth
-                variant="standard"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                sx={inputStyle}
-              />
-            </Box>
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingLeft: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <Typography sx={labelStyle}>Mobile Number</Typography>
-              <TextField
-                fullWidth
-                variant="standard"
-                name="mobileNumber"
-                value={formData.mobileNumber}
-                onChange={handleChange}
-                sx={inputStyle}
-              />
-            </Box>
-          </Box>
+          <TextField
+            name="fullName"
+            label="Full Name"
+            variant="outlined"
+            fullWidth
+            sx={{ ...textFieldSx, marginBottom: "2rem" }}
+            value={formData.fullName}
+            onChange={handleChange}
+          />
+          <TextField
+            name="phoneNumber"
+            label="Phone Number"
+            variant="outlined"
+            fullWidth
+            sx={{ ...textFieldSx, marginBottom: "2rem" }}
+            value={formData.phoneNumber}
+            onChange={handleChange}
+          />
+          <TextField
+            name="pincode"
+            label="Pincode"
+            variant="outlined"
+            fullWidth
+            sx={{ ...textFieldSx, marginBottom: "2rem" }}
+            value={formData.pincode}
+            onChange={handleChange}
+          />
+          <TextField
+            name="address"
+            label="Address"
+            variant="outlined"
+            fullWidth
+            sx={{ ...textFieldSx, marginBottom: "2rem" }}
+            value={formData.address}
+            onChange={handleChange}
+          />
+          <TextField
+            name="locality"
+            label="Locality / Town"
+            variant="outlined"
+            fullWidth
+            sx={{ ...textFieldSx, marginBottom: "2rem" }}
+            value={formData.locality}
+            onChange={handleChange}
+          />
+          <TextField
+            name="city"
+            label="City / Distric"
+            variant="outlined"
+            fullWidth
+            sx={{ ...textFieldSx, marginBottom: "2rem" }}
+            value={formData.city}
+            onChange={handleChange}
+          />
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "1rem" : 0,
-              justifyContent: "space-between",
-            }}
-          >
+          <Box>
+            <Typography>Type of Address</Typography>
             <Box
               sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingRight: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <Typography sx={labelStyle}>Pincode</Typography>
-              <TextField
-                fullWidth
-                variant="standard"
-                name="pincode"
-                value={formData.pincode}
-                onChange={handleChange}
-                sx={inputStyle}
-              />
-            </Box>
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingLeft: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <Typography sx={labelStyle}>Address</Typography>
-              <TextField
-                fullWidth
-                variant="standard"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                sx={inputStyle}
-              />
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "1rem" : 0,
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingRight: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <Typography sx={labelStyle}>Locality/Town</Typography>
-              <TextField
-                fullWidth
-                variant="standard"
-                name="locality"
-                value={formData.locality}
-                onChange={handleChange}
-                sx={inputStyle}
-              />
-            </Box>
-            <Box
-              sx={{
-                width: isMobile ? "100%" : "50%",
-                paddingLeft: isMobile ? 0 : "0.5rem",
-              }}
-            >
-              <Typography sx={labelStyle}>City/District</Typography>
-              <TextField
-                fullWidth
-                variant="standard"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                sx={inputStyle}
-              />
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box>
-              <Typography sx={labelStyle}>Type of Address</Typography>
-              <Box
-                sx={{
-                  marginTop: "0.5rem",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Radio
-                      size="large"
-                      checked={formData.addressType === "home"}
-                      onChange={handleRadioChange}
-                      value="home"
-                    />
-                  }
-                  label={
-                    <Typography sx={{ fontSize: "1.4rem", color: "#383737" }}>
-                      Home
-                    </Typography>
-                  }
-                  sx={{ marginRight: "1rem" }}
-                />
-                <FormControlLabel
-                  control={
-                    <Radio
-                      checked={formData.addressType === "office"}
-                      onChange={handleRadioChange}
-                      value="office"
-                      size="large"
-                    />
-                  }
-                  label={
-                    <Typography sx={{ fontSize: "1.4rem", color: "#383737" }}>
-                      Office
-                    </Typography>
-                  }
-                />
-              </Box>
-            </Box>
-            <Box
-              sx={{
+                marginTop: "0.5rem",
                 display: "flex",
                 alignItems: "center",
-                mx: isMobile ? 0 : 4,
               }}
             >
               <FormControlLabel
                 control={
-                  <Checkbox
-                    checked={formData.isDefault}
-                    onChange={handleCheckboxChange}
+                  <Radio
                     size="large"
+                    checked={formData.addressType === "home"}
+                    onChange={handleRadioChange}
+                    value="home"
+                    sx={{
+                      "&.Mui-checked": {
+                        color: "#10b981 ",
+                      },
+                    }}
                   />
                 }
                 label={
-                  <Typography sx={{ fontSize: "1.2rem", color: "#6b7280" }}>
-                    Make this my default Address
+                  <Typography sx={{ fontSize: "1.4rem", color: "#383737" }}>
+                    Home
+                  </Typography>
+                }
+                sx={{ marginRight: "1rem" }}
+              />
+              <FormControlLabel
+                control={
+                  <Radio
+                    checked={formData.addressType === "office"}
+                    onChange={handleRadioChange}
+                    value="office"
+                    size="large"
+                    sx={{
+                      "&.Mui-checked": {
+                        color: "#10b981 ",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontSize: "1.4rem", color: "#383737" }}>
+                    Office
                   </Typography>
                 }
               />
             </Box>
           </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "end",
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isDefault}
+                  onChange={handleCheckboxChange}
+                  size="large"
+                  sx={{
+                    "&.Mui-checked": {
+                      color: "#10b981 ",
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography sx={{ fontSize: "1.2rem", color: "#6b7280" }}>
+                  Make this my default Address
+                </Typography>
+              }
+            />
+          </Box>
         </Box>
-
         <Box
           sx={{
-            marginTop: "2rem",
+            padding: "0.5rem 1rem 2rem",
             display: "flex",
             justifyContent: "flex-end",
             gap: "1rem",
-            flexDirection: isMobile ? "column" : "row",
           }}
         >
           <Button
             variant="outlined"
             color="success"
             sx={{
-              borderRadius: "0.375rem",
+              width: "102px",
+              height: "35px",
+              padding: "9px 20px",
               color: "#73af96",
               borderColor: "#73af96",
+              fontSize: "16px",
+              fontWeight: 400,
+              textAlign: "left",
+              textTransform: "capitalize",
               "&:hover": {
                 color: "#ffffff",
                 borderColor: "#60a487",
                 backgroundColor: "#60a487",
               },
+
+              flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
             }}
             onClick={handleClose}
           >
@@ -340,13 +315,24 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
           </Button>
           <Button
             variant="contained"
+            color="error"
             sx={{
-              color: "white",
-              borderRadius: "0.375rem",
+              width: useMediaQuery("(max-width:425px)") ? "100%" : "102px",
+              height: "35px",
+              padding: "9px 20px",
+              fontSize: "16px",
+              fontWeight: 400,
+              textAlign: "left",
+              color: "#ffffff",
+              textTransform: "capitalize",
               backgroundColor: "rgba(173, 63, 56, 1)",
+              border: "none",
               "&:hover": {
+                color: "#ffffff",
+                borderColor: "#6d001d",
                 backgroundColor: "#6d001d",
               },
+              flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
             }}
             onClick={handleClose}
           >
@@ -357,4 +343,5 @@ const EditAddressModal = ({ open, handleClose, addressData }) => {
     </Modal>
   );
 };
+
 export default EditAddressModal;

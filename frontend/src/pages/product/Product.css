@@ -1,6 +1,6 @@
 /* Base styles */
 .product_container {
-  padding: 0 3%;
+  padding: 1.5rem 3%;
 }
 
 /* Breadcrumb styles */
@@ -70,7 +70,21 @@
     justify-content: flex-start;
 
     .priceBox {
-      font-size: 2.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      & > h2 {
+        font-size: 1.4rem;
+      }
+      & > strike {
+        font-size: 1.4rem;
+        color: #c0c0c0;
+      }
+      & > h4 {
+        font-size: 1.2rem;
+        color: #60a487;
+      }
     }
 
     .ratingBox {
@@ -131,7 +145,7 @@
 
 /* Product description */
 .product_details_description {
-  border-top: 1px dashed black;
+  border-top: 2px dashed #60a487;
   padding: 2.5rem 0;
 
   h2 {
@@ -152,10 +166,13 @@
         font-size: 1rem;
         color: #6f6f6f;
         margin-bottom: 0.5rem;
+        font-weight: 400;
       }
 
       & > div:nth-of-type(2) {
         font-size: 1.4rem;
+        color: #383737;
+        font-weight: 400;
       }
 
       & > .bottomLine {
@@ -240,8 +257,9 @@
   }
 
   .Product_tab_items button {
-    font-size: 1.4rem !important;
-    font-weight: 700 !important;
+    font-size: 1.6rem !important;
+    font-weight: 500 !important;
+    text-transform: capitalize !important;
   }
 
   .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
@@ -293,12 +311,20 @@
     h3 {
       font-size: 1.4rem;
       font-weight: 600;
+      color: #383737;
     }
 
     p {
       color: #6f6f6f;
+      font-size: 1.4rem;
+      font-weight: 400;
     }
   }
+}
+
+.detail_description {
+  /* background-color: red; */
+  padding: 1rem;
 }
 
 /* Detail description */
@@ -308,11 +334,16 @@
   h3 {
     font-size: 1.4rem;
     font-weight: 600;
+    color: #515050;
   }
 
   p {
     color: #6f6f6f;
   }
+}
+
+.css-19kzrtu {
+  padding: 2rem 0rem !important;
 }
 
 /* Ask question */
@@ -341,7 +372,7 @@
       background-color: #ad3f380d;
       color: #ad3f38;
       font-size: 1.4rem;
-      white-space: nowrap;
+      /* white-space: nowrap; */
 
       &:hover {
         border-color: #ad3f38;
@@ -380,17 +411,16 @@
 
   .priceRatingContainer > div:first-of-type {
     display: grid !important;
-    grid-template-columns: 1fr 1.3fr;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
+    gap: 0.5rem;
 
     .ratingBox {
-      order: 3;
-      margin-left: 0 !important;
+      margin-left: auto;
     }
 
     .pincodeBox {
-      margin-left: auto !important;
-      order: 2;
+      grid-column: span 2;
       width: 100% !important;
 
       div:first-of-type input {
@@ -407,8 +437,8 @@
       padding: 1rem 0;
     }
 
-    .ask_question > div {
-      flex-direction: row;
+    .ask_question {
+      padding: 0rem;
     }
 
     .reviews_section div {
@@ -419,6 +449,10 @@
       div {
         margin-left: 0;
       }
+    }
+
+    .Product_tab_items button {
+      font-size: 1.4rem !important;
     }
   }
 }

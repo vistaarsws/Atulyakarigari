@@ -7,13 +7,14 @@ import DeliveryEstimate from "./DeliveryEstimate";
 const PlaceOrder = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   return (
-    <div>
+    <Box>
       <Progress />
       <Box
         sx={{
           display: "flex",
           width: "100%",
           flexDirection: isMobile ? "column" : "row",
+          // height: isMobile ? "" : "83vh",
         }}
       >
         <Box sx={{ width: isMobile ? "100%" : "65%" }}>
@@ -22,16 +23,18 @@ const PlaceOrder = () => {
         <Box
           sx={{
             width: isMobile ? "100%" : "35%",
-            height: isMobile ? "" : "89vh",
+            height: isMobile ? "" : "83.5vh",
             overflow: "scroll",
             scrollbarWidth: "none",
+            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            // mb: 2,
           }}
         >
           <DeliveryEstimate />
           <Payment />
         </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
 

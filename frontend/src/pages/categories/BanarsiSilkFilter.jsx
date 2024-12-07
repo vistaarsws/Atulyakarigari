@@ -4,7 +4,6 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
-  
 } from "@mui/material";
 import PriceRangeSlider from "./PriceRangeSlider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -12,6 +11,7 @@ import "./CategoryPage.css";
 import toggleArrow from "../../assets/images/left-arrow-return-svgrepo-com.svg";
 import toggleFilter from "../../assets/images/filter-list-svgrepo-com.svg";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const colors = [
   { name: "Alizarin Crimson", hex: "#E32636", selected: true },
@@ -95,6 +95,8 @@ export default function SidebarFilter() {
     colors.filter((c) => c.selected).map((c) => c.name)
   );
 
+  const navigate = useNavigate();
+
   const toggleColor = (colorName) => {
     setSelectedColors((prev) =>
       prev.includes(colorName)
@@ -114,7 +116,12 @@ export default function SidebarFilter() {
       <Box sx={sidebarStyles.container}>
         {/* Header */}
         <Box sx={sidebarStyles.header}>
-          <IconButton sx={sidebarStyles.backButton}>
+          <IconButton
+            sx={sidebarStyles.backButton}
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
             <ArrowBackIcon
               style={{
                 width: 24,
@@ -124,6 +131,19 @@ export default function SidebarFilter() {
             />
           </IconButton>
           <Typography sx={sidebarStyles.title}>Banarsi Silk</Typography>
+          <div
+            className={`filterIconBox ${
+              isToggled ? "filterIconBoxOpened" : "filterIconBoxClosed"
+            }`}
+          >
+            <figure className={`toggleImg_container `}>
+              <img
+                src={isToggled ? toggleArrow : toggleFilter}
+                alt="Toggle Arrow"
+                onClick={() => setIsToggled(!isToggled)}
+              />
+            </figure>
+          </div>
         </Box>
         <Box sx={{ marginLeft: "2rem" }}>
           {/* Stock Filter */}
@@ -203,7 +223,7 @@ export default function SidebarFilter() {
                         <Typography
                           sx={{
                             fontSize: "14px",
-                            fontWeight: 100,
+
                             color: "#383737",
                           }}
                         >
@@ -223,19 +243,6 @@ export default function SidebarFilter() {
           </Box>
         </Box>
       </Box>
-      <div
-        className={`${
-          isToggled ? "filterIconBoxClosed" : "filterIconBoxOpened"
-        }`}
-      >
-        <figure className={`toggleImg_container `}>
-          <img
-            src={isToggled ? toggleFilter : toggleArrow}
-            alt="Toggle Arrow"
-            onClick={() => setIsToggled(!isToggled)}
-          />
-        </figure>
-      </div>
     </div>
   );
 }

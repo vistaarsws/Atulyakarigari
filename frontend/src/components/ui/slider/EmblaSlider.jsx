@@ -98,54 +98,49 @@ export function EmblaSlider({
       const scrollProgress = emblaApi.scrollProgress();
       const slidesInView = emblaApi.slidesInView();
       const isScrollEvent = eventName === "scroll";
-      const middleIndex = Math.floor(slidesInView.length / 2);
+      const scrollSnaps = emblaApi.scrollSnapList();
+      const slideNodes = emblaApi.slideNodes();
 
-      {
-        centerSlideStyle &&
-          slidesInView.forEach((slideIndex) => {
-            const tweenNode = emblaApi.slideNodes()[slideIndex];
-            if (tweenNode) {
-              const isCenterSlide = slideIndex === slidesInView[middleIndex];
+      if (centerSlideStyle) {
+        const middleIndex = Math.floor(slidesInView.length / 2);
+        const centerSlideIndex = slidesInView[middleIndex];
 
-              tweenNode.classList.remove(centerSlideStyle.style);
+        slidesInView.forEach((slideIndex) => {
+          const tweenNode = slideNodes[slideIndex];
+          if (!tweenNode) return;
 
-              if (isCenterSlide) {
-                tweenNode.classList.add(centerSlideStyle.style);
-              }
-            }
-          });
+          // Toggle center slide style
+          tweenNode.classList.toggle(
+            centerSlideStyle.style,
+            slideIndex === centerSlideIndex
+          );
+        });
       }
 
-      emblaApi.scrollSnapList().forEach((scrollSnap, snapIndex) => {
-        let diffToTarget = scrollSnap - scrollProgress;
+      // Calculate and apply scale transformations
+      scrollSnaps.forEach((scrollSnap, snapIndex) => {
         const slidesInSnap = engine.slideRegistry[snapIndex];
 
         slidesInSnap.forEach((slideIndex) => {
           if (isScrollEvent && !slidesInView.includes(slideIndex)) return;
 
+          let diffToTarget = scrollSnap - scrollProgress;
+
           if (engine.options.loop) {
             engine.slideLooper.loopPoints.forEach((loopItem) => {
-              const target = loopItem.target();
-
-              if (slideIndex === loopItem.index && target !== 0) {
-                const sign = Math.sign(target);
-
-                if (sign === -1) {
-                  diffToTarget = scrollSnap - (1 + scrollProgress);
-                }
-                if (sign === 1) {
-                  diffToTarget = scrollSnap + (1 - scrollProgress);
-                }
+              if (slideIndex === loopItem.index && loopItem.target() !== 0) {
+                diffToTarget =
+                  scrollSnap +
+                  Math.sign(loopItem.target()) * (1 - scrollProgress);
               }
             });
           }
 
           const tweenValue = 1 - Math.abs(diffToTarget * tweenFactor.current);
-          const scale = numberWithinRange(tweenValue, 0, 1).toString();
+          const scale = numberWithinRange(tweenValue, 0, 1);
           const tweenNode = tweenNodes.current[slideIndex];
-          if (tweenNode) {
-            tweenNode.style.transform = `scale(${scale})`;
-          }
+
+          if (tweenNode) tweenNode.style.transform = `scale(${scale})`;
         });
       });
     },

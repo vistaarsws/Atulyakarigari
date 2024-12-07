@@ -1,17 +1,56 @@
 import CART from "../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfile from "../../../assets/images/userProfile.png";
+import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
+// import Cookies from "js-cookie";
+// import avatar from "../../../assets/images/avatar.svg";
+import { useAuth } from "../../../context/AuthContext";
+// import { Button } from "@mui/material";
+import { useSnackbar } from "notistack";
 
-export default function Navbar() {
+import Badge from "@mui/material/Badge";
+// import { styled } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+
+export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
-  const [isProfileView, setIsProfileView] = useState(false);
+
+  // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
+  // const location = useLocation();
+  const { userContext, onLogout } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+  // const cookies = Cookies.get("authToken");
+
+  // const StyledBadge = styled(Badge)(({ theme }) => ({
+  //   "& .MuiBadge-badge": {
+  //     right: -3,
+  //     top: 13,
+  //     border: `1px solid ${theme.palette.background.paper}`,
+  //     padding: "0 2px",
+  //     backgroundColor: "#b56f82",
+  //     fontSize: "1.2rem",
+  //     width: "1.5rem",
+  //     height: "1.5rem",
+  //   },
+  // }));
+
+  function notificationsLabel(count) {
+    if (count === 0) {
+      return "no notifications";
+    }
+    if (count > 99) {
+      return "more than 99 notifications";
+    }
+    return `${count} notifications`;
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -30,22 +69,30 @@ export default function Navbar() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  useEffect(() => {
-    // Check if the URL contains "user/wishlist"
-    const path = window.location.pathname;
-    if (path.includes("user/") || path.includes("/blogs")) {
-      setIsProfileView(true);
-    } else {
-      setIsProfileView(false);
+
+  const logoutHandler = (isLogout) => {
+    if (isLogout === "Logout") {
+      enqueueSnackbar("Logout Successfully", { variant: "success" });
+      onLogout();
     }
-    return () => {
-      setIsProfileView(false);
-    };
-  }, [window.location.pathname]);
+  };
+
+  // useEffect(() => {
+  //   // Check if the URL contains "user/wishlist"
+  //   const path = window.location.pathname;
+  //   if (path.includes("user/") || path.includes("/blogs")) {
+  //     setIsProfileView(true);
+  //   } else {
+  //     setIsProfileView(false);
+  //   }
+  //   return () => {
+  //     setIsProfileView(false);
+  //   };
+  // }, [window.location.pathname]);
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
-      // { name: "SHOP", path: "/shop" },
+
       {
         name: "CATEGORIES",
         path: "/categories",
@@ -151,14 +198,17 @@ export default function Navbar() {
     { name: "Wishlist", link: "/user/wishlist" },
     { name: "Orders", link: "/user/orders" },
     { name: "Address", link: "/user/address" },
-    { name: "Contact Us", link: "/user/contact" },
-    { name: "Terms of use", link: "/user/terms" },
-    { name: "Privacy Policy", link: "/user/privacy" },
-    { name: "Log Out", link: "/user/logout" },
+    { name: "Logout", link: "/" },
+
+    // { name: "Contact Us", link: "/user/contact" },
+    // { name: "Terms of use", link: "/user/terms" },
+    // { name: "Privacy Policy", link: "/user/privacy" },
+    // { name: "Log Out", link: "/user/logout" },
   ];
 
   return (
     <nav className="navbar_container">
+      {/* <Button onClick={() => navigate("/admin")}>admin</Button> */}
       <figure>
         <Link to={"/"}>
           <img src={headerLogo} alt="Atulyakarigari Logo" />
@@ -166,7 +216,9 @@ export default function Navbar() {
       </figure>
       <ul
         // className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
-        className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"}`}
+        className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"} ${
+          navWithoutSearchBar_list ? "navWithoutSearchBar_list" : ""
+        }`}
       >
         {navigation.links.map((link, index) => {
           return (
@@ -242,86 +294,126 @@ export default function Navbar() {
           );
         })}
       </ul>
+
       <div>
-        {isProfileView !== true && (
-          <form className="form">
-            <button>
-              <svg
-                width="17"
-                height="16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                role="img"
-                aria-labelledby="search"
-              >
-                <path
-                  d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
+        <div>
+          {!navWithoutSearchBar_list && (
+            <form className="form">
+              <button>
+                <svg
+                  width="17"
+                  height="16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  role="img"
+                  aria-labelledby="search"
+                >
+                  <path
+                    d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
+                    stroke="white"
+                    strokeWidth="1.333"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </button>
+              <input
+                className="input"
+                placeholder="What are you looking for ?"
+                required=""
+                type="text"
+              />
+              {/* )} */}
+              <button className="reset" type="reset">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
-                  strokeWidth="1.333"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                ></path>
-              </svg>
-            </button>
-            <input
-              className="input"
-              placeholder="What are you looking for ?"
-              required=""
-              type="text"
-            />
-            {/* )} */}
-            <button className="reset" type="reset">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-          </form>
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </button>
+            </form>
+          )}
+        </div>
+
+        {userContext?.token && (
+          <IconButton
+            aria-label={notificationsLabel(100)}
+            onClick={() => navigate("/user/wishlist")}
+          >
+            <Badge
+              badgeContent={8}
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: "#b56f82",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                },
+              }}
+            >
+              <ShoppingCartIcon fontSize="large" sx={{ fill: "white" }} />
+            </Badge>
+          </IconButton>
         )}
-      </div>
-      <div>
-        <figure id="cartIcon_container">
-          <img height={24} src={CART} alt="cart" />
-        </figure>
+
         <div
           className="profileBox"
           onMouseEnter={() => setIsProfileHovered(true)}
           onMouseLeave={() => setIsProfileHovered(false)}
         >
-          <img src={userProfile} alt="User Profile" />
+          {userContext?.token ? (
+            <img src={userProfile} alt="User Profile" />
+          ) : (
+            <Avatar src="/broken-image.jpg" />
+          )}
+
           {isProfileHovered && (
             <div className="profile-dropdown">
-              <div
-                onClick={() => {
-                  navigate("/user/profile");
-                  setIsProfileHovered(false);
-                }}
-              >
-                <p>Hello, Savvy Srivastava</p>
-                <p>8175961513</p>
-              </div>
-              <ul>
-                {menuItems.map((item, index) => (
-                  <li key={index}>
-                    <Link
-                      onClick={() => setIsProfileHovered(false)}
-                      to={item.link}
-                    >
-                      {item.name}
-                    </Link>
+              {userContext?.token && (
+                <div
+                  onClick={() => {
+                    navigate("/user/profile");
+                    setIsProfileHovered(false);
+                  }}
+                >
+                  <p>Hello, Savvy Srivastava</p>
+                  <p>8175961513</p>
+                </div>
+              )}
+              {userContext?.token ? (
+                <ul>
+                  {menuItems.map((item, index) => (
+                    <li key={index}>
+                      <Link
+                        onClick={() => {
+                          setIsProfileHovered(false);
+                          logoutHandler(item.name);
+                        }}
+                        to={item.link}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul>
+                  <li>
+                    <Link to={"/login"}>Login</Link>
                   </li>
-                ))}
-              </ul>
+                  <li>
+                    <Link to={"/signup"}>Sign Up</Link>
+                  </li>
+                </ul>
+              )}
             </div>
           )}
         </div>

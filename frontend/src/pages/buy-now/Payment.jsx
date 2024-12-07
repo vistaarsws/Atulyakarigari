@@ -5,45 +5,41 @@ import {
   Divider,
   FormControlLabel,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Payment = () => {
   const navigate = useNavigate();
+  const isPlaceOrder = useLocation()?.pathname === "/place-order";
+
   return (
     <Box
       sx={{
-        // minHeight: "100vh",
         display: "flex",
-        // alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#f3f4f6",
-        // border: "2px solid red",
-        boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+        boxShadow: isPlaceOrder ? "" : "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
         mr: { xs: 0 },
         height: {
           xs: "auto",
-          //  md: "75vh"
         },
-        overflow: "auto",
+        overflow: "hidden",
         scrollbarWidth: "none",
-        mb: 2,
+
+        borderRadius: 2,
+        paddingBottom: isPlaceOrder ? "4rem" : "",
       }}
     >
       <Box
         sx={{
           backgroundColor: "white",
-          // padding: 4,
-          borderRadius: 2,
           boxShadow: 1,
-          // maxWidth: "500px",
-          // width: { md: "100%", lg: "500px" },
           padding: { xs: 2, md: 4 },
-          // Full width on mobile, max-width on larger screens
           width: "100%",
         }}
       >
-        <Box sx={{ marginBottom: 3 }}>
+        <Box>
           <Typography
             sx={{
               fontWeight: 400,
@@ -54,40 +50,26 @@ const Payment = () => {
           >
             Support Hardworking Artisans In India
           </Typography>
-          {/* <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label="Donate and make a difference"
-              sx={{
-                ".MuiFormControlLabel-label": {
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  lineHeight: "25px",
-                  color: "rgb(56, 55, 55)",
-                  backgroundColor: "fff",
-                },
-              }}
-            />
-          </Box> */}
+
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               marginTop: 1,
-              // No boxShadow property, so no shadow is applied
             }}
           >
             <FormControlLabel
               control={
                 <Checkbox
                   defaultChecked
+                  size="large"
                   sx={{
-                    color: "rgb(56, 55, 55)", // default color for unchecked state
+                    color: "rgb(56, 55, 55)",
                     "&.Mui-checked": {
-                      color: "rgb(76, 175, 80)", // green color for the checkmark
+                      color: "#60a487",
                     },
                     "& .MuiSvgIcon-root": {
-                      fontSize: 16, // adjust checkbox size to be smaller like the image
+                      fontSize: 16,
                       boxShadow: "none",
                     },
                   }}
@@ -96,10 +78,10 @@ const Payment = () => {
               label="Donate and make a difference"
               sx={{
                 ".MuiFormControlLabel-label": {
-                  fontSize: "13px", // adjust font size to closely match the image
+                  fontSize: "13px",
                   fontWeight: 400,
                   lineHeight: "25px",
-                  color: "rgb(56, 55, 55)", // dark grey label color
+                  color: "rgb(56, 55, 55)",
                 },
               }}
             />
@@ -287,7 +269,7 @@ const Payment = () => {
           </Box>
         </Box>
         <Divider sx={{ marginY: 3 }} />
-        <Box sx={{ marginBottom: 3 }}>
+        <Box sx={{ marginBottom: 2 }}>
           <Box
             sx={{
               display: "flex",
@@ -318,23 +300,41 @@ const Payment = () => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
+        <Box
           sx={{
+            position: useMediaQuery("(max-width:900px)") ? "fixed" : "relative",
+            left: "50%",
+            bottom: "0",
+            transform: "translateX(-50%)",
             width: "100%",
-            backgroundColor: "rgba(96, 164, 135, 1)",
-            color: "white",
-            paddingY: 1.5,
-            borderRadius: 1,
-            textTransform: "capitalize",
-            fontSize: "12px",
-          }}
-          onClick={() => {
-            navigate("/place-order");
+            display: "flex",
+            justifyContent: "center",
+            backgroundColor: "white",
+            zIndex: 9999,
+            paddingBottom: "1rem",
+            paddingInline: useMediaQuery("(max-width:900px)") ? "1.6rem" : "",
           }}
         >
-          Place Order
-        </Button>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "rgba(96, 164, 135, 1)",
+              color: "white",
+              paddingY: 1.5,
+              borderRadius: 1,
+              textTransform: "capitalize",
+              fontSize: "16px",
+              fontWeight: 400,
+              position: "relative",
+              width: "100%",
+            }}
+            onClick={() => {
+              navigate("/place-order");
+            }}
+          >
+            Place Order
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

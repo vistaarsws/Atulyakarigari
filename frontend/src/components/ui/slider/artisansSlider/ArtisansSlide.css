@@ -1,12 +1,14 @@
 .artisansSlider_container {
+  height: 100%;
 }
 
 .artisansSlider_container > section:first-of-type {
-  padding: 2% 5%;
+  padding: 5%;
   background-color: #f4f4f4;
   display: grid;
   grid-template-columns: 1fr 1fr 1.5fr;
   gap: 2rem;
+  height: 100%;
 }
 
 .artisansSlider_container > section:first-of-type figure {
@@ -35,8 +37,13 @@
   }
 
   p {
+    font-family: Lato;
+    margin-top: 1rem;
     font-size: 1.4rem;
+    color: #383737;
     font-weight: 300;
+    line-height: 21px;
+    text-align: left;
   }
 }
 
