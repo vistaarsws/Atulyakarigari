@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import productRoutes from "./routes/product.routes.js"
 import subCategoryRoutes from "./routes/sub-category.routes.js";
+import profileRoutes from "./routes/prfile.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 import cloudinaryConnect from "./config/cloudinary.js";
 import fileUpload from "express-fileupload";
 
@@ -29,7 +31,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/sub-category", subCategoryRoutes);
 app.use("/api/v1/product", productRoutes);
-
+app.use("/api/v1/profile", profileRoutes);
+app.use("/api/reviews", reviewRoutes); 
 
 cloudinaryConnect()
 
