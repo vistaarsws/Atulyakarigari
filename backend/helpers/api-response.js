@@ -37,7 +37,7 @@ export const unauthorized = (req, res, error = null, message = "Unauthorized acc
 };
 
 export const notFoundRequest = (request, response, err, message = "Resource not found") => {
-    response.status(400).json({
+    response.status(404).json({
         err,
         message,
         error: true,

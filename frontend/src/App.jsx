@@ -54,9 +54,7 @@ const getRoutesConfig = () => ({
     { path: "wishlist", element: <Wishlist /> },
     { path: "logout", element: <Logout /> },
   ],
-  adminRoutes: [
-    { path: "dashboard", element: <Admin /> },
-  ],
+  adminRoutes: [{ path: "dashboard", element: <Admin /> }],
 });
 
 // Main App Component
@@ -111,7 +109,6 @@ export default function App() {
       <ScrollToTop />
       <TrackPageView /> {/* Track page views on route changes */}
       {!hide_nav && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
-
       <main className={`${hide_nav ? "" : "marginTop"}`}>
         <Routes>
           {/* Public Routes */}
@@ -147,7 +144,6 @@ export default function App() {
           </Route>
         </Routes>
       </main>
-
       {!hide_footer && <Footer />}
     </SnackbarProvider>
   );

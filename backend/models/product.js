@@ -19,6 +19,10 @@ const ProductSchema = new mongoose.Schema({
         required: [true, 'Product price is required'],
         min: [0, 'Price cannot be negative']
     },
+    priceAfterDiscount: {
+        type: Number,
+        min: [0, 'Discounted price cannot be negative']
+    },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
@@ -53,6 +57,28 @@ const ProductSchema = new mongoose.Schema({
         enum: ['Draft', 'Published'],
         required: [true, 'Product status is required'],
     },
+    artisanName: {
+        type: String,
+        required: [true, 'Artisan name is required'],
+        trim: true,
+        maxlength: [200, 'Artisan name cannot exceed 200 characters']
+    },
+    artisanAbout: {
+        type: String,
+        required: [true, 'Artisan about is required'],
+        trim: true,
+        maxlength: [1000, 'Artisan about cannot exceed 1000 characters']
+    },
+    artisanImage: {
+        type: String,
+        required: [true, 'Artisan image is required'],
+        validate: {
+            validator: function (v) {
+                return /^(https?:\/\/).*\.(jpg|jpeg|png|gif)$/i.test(v);
+            },
+            message: 'Invalid image URL'
+        }
+    }
 }, {
     timestamps: true
 });

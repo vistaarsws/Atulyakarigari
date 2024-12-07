@@ -1,4 +1,4 @@
-import "./wishListHeartIcon.css";
+import "./WishListHeartIcon.css";
 
 export default function WishListHeartIcon() {
   return (
