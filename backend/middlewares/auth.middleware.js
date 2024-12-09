@@ -5,7 +5,7 @@ import { badRequest, internalServerError, notFoundRequest } from "../helpers/api
 export const auth = async (req, res, next) => {
     try {
         // extract token
-        const token = req.cookies.token ||
+        const token = req?.cookies?.token ||
             req.body.token ||
             (req.header("Authorization") ? req.header("Authorization").replace("Bearer ", "") : null);
         // req.header("Authorization").replace("Bearer ", "");

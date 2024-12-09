@@ -507,18 +507,61 @@ export const deleteProduct = async (req, res) => {
 };
 
 // cloudinary image delete
+// export const deleteSingleImage = async (req, res) => {
+//     try {
+//         const { imageId } = req.body;
+//         const user = req.user
+
+//         if (!imageId) {
+//             return badRequest(req, res, null, "Image ID is required");
+//         }
+
+//         const result = await deleteImageFromCloudinary(imageId);
+
+//         if (result.status === "success") {
+//             return success(req, res, "Image deleted successfully", result);
+//         } else {
+//             return notFoundRequest(req, res, null, `Failed to delete image: ${result.reason}`);
+//         }
+//     } catch (error) {
+//         console.error("Error in deleteSingleImage controller:", error);
+//         return internalServerError(req, res, error, "Unable to delete image");
+//     }
+// };
+
+// extract the id from image url
+const extractId = (url) => {
+    const parts = url.split('/');
+    const fileWithExt = parts.pop();
+    const publicId = fileWithExt.split('.')[0];
+    return `${parts.slice(-1)}/${publicId}`;
+};
+
+
 export const deleteSingleImage = async (req, res) => {
     try {
-        const { imageId } = req.body;
+        const { imageUrl, productId } = req.body;
 
-        if (!imageId) {
+        if (!imageUrl || !productId) {
             return badRequest(req, res, null, "Image ID is required");
         }
-
+        const imageId = extractId(imageUrl)
+        // Delete image from Cloudinary
         const result = await deleteImageFromCloudinary(imageId);
 
         if (result.status === "success") {
-            return success(req, res, "Image deleted successfully", result);
+            // Update product's images array
+            const product = await Product.findById(productId);
+            if (!product) {
+                return notFoundRequest(req, res, null, "Product not found");
+            }
+
+            // Remove the image URL from the product's images array
+            const updatedImages = product?.images && product?.images?.filter(image => image !== imageUrl);
+            product.images = updatedImages;
+            await product.save();
+
+            return success(req, res, "Image deleted successfully", { updatedProduct: product });
         } else {
             return notFoundRequest(req, res, null, `Failed to delete image: ${result.reason}`);
         }
@@ -528,9 +571,11 @@ export const deleteSingleImage = async (req, res) => {
     }
 };
 
+
 export const deleteMultipleImages = async (req, res) => {
     try {
         const { imageIds } = req.body;
+        const user = req.user
 
         if (!imageIds || !Array.isArray(imageIds) || imageIds.length === 0) {
             return badRequest(req, res, null, "Image IDs are required");
