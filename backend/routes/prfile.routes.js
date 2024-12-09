@@ -4,8 +4,10 @@ import {
     updateProfile,
     deleteProfile
 } from "../controllers/profile.controller.js";
+import { auth } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
+router.use(auth)
 
 router.post("/create", createProfile); // Create a profile
 router.put("/update", updateProfile); // Update profile by ID

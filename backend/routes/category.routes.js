@@ -6,8 +6,8 @@ const router = Router();
 router.get("/get", getAllCategories);
 router.get("/get/:id", getCategoryById)
 
-// router.use(auth)
-// router.use(isAdmin)
+router.use(auth)
+router.use(isAdmin)
 
 router.post("/create", createCategory);
 router.put("/update/:id", updateCategory)

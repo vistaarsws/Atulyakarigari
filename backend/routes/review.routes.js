@@ -5,18 +5,15 @@ import {
   updateReview,
   deleteReview,
 } from "../controllers/review.controller.js";
+import { auth } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
-// Create a review
+
+router.use(auth)
+
 router.post("/create", createReview);
-
-// Get all reviews for a product
 router.get("/getAll", getReviewsByProduct);
-
-// Update a review
 router.put("/update", updateReview);
-
-// Delete a review
 router.delete("/delete", deleteReview);
 
 export default router;
