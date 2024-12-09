@@ -9,14 +9,17 @@
   "builds": [
     {
       "require": "@vercel/static-build",
-      "requirePath": "C:\\Users\\DHANJEET\\AppData\\Roaming\\npm\\node_modules\\vercel\\node_modules\\@vercel\\static-build\\dist\\index",
       "apiVersion": 2,
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
         "zeroConfig": true,
+        "distDir": "dist",
         "framework": "vite"
       }
     }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
