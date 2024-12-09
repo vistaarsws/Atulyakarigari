@@ -16,5 +16,6 @@ export default defineConfig({
         warn(warning); // Default warning handler
       },
     },
+     outDir: 'dist',
   },
 });
