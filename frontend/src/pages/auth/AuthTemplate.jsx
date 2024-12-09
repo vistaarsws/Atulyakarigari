@@ -54,6 +54,11 @@ export default function AuthTemplate({ page }) {
     console.log("Token set in cookies!");
   };
 
+  // Google Login Handler
+  const loginWithGoogle = () => {
+    window.location.href = "http://localhost:3000/auth/login"; // Change URL for production
+  };
+
   useEffect(() => {
     setOtpType(location.state?.type);
   }, [location.state?.type]);
@@ -245,6 +250,10 @@ export default function AuthTemplate({ page }) {
                   </div>
                 </div>
               </form>
+               {/* Google login button */}
+            <Button variant="contained" color="primary" onClick={loginWithGoogle}>
+              Log in with Google
+            </Button>
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
