@@ -17,7 +17,9 @@ const app = express();
 
 connectDB();
 
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -32,10 +34,10 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/sub-category", subCategoryRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/profile", profileRoutes);
-app.use("/api/reviews", reviewRoutes); 
+app.use("/api/reviews", reviewRoutes);
 
 // Protected route example
-app.get('/api/v1/protected',async (req, res) => {
+app.get('/api/v1/protected', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
