@@ -7,8 +7,8 @@ const router = Router();
 router.get("/get", getAllProducts);
 router.get("/get/:id", getProductById)
 
-// router.use(isAdmin)
-// router.use(auth)
+router.use(auth)
+router.use(isAdmin)
 
 router.delete("/delete-single-image/", deleteSingleImage)
 router.delete("/delete-multiple-images/", deleteMultipleImages)
