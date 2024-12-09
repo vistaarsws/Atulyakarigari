@@ -34,6 +34,21 @@ app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/reviews", reviewRoutes); 
 
+// Protected route example
+app.get('/api/v1/protected',async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const { verifyToken } = await import('./utils/google-auth/googleAuth.js');
+    const userData = verifyToken(token);
+    res.json({ message: 'Protected content', user: userData });
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+});
 cloudinaryConnect()
 
 // Start server

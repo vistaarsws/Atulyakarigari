@@ -8,6 +8,10 @@ export const createProfile = async (req, res) => {
         const { userId, ...profileData } = req.body;
 
         // Ensure user exists
+        if (!mongoose.isValidObjectId(userId)) {
+            return badRequest(req, res, null, "Invalid user ID format");
+        }
+
         const user = await User.findById(userId);
         if (!user) {
             return notFoundRequest(req, res, null, "User not found");
@@ -48,6 +52,10 @@ export const getProfileById = async (req, res) => {
     try {
         const userId = req.user._id;
 
+        if (!mongoose.isValidObjectId(userId)) {
+            return badRequest(req, res, null, "Invalid profile ID format");
+        }
+
         // Fetch the profile and populate user details
         const profile = await Profile.findById(userId).populate("userId", "fullName email");
 
@@ -66,6 +74,10 @@ export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
         const updates = req.body;
+
+        if (!mongoose.isValidObjectId(userId)) {
+            return badRequest(req, res, null, "Invalid profile ID format");
+        }
 
         // Update the profile
         const updatedProfile = await Profile.findByIdAndUpdate(userId, updates, {
@@ -86,6 +98,10 @@ export const updateProfile = async (req, res) => {
 export const deleteProfile = async (req, res) => {
     try {
         const userId = req.user._id;
+
+        if (!mongoose.isValidObjectId(userId)) {
+            return badRequest(req, res, null, "Invalid profile ID format");
+        }
 
         // Delete the profile and unlink it from the user
         const profile = await Profile.findById(userId);
