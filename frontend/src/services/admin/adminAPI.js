@@ -1,4 +1,4 @@
-import { apiConnector } from "../apiConnector";
+import { apiConnector, axiosInstance } from "../apiConnector";
 import { admin_endpoints } from "../endPoint";
 
 const getCategory = async () => {
@@ -72,9 +72,8 @@ const deleteSubCategory = async (id) => {
 const updateSubCategory = async (name, id) => {
   const response = await apiConnector(
     "PUT",
-    admin_endpoints.UPDATE_SUBCATEGORY,
+    `${admin_endpoints.UPDATE_SUBCATEGORY}/${id}`,
     {
-      id,
       name,
     }
   );

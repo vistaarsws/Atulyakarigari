@@ -22,3 +22,7 @@ export const admin_endpoints = {
   GET_SUBCATEGORY_BY_CATEGORY_ID:
     BASE_URL + "/api/v1/sub-category/get-by-category",
 };
+
+export const user_endpoints = {
+  CREATE_PRODUCT: BASE_URL + "/api/v1/product/create",
+};
