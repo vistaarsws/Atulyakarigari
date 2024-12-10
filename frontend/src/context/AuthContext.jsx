@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import Cookies from "js-cookie"; // Import cookie.js library
+import { createContext, useContext, useState } from "react";
+import Cookies from "js-cookie";
 
 const AuthContext = createContext();
 
@@ -8,8 +8,9 @@ export const AuthProvider = ({ children }) => {
   console.count();
 
   const loginContext = (data) => {
-    Cookies.set("authToken", data.token, { expires: 7 }); // Set token with expiration
-    setUserContext(data); // Immediately update the state after setting token
+    console.log(data.token, "ORIGINAL TOKEN");
+    Cookies.set("authToken", data.token, { expires: 7 });
+    setUserContext(data);
   };
 
   const logout = () => {

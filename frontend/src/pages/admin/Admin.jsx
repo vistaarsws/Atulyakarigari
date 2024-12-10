@@ -5,7 +5,6 @@ import {
   Drawer,
   IconButton,
   List,
-  Divider,
   ListItem,
   ListItemButton,
   ListItemText,
@@ -43,6 +42,8 @@ import {
   getSubCategoryByCategoryId,
 } from "../../services/admin/adminAPI";
 
+import { createProduct } from "../../services/user/userAPI";
+
 import notificationIcon from "../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../assets/images/adminLogoutIcon.svg";
 
@@ -51,39 +52,56 @@ import "./Admin.css";
 export default function Admin() {
   const [open, setOpen] = useState(false);
 
+  const [loadingStates, setLoadingStates] = useState({
+    category: false,
+    subcategory: false,
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
+  const [variantOption, setVariantOption] = useState("");
+  const [variantValues, setVariantValues] = useState([]);
+  const [currentVariantValue, setCurrentVariantValue] = useState("");
+  const [savedVariants, setSavedVariants] = useState([]);
+  const [variantToEdit, setVariantToEdit] = useState(null);
+
+  const [categoryName, setCategoryName] = useState("");
+  const [addCategoryPopup, setAddCategoryPopup] = useState(false);
+  const [viewCategoriesPopup, setViewCategoriesPopup] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  const [editCategoryId, setEditCategoryId] = useState(null);
+  const [editCategoryName, setEditCategoryName] = useState("");
+
+  const [editSubCategoryId, setEditSubCategoryId] = useState(null);
+  const [editSubCategoryName, setEditSubCategoryName] = useState("");
+
+  const [subCategoryName, setSubCategoryName] = useState("");
+  const [viewSubCategoriesPopup, setViewSubCategoriesPopup] = useState(false);
+  const [addSubCategoryPopup, setAddSubCategoryPopup] = useState(false);
+  const [subCategories, setSubCategories] = useState([]);
+
+  const [parentCategory, setParentCategory] = useState("");
+
   const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    quantity: 1,
+    name: "",
+    productImage: [],
     description: "",
     price: "",
-    discount: "",
-    artisanName: "",
-    images: [],
+    category: null,
     subCategory: "",
-    attributes: [],
-    singleImage: null,
+    _attributes: [],
+    stock: 1,
+    status: "",
+    discountPercentage: "",
+    artisanName: "",
+    artisanAbout: "",
+    artisanImage: null,
   });
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
-
-  // State for the variant option (e.g., "Size")
-  const [variantOption, setVariantOption] = useState("");
-
-  // State for managing multiple variant values
-  const [variantValues, setVariantValues] = useState([]);
-
-  // State for the current input value
-  const [currentVariantValue, setCurrentVariantValue] = useState("");
-
-  // State to store all saved variants
-  const [savedVariants, setSavedVariants] = useState([]);
-  const [variantToEdit, setVariantToEdit] = useState(null);
 
   const handleOpenDialog = (variant = null) => {
     if (variant) {
@@ -164,110 +182,94 @@ export default function Admin() {
     );
   };
 
-  // const handleEditVariant = (variant) => {
-  //   setIsEditing(true);
-  //   setVariantOption(variant.option);
-  //   setVariantValues(variant.values);
-  //   handleOpenDialog();
-  // };
-
-  // const handleUpdateVariant = () => {
-  //   const updatedVariants = savedVariants.map((v) =>
-  //     v.option === variantOption
-  //       ? { option: variantOption, values: variantValues }
-  //       : v
-  //   );
-  //   setSavedVariants(updatedVariants);
-  //   handleCloseDialog();
-  // };
-
   // --------------------------------------------------------------------------------------------------------
 
-  const [categoryName, setCategoryName] = useState("");
-  const [addCategoryPopup, setAddCategoryPopup] = useState(false);
-  const [viewCategoriesPopup, setViewCategoriesPopup] = useState(false);
-  const [editCategoryPopup, setEditCategoryPopup] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categories, setCategories] = useState([]);
-
-  const [editCategoryId, setEditCategoryId] = useState(null);
-  const [editCategoryName, setEditCategoryName] = useState("");
-
-  const [subCategoryName, setSubCategoryName] = useState("");
-  const [viewSubCategoriesPopup, setViewSubCategoriesPopup] = useState(false);
-  const [editSubCategoryPopup, setEditSubCategoryPopup] = useState(false);
-  const [addSubCategoryPopup, setAddSubCategoryPopup] = useState(false);
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-  const [subCategories, setSubCategories] = useState([]);
-
-  const [parentCategory, setParentCategory] = useState("");
-
-  const searchCategoryByName = (name) => {
-    return categories.find((category) => category.name === name);
+  const getCategoryBySubcategoryId = (subcategoryId) => {
+    for (const category of categories) {
+      if (category.subcategory.includes(subcategoryId)) {
+        return category._id; // Return the category ID
+      }
+    }
+    return null;
   };
 
-  // ----------------------------------------------Generic Function for deleting category and subcategory-----------------------------
+  // ----------------------------------------------Function for deleting category and subcategory-----------------------------
 
-  const handleDelete_cat_subCat = async (id, type) => {
+  const handleDeleteCategory = async (id) => {
     try {
-      if (type === "category") {
-        await deleteCategory(id);
-        await get_cat_subCat_Data("category");
-      } else {
-        await deleteSubCategory(id);
-        await get_cat_subCat_Data("subCategory");
-      }
+      await deleteCategory(id);
+      await getCategoryData();
     } catch (error) {
       console.error(`Error deleting ${type}:`, error);
     }
   };
 
-  // --------------------------------------------Generic Function for Adding category and subcategory------------------------------------
-
-  const handleAdd_cat_subCat = async (type) => {
+  const handleDeleteSubCategory = async (id) => {
     try {
-      const searchedCategory = searchCategoryByName(parentCategory);
+      const catId = getCategoryBySubcategoryId(id);
+      await deleteSubCategory(id);
+      await getSubCategoryData(catId);
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error);
+    }
+  };
 
-      if (type === "category") {
-        setAddCategoryPopup(false);
-        const res = await createCategory(categoryName);
-        const newCategory = res.data.data;
-        console.log("category", categories);
-        console.log("new category");
-        setCategories((prev) => [...prev, newCategory]);
-      } else {
-        setAddSubCategoryPopup(false);
-        createSubCategory(subCategoryName, searchedCategory._id);
-      }
+  // --------------------------------------------Function for Adding category and subcategory------------------------------------
+
+  const handleAddCategory = async () => {
+    try {
+      setAddCategoryPopup(false);
+      await createCategory(categoryName);
+      await getCategoryData();
+      setCategoryName("");
     } catch (error) {
       console.log(error);
     }
   };
 
-  // ----------------------------------------Generic Function for Geting categories and subcategories--------------------------------------
-
-  const get_cat_subCat_Data = async (type) => {
+  const handleAddSubCategory = async () => {
     try {
-      if (type === "category") {
-        const response = await getCategory();
+      const parentCatId = parentCategory._id;
+      await createSubCategory(subCategoryName, parentCatId);
+      await getSubCategoryData(parentCatId);
+      setAddSubCategoryPopup(false);
+      setSubCategoryName("");
+      setParentCategory("");
+      console.log("addSUbCateggg", res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-        const categories_arr = Object.values(response.data.data).map(
-          (cat) => cat
-        );
+  // ----------------------------------------Function for Geting categories and subcategories--------------------------------------
 
-        setCategories(categories_arr);
-      } else {
-        const enteredCategory = searchCategoryByName(formData.category);
-        console.log(formData, "DDDDFFFFFFFFFF");
+  const getCategoryData = async () => {
+    try {
+      setLoadingStates((prev) => ({ ...prev, category: true }));
+      const response = await getCategory();
 
-        const response = await getSubCategoryByCategoryId(category._id);
+      const categories_arr = Object.values(response.data.data).map(
+        (cat) => cat
+      );
 
-        const subCategories_array = Object.values(
-          response.data.data.subCategory
-        ).map((item) => item.name);
+      setCategories(categories_arr);
+      setLoadingStates((prev) => ({ ...prev, category: false }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-        setSubCategories(subCategories_array);
-      }
+  const getSubCategoryData = async (categoryId) => {
+    try {
+      setLoadingStates((prev) => ({ ...prev, subcategory: true }));
+      // const enteredCategory = searchCategoryByName(category);
+
+      const response = await getSubCategoryByCategoryId(categoryId);
+
+      const subCategories_array = response.data.data.subcategory;
+
+      setSubCategories(subCategories_array);
+      setLoadingStates((prev) => ({ ...prev, subcategory: false }));
     } catch (error) {
       console.log(error);
     }
@@ -275,33 +277,62 @@ export default function Admin() {
 
   // ----------------------------------------------------
 
-  const handleEditCategory = async (name, id) => {
+  const handleEditCategory = (name, id) => {
     setEditCategoryId(id);
     setEditCategoryName(name);
   };
 
-  const handleSaveEdit = async (id) => {
+  const handleSaveCategory = async (id) => {
     await updateCategory(editCategoryName, id);
     setEditCategoryId(null);
-    await get_cat_subCat_Data("category");
+    await getCategoryData();
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelCategory = () => {
     setEditCategoryId(null);
     setEditCategoryName("");
   };
   // ------------------------------------------------------------------------------------------------
 
-  const handleEditSubCategory = (subCategoryId) => {
-    setSelectedSubCategory(subCategory);
-    setSubCategoryName(subCategory.name); // Pre-fill the input field with the current name
-    setEditSubCategoryPopup(true);
+  const handleEditSubCategory = (subCategoryName, subCategoryId) => {
+    setEditSubCategoryId(subCategoryId);
+    setEditSubCategoryName(subCategoryName);
+  };
+
+  const handleSaveSubCategory = async (subCategoryId) => {
+    try {
+      console.log(subCategoryId, editCategoryId, "ooooo");
+      await updateSubCategory(editSubCategoryName, subCategoryId);
+      setEditSubCategoryId(null);
+      const catId = getCategoryBySubcategoryId(subCategoryId);
+      await getSubCategoryData(catId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCancelSubCategory = () => {
+    setEditSubCategoryId(null);
+    setEditSubCategoryName("");
   };
 
   useEffect(() => {
-    get_cat_subCat_Data("category");
-    get_cat_subCat_Data("subCategory");
+    getCategoryData();
   }, []);
+
+  const addProductHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const currentStatus =
+        e.submitter.textContent === "Add Product" ? "published" : "draft";
+      setFormData((prev) => ({ ...prev, status: currentStatus }));
+
+      console.log(formData, "FFFFFOOORRRRMm");
+      await createProduct(formData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // --------------------------------------------------------------------------------------------------------
 
@@ -345,7 +376,7 @@ export default function Admin() {
   );
 
   useEffect(() => {
-    setFormData({ ...formData, attributes: savedVariants });
+    setFormData({ ...formData, _attributes: savedVariants });
   }, [savedVariants]);
 
   // Dropzone for multiple images
@@ -354,13 +385,16 @@ export default function Admin() {
     getInputProps: getInputPropsMultiple,
     isDragActive: isDragActiveMultiple,
   } = useDropzone({
+    accept: {
+      "image/*": [".jpeg", ".png", ".jpg", ".gif"],
+    },
     onDrop: (acceptedFiles) => {
       setFormData({
         ...formData,
-        images: [...formData.images, ...acceptedFiles],
+        productImage: [...formData.productImage, ...acceptedFiles],
       });
     },
-    accept: "image/*", // Only accept images
+
     maxFiles: 5, // Limit to 5 images for multiple upload
   });
 
@@ -372,10 +406,12 @@ export default function Admin() {
   } = useDropzone({
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
-        setFormData({ ...formData, singleImage: acceptedFiles[0] });
+        setFormData({ ...formData, artisanImage: acceptedFiles[0] });
       }
     },
-    accept: "image/*", // Only accept images
+    accept: {
+      "image/*": [".jpeg", ".png", ".jpg", ".gif"],
+    },
     maxFiles: 1, // Limit to 1 image
   });
 
@@ -494,12 +530,7 @@ export default function Admin() {
             </div>
 
             {/* Main Form */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault;
-                console.log("FORM DATA", formData);
-              }}
-            >
+            <form onSubmit={addProductHandler}>
               <div className="form-main">
                 {/* Left Section: Image Upload */}
                 <div className="image-upload">
@@ -526,7 +557,7 @@ export default function Admin() {
                     className="image-thumbnails"
                     style={{ marginTop: "20px" }}
                   >
-                    {formData.images.map((file, index) => (
+                    {formData.productImage.map((file, index) => (
                       <img
                         key={index}
                         src={URL.createObjectURL(file)}
@@ -557,9 +588,9 @@ export default function Admin() {
                         id="productTitle"
                         label="Product & Title"
                         variant="outlined"
-                        value={formData.title}
+                        value={formData.name}
                         onChange={(e) =>
-                          setFormData({ ...formData, title: e.target.value })
+                          setFormData({ ...formData, name: e.target.value })
                         }
                       />
                     </div>
@@ -570,11 +601,11 @@ export default function Admin() {
                         label="Quantity"
                         type="number"
                         variant="outlined"
-                        value={formData.quantity}
+                        value={formData.stock}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            quantity: e.target.value,
+                            stock: e.target.value,
                           })
                         }
                       />
@@ -586,11 +617,22 @@ export default function Admin() {
                       <Autocomplete
                         sx={{ width: "100%" }}
                         disablePortal
-                        options={categories.map((c) => c.name)}
-                        value={formData.category}
-                        onChange={(e, newValue) =>
-                          setFormData({ ...formData, category: newValue })
+                        options={categories}
+                        getOptionLabel={(option) => option?.name || ""}
+                        value={
+                          categories.find(
+                            (cat) => cat._id === formData.category
+                          ) || null
                         }
+                        onChange={(e, newCategory) => {
+                          getSubCategoryData(newCategory._id);
+                          setFormData({
+                            ...formData,
+                            category: newCategory._id,
+                            subCategory: "",
+                          });
+                        }}
+                        loading={loadingStates.category}
                         renderInput={(params) => (
                           <TextField {...params} label="Category" />
                         )}
@@ -688,7 +730,7 @@ export default function Admin() {
                         </Button>
                         <Button
                           size="large"
-                          onClick={() => handleAdd_cat_subCat("category")}
+                          onClick={handleAddCategory}
                           variant="contained"
                           sx={{
                             backgroundColor: "#5f3dc3",
@@ -789,7 +831,7 @@ export default function Admin() {
                                         aria-label="save"
                                         color="primary"
                                         onClick={() =>
-                                          handleSaveEdit(category._id)
+                                          handleSaveCategory(category._id)
                                         }
                                       >
                                         <CheckIcon />
@@ -799,7 +841,7 @@ export default function Admin() {
                                       <IconButton
                                         aria-label="cancel"
                                         color="error"
-                                        onClick={handleCancelEdit}
+                                        onClick={handleCancelCategory}
                                       >
                                         <CloseIcon />
                                       </IconButton>
@@ -827,10 +869,7 @@ export default function Admin() {
                                         aria-label="delete"
                                         color="error"
                                         onClick={() =>
-                                          handleDelete_cat_subCat(
-                                            category._id,
-                                            "category"
-                                          )
+                                          handleDeleteCategory(category._id)
                                         }
                                       >
                                         <DeleteIcon />
@@ -895,7 +934,7 @@ export default function Admin() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              discount: e.target.value,
+                              discountPercentage: e.target.value,
                             })
                           }
                         />
@@ -904,9 +943,20 @@ export default function Admin() {
                         <Autocomplete
                           sx={{ width: "100%" }}
                           disablePortal
-                          options={subCategories.map((sc) => sc.name)}
-                          value={subCategoryName}
-                          onChange={(e) => setSubCategories(e.target.value)}
+                          options={subCategories}
+                          getOptionLabel={(option) => option?.name || ""}
+                          value={
+                            subCategories.find(
+                              (subCat) => subCat._id === formData.subCategory
+                            ) || null
+                          }
+                          loading={loadingStates.subcategory}
+                          onChange={(e, newValue) => {
+                            setFormData({
+                              ...formData,
+                              subCategory: newValue._id,
+                            });
+                          }}
                           renderInput={(params) => (
                             <TextField {...params} label="Sub Category" />
                           )}
@@ -980,7 +1030,8 @@ export default function Admin() {
                           <Autocomplete
                             sx={{ width: "100%" }}
                             disablePortal
-                            options={categories.map((c) => c.name)}
+                            options={categories}
+                            getOptionLabel={(option) => option?.name || ""}
                             value={parentCategory}
                             onChange={(e, newValue) =>
                               setParentCategory(newValue)
@@ -993,7 +1044,7 @@ export default function Admin() {
                             autoFocus
                             margin="dense"
                             id="categoryName"
-                            label=""
+                            label="Sub Category Name"
                             type="text"
                             fullWidth
                             variant="outlined"
@@ -1017,7 +1068,7 @@ export default function Admin() {
                           Cancel
                         </Button>
                         <Button
-                          onClick={() => handleAdd_cat_subCat("subCategory")}
+                          onClick={handleAddSubCategory}
                           variant="contained"
                           sx={{
                             backgroundColor: "#5f3dc3",
@@ -1075,40 +1126,88 @@ export default function Admin() {
                                 alignItems: "center",
                                 padding: "1rem 0",
                                 borderBottom: "1px solid #e0e0e0",
+                                "&:hover": {
+                                  backgroundColor: "#f9f9f9",
+                                },
                               }}
                             >
-                              <Typography
-                                sx={{ fontSize: "1.4rem", color: "#4a4a4a" }}
-                              >
-                                {subCategory.name}
-                              </Typography>
+                              {editSubCategoryId === subCategory._id ? (
+                                // Render input field if this subcategory is being edited
+                                <TextField
+                                  value={editSubCategoryName}
+                                  onChange={(e) =>
+                                    setEditSubCategoryName(e.target.value)
+                                  }
+                                  size="small"
+                                  autoFocus
+                                />
+                              ) : (
+                                // Otherwise render the subcategory name
+                                <Typography
+                                  sx={{ fontSize: "1.4rem", color: "#4a4a4a" }}
+                                >
+                                  {subCategory.name}
+                                </Typography>
+                              )}
                               <Box sx={{ display: "flex", gap: 1 }}>
-                                <Tooltip title="Edit">
-                                  <IconButton
-                                    onClick={() =>
-                                      handleEditSubCategory(
-                                        subCategory.name,
-                                        subCategory._id
-                                      )
-                                    }
-                                    sx={{ color: "#5f3dc3" }}
-                                  >
-                                    <EditIcon />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Delete">
-                                  <IconButton
-                                    onClick={() =>
-                                      handleDelete_cat_subCat(
-                                        subCategory._id,
-                                        "subCategory"
-                                      )
-                                    }
-                                    sx={{ color: "#d32f2f" }}
-                                  >
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </Tooltip>
+                                {editSubCategoryId === subCategory._id ? (
+                                  // Show save and cancel buttons during editing
+                                  <>
+                                    <Tooltip title="Save">
+                                      <IconButton
+                                        aria-label="save"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleSaveSubCategory(subCategory._id)
+                                        }
+                                      >
+                                        <CheckIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Cancel">
+                                      <IconButton
+                                        aria-label="cancel"
+                                        color="error"
+                                        onClick={handleCancelSubCategory}
+                                      >
+                                        <CloseIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </>
+                                ) : (
+                                  // Show edit and delete buttons when not editing
+                                  <>
+                                    <Tooltip title="Edit">
+                                      <IconButton
+                                        aria-label="edit"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleEditSubCategory(
+                                            subCategory.name,
+                                            subCategory._id
+                                          )
+                                        }
+                                        sx={{ color: "#5f3dc3" }}
+                                      >
+                                        <EditIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+                                      <IconButton
+                                        aria-label="delete"
+                                        color="error"
+                                        onClick={() =>
+                                          handleDeleteSubCategory(
+                                            subCategory._id
+                                          )
+                                        }
+                                        sx={{ color: "#d32f2f" }}
+                                      >
+                                        <DeleteIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </>
+                                )}
                               </Box>
                             </Box>
                           ))}
@@ -1338,9 +1437,9 @@ export default function Admin() {
                         )}
 
                         {/* Show the image inside the dotted area */}
-                        {formData.singleImage && (
+                        {formData.artisanImage && (
                           <img
-                            src={URL.createObjectURL(formData.singleImage)}
+                            src={URL.createObjectURL(formData.artisanImage)}
                             alt="Preview"
                             style={{
                               width: "100%",
@@ -1362,11 +1461,12 @@ export default function Admin() {
                           label="About Artisan"
                           multiline
                           rows={8}
+                          value={formData.artisanAbout}
                           variant="outlined"
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              aboutArtisan: e.target.value,
+                              artisanAbout: e.target.value,
                             })
                           }
                         />
@@ -1388,7 +1488,7 @@ export default function Admin() {
                       >
                         Add Product
                       </Button>
-                      <Button variant="outlined" color="success">
+                      <Button type="submit" variant="outlined" color="success">
                         Save As Draft
                       </Button>
                     </Box>
