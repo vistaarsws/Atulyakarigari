@@ -5,7 +5,7 @@ import { badRequest, internalServerError, notFoundRequest } from "../helpers/api
 export const auth = async (req, res, next) => {
     try {
         // extract token
-        const token = req.cookies.token ||
+        const token = req?.cookies?.token ||
             req.body.token ||
             (req.header("Authorization") ? req.header("Authorization").replace("Bearer ", "") : null);
         // req.header("Authorization").replace("Bearer ", "");
@@ -47,7 +47,7 @@ export const isUser = async (req, res, next) => {
 export const isAdmin = (req, res, next) => {
     try {
         const user = req.user
-        if (user.accountType === "admin") {
+        if (user.role === "admin") {
             next()
         } else {
             return badRequest(req, res, null, "you are not an admin")

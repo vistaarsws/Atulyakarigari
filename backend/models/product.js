@@ -1,11 +1,17 @@
 import mongoose from "mongoose";
 
 const ProductSchema = new mongoose.Schema({
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        // required: true
+    },
     name: {
         type: String,
         required: [true, 'Product name is required'],
         trim: true,
-        maxlength: [200, 'Product name cannot exceed 200 characters']
+        maxlength: [200, 'Product name cannot exceed 200 characters'],
+        index: true
 
     },
     description: {
@@ -19,9 +25,15 @@ const ProductSchema = new mongoose.Schema({
         required: [true, 'Product price is required'],
         min: [0, 'Price cannot be negative']
     },
+    discountPercentage: {
+        type: Number,
+        min: [0, 'Discounted  cannot be negative'],
+        required: [true, 'Discount percentage is required']
+    },
     priceAfterDiscount: {
         type: Number,
-        min: [0, 'Discounted price cannot be negative']
+        min: [0, 'Price cannot be negative'],
+        required: [true, 'Price after discount is required']
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
