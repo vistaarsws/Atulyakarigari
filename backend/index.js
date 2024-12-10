@@ -10,9 +10,10 @@ import profileRoutes from "./routes/prfile.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import cloudinaryConnect from "./config/cloudinary.js";
 import fileUpload from "express-fileupload";
+import healthRoutes from "./routes/health.routes.js"
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000
 const app = express();
 
 connectDB();
@@ -34,7 +35,9 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/sub-category", subCategoryRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/profile", profileRoutes);
-app.use("/api/reviews", reviewRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/health", healthRoutes);
+
 
 // Protected route example
 app.get('/api/v1/protected', async (req, res) => {
