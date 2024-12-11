@@ -1,35 +1,104 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv/config";
+import morgan from "morgan";
+import chalk from "chalk";
+import fileUpload from "express-fileupload";
+
+// Import routes
 import connectDB from "./config/DBConnection.js";
+import cloudinaryConnect from "./config/cloudinary.js";
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
-import productRoutes from "./routes/product.routes.js"
+import productRoutes from "./routes/product.routes.js";
 import subCategoryRoutes from "./routes/sub-category.routes.js";
 import profileRoutes from "./routes/prfile.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
-import cloudinaryConnect from "./config/cloudinary.js";
-import fileUpload from "express-fileupload";
-import healthRoutes from "./routes/health.routes.js"
+import healthRoutes from "./routes/health.routes.js";
 
+// Enhanced console styling with emojis and better formatting
+const log = {
+  info: (msg) => console.log(chalk.blue("ℹ️  INFO     │ ") + chalk.cyan(msg)),
+  success: (msg) => console.log(chalk.green("✅ SUCCESS  │ ") + chalk.green(msg)),
+  warning: (msg) => console.log(chalk.yellow("⚠️  WARNING  │ ") + chalk.yellow(msg)),
+  error: (msg) => console.log(chalk.red("❌ ERROR    │ ") + chalk.red(msg)),
+  route: (method, path, status, time) => {
+    const statusColor = status >= 500 ? "red" : status >= 400 ? "yellow" : "green";
+    const icon = status >= 500 ? "❌" : status >= 400 ? "⚠️" : "✅";
+    console.log(
+      chalk.magenta("🔗 REQUEST  │ ") +
+      chalk.yellow(method.toUpperCase().padEnd(6)) +
+      chalk.white(path.padEnd(50)) +
+      chalk[statusColor](`${icon} ${status}`) +
+      chalk.gray(` (${time}ms)`)
+    );
+  },
+  db: (msg) => console.log(chalk.blue("🗄️  DATABASE      │ ") + chalk.cyan(msg)),
+  cloud: (msg) => console.log(chalk.magenta("☁️  CLOUDINARY    │  ") + chalk.magenta(msg))
+};
 
-const PORT = process.env.PORT || 5000
+// Environment variables
+const PORT = process.env.PORT || 5000;
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+// Initialize express app
 const app = express();
 
-connectDB();
+// CORS configuration
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  credentials: true,
+  maxAge: 3600,
+};
+app.use(cors(corsOptions));
 
-app.use(cors({
-  origin: '*'
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parsing middleware
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// File upload middleware
 app.use(
   fileUpload({
     useTempFiles: true,
     tempFileDir: "/tmp/",
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max file size
+    abortOnLimit: true,
   })
-)
-// Routes
+);
+
+// Enhanced request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  
+  // Override end function to log response details
+  const oldEnd = res.end;
+  res.end = function () {
+    const duration = Date.now() - start;
+    log.route(req.method, req.path, res.statusCode, duration);
+    return oldEnd.apply(this, arguments);
+  };
+  
+  next();
+});
+
+// Development logging with clean format
+if (NODE_ENV === "development") {
+  morgan.token('statusColor', (req, res) => {
+    const status = res.statusCode;
+    return status >= 500 ? chalk.red(status) :
+           status >= 400 ? chalk.yellow(status) :
+           status >= 300 ? chalk.cyan(status) :
+           chalk.green(status);
+  });
+
+  app.use(morgan((tokens, req, res) => {
+    return false; // Disable default Morgan logging as we have our custom logger
+  }));
+}
+
+// API Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/sub-category", subCategoryRoutes);
@@ -39,24 +108,50 @@ app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/health", healthRoutes);
 
 
-// Protected route example
-app.get('/api/v1/protected', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
 
+// Initialize external services
+const initializeServices = async () => {
   try {
-    const { verifyToken } = await import('./utils/google-auth/googleAuth.js');
-    const userData = verifyToken(token);
-    res.json({ message: 'Protected content', user: userData });
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-});
-cloudinaryConnect()
+    // Start server with enhanced console output
+    app.listen(PORT, () => {
+      console.log("\n" + chalk.bold.cyan("🚀 SERVER STATUS "));
+      console.log(chalk.gray("━".repeat(60)));
+      console.log(chalk.white("🌐 PORT        │ ") + chalk.yellow(PORT));
+      console.log(chalk.white("🔗 HEALTH CHECK │ ") + chalk.yellow(`http://localhost:${PORT}/api/v1/health`));
+      console.log(chalk.gray("━".repeat(60)));
+    });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    // Connect to services with clean logging
+    await connectDB();
+    log.db("Connection established successfully");
+
+    await cloudinaryConnect();
+    log.cloud("Connection established successfully");
+    
+    console.log(chalk.gray("━".repeat(60)) + "\n");
+    
+     
+
+  } catch (error) {
+    log.error("Failed to initialize services:");
+    console.error(chalk.red(error.stack));
+    process.exit(1);
+  }
+};
+
+// Enhanced error handlers
+process.on("uncaughtException", (err) => {
+  log.error("Uncaught Exception! Shutting down...");
+  console.error(chalk.red(err.stack));
+  process.exit(1);
 });
+
+process.on("unhandledRejection", (err) => {
+  log.error("Unhandled Promise Rejection! Shutting down...");
+  console.error(chalk.red(err.stack));
+  process.exit(1);
+});
+
+initializeServices();
+
+export default app;
