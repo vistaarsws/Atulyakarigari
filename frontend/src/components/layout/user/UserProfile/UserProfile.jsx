@@ -1,9 +1,9 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import "./user.css";
+import "./UserProfile.css";
 import { Box, Button, Typography, useMediaQuery } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-export default function Sidebar() {
+export default function UserProfile() {
   const location = useLocation();
   const menuItems = [
     { key: "user/profile", label: "Profile" },

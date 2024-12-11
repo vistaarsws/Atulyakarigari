@@ -26,7 +26,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
 
-import SidebarDraft from "./sidebar-drafts/SidebarDraft";
+import SidebarDraft from "../../components/layout/admin/draftSection/draftSection";
 
 import { Menu as MenuIcon, Add as AddIcon, Style } from "@mui/icons-material";
 
@@ -42,7 +42,7 @@ import {
   getSubCategoryByCategoryId,
 } from "../../services/admin/adminAPI";
 
-import { createProduct } from "../../services/user/userAPI";
+import { createProduct, getProducts } from "../../services/user/userAPI";
 
 import notificationIcon from "../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../assets/images/adminLogoutIcon.svg";
@@ -318,6 +318,7 @@ export default function Admin() {
 
   useEffect(() => {
     getCategoryData();
+    getProducts();
   }, []);
 
   const addProductHandler = async (e) => {
@@ -329,6 +330,15 @@ export default function Admin() {
 
       console.log(formData, "FFFFFOOORRRRMm");
       await createProduct(formData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getProducts = async () => {
+    try {
+      const products = await getProducts();
+      console.log(products);
     } catch (error) {
       console.log(error);
     }
