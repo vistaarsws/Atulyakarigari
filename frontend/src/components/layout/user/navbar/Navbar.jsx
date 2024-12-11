@@ -1,13 +1,13 @@
-import CART from "../../../assets/images/cart.svg";
+import CART from "../../../../assets/images/cart.svg";
 import "./Navbar.css";
-import headerLogo from "../../../assets/images/headerLogo.svg";
+import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import userProfile from "../../../assets/images/userProfile.png";
+import userProfile from "../../../../assets/images/userProfile.png";
 import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
 // import Cookies from "js-cookie";
 // import avatar from "../../../assets/images/avatar.svg";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../../context/AuthContext";
 // import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
 

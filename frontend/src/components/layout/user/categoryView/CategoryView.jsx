@@ -1,6 +1,6 @@
 import "./CategotyView.css";
-import rightArrow from "../../../assets/images/rightArrow.svg";
-import { ourCollections } from "../../../utils/Constant";
+import rightArrow from "../../../../assets/images/rightArrow.svg";
+import { ourCollections } from "../../../../utils/Constant";
 import { Link } from "react-router-dom";
 
 export default function CategoryView() {

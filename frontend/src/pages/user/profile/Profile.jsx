@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PROFILE_IMAGE from "../../../assets/images/userProfile.png";
 import { Button } from "@mui/material";
-import "./userprofile.css";
+import "./Profile.css";
 
 const ProfileField = ({ label, value, onChange, type }) => {
   return (
@@ -17,7 +17,7 @@ const ProfileField = ({ label, value, onChange, type }) => {
   );
 };
 
-const ProfileComponent = () => {
+const Profile = () => {
   const [formData, setFormData] = useState({
     fullName: "Savvy Srivastava Srivastava",
     email: "savvysrivastava4@gmail.com",
@@ -112,4 +112,4 @@ const ProfileComponent = () => {
   );
 };
 
-export default ProfileComponent;
+export default Profile;

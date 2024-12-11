@@ -5,7 +5,7 @@ import artistry_1 from "../../assets/images/cat5_2.png";
 import artistry_2 from "../../assets/images/artistry_2.png";
 import artistry_3 from "../../assets/images/artistry_3.png";
 import bg_pattern from "../../assets/images/bgSidePattern.svg";
-import ProductSection from "../../components/layout/productSection/ProductSection";
+import ProductSection from "../../components/layout/user/productSection/ProductSection";
 
 import cat1_1 from "../../assets/images/cat2_1.png";
 import cat1_2 from "../../assets/images/cat2_2.png";
@@ -32,7 +32,7 @@ import cat5_3 from "../../assets/images/cat5_3.png";
 import cat5_4 from "../../assets/images/cat5_4.png";
 import cat5_5 from "../../assets/images/cat5_5.png";
 import cat5_6 from "../../assets/images/cat5_1.png";
-import CategoryView from "../../components/layout/categoryView/CategoryView";
+import CategoryView from "../../components/layout/user/categoryView/CategoryView";
 import { useMediaQuery } from "@mui/material";
 
 export default function Home() {

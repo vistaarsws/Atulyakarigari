@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Container,
@@ -18,8 +17,8 @@ import {
   Mail,
   Phone,
 } from "@mui/icons-material";
-import WAVES_IMG from "../../../assets/images/footer-wave-effect.png";
-import LEAFE_IMG from "../../../assets/images/FooterLeafe.png";
+import WAVES_IMG from "../../../../assets/images/footer-wave-effect.png";
+import LEAFE_IMG from "../../../../assets/images/FooterLeafe.png";
 
 // Styled components
 const StyledFooter = styled("footer")(({ theme }) => ({
