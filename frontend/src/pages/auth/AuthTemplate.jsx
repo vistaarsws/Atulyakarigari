@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import {
   signUp,
   sendOtp,
@@ -15,7 +15,7 @@ import {
   varifyOtp,
 } from "../../services/operations/authAPI";
 import { useAuth } from "../../context/AuthContext";
-import  setCustomDimension  from '../../utils/helpers';
+import setCustomDimension from "../../utils/helpers";
 
 dayjs.extend(customParseFormat);
 
@@ -77,9 +77,9 @@ export default function AuthTemplate({ page }) {
         }
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
-        })
-        setCustomDimension('dimension1', userDetails.role);  // Example: Set user role
-    setCustomDimension('dimension2', userDetails.id);    // Example: Set user ID;
+        });
+        setCustomDimension("dimension1", userDetails.role); // Example: Set user role
+        setCustomDimension("dimension2", userDetails.id); // Example: Set user ID;
       } else {
         enqueueSnackbar(res.data.message, {
           variant: "warning",
@@ -203,7 +203,15 @@ export default function AuthTemplate({ page }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+    const isNumber = /^[0-9]+$/.test(value);
+    let formattedValue = value;
+    if (isNumber && !value.startsWith("+91")) {
+      formattedValue = "+91" + value;
+    }
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: formattedValue,
+    }));
   };
 
   return (
@@ -225,12 +233,25 @@ export default function AuthTemplate({ page }) {
               <form onSubmit={loginHandler}>
                 <div>
                   <div>
-                    <label htmlFor="loginId">Email/Phone Number</label>
-                    <input
-                      type="text"
-                      name="loginId"
+                    <TextField
+                      label=""
+                      sx={{
+                        width: "100%",
+                        marginBottom: "2rem",
+                        "& .MuiInputBase-input": {
+                          fontSize: "1.4rem",
+                          padding: "1rem",
+                          height: "unset",
+                          lineHeight: "1.75",
+                        },
+
+                        "& .MuiInputBase-input::placeholder": {
+                          fontSize: "1.4rem",
+                        },
+                      }}
+                      placeholder="Enter Your Email / Phone Number"
                       id="loginId"
-                      placeholder="Enter Your Email/Phone Number"
+                      name="loginId"
                       onChange={handleInputChange}
                     />
                   </div>
@@ -250,10 +271,14 @@ export default function AuthTemplate({ page }) {
                   </div>
                 </div>
               </form>
-               {/* Google login button */}
-            <Button variant="contained" color="primary" onClick={loginWithGoogle}>
-              Log in with Google
-            </Button>
+              {/* Google login button */}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={loginWithGoogle}
+              >
+                Log in with Google
+              </Button>
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
@@ -268,42 +293,64 @@ export default function AuthTemplate({ page }) {
                 <h3>Use your email or phone number to sign up</h3>
               </div>
 
-              <form onSubmit={signupHandler}>
+              <form onSubmit={signupHandler} className="signUpForm">
                 <div>
-                  <div>
-                    <label htmlFor="fullName">Full Name*</label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      id="fullName"
-                      placeholder="Enter Your Full Name"
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                  <TextField
+                    placeholder="Enter Your Full Name"
+                    id="fullName"
+                    name="fullName"
+                    label=""
+                    variant="outlined"
+                    sx={{
+                      width: "100%",
+                      mb: "1rem",
+                      "& .MuiInputBase-input": {
+                        fontSize: "1.4rem",
+                        padding: "1rem",
+                        height: "unset",
+                        lineHeight: "1.75",
+                      },
 
-                  <div>
-                    <label>Phone Number or Email*</label>
-                    <input
-                      type="text"
-                      name="loginId"
-                      id="loginId"
-                      placeholder="Enter Phone Number or Email"
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <CircularProgress size={24} color="white" />
-                      ) : (
-                        "Sign Up"
-                      )}
-                    </Button>
-                  </div>
+                      "& .MuiInputBase-input::placeholder": {
+                        fontSize: "1.4rem",
+                      },
+                    }}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div>
+                  <TextField
+                    placeholder="Enter Phone Number or Email"
+                    id="loginId"
+                    name="loginId"
+                    label=""
+                    variant="outlined"
+                    sx={{
+                      width: "100%",
+                      mb: "2rem",
+                      "& .MuiInputBase-input": {
+                        fontSize: "1.4rem",
+                        padding: "1rem",
+                        height: "unset",
+                        lineHeight: "1.75",
+                      },
+
+                      "& .MuiInputBase-input::placeholder": {
+                        fontSize: "1.4rem",
+                      },
+                    }}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Button variant="contained" type="submit" disabled={loading}>
+                    {loading ? (
+                      <CircularProgress size={24} color="white" />
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </Button>
                 </div>
               </form>
             </article>
