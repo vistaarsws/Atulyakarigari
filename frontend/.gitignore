@@ -18,6 +18,9 @@ dist-ssr
 *.local
 *.env
 
+# Add this to .gitignore
+.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -30,8 +33,6 @@ dist-ssr
 *.sw?
 
 # Ignore specific environment files
-.env
-.env.*
 .vercel
 
 
