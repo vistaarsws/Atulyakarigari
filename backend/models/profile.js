@@ -1,5 +1,10 @@
 import mongoose from "mongoose"
 const profileSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
     gender: {
         type: String
     },
@@ -30,4 +35,5 @@ const profileSchema = new mongoose.Schema({
     timestamps: true
 })
 
-module.exports = mongoose.model("Profile", profileSchema)
+const Profile = mongoose.model("Profile", profileSchema);
+export default Profile;

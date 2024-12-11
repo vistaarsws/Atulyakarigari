@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import "./ProductCard.css";
 import { useNavigate } from "react-router-dom";
-import WishListHeartIcon from "../../micro_elements/wishListHeartIcon/wishListHeartIcon";
+import WishListHeartIcon from "../../micro_elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
 

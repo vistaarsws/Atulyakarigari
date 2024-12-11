@@ -178,7 +178,9 @@ export const getSubcategoryByCategoryId = async (req, res) => {
         }
 
         // Find subcategory with populated parent category
-        const subcategory = await Category.findById(id).select("name _id")
+        const subcategory = await Category.findById(id).select('_id name subcategory').populate({
+            path: 'subcategory', select: 'name _id'
+        });
 
         // Check if subcategory exists
         if (!subcategory) {
@@ -187,6 +189,7 @@ export const getSubcategoryByCategoryId = async (req, res) => {
 
         return success(req, res, "Subcategory retrieved successfully", subcategory.toObject());
     } catch (error) {
+        console.log(error);
         return internalServerError(req, res, error, "Failed to retrieve subcategory");
     }
 };

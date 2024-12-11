@@ -1,4 +1,4 @@
-import { apiConnector } from "../apiConnector";
+import { apiConnector, axiosInstance } from "../apiConnector";
 import { admin_endpoints } from "../endPoint";
 
 const getCategory = async () => {
@@ -15,57 +15,64 @@ const createCategory = async (name) => {
   return response;
 };
 
-const deleteCategory = async (name) => {
+const deleteCategory = async (id) => {
   const response = await apiConnector(
     "DELETE",
-    admin_endpoints.DELETE_CATEGORY,
-    {
-      name,
-    }
+    `${admin_endpoints.DELETE_CATEGORY}/${id}`
   );
 
   return response;
 };
 
-const updateCategory = async (name) => {
-  const response = await apiConnector("PUT", admin_endpoints.UPDATE_CATEGORY, {
-    id,
-    name,
-  });
+const updateCategory = async (name, id) => {
+  const response = await apiConnector(
+    "PUT",
+    `${admin_endpoints.UPDATE_CATEGORY}/${id}`,
+    {
+      name,
+    }
+  );
 
   return response;
 };
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------
 
-const getSubCategory = async (name) => {
-  const response = await apiConnector(
-    "GET",
-    admin_endpoints.CREATE_SUBCATEGORY,
-    {
-      name,
-    }
-  );
+const getSubCategory = async () => {
+  const response = await apiConnector("GET", admin_endpoints.GET_SUBCATEGORY);
 
   return response;
 };
 
-const createSubCategory = async (name) => {
+const createSubCategory = async (name, parentCategory) => {
   const response = await apiConnector(
     "POST",
     admin_endpoints.CREATE_SUBCATEGORY,
     {
       name,
+      parentCategory,
     }
   );
 
   return response;
 };
 
-const deleteSubCategory = async (name) => {
+const deleteSubCategory = async (id) => {
   const response = await apiConnector(
     "DELETE",
-    admin_endpoints.DELETE_SUBCATEGORY,
+    `${admin_endpoints.DELETE_SUBCATEGORY}/${id}`,
+    {
+      id,
+    }
+  );
+
+  return response;
+};
+
+const updateSubCategory = async (name, id) => {
+  const response = await apiConnector(
+    "PUT",
+    `${admin_endpoints.UPDATE_SUBCATEGORY}/${id}`,
     {
       name,
     }
@@ -74,13 +81,12 @@ const deleteSubCategory = async (name) => {
   return response;
 };
 
-const updateSubCategory = async (name) => {
+const getSubCategoryByCategoryId = async (id) => {
   const response = await apiConnector(
-    "PUT",
-    admin_endpoints.UPDATE_SUBCATEGORY,
+    "GET",
+    `${admin_endpoints.GET_SUBCATEGORY_BY_CATEGORY_ID}/${id}`,
     {
       id,
-      name,
     }
   );
 
@@ -96,4 +102,5 @@ export {
   createSubCategory,
   deleteSubCategory,
   updateSubCategory,
+  getSubCategoryByCategoryId,
 };

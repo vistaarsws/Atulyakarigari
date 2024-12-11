@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Avatar,
   Drawer,
   IconButton,
   List,
-  Divider,
   ListItem,
   ListItemButton,
   ListItemText,
@@ -25,6 +24,9 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CheckIcon from "@mui/icons-material/Check";
+
+import SidebarDraft from "./sidebar-drafts/SidebarDraft";
 
 import { Menu as MenuIcon, Add as AddIcon, Style } from "@mui/icons-material";
 
@@ -37,13 +39,10 @@ import {
   createSubCategory,
   updateSubCategory,
   deleteSubCategory,
+  getSubCategoryByCategoryId,
 } from "../../services/admin/adminAPI";
 
-// ------------------------------ react-date-range -------------------------------------------------
-import { DateRange } from "react-date-range";
-import "react-date-range/dist/styles.css"; // main css file
-import "react-date-range/dist/theme/default.css"; // theme css file
-// -------------------------------------------------------------------------------------------------
+import { createProduct } from "../../services/user/userAPI";
 
 import notificationIcon from "../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../assets/images/adminLogoutIcon.svg";
@@ -53,60 +52,56 @@ import "./Admin.css";
 export default function Admin() {
   const [open, setOpen] = useState(false);
 
+  const [loadingStates, setLoadingStates] = useState({
+    category: false,
+    subcategory: false,
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
+  const [variantOption, setVariantOption] = useState("");
+  const [variantValues, setVariantValues] = useState([]);
+  const [currentVariantValue, setCurrentVariantValue] = useState("");
+  const [savedVariants, setSavedVariants] = useState([]);
+  const [variantToEdit, setVariantToEdit] = useState(null);
+
+  const [categoryName, setCategoryName] = useState("");
+  const [addCategoryPopup, setAddCategoryPopup] = useState(false);
+  const [viewCategoriesPopup, setViewCategoriesPopup] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  const [editCategoryId, setEditCategoryId] = useState(null);
+  const [editCategoryName, setEditCategoryName] = useState("");
+
+  const [editSubCategoryId, setEditSubCategoryId] = useState(null);
+  const [editSubCategoryName, setEditSubCategoryName] = useState("");
+
+  const [subCategoryName, setSubCategoryName] = useState("");
+  const [viewSubCategoriesPopup, setViewSubCategoriesPopup] = useState(false);
+  const [addSubCategoryPopup, setAddSubCategoryPopup] = useState(false);
+  const [subCategories, setSubCategories] = useState([]);
+
+  const [parentCategory, setParentCategory] = useState("");
+
+  const [formData, setFormData] = useState({
+    name: "",
+    productImage: [],
+    description: "",
+    price: "",
+    category: null,
+    subCategory: "",
+    _attributes: [],
+    stock: 1,
+    status: "",
+    discountPercentage: "",
+    artisanName: "",
+    artisanAbout: "",
+    artisanImage: null,
+  });
+
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
-
-  // ------------------------------ react-date-range -------------------------------------------------
-
-  const [range, setRange] = useState([
-    {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: "selection",
-    },
-  ]);
-
-  const [isOpen, setIsOpen] = useState(false); // State to toggle the calendar visibility
-  const calendarRef = useRef(null);
-
-  // Close calendar when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // Handle opening of calendar when input is clicked
-  const handleDateClick = () => {
-    setIsOpen(true); // Open calendar on input click
-  };
-  const formatDate = (date) => {
-    return date.toLocaleDateString("en-GB"); // This will return the date in "DD/MM/YYYY"
-  };
-
-  // --------------------------------------------------------------------------------------------------------
-  const [isEditing, setIsEditing] = useState(false);
-  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
-
-  // State for the variant option (e.g., "Size")
-  const [variantOption, setVariantOption] = useState("");
-
-  // State for managing multiple variant values
-  const [variantValues, setVariantValues] = useState([]);
-
-  // State for the current input value
-  const [currentVariantValue, setCurrentVariantValue] = useState("");
-
-  // State to store all saved variants
-  const [savedVariants, setSavedVariants] = useState([]);
-  const [variantToEdit, setVariantToEdit] = useState(null);
 
   const handleOpenDialog = (variant = null) => {
     if (variant) {
@@ -177,8 +172,6 @@ export default function Admin() {
     }
     // debugger;
 
-    console.log(savedVariants, "m111111111111111111111111111111");
-
     handleCloseDialog();
   };
 
@@ -189,83 +182,156 @@ export default function Admin() {
     );
   };
 
-  // const handleEditVariant = (variant) => {
-  //   setIsEditing(true);
-  //   setVariantOption(variant.option);
-  //   setVariantValues(variant.values);
-  //   handleOpenDialog();
-  // };
-
-  // const handleUpdateVariant = () => {
-  //   const updatedVariants = savedVariants.map((v) =>
-  //     v.option === variantOption
-  //       ? { option: variantOption, values: variantValues }
-  //       : v
-  //   );
-  //   setSavedVariants(updatedVariants);
-  //   handleCloseDialog();
-  // };
-
   // --------------------------------------------------------------------------------------------------------
-  const [viewCategoriesPopup, setViewCategoriesPopup] = useState(false);
-  const [viewSubCategoriesPopup, setViewSubCategoriesPopup] = useState(false);
-  const [addCategoryPopup, setAddCategoryPopup] = useState(false);
-  const [addSubCategoryPopup, setAddSubCategoryPopup] = useState(false);
-  const [categoryName, setCategoryName] = useState("");
-  const [subCategoryName, setSubCategoryName] = useState("");
 
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([
-    { id: 1, name: "subCategory 1" },
-    { id: 2, name: "subCategory 2" },
-  ]);
-
-  const closeAddCategoryPopup = () => {
-    setAddCategoryPopup(false);
-    setCategoryName("");
+  const getCategoryBySubcategoryId = (subcategoryId) => {
+    for (const category of categories) {
+      if (category.subcategory.includes(subcategoryId)) {
+        return category._id; // Return the category ID
+      }
+    }
+    return null;
   };
+
+  // ----------------------------------------------Function for deleting category and subcategory-----------------------------
 
   const handleDeleteCategory = async (id) => {
-    setCategories((prev) => prev.filter((category) => category.id !== id));
-    await deleteCategory(id);
-  };
-
-  const handleAddCategory = async () => {
-    console.log("Category Added:", categoryName);
-    closeAddCategoryPopup();
-    await createCategory(categoryName);
-  };
-
-  const getCategoryHandler = async () => {
-    const response = await getCategory();
-    console.log(response);
-    const categories_array = Object.values(response.data.data).map(
-      (category) => category
-    );
-    setCategories(categories_array);
-    console.log("cat", categories_array);
-  };
-
-  useEffect(() => {
-    getCategoryHandler();
-  }, []);
-
-  // ------------------------------------------------------------------------------------------------
-
-  const closeAddSubCategoryPopup = () => {
-    setAddSubCategoryPopup(false);
-    setSubCategoryName("");
+    try {
+      await deleteCategory(id);
+      await getCategoryData();
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error);
+    }
   };
 
   const handleDeleteSubCategory = async (id) => {
-    setSubCategories((prev) => prev.filter((category) => category.id !== id));
-    await deleteSubCategory(id);
+    try {
+      const catId = getCategoryBySubcategoryId(id);
+      await deleteSubCategory(id);
+      await getSubCategoryData(catId);
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error);
+    }
+  };
+
+  // --------------------------------------------Function for Adding category and subcategory------------------------------------
+
+  const handleAddCategory = async () => {
+    try {
+      setAddCategoryPopup(false);
+      await createCategory(categoryName);
+      await getCategoryData();
+      setCategoryName("");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleAddSubCategory = async () => {
-    console.log("sub Category Added:", categoryName);
-    closeAddSubCategoryPopup();
-    await createSubCategory(categoryName);
+    try {
+      const parentCatId = parentCategory._id;
+      await createSubCategory(subCategoryName, parentCatId);
+      await getSubCategoryData(parentCatId);
+      setAddSubCategoryPopup(false);
+      setSubCategoryName("");
+      setParentCategory("");
+      console.log("addSUbCateggg", res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ----------------------------------------Function for Geting categories and subcategories--------------------------------------
+
+  const getCategoryData = async () => {
+    try {
+      setLoadingStates((prev) => ({ ...prev, category: true }));
+      const response = await getCategory();
+
+      const categories_arr = Object.values(response.data.data).map(
+        (cat) => cat
+      );
+
+      setCategories(categories_arr);
+      setLoadingStates((prev) => ({ ...prev, category: false }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getSubCategoryData = async (categoryId) => {
+    try {
+      setLoadingStates((prev) => ({ ...prev, subcategory: true }));
+      // const enteredCategory = searchCategoryByName(category);
+
+      const response = await getSubCategoryByCategoryId(categoryId);
+
+      const subCategories_array = response.data.data.subcategory;
+
+      setSubCategories(subCategories_array);
+      setLoadingStates((prev) => ({ ...prev, subcategory: false }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ----------------------------------------------------
+
+  const handleEditCategory = (name, id) => {
+    setEditCategoryId(id);
+    setEditCategoryName(name);
+  };
+
+  const handleSaveCategory = async (id) => {
+    await updateCategory(editCategoryName, id);
+    setEditCategoryId(null);
+    await getCategoryData();
+  };
+
+  const handleCancelCategory = () => {
+    setEditCategoryId(null);
+    setEditCategoryName("");
+  };
+  // ------------------------------------------------------------------------------------------------
+
+  const handleEditSubCategory = (subCategoryName, subCategoryId) => {
+    setEditSubCategoryId(subCategoryId);
+    setEditSubCategoryName(subCategoryName);
+  };
+
+  const handleSaveSubCategory = async (subCategoryId) => {
+    try {
+      console.log(subCategoryId, editCategoryId, "ooooo");
+      await updateSubCategory(editSubCategoryName, subCategoryId);
+      setEditSubCategoryId(null);
+      const catId = getCategoryBySubcategoryId(subCategoryId);
+      await getSubCategoryData(catId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCancelSubCategory = () => {
+    setEditSubCategoryId(null);
+    setEditSubCategoryName("");
+  };
+
+  useEffect(() => {
+    getCategoryData();
+  }, []);
+
+  const addProductHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const currentStatus =
+        e.submitter.textContent === "Add Product" ? "published" : "draft";
+      setFormData((prev) => ({ ...prev, status: currentStatus }));
+
+      console.log(formData, "FFFFFOOORRRRMm");
+      await createProduct(formData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // --------------------------------------------------------------------------------------------------------
@@ -309,29 +375,8 @@ export default function Admin() {
     </Box>
   );
 
-  const [drafts, setDrafts] = useState([
-    { title: "Banarasi Silk Saari", date: "01/09/24" },
-    { title: "Designer Silk Saari", date: "01/09/24" },
-    { title: "Designer Silk Saari", date: "01/09/24" },
-    // Add more drafts as needed
-  ]);
-
-  const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    quantity: 1,
-    description: "",
-    price: "",
-    discount: "",
-    artisanName: "",
-    images: [],
-    subCategory: "",
-    attributes: [],
-    singleImage: null,
-  });
-
   useEffect(() => {
-    setFormData({ ...formData, attributes: savedVariants });
+    setFormData({ ...formData, _attributes: savedVariants });
   }, [savedVariants]);
 
   // Dropzone for multiple images
@@ -340,13 +385,16 @@ export default function Admin() {
     getInputProps: getInputPropsMultiple,
     isDragActive: isDragActiveMultiple,
   } = useDropzone({
+    accept: {
+      "image/*": [".jpeg", ".png", ".jpg", ".gif"],
+    },
     onDrop: (acceptedFiles) => {
       setFormData({
         ...formData,
-        images: [...formData.images, ...acceptedFiles],
+        productImage: [...formData.productImage, ...acceptedFiles],
       });
     },
-    accept: "image/*", // Only accept images
+
     maxFiles: 5, // Limit to 5 images for multiple upload
   });
 
@@ -358,10 +406,12 @@ export default function Admin() {
   } = useDropzone({
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
-        setFormData({ ...formData, singleImage: acceptedFiles[0] });
+        setFormData({ ...formData, artisanImage: acceptedFiles[0] });
       }
     },
-    accept: "image/*", // Only accept images
+    accept: {
+      "image/*": [".jpeg", ".png", ".jpg", ".gif"],
+    },
     maxFiles: 1, // Limit to 1 image
   });
 
@@ -480,12 +530,7 @@ export default function Admin() {
             </div>
 
             {/* Main Form */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault;
-                console.log("FORM DATA", formData);
-              }}
-            >
+            <form onSubmit={addProductHandler}>
               <div className="form-main">
                 {/* Left Section: Image Upload */}
                 <div className="image-upload">
@@ -512,7 +557,7 @@ export default function Admin() {
                     className="image-thumbnails"
                     style={{ marginTop: "20px" }}
                   >
-                    {formData.images.map((file, index) => (
+                    {formData.productImage.map((file, index) => (
                       <img
                         key={index}
                         src={URL.createObjectURL(file)}
@@ -543,9 +588,9 @@ export default function Admin() {
                         id="productTitle"
                         label="Product & Title"
                         variant="outlined"
-                        value={formData.title}
+                        value={formData.name}
                         onChange={(e) =>
-                          setFormData({ ...formData, title: e.target.value })
+                          setFormData({ ...formData, name: e.target.value })
                         }
                       />
                     </div>
@@ -556,26 +601,38 @@ export default function Admin() {
                         label="Quantity"
                         type="number"
                         variant="outlined"
-                        value={formData.quantity}
+                        value={formData.stock}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            quantity: e.target.value,
+                            stock: e.target.value,
                           })
                         }
                       />
                     </div>
                   </article>
+                  {/* -----------------------------------------------Category Section----------------------------------------------------------------------------------------- */}
                   <article>
                     <div>
                       <Autocomplete
                         sx={{ width: "100%" }}
                         disablePortal
-                        options={categories.map((c) => c.name)}
-                        value={formData.category}
-                        onChange={(e, newValue) =>
-                          setFormData({ ...formData, category: newValue })
+                        options={categories}
+                        getOptionLabel={(option) => option?.name || ""}
+                        value={
+                          categories.find(
+                            (cat) => cat._id === formData.category
+                          ) || null
                         }
+                        onChange={(e, newCategory) => {
+                          getSubCategoryData(newCategory._id);
+                          setFormData({
+                            ...formData,
+                            category: newCategory._id,
+                            subCategory: "",
+                          });
+                        }}
+                        loading={loadingStates.category}
                         renderInput={(params) => (
                           <TextField {...params} label="Category" />
                         )}
@@ -588,7 +645,6 @@ export default function Admin() {
                           sx={{
                             width: "100%",
                             height: "100%",
-                            borderRadius: "0px",
                             backgroundColor: "#5f3dc3",
                             color: "white",
                             borderRadius: "0.4rem",
@@ -619,9 +675,12 @@ export default function Admin() {
                         </IconButton>
                       </div>
                     </Box>
+
+                    {/* ----------------------------------------------ADD Category Dialog Box-------------------------------------------------------------------------- */}
+
                     <Dialog
                       open={addCategoryPopup}
-                      onClose={closeAddCategoryPopup}
+                      onClose={() => setAddCategoryPopup(false)}
                       maxWidth="sm"
                       sx={{
                         "& .MuiDialog-paper": {
@@ -652,14 +711,14 @@ export default function Admin() {
                             fullWidth
                             variant="outlined"
                             value={categoryName}
-                            onChange={(e) => setCategoryName(e.target.value)} // Update category state on input change
+                            onChange={(e) => setCategoryName(e.target.value)}
                           />
                         </Box>
                       </DialogContent>
                       <DialogActions sx={{ padding: "0 2.4rem 1.6rem" }}>
                         <Button
                           size="large"
-                          onClick={closeAddCategoryPopup}
+                          onClick={() => setAddCategoryPopup(false)}
                           variant="contained"
                           sx={{
                             backgroundColor: "#d32f2f",
@@ -683,6 +742,7 @@ export default function Admin() {
                         </Button>
                       </DialogActions>
                     </Dialog>
+                    {/* ----------------------------------------------EDIT Category Dialog Box-------------------------------------------------------------------------- */}
 
                     <Dialog
                       open={viewCategoriesPopup}
@@ -741,37 +801,82 @@ export default function Admin() {
                                 },
                               }}
                             >
-                              <Typography
-                                sx={{
-                                  fontSize: "1.6rem",
-                                  color: "#4a4a4a",
-                                }}
-                              >
-                                {category.name}
-                              </Typography>
+                              {editCategoryId === category._id ? (
+                                // Render input field if this category is being edited
+                                <TextField
+                                  value={editCategoryName}
+                                  onChange={(e) =>
+                                    setEditCategoryName(e.target.value)
+                                  }
+                                  size="small"
+                                  autoFocus
+                                />
+                              ) : (
+                                // Otherwise render the category name
+                                <Typography
+                                  sx={{
+                                    fontSize: "1.6rem",
+                                    color: "#4a4a4a",
+                                  }}
+                                >
+                                  {category.name}
+                                </Typography>
+                              )}
                               <Box sx={{ display: "flex", gap: 1 }}>
-                                {/* Edit Icon with Tooltip */}
-                                <Tooltip title="Edit">
-                                  <IconButton
-                                    aria-label="edit"
-                                    color="primary"
-                                    onClick={() => handleEditCategory(category)}
-                                  >
-                                    <EditIcon />
-                                  </IconButton>
-                                </Tooltip>
-                                {/* Delete Icon with Tooltip */}
-                                <Tooltip title="Delete">
-                                  <IconButton
-                                    aria-label="delete"
-                                    color="error"
-                                    onClick={() =>
-                                      handleDeleteCategory(category._id)
-                                    }
-                                  >
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </Tooltip>
+                                {editCategoryId === category._id ? (
+                                  // Show save and cancel buttons during editing
+                                  <>
+                                    <Tooltip title="Save">
+                                      <IconButton
+                                        aria-label="save"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleSaveCategory(category._id)
+                                        }
+                                      >
+                                        <CheckIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Cancel">
+                                      <IconButton
+                                        aria-label="cancel"
+                                        color="error"
+                                        onClick={handleCancelCategory}
+                                      >
+                                        <CloseIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </>
+                                ) : (
+                                  // Show edit and delete buttons when not editing
+                                  <>
+                                    <Tooltip title="Edit">
+                                      <IconButton
+                                        aria-label="edit"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleEditCategory(
+                                            category.name,
+                                            category._id
+                                          )
+                                        }
+                                      >
+                                        <EditIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+                                      <IconButton
+                                        aria-label="delete"
+                                        color="error"
+                                        onClick={() =>
+                                          handleDeleteCategory(category._id)
+                                        }
+                                      >
+                                        <DeleteIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </>
+                                )}
                               </Box>
                             </Box>
                           ))}
@@ -795,6 +900,7 @@ export default function Admin() {
                       }
                     />
                   </article>
+                  {/* -----------------------------------------------Sub Category Section----------------------------------------------------------------------------------------- */}
                   <article>
                     <Box
                       sx={{
@@ -828,7 +934,7 @@ export default function Admin() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              discount: e.target.value,
+                              discountPercentage: e.target.value,
                             })
                           }
                         />
@@ -837,14 +943,20 @@ export default function Admin() {
                         <Autocomplete
                           sx={{ width: "100%" }}
                           disablePortal
-                          options={["tie", "lengha", "kurta"]}
-                          value={formData.subCategory}
-                          onChange={(e, newValue) =>
+                          options={subCategories}
+                          getOptionLabel={(option) => option?.name || ""}
+                          value={
+                            subCategories.find(
+                              (subCat) => subCat._id === formData.subCategory
+                            ) || null
+                          }
+                          loading={loadingStates.subcategory}
+                          onChange={(e, newValue) => {
                             setFormData({
                               ...formData,
-                              subCategory: newValue,
-                            })
-                          }
+                              subCategory: newValue._id,
+                            });
+                          }}
                           renderInput={(params) => (
                             <TextField {...params} label="Sub Category" />
                           )}
@@ -888,10 +1000,10 @@ export default function Admin() {
                         </IconButton>
                       </div>
                     </Box>
-
+                    {/* ----------------------------------------------ADD Sub Category Dialog Box-------------------------------------------------------------------------- */}
                     <Dialog
                       open={addSubCategoryPopup}
-                      onClose={closeAddSubCategoryPopup}
+                      onClose={() => setAddSubCategoryPopup(false)}
                       maxWidth="sm"
                       sx={{
                         "& .MuiDialog-paper": {
@@ -912,25 +1024,40 @@ export default function Admin() {
                             display: "flex",
                             flexDirection: "column",
                             gap: 2,
-                            marginY: "0.5rem",
+                            marginY: "1rem",
                           }}
                         >
+                          <Autocomplete
+                            sx={{ width: "100%" }}
+                            disablePortal
+                            options={categories}
+                            getOptionLabel={(option) => option?.name || ""}
+                            value={parentCategory}
+                            onChange={(e, newValue) =>
+                              setParentCategory(newValue)
+                            }
+                            renderInput={(params) => (
+                              <TextField {...params} label="Parent Category" />
+                            )}
+                          />
                           <TextField
                             autoFocus
                             margin="dense"
                             id="categoryName"
-                            label=""
+                            label="Sub Category Name"
                             type="text"
                             fullWidth
                             variant="outlined"
-                            value={categoryName}
-                            onChange={(e) => setSubCategoryName(e.target.value)} // Update category state on input change
+                            value={subCategoryName}
+                            onChange={(e) => {
+                              setSubCategoryName(e.target.value);
+                            }}
                           />
                         </Box>
                       </DialogContent>
                       <DialogActions sx={{ padding: "0 2.4rem 1.6rem" }}>
                         <Button
-                          onClick={closeAddSubCategoryPopup}
+                          onClick={() => setAddSubCategoryPopup(false)}
                           variant="contained"
                           sx={{
                             backgroundColor: "#d32f2f",
@@ -953,6 +1080,7 @@ export default function Admin() {
                         </Button>
                       </DialogActions>
                     </Dialog>
+                    {/* ----------------------------------------------EDIT Sub Category Dialog Box-------------------------------------------------------------------------- */}
                     <Dialog
                       open={viewSubCategoriesPopup}
                       onClose={() => setViewSubCategoriesPopup(false)}
@@ -967,7 +1095,7 @@ export default function Admin() {
                       }}
                     >
                       <DialogTitle sx={{ fontSize: "1.8rem" }}>
-                        Sub Categories
+                        Sub Category
                         <IconButton
                           aria-label="close"
                           onClick={() => setViewSubCategoriesPopup(false)}
@@ -975,7 +1103,6 @@ export default function Admin() {
                             position: "absolute",
                             right: "1.6rem",
                             top: "1.6rem",
-
                             color: (theme) => theme.palette.grey[500],
                           }}
                         >
@@ -987,7 +1114,7 @@ export default function Admin() {
                           sx={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: 1,
+                            gap: 2,
                           }}
                         >
                           {subCategories.map((subCategory) => (
@@ -997,62 +1124,95 @@ export default function Admin() {
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
+                                padding: "1rem 0",
                                 borderBottom: "1px solid #e0e0e0",
-                                padding: "8px 0",
-                                fontSize: "1.4rem",
                                 "&:hover": {
                                   backgroundColor: "#f9f9f9",
                                 },
                               }}
                             >
-                              <Typography
-                                sx={{ fontSize: "1.4rem", color: "#4a4a4a" }}
-                              >
-                                {subCategory.name}
-                              </Typography>
+                              {editSubCategoryId === subCategory._id ? (
+                                // Render input field if this subcategory is being edited
+                                <TextField
+                                  value={editSubCategoryName}
+                                  onChange={(e) =>
+                                    setEditSubCategoryName(e.target.value)
+                                  }
+                                  size="small"
+                                  autoFocus
+                                />
+                              ) : (
+                                // Otherwise render the subcategory name
+                                <Typography
+                                  sx={{ fontSize: "1.4rem", color: "#4a4a4a" }}
+                                >
+                                  {subCategory.name}
+                                </Typography>
+                              )}
                               <Box sx={{ display: "flex", gap: 1 }}>
-                                {/* Edit Icon with Tooltip */}
-                                <Tooltip title="Edit">
-                                  <IconButton
-                                    aria-label="edit"
-                                    color="primary"
-                                    onClick={() =>
-                                      handleEditSubCategory(subCategory)
-                                    }
-                                  >
-                                    <EditIcon />
-                                  </IconButton>
-                                </Tooltip>
-                                {/* Delete Icon with Tooltip */}
-                                <Tooltip title="Delete">
-                                  <IconButton
-                                    aria-label="delete"
-                                    color="error"
-                                    onClick={() =>
-                                      handleDeleteSubCategory(subCategory._id)
-                                    }
-                                  >
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </Tooltip>
+                                {editSubCategoryId === subCategory._id ? (
+                                  // Show save and cancel buttons during editing
+                                  <>
+                                    <Tooltip title="Save">
+                                      <IconButton
+                                        aria-label="save"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleSaveSubCategory(subCategory._id)
+                                        }
+                                      >
+                                        <CheckIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Cancel">
+                                      <IconButton
+                                        aria-label="cancel"
+                                        color="error"
+                                        onClick={handleCancelSubCategory}
+                                      >
+                                        <CloseIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </>
+                                ) : (
+                                  // Show edit and delete buttons when not editing
+                                  <>
+                                    <Tooltip title="Edit">
+                                      <IconButton
+                                        aria-label="edit"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleEditSubCategory(
+                                            subCategory.name,
+                                            subCategory._id
+                                          )
+                                        }
+                                        sx={{ color: "#5f3dc3" }}
+                                      >
+                                        <EditIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+                                      <IconButton
+                                        aria-label="delete"
+                                        color="error"
+                                        onClick={() =>
+                                          handleDeleteSubCategory(
+                                            subCategory._id
+                                          )
+                                        }
+                                        sx={{ color: "#d32f2f" }}
+                                      >
+                                        <DeleteIcon />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </>
+                                )}
                               </Box>
                             </Box>
                           ))}
                         </Box>
                       </DialogContent>
-                      {/* <DialogActions sx={{ padding: "0 2.4rem 1.6rem" }}>
-                        <Button
-                          onClick={() => setViewSubCategoriesPopup(false)}
-                          variant="contained"
-                          size="large"
-                          sx={{
-                            backgroundColor: "#d32f2f",
-                            fontSize: "1.2rem",
-                          }}
-                        >
-                          Close
-                        </Button>
-                      </DialogActions> */}
                     </Dialog>
                   </article>
 
@@ -1277,9 +1437,9 @@ export default function Admin() {
                         )}
 
                         {/* Show the image inside the dotted area */}
-                        {formData.singleImage && (
+                        {formData.artisanImage && (
                           <img
-                            src={URL.createObjectURL(formData.singleImage)}
+                            src={URL.createObjectURL(formData.artisanImage)}
                             alt="Preview"
                             style={{
                               width: "100%",
@@ -1301,11 +1461,12 @@ export default function Admin() {
                           label="About Artisan"
                           multiline
                           rows={8}
+                          value={formData.artisanAbout}
                           variant="outlined"
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              aboutArtisan: e.target.value,
+                              artisanAbout: e.target.value,
                             })
                           }
                         />
@@ -1327,71 +1488,14 @@ export default function Admin() {
                       >
                         Add Product
                       </Button>
-                      <Button variant="outlined" color="success">
+                      <Button type="submit" variant="outlined" color="success">
                         Save As Draft
                       </Button>
                     </Box>
                   </article>
                 </div>
-
                 {/* Sidebar */}
-
-                <div className="draft-sidebar">
-                  <div className="draft-sidebar-header">
-                    <h2>Drafts</h2>
-
-                    <div style={{ position: "relative" }}>
-                      <input
-                        type="text"
-                        readOnly
-                        value={`${formatDate(range[0].startDate)} - ${formatDate(range[0].endDate)}`} // Apply the format
-                        onClick={handleDateClick} // Opens the calendar when clicked
-                        style={{
-                          padding: "10px",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                        }}
-                      />
-
-                      {/* Calendar Popup */}
-                      {isOpen && (
-                        <div
-                          ref={calendarRef} // Reference for outside click detection
-                          style={{
-                            position: "absolute",
-                            top: "40px",
-                            left: "-100%",
-                            zIndex: 10,
-                            background: "#fff",
-                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                            borderRadius: "8px",
-                          }}
-                        >
-                          <DateRange
-                            onChange={(item) => setRange([item.selection])}
-                            moveRangeOnFirstSelection={false}
-                            ranges={range}
-                            showDateDisplay={false}
-                            months={1}
-                            direction="horizontal"
-                            staticRanges={[]} // Removes predefined ranges
-                            inputRanges={[]} // Removes custom input ranges
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="draft-list">
-                    {drafts.map((draft, index) => (
-                      <div key={index} className="draft-item">
-                        <p>{draft.title}</p>
-                        <span>{draft.date}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <SidebarDraft />
               </div>
             </form>
           </div>
