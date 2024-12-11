@@ -7,9 +7,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependency directories
 node_modules
+
+# Build output
 dist
 dist-ssr
+
+# Local environment files
 *.local
 *.env
 
@@ -24,5 +29,7 @@ dist-ssr
 *.sln
 *.sw?
 
+# Ignore specific environment files
 .env
+.env.*
 .vercel
