@@ -10,8 +10,8 @@ import TrackPageView from "./utils/analytics/TrackPageView"; // Import the track
 import "./App.css";
 
 // Import Pages
-import Navbar from "./components/layout/navbar/Navbar";
-import Footer from "./components/layout/footer/Footer";
+import Navbar from "./components/layout/user/navbar/Navbar";
+import Footer from "./components/layout/user/footer/Footer";
 
 import Home from "./pages/home/Home";
 import About from "./pages/about/About";
@@ -23,7 +23,7 @@ import BuyNow from "./pages/buy-now/index";
 import PlaceOrder from "./pages/place-order";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
-import User from "./components/layout/user/User";
+import UserProfile from "./components/layout/user/UserProfile/UserProfile";
 import Order from "./pages/user/order/Order";
 import Address from "./pages/user/address/Address";
 import Profile from "./pages/user/profile/Profile";
@@ -121,7 +121,7 @@ export default function App() {
             path="/user/*"
             element={
               <ProtectedRoute>
-                <User />
+                <UserProfile />
               </ProtectedRoute>
             }
           >

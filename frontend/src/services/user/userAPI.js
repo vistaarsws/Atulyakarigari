@@ -10,4 +10,9 @@ const createProduct = async (productObj) => {
   return response;
 };
 
-export { createProduct };
+const getProducts = async () => {
+  const response = await apiConnector("POST", user_endpoints.CREATE_PRODUCT);
+  return response;
+};
+
+export { createProduct, getProducts };

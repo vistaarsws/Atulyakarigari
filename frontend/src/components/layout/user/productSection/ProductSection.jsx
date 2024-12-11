@@ -1,7 +1,7 @@
-import ProductCard from "../../ui/cards/productCard/ProductCard";
-import pattern from "../../../assets/images/designPattern_1.svg";
-import { EmblaSlider } from "../../ui/slider/EmblaSlider";
-import { top_product_list_from_category } from "../../../utils/Constant";
+import ProductCard from "../../../ui/cards/productCard/ProductCard";
+import pattern from "../../../../assets/images/designPattern_1.svg";
+import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
+import { top_product_list_from_category } from "../../../../utils/Constant";
 
 import "./ProductSection.css";
 import PropTypes from "prop-types";
