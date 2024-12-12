@@ -8,21 +8,15 @@ const wishlistSchema = new mongoose.Schema({
     },
     items: [
         {
-            productId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
-                required: true
-            },
-            addedAt: {
-                type: Date,
-                default: Date.now
-            }
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product',
+            required: true
         }
     ]
 }, {
     timestamps: true
 });
 
-// Create Wishlist Model
+
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 export default Wishlist;
