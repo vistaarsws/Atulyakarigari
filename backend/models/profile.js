@@ -5,6 +5,7 @@ const profileSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    profilePicture: String,
     gender: {
         type: String
     },

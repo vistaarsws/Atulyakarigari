@@ -65,7 +65,8 @@ export default function App() {
 
   useEffect(() => {
     initializeAnalytics();
-    initializeMetaPixel(import.meta.env.Pixel_ID);
+     
+    initializeMetaPixel(import.meta.env.VITE_PIXEL_ID);
   }, []);
 
   console.log("userContext", userContext?.accountType);
