@@ -32,10 +32,10 @@ export const auth = async (req, res, next) => {
 export const isUser = async (req, res, next) => {
     try {
         const user = req.user
-        if (user.accountType === "student") {
+        if (user.role === "customer") {
             next()
         } else {
-            return badRequest(req, res, null, "you are not an admin")
+            return badRequest(req, res, null, "you are not an Customer")
         }
     } catch (err) {
         console.log(err);
