@@ -14,6 +14,7 @@ import subCategoryRoutes from "./routes/sub-category.routes.js";
 import profileRoutes from "./routes/prfile.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import healthRoutes from "./routes/health.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js"
 
 // Enhanced console styling with emojis and better formatting
 const log = {
@@ -71,7 +72,7 @@ app.use(
 // Enhanced request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
-  
+
   // Override end function to log response details
   const oldEnd = res.end;
   res.end = function () {
@@ -79,7 +80,7 @@ app.use((req, res, next) => {
     log.route(req.method, req.path, res.statusCode, duration);
     return oldEnd.apply(this, arguments);
   };
-  
+
   next();
 });
 
@@ -88,9 +89,9 @@ if (NODE_ENV === "development") {
   morgan.token('statusColor', (req, res) => {
     const status = res.statusCode;
     return status >= 500 ? chalk.red(status) :
-           status >= 400 ? chalk.yellow(status) :
-           status >= 300 ? chalk.cyan(status) :
-           chalk.green(status);
+      status >= 400 ? chalk.yellow(status) :
+        status >= 300 ? chalk.cyan(status) :
+          chalk.green(status);
   });
 
   app.use(morgan((tokens, req, res) => {
@@ -106,6 +107,8 @@ app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/health", healthRoutes);
+app.use("/api/v1/wishlist", wishlistRoutes);
+
 
 
 
@@ -127,10 +130,10 @@ const initializeServices = async () => {
 
     await cloudinaryConnect();
     log.cloud("Connection established successfully");
-    
+
     console.log(chalk.gray("━".repeat(60)) + "\n");
-    
-     
+
+
 
   } catch (error) {
     log.error("Failed to initialize services:");
