@@ -13,6 +13,7 @@ import {
   isPhoneNumber,
   verifyOtp,
 } from "../utils/otp/index.js";
+import { createProfileForUser } from "./profile.controller.js";
 
 //  OTP generator
 export const sendOtp = async (req, res) => {
@@ -149,6 +150,15 @@ export const register = async (req, res) => {
         console.error("Error saving new user to database:", err);
         return internalServerError(req, res, err, "User registration failed");
       }
+
+      // Create a profile for the new user
+      try {
+        await createProfileForUser(newUser , isEmailLogin,loginId);
+      } catch (err) {
+        console.error("Error creating profile:", err);
+        return internalServerError(req, res, err, "Profile creation failed");
+      }
+
       // Generate auth token for the new user
       let token;
       try {
@@ -208,6 +218,14 @@ export const register = async (req, res) => {
         } catch (err) {
           console.error("Error saving new user to database:", err);
           return internalServerError(req, res, err, "User registration failed");
+        }
+
+        // Create a profile for the new user
+        try {
+          await createProfileForUser(newUser);
+        } catch (err) {
+          console.error("Error creating profile:", err);
+          return internalServerError(req, res, err, "Profile creation failed");
         }
 
         // Generate auth token

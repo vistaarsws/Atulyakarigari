@@ -5,7 +5,7 @@ import "dotenv/config"
 
 const userSchema = new mongoose.Schema({
     googleId: String,
-    profilePicture: String,
+    
     fullName: {
         type: String,
         required: true,

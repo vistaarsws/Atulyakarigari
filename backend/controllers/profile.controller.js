@@ -8,113 +8,37 @@ import {
   notFoundRequest,
 } from "../helpers/api-response.js";
 
-// Create a new profile
-export const createProfile = async (req, res) => {
+
+
+export const createProfileForUser = async (user) => {
   try {
-    const userId = req.user?._id;
+      const { _id: userId, fullName, email, phone, accountType, createdAt, updatedAt } = user;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return badRequest(req, res, null, "Invalid user ID format");
-    }
+      // Construct profile data
+      const profileData = {
+          userId,
+          profilePicture: "",
+          gender: "",
+          dateOfBirth: "",
+          about: "",
+          contactNumber: phone || "",
+          alternativeContactNumber: "",
+          hintName: "",
+          location: "",
+      };
 
-    // Check if the user already has a profile
-    const existingProfile = await Profile.findOne({ userId });
-    if (existingProfile) {
-      return badRequest(req, res, null, "User already has a profile");
-    }
+      // Create and save the profile
+      const newProfile = new Profile(profileData);
+      await newProfile.save();
 
-    // Check if the contact number is already in use
-    const existingContact = await Profile.findOne({
-      contactNumber: req.body.contactNumber,
-    });
-    if (existingContact) {
-      return badRequest(req, res, null, "Contact number already in use");
-    }
+      // Link the profile to the user
+      user.additionalDetails = newProfile._id;
+      await user.save();
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return notFoundRequest(req, res, null, "User not found");
-    }
-
-    // Extract and validate profile data
-    const {
-      gender,
-      dateOfBirth,
-      about,
-      contactNumber,
-      alternativeContactNumber,
-      hintName,
-      location,
-    } = req.body;
-
-    const missingFields = [];
-    if (!gender) missingFields.push("gender");
-    if (!dateOfBirth) missingFields.push("dateOfBirth");
-    if (!about) missingFields.push("about");
-    if (!contactNumber) missingFields.push("contactNumber");
-    if (!hintName) missingFields.push("hintName");
-    if (!location) missingFields.push("location");
-
-    if (missingFields.length > 0) {
-      return badRequest(
-        req,
-        res,
-        null,
-        `Missing required fields: ${missingFields.join(", ")}`
-      );
-    }
-
-    // Validate contact number formats
-    if (
-      typeof contactNumber !== "number" ||
-      contactNumber.toString().length !== 10
-    ) {
-      return badRequest(req, res, null, "Invalid contact number format");
-    }
-
-    if (
-      alternativeContactNumber &&
-      (typeof alternativeContactNumber !== "number" ||
-        alternativeContactNumber.toString().length !== 10)
-    ) {
-      return badRequest(
-        req,
-        res,
-        null,
-        "Invalid alternative contact number format"
-      );
-    }
-
-    if (isNaN(Date.parse(dateOfBirth))) {
-      return badRequest(req, res, null, "Invalid dateOfBirth format");
-    }
-
-    // Construct profile data
-    const profileData = {
-      gender,
-      dateOfBirth,
-      about,
-      contactNumber,
-      alternativeContactNumber,
-      hintName,
-      location,
-    };
-
-    // Create and save the profile
-    const newProfile = new Profile({ ...profileData, userId });
-    await newProfile.save();
-
-    // Link the profile to the user
-    user.additionalDetails = newProfile._id;
-    await user.save();
-
-    // Respond with success
-    return success(req, res, "Profile created successfully", {
-      data: newProfile,
-    });
+      return newProfile;
   } catch (error) {
-    console.error("Error creating profile:", error);
-    return internalServerError(req, res, error, "Error creating profile");
+      console.error("Error creating profile:", error);
+      throw new Error("Error creating profile");
   }
 };
 
