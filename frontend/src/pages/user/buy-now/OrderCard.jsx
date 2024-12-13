@@ -13,9 +13,9 @@ import {
 import { margin, styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
-import TEST_IMG1 from "../../assets/images/banarshi sharee.png";
-import TEST_IMG2 from "../../assets/images/Necklace.png";
-import TEST_IMG3 from "../../assets/images/Necklace1.png";
+import TEST_IMG1 from "../../../assets/images/banarshi sharee.png";
+import TEST_IMG2 from "../../../assets/images/Necklace.png";
+import TEST_IMG3 from "../../../assets/images/Necklace1.png";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const theme = createTheme({

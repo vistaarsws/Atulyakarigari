@@ -11,7 +11,7 @@ const createProduct = async (productObj) => {
 };
 
 const getProducts = async () => {
-  const response = await apiConnector("POST", user_endpoints.CREATE_PRODUCT);
+  const response = await apiConnector("GET", user_endpoints.GET_PRODUCT);
   return response;
 };
 

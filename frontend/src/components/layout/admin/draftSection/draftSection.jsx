@@ -5,7 +5,9 @@ import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 // -------------------------------------------------------------------------------------------------
 
-export default function SidebarDraft() {
+import "./DraftSection.css";
+
+export default function DraftSection({ draftProducts }) {
   const [range, setRange] = useState([
     {
       startDate: new Date(),
@@ -13,13 +15,7 @@ export default function SidebarDraft() {
       key: "selection",
     },
   ]);
-
-  const [drafts, setDrafts] = useState([
-    { title: "Banarasi Silk Saari", date: "01/09/24" },
-    { title: "Designer Silk Saari", date: "01/09/24" },
-    { title: "Designer Silk Saari", date: "01/09/24" },
-    // Add more drafts as needed
-  ]);
+  console.log(draftProducts, "DDDDDDDDDDDDDDDDDD");
 
   const [isOpen, setIsOpen] = useState(false); // State to toggle the calendar visibility
   const calendarRef = useRef(null);
@@ -95,12 +91,13 @@ export default function SidebarDraft() {
         </div>
 
         <div className="draft-list">
-          {drafts.map((draft, index) => (
+          {draftProducts?.map((draftProduct, index) => (
             <div key={index} className="draft-item">
-              <p>{draft.title}</p>
-              <span>{draft.date}</span>
+              <p>{draftProduct.name}</p>
+              <span>{draftProduct.createdAt}</span>
             </div>
           ))}
+          {draftProducts.length === 0 && <p>No Draft Added</p>}
         </div>
       </div>
     </>

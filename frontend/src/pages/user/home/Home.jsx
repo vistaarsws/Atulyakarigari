@@ -1,38 +1,38 @@
 import "./Home.css";
-import { EmblaSlider } from "../../components/ui/slider/EmblaSlider";
-import { HeroBanner_array } from "../../utils/Constant";
-import artistry_1 from "../../assets/images/cat5_2.png";
-import artistry_2 from "../../assets/images/artistry_2.png";
-import artistry_3 from "../../assets/images/artistry_3.png";
-import bg_pattern from "../../assets/images/bgSidePattern.svg";
-import ProductSection from "../../components/layout/user/productSection/ProductSection";
+import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
+import { HeroBanner_array } from "../../../utils/Constant";
+import artistry_1 from "../../../assets/images/cat5_2.png";
+import artistry_2 from "../../../assets/images/artistry_2.png";
+import artistry_3 from "../../../assets/images/artistry_3.png";
+import bg_pattern from "../../../assets/images/bgSidePattern.svg";
+import ProductSection from "../../../components/layout/user/productSection/ProductSection";
 
-import cat1_1 from "../../assets/images/cat2_1.png";
-import cat1_2 from "../../assets/images/cat2_2.png";
-import cat1_3 from "../../assets/images/cat2_3.png";
-import cat1_4 from "../../assets/images/cat2_4.png";
-import cat1_5 from "../../assets/images/cat2_5.png";
+import cat1_1 from "../../../assets/images/cat2_1.png";
+import cat1_2 from "../../../assets/images/cat2_2.png";
+import cat1_3 from "../../../assets/images/cat2_3.png";
+import cat1_4 from "../../../assets/images/cat2_4.png";
+import cat1_5 from "../../../assets/images/cat2_5.png";
 
-import cat3_1 from "../../assets/images/cat_3_1.png";
-import cat3_2 from "../../assets/images/cat_3_2.png";
-import cat3_3 from "../../assets/images/cat_3_3.png";
-import cat3_4 from "../../assets/images/cat_3_4.png";
-import cat3_5 from "../../assets/images/cat_3_5.png";
-import cat3_6 from "../../assets/images/cat_3_1.png";
+import cat3_1 from "../../../assets/images/cat_3_1.png";
+import cat3_2 from "../../../assets/images/cat_3_2.png";
+import cat3_3 from "../../../assets/images/cat_3_3.png";
+import cat3_4 from "../../../assets/images/cat_3_4.png";
+import cat3_5 from "../../../assets/images/cat_3_5.png";
+import cat3_6 from "../../../assets/images/cat_3_1.png";
 
-import cat4_1 from "../../assets/images/cat_4_1.png";
-import cat4_2 from "../../assets/images/cat_4_2.png";
-import cat4_3 from "../../assets/images/cat_4_3.png";
-import cat4_4 from "../../assets/images/cat_4_4.png";
-import cat4_5 from "../../assets/images/cat_4_5.png";
+import cat4_1 from "../../../assets/images/cat_4_1.png";
+import cat4_2 from "../../../assets/images/cat_4_2.png";
+import cat4_3 from "../../../assets/images/cat_4_3.png";
+import cat4_4 from "../../../assets/images/cat_4_4.png";
+import cat4_5 from "../../../assets/images/cat_4_5.png";
 
-import cat5_1 from "../../assets/images/cat5_1.png";
-import cat5_2 from "../../assets/images/cat5_2.png";
-import cat5_3 from "../../assets/images/cat5_3.png";
-import cat5_4 from "../../assets/images/cat5_4.png";
-import cat5_5 from "../../assets/images/cat5_5.png";
-import cat5_6 from "../../assets/images/cat5_1.png";
-import CategoryView from "../../components/layout/user/categoryView/CategoryView";
+import cat5_1 from "../../../assets/images/cat5_1.png";
+import cat5_2 from "../../../assets/images/cat5_2.png";
+import cat5_3 from "../../../assets/images/cat5_3.png";
+import cat5_4 from "../../../assets/images/cat5_4.png";
+import cat5_5 from "../../../assets/images/cat5_5.png";
+import cat5_6 from "../../../assets/images/cat5_1.png";
+import CategoryView from "../../../components/layout/user/categoryView/CategoryView";
 import { useMediaQuery } from "@mui/material";
 
 export default function Home() {

@@ -8,8 +8,8 @@ import {
 import PriceRangeSlider from "./PriceRangeSlider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import "./CategoryPage.css";
-import toggleArrow from "../../assets/images/left-arrow-return-svgrepo-com.svg";
-import toggleFilter from "../../assets/images/filter-list-svgrepo-com.svg";
+import toggleArrow from "../../../assets/images/left-arrow-return-svgrepo-com.svg";
+import toggleFilter from "../../../assets/images/filter-list-svgrepo-com.svg";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 

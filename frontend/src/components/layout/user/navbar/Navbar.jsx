@@ -25,7 +25,9 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
   // const location = useLocation();
-  const { userContext, onLogout } = useAuth();
+  const { loginContext, logoutContext, authContext, setAuthContext } =
+    useAuth();
+
   const { enqueueSnackbar } = useSnackbar();
   // const cookies = Cookies.get("authToken");
 
@@ -73,7 +75,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const logoutHandler = (isLogout) => {
     if (isLogout === "Logout") {
       enqueueSnackbar("Logout Successfully", { variant: "success" });
-      onLogout();
+      logoutContext();
     }
   };
 
@@ -344,7 +346,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           )}
         </div>
 
-        {userContext?.token && (
+        {authContext && (
           <IconButton
             aria-label={notificationsLabel(100)}
             onClick={() => navigate("/user/wishlist")}
@@ -369,7 +371,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseEnter={() => setIsProfileHovered(true)}
           onMouseLeave={() => setIsProfileHovered(false)}
         >
-          {userContext?.token ? (
+          {authContext ? (
             <img src={userProfile} alt="User Profile" />
           ) : (
             <Avatar src="/broken-image.jpg" />
@@ -377,7 +379,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
           {isProfileHovered && (
             <div className="profile-dropdown">
-              {userContext?.token && (
+              {authContext && (
                 <div
                   onClick={() => {
                     navigate("/user/profile");
@@ -388,7 +390,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <p>8175961513</p>
                 </div>
               )}
-              {userContext?.token ? (
+              {authContext ? (
                 <ul>
                   {menuItems.map((item, index) => (
                     <li key={index}>

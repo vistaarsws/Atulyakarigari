@@ -13,22 +13,22 @@ import "./App.css";
 import Navbar from "./components/layout/user/navbar/Navbar";
 import Footer from "./components/layout/user/footer/Footer";
 
-import Home from "./pages/home/Home";
-import About from "./pages/about/About";
-import Categories from "./pages/categories/index";
-import Blogs from "./pages/blogs/Blogs";
-import Product from "./pages/product/Product";
-import Artisans from "./pages/artisans/Artisans";
-import BuyNow from "./pages/buy-now/index";
-import PlaceOrder from "./pages/place-order";
+import Home from "./pages/user/home/Home";
+import About from "./pages/user/about/About";
+import Categories from "./pages/user/categories/index";
+import Blogs from "./pages/user/blogs/Blogs";
+import Product from "./pages/user/product/Product";
+import Artisans from "./pages/user/artisans/Artisans";
+import BuyNow from "./pages/user/buy-now/index";
+import PlaceOrder from "./pages/user/place-order";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
 import UserProfile from "./components/layout/user/UserProfile/UserProfile";
-import Order from "./pages/user/order/Order";
-import Address from "./pages/user/address/Address";
-import Profile from "./pages/user/profile/Profile";
-import Wishlist from "./pages/user/wishlist/Wishlist";
-import Logout from "./pages/user/logout/Logout";
+import Order from "./pages/user/profile/order/Order";
+import Address from "./pages/user/profile/address/Address";
+import Profile from "./pages/user/profile/profile/Profile";
+import Wishlist from "./pages/user/profile/wishlist/Wishlist";
+import Logout from "./pages/user/profile/logout/Logout";
 import Admin from "./pages/admin/Admin";
 import AdminRoute from "./utils/AdminRoute";
 

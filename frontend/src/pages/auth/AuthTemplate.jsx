@@ -2,7 +2,7 @@ import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -39,20 +39,20 @@ export default function AuthTemplate({ page }) {
   const isSignupPage = page === "signup";
   const isOtp = page === "otp";
 
-  const { setUserContext } = useAuth();
-  const setAuthToken = (token) => {
-    if (!token) {
-      console.error("Token is undefined or null.");
-      return;
-    }
+  const { loginContext, logoutContext } = useAuth();
+  // const setAuthToken = (token) => {
+  //   if (!token) {
+  //     console.error("Token is undefined or null.");
+  //     return;
+  //   }
 
-    Cookies.set("authToken", token, {
-      expires: 7, // Expires in 7 days
-      sameSite: "Strict", // SameSite policy
-      // secure: true, // Uncomment this in production (requires HTTPS)
-    });
-    console.log("Token set in cookies!");
-  };
+  //   Cookies.set("authToken", token, {
+  //     expires: 7, // Expires in 7 days
+  //     sameSite: "Strict", // SameSite policy
+  //     // secure: true, // Uncomment this in production (requires HTTPS)
+  //   });
+  //   console.log("Token set in cookies!");
+  // };
 
   // Google Login Handler
   const loginWithGoogle = () => {
@@ -142,11 +142,12 @@ export default function AuthTemplate({ page }) {
       const res = await action(...args);
 
       if (res.status === 200) {
-        const token = res.data.data.token;
-        setUserContext(res.data.data);
+        const tokenValue = res.data.data.token;
 
-        if (token) {
-          setAuthToken(token);
+        loginContext(tokenValue);
+
+        if (!tokenValue) {
+          logoutContext();
         }
 
         const successMessage =
@@ -172,8 +173,15 @@ export default function AuthTemplate({ page }) {
   // -----------------------------------------------------------------------------------------------------------------------------
 
   const handleOTPChange = (value) => {
-    setOtp(value);
+    console.log(value);
+
+    setOtp(numericValue);
   };
+
+  // const handleOTPInput = (e) => {
+  //   const input = e.target.value.replace(/[^0-9]/g, ""); // Filter non-numeric characters
+  //   e.target.value = input; // Update the input field immediately
+  // };
 
   useEffect(() => {
     const countdown = setInterval(() => {
@@ -377,6 +385,7 @@ export default function AuthTemplate({ page }) {
                       inputMode="numeric"
                       value={otp}
                       onChange={handleOTPChange}
+                      // onInput={handleOTPInput}
                       length={4}
                     />
                   </Flex>
