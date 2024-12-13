@@ -4,22 +4,25 @@ import Cookies from "js-cookie";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userContext, setUserContext] = useState(false);
-  console.count();
+  const [authContext, setAuthContext] = useState(() => {
+    // Initialize context with token if available
+    const token = Cookies.get("authToken");
+    return token ? token : null;
+  });
 
-  const loginContext = (data) => {
-    console.log(data.token, "ORIGINAL TOKEN");
-    Cookies.set("authToken", data.token, { expires: 7 });
-    setUserContext(data);
+  const loginContext = (token) => {
+    Cookies.set("authToken", token, { expires: 7 }); // Set token in cookies
+    setAuthContext(token); // Update user context
   };
 
-  const logout = () => {
-    Cookies.remove("authToken");
+  const logoutContext = () => {
+    Cookies.remove("authToken"); // Remove token from cookies
+    setAuthContext(null); // Clear context
   };
 
   return (
     <AuthContext.Provider
-      value={{ userContext, setUserContext, loginContext, logout }}
+      value={{ authContext, setAuthContext, loginContext, logoutContext }}
     >
       {children}
     </AuthContext.Provider>

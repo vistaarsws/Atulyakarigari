@@ -2,7 +2,7 @@ import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -39,20 +39,20 @@ export default function AuthTemplate({ page }) {
   const isSignupPage = page === "signup";
   const isOtp = page === "otp";
 
-  const { setUserContext } = useAuth();
-  const setAuthToken = (token) => {
-    if (!token) {
-      console.error("Token is undefined or null.");
-      return;
-    }
+  const { loginContext, logoutContext } = useAuth();
+  // const setAuthToken = (token) => {
+  //   if (!token) {
+  //     console.error("Token is undefined or null.");
+  //     return;
+  //   }
 
-    Cookies.set("authToken", token, {
-      expires: 7, // Expires in 7 days
-      sameSite: "Strict", // SameSite policy
-      // secure: true, // Uncomment this in production (requires HTTPS)
-    });
-    console.log("Token set in cookies!");
-  };
+  //   Cookies.set("authToken", token, {
+  //     expires: 7, // Expires in 7 days
+  //     sameSite: "Strict", // SameSite policy
+  //     // secure: true, // Uncomment this in production (requires HTTPS)
+  //   });
+  //   console.log("Token set in cookies!");
+  // };
 
   // Google Login Handler
   const loginWithGoogle = () => {
@@ -70,7 +70,9 @@ export default function AuthTemplate({ page }) {
     setLoading(true);
 
     try {
-      const res = await login(userDetails.loginId);
+      const res = await login(
+        userDetails.loginId || localStorage.getItem("loginId")
+      );
       if (res?.status === 200) {
         if (isLoginPage) {
           navigate("/otp", { state: { type: "login" } });
@@ -78,6 +80,7 @@ export default function AuthTemplate({ page }) {
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
         });
+
         setCustomDimension("dimension1", userDetails.role); // Example: Set user role
         setCustomDimension("dimension2", userDetails.id); // Example: Set user ID;
       } else {
@@ -98,7 +101,9 @@ export default function AuthTemplate({ page }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await sendOtp(userDetails.loginId);
+      const res = await sendOtp(
+        userDetails.loginId || localStorage.getItem("loginId")
+      );
       if (res?.status === 200) {
         navigate("/otp", {
           state: { type: "signup" },
@@ -136,17 +141,18 @@ export default function AuthTemplate({ page }) {
 
       const args =
         otpType === "login"
-          ? [userDetails.loginId, otp]
+          ? [userDetails.loginId || localStorage.getItem("loginId"), otp]
           : [userDetails.fullName, userDetails.loginId, otp];
 
       const res = await action(...args);
 
       if (res.status === 200) {
-        const token = res.data.data.token;
-        setUserContext(res.data.data);
+        const tokenValue = res.data.data.token;
 
-        if (token) {
-          setAuthToken(token);
+        loginContext(tokenValue);
+
+        if (!tokenValue) {
+          logoutContext();
         }
 
         const successMessage =
@@ -208,6 +214,7 @@ export default function AuthTemplate({ page }) {
     if (isNumber && !value.startsWith("+91")) {
       formattedValue = "+91" + value;
     }
+    localStorage.setItem(`${name}`, formattedValue);
     setUserDetails((prevDetails) => ({
       ...prevDetails,
       [name]: formattedValue,
@@ -252,6 +259,7 @@ export default function AuthTemplate({ page }) {
                       placeholder="Enter Your Email / Phone Number"
                       id="loginId"
                       name="loginId"
+                      value={userDetails.loginId}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -301,6 +309,9 @@ export default function AuthTemplate({ page }) {
                     name="fullName"
                     label=""
                     variant="outlined"
+                    value={
+                      userDetails.fullName || localStorage.getItem("fullName")
+                    }
                     sx={{
                       width: "100%",
                       mb: "1rem",
@@ -341,6 +352,9 @@ export default function AuthTemplate({ page }) {
                       },
                     }}
                     onChange={handleInputChange}
+                    value={
+                      userDetails.loginId || localStorage.getItem("loginId")
+                    }
                   />
                 </div>
                 <div>
@@ -365,7 +379,8 @@ export default function AuthTemplate({ page }) {
 
                 <h2>Verify OTP</h2>
                 <h3>
-                  sent to <span>+91 8175961513</span>
+                  sent to
+                  <span>{localStorage.getItem("loginId")}</span>
                 </h3>
               </div>
 

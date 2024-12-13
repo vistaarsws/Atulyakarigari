@@ -9,10 +9,10 @@ import {
 } from "@mui/icons-material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
-import TEST_01 from "../../../assets/images/order-img.png";
-import TEST_02 from "../../../assets/images/aboutBanner.png";
-import TEST_03 from "../../../assets/images/artistry_1.png";
-import TEST_04 from "../../../assets/images/ourCollections_2.png";
+import TEST_01 from "../../../../assets/images/order-img.png";
+import TEST_02 from "../../../../assets/images/aboutBanner.png";
+import TEST_03 from "../../../../assets/images/artistry_1.png";
+import TEST_04 from "../../../../assets/images/ourCollections_2.png";
 import EditAddressModal from "./FilterModal";
 
 export default function Component() {

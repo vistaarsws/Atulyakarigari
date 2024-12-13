@@ -8,7 +8,7 @@ import {
   CardMedia,
   Checkbox,
 } from "@mui/material";
-import ORDER_IMG from "../../assets/images/order-img.png";
+import ORDER_IMG from "../../../assets/images/order-img.png";
 
 const items = [
   {

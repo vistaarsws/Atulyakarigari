@@ -4,21 +4,18 @@ import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 // -------------------------------------------------------------------------------------------------
+import { getProducts } from "../../../../services/user/userAPI";
 
-export default function SidebarDraft() {
+import "./DraftSection.css";
+
+export default function DraftSection() {
+  const [drafts, setDrafts] = useState([]);
   const [range, setRange] = useState([
     {
       startDate: new Date(),
       endDate: new Date(),
       key: "selection",
     },
-  ]);
-
-  const [drafts, setDrafts] = useState([
-    { title: "Banarasi Silk Saari", date: "01/09/24" },
-    { title: "Designer Silk Saari", date: "01/09/24" },
-    { title: "Designer Silk Saari", date: "01/09/24" },
-    // Add more drafts as needed
   ]);
 
   const [isOpen, setIsOpen] = useState(false); // State to toggle the calendar visibility
@@ -44,6 +41,16 @@ export default function SidebarDraft() {
   const formatDate = (date) => {
     return date.toLocaleDateString("en-GB"); // This will return the date in "DD/MM/YYYY"
   };
+
+  const getAllProducts = async () => {
+    const products = await getProducts();
+
+    setDrafts(products.filter((prod) => prod.type === "Draft"));
+  };
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
 
   return (
     <>
@@ -95,12 +102,13 @@ export default function SidebarDraft() {
         </div>
 
         <div className="draft-list">
-          {drafts.map((draft, index) => (
+          {drafts?.map((draftProduct, index) => (
             <div key={index} className="draft-item">
-              <p>{draft.title}</p>
-              <span>{draft.date}</span>
+              <p>{draftProduct.name}</p>
+              <span>{draftProduct.createdAt}</span>
             </div>
           ))}
+          {drafts.length === 0 && <p>No Draft Added</p>}
         </div>
       </div>
     </>

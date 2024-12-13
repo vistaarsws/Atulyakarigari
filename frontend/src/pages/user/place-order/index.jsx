@@ -1,9 +1,9 @@
 import React from "react";
 import Progress from "../buy-now/Stepper";
-import AddressUI from "../user/address/Address";
-import Payment from "../buy-now/Payment";
 import { Box, useMediaQuery } from "@mui/material";
 import DeliveryEstimate from "./DeliveryEstimate";
+import AddressUI from "../profile/address/Address";
+import Payment from "../buy-now/Payment";
 const PlaceOrder = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   return (

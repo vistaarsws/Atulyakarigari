@@ -1,7 +1,7 @@
 import "./Artisans.css";
-import { EmblaSlider } from "../../components/ui/slider/EmblaSlider";
-import ArtisansSlide from "../../components/ui/slider/artisansSlider/ArtisansSlide";
-import { artisans } from "../../utils/Constant";
+import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
+import ArtisansSlide from "../../../components/ui/slider/artisansSlider/ArtisansSlide";
+import { artisans } from "../../../utils/Constant";
 
 export default function Artisans() {
   const artisans_slider_array = artisans.map((artisan, index) => {

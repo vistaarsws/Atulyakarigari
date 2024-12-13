@@ -1,0 +1,44 @@
+.draft-sidebar {
+  flex: 0.25;
+  padding: 2rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+
+  & h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+.draft-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.draft-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.rdrDefinedRangesWrapper {
+  display: none; /* Ensures the quick selection options stay hidden */
+}
+
+.rdrCalendarWrapper {
+  margin-left: 0; /* Align the calendar to the left */
+}
+
+.rdrDateRangePickerWrapper {
+  display: flex;
+  justify-content: center; /* Centers the calendar */
+}
+
+.draft-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}

@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: center;
   padding: 2% 5%;
-  background-image: url(../../assets/images/background_artistry.png);
+  background-image: url(../../../assets/images/background_artistry.png);
   background-repeat: no-repeat;
   background-position: 45% 100%;
   background-size: cover;
@@ -220,7 +220,7 @@ button {
 }
 .noDiscount_container > figure:first-of-type {
   position: relative;
-  background-image: url(../../assets/images/imageChanging_1.png);
+  background-image: url(../../../assets/images/imageChanging_1.png);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -231,19 +231,19 @@ button {
 
 @keyframes imageChanging {
   0% {
-    background-image: url(../../assets/images/imageChanging_1.png);
+    background-image: url(../../../assets/images/imageChanging_1.png);
   }
   20% {
-    background-image: url(../../assets/images/imageChanging_2.png);
+    background-image: url(../../../assets/images/imageChanging_2.png);
   }
   40% {
-    background-image: url(../../assets/images/imageChanging_3.png);
+    background-image: url(../../../assets/images/imageChanging_3.png);
   }
   60% {
-    background-image: url(../../assets/images/imageChanging_4.png);
+    background-image: url(../../../assets/images/imageChanging_4.png);
   }
   80% {
-    background-image: url(../../assets/images/imageChanging_5.png);
+    background-image: url(../../../assets/images/imageChanging_5.png);
   }
 }
 
