@@ -12,33 +12,35 @@ import {
 
 export const createProfileForUser = async (user) => {
   try {
-      const { _id: userId, fullName, email, phone, accountType, createdAt, updatedAt } = user;
+    const { _id: userId, fullName, email, phone } = user;
 
-      // Construct profile data
-      const profileData = {
-          userId,
-          profilePicture: "",
-          gender: "",
-          dateOfBirth: "",
-          about: "",
-          contactNumber: phone || "",
-          alternativeContactNumber: "",
-          hintName: "",
-          location: "",
-      };
+    // Construct profile data
+    const profileData = {
+      userId,
+      fullName,
+      email: email || "",
+      contactNumber: phone || "",
+      profilePicture: "",
+      gender: "",
+      dateOfBirth: "",
+      about: "",
+      alternativeContactNumber: "",
+      hintName: "",
+      location: "",
+    };
 
-      // Create and save the profile
-      const newProfile = new Profile(profileData);
-      await newProfile.save();
+    // Create and save the profile
+    const newProfile = new Profile(profileData);
+    await newProfile.save();
 
-      // Link the profile to the user
-      user.additionalDetails = newProfile._id;
-      await user.save();
+    // Link the profile to the user
+    user.additionalDetails = newProfile._id;
+    await user.save();
 
-      return newProfile;
+    return newProfile;
   } catch (error) {
-      console.error("Error creating profile:", error);
-      throw new Error("Error creating profile");
+    console.error("Error creating profile:", error);
+    throw new Error("Error creating profile");
   }
 };
 
@@ -162,5 +164,27 @@ export const deleteProfile = async (req, res) => {
   } catch (error) {
     console.error("Error deleting profile:", error);
     return internalServerError(req, res, error, "Error deleting profile");
+  }
+};
+
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user?._id;// Extract user ID from request
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return badRequest(req, res, null, "Invalid user ID format");
+    }
+
+    // Find the profile linked to the user
+    const profile = await Profile.findOne({ userId });
+    if (!profile) {
+      return notFoundRequest(req, res, null, "Profile not found");
+    }
+
+    // Send a clean, user-friendly success response
+    return success(req, res, "Profile fetched successfully", profile);
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return internalServerError(req, res, error, "Error fetching profile");
   }
 };

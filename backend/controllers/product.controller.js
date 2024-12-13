@@ -61,11 +61,13 @@ export const createProduct = async (req, res) => {
         if (!req.files || !req.files.productImage) {
             return badRequest(req, res, null, "product image is required");
         }
-        if (!req.files.artisanImage) {
-            return badRequest(req, res, null, "artisan image is required");
-        }
+        // if (!req.files.artisanImage) {
+        //     return badRequest(req, res, null, "artisan image is required");
+        // }
         //  input validation
-        if (!name || !price || !category || !stock || !status || !description || !_attributes || !discountPercentage || !artisanName || !artisanAbout) {
+        if (!name || !price || !category || !stock || !status || !description || !_attributes || !discountPercentage
+            //  || !artisanName || !artisanAbout
+        ) {
             return badRequest(req, res, null, "fields are missing");
         }
         const attributes = JSON.parse(_attributes);
