@@ -5,6 +5,14 @@ const profileSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    email: {
+        type: String,
+        trim: true
+    },
+    fullName: {
+        type: String,
+        trim: true
+    },
     profilePicture: String,
     gender: {
         type: String

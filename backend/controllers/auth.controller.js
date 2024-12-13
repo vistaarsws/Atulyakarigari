@@ -4,6 +4,7 @@ import {
   internalServerError,
   unauthorized,
 } from "../helpers/api-response.js";
+import mongoose from "mongoose";
 import User from "../models/user.js";
 import Otp from "../models/emailOtp.js";
 import SmsOtp from "../models/smsOtp.js";
@@ -153,7 +154,7 @@ export const register = async (req, res) => {
 
       // Create a profile for the new user
       try {
-        await createProfileForUser(newUser , isEmailLogin,loginId);
+        await createProfileForUser(newUser, isEmailLogin, loginId);
       } catch (err) {
         console.error("Error creating profile:", err);
         return internalServerError(req, res, err, "Profile creation failed");
@@ -163,7 +164,7 @@ export const register = async (req, res) => {
       let token;
       try {
         token = newUser.generateAuthToken();
-        console.log(`Generated token: ${token}`);
+        // console.log(`Generated token: ${token}`);
       } catch (error) {
         console.error("Token generation error:", error);
         return internalServerError(req, res, error, "Token generation failed");
@@ -374,3 +375,35 @@ export const validateOtp = async (req, res) => {
     return internalServerError(req, res, err, "Unable to validate OTP");
   }
 };
+export const backup = async (req, res) => {
+  try {
+    const { BACKUP_ATLAS_URI } = req.body
+    // Connect to the backup database
+    const backupConnection = await mongoose.createConnection(BACKUP_ATLAS_URI,);
+
+    // Get collections from the current database
+    const collections = await mongoose.connection.db.collections();
+
+    for (const collection of collections) {
+      const collectionName = collection.collectionName;
+
+      // Fetch data from the current database
+      const data = await collection.find({}).toArray();
+
+      // Create a collection in the backup database and insert the data
+      const backupCollection = backupConnection.collection(collectionName);
+      if (data.length > 0) {
+        await backupCollection.insertMany(data);
+      }
+    }
+
+    // for (const collection of collections) {
+    //   await collection.deleteMany({});
+    // }
+
+    res.status(200).send({ message: 'Backup completed successfully in Atlas.' });
+  } catch (error) {
+    console.error('Error during backup:', error);
+    res.status(500).send({ error: 'Backup failed.' });
+  }
+} 

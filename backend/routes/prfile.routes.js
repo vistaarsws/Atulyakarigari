@@ -1,7 +1,8 @@
 import express from "express";
 import {
     updateProfile,
-    deleteProfile
+    deleteProfile,
+    getProfile
 } from "../controllers/profile.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
@@ -10,5 +11,6 @@ router.use(auth)
 
 router.put("/update", updateProfile); // Update profile by ID
 router.delete("/delete", deleteProfile); // Delete profile by ID
+router.get("/get", getProfile)
 
 export default router; 
