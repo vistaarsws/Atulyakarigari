@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import LoadingButton from "@mui/lab/LoadingButton";
 import "./ProductForm.css";
 
 import {
@@ -39,10 +40,12 @@ import { createProduct, getProducts } from "../../../../services/user/userAPI";
 
 import { Add as AddIcon } from "@mui/icons-material";
 
-export default function ProductForm({ getDraftProduct }) {
+export default function ProductForm() {
   const [loadingStates, setLoadingStates] = useState({
     category: false,
     subcategory: false,
+    addCategory: false,
+    addSubCategory: false,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -88,8 +91,6 @@ export default function ProductForm({ getDraftProduct }) {
     artisanAbout: "",
     artisanImage: null,
   };
-
-  const draftProducts = products.filter((prod) => prod.status == "Draft");
 
   const [formData, setFormData] = useState(initialState);
 
@@ -208,10 +209,12 @@ export default function ProductForm({ getDraftProduct }) {
 
   const handleAddCategory = async () => {
     try {
+      setLoadingStates({ ...loadingStates, addCategory: true });
       setAddCategoryPopup(false);
       await createCategory(categoryName);
       await getCategoryData();
       setCategoryName("");
+      setLoadingStates({ ...loadingStates, addCategory: false });
     } catch (error) {
       console.log(error);
     }
@@ -219,13 +222,14 @@ export default function ProductForm({ getDraftProduct }) {
 
   const handleAddSubCategory = async () => {
     try {
+      setLoadingStates({ ...loadingStates, addSubCategory: true });
       const parentCatId = parentCategory._id;
       await createSubCategory(subCategoryName, parentCatId);
       await getSubCategoryData(parentCatId);
       setAddSubCategoryPopup(false);
       setSubCategoryName("");
       setParentCategory("");
-      console.log("addSUbCateggg", res);
+      setLoadingStates({ ...loadingStates, addSubCategory: false });
     } catch (error) {
       console.log(error);
     }
@@ -321,11 +325,6 @@ export default function ProductForm({ getDraftProduct }) {
   useEffect(() => {
     getCategoryData();
     getProductsData();
-  }, []);
-
-  useEffect(() => {
-    getDraftProduct(draftProducts);
-    0;
   }, []);
 
   // --------------------------------------------------------------------------------------------------------
@@ -499,7 +498,7 @@ export default function ProductForm({ getDraftProduct }) {
                 label="Quantity"
                 type="number"
                 variant="outlined"
-                value={formData.stock}
+                value={formData.stock || 1}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -625,7 +624,20 @@ export default function ProductForm({ getDraftProduct }) {
                 >
                   Cancel
                 </Button>
-                <Button
+                <LoadingButton
+                  size="large"
+                  sx={{
+                    backgroundColor: "#5f3dc3",
+                    minWidth: "8rem",
+                    fontSize: "1.2rem",
+                  }}
+                  onClick={handleAddCategory}
+                  loading={loadingStates.addCategory}
+                  variant="contained"
+                >
+                  Add
+                </LoadingButton>
+                {/* <Button
                   size="large"
                   onClick={handleAddCategory}
                   variant="contained"
@@ -636,7 +648,7 @@ export default function ProductForm({ getDraftProduct }) {
                   }}
                 >
                   Add
-                </Button>
+                </Button> */}
               </DialogActions>
             </Dialog>
             {/* ----------------------------------------------EDIT Category Dialog Box-------------------------------------------------------------------------- */}
@@ -961,7 +973,20 @@ export default function ProductForm({ getDraftProduct }) {
                 >
                   Cancel
                 </Button>
-                <Button
+                <LoadingButton
+                  variant="contained"
+                  color="secondary"
+                  loading={loadingStates.addSubCategory}
+                  onClick={handleAddSubCategory}
+                  sx={{
+                    backgroundColor: "#5f3dc3",
+                    minWidth: "8rem",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Add
+                </LoadingButton>
+                {/* <Button
                   onClick={handleAddSubCategory}
                   variant="contained"
                   sx={{
@@ -971,7 +996,7 @@ export default function ProductForm({ getDraftProduct }) {
                   }}
                 >
                   Add
-                </Button>
+                </Button> */}
               </DialogActions>
             </Dialog>
             {/* ----------------------------------------------EDIT Sub Category Dialog Box-------------------------------------------------------------------------- */}

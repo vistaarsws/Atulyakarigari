@@ -4,10 +4,12 @@ import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 // -------------------------------------------------------------------------------------------------
+import { getProducts } from "../../../../services/user/userAPI";
 
 import "./DraftSection.css";
 
-export default function DraftSection({ draftProducts }) {
+export default function DraftSection() {
+  const [drafts, setDrafts] = useState([]);
   const [range, setRange] = useState([
     {
       startDate: new Date(),
@@ -15,7 +17,6 @@ export default function DraftSection({ draftProducts }) {
       key: "selection",
     },
   ]);
-  console.log(draftProducts, "DDDDDDDDDDDDDDDDDD");
 
   const [isOpen, setIsOpen] = useState(false); // State to toggle the calendar visibility
   const calendarRef = useRef(null);
@@ -40,6 +41,16 @@ export default function DraftSection({ draftProducts }) {
   const formatDate = (date) => {
     return date.toLocaleDateString("en-GB"); // This will return the date in "DD/MM/YYYY"
   };
+
+  const getAllProducts = async () => {
+    const products = await getProducts();
+
+    setDrafts(products.filter((prod) => prod.type === "Draft"));
+  };
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
 
   return (
     <>
@@ -91,13 +102,13 @@ export default function DraftSection({ draftProducts }) {
         </div>
 
         <div className="draft-list">
-          {draftProducts?.map((draftProduct, index) => (
+          {drafts?.map((draftProduct, index) => (
             <div key={index} className="draft-item">
               <p>{draftProduct.name}</p>
               <span>{draftProduct.createdAt}</span>
             </div>
           ))}
-          {draftProducts.length === 0 && <p>No Draft Added</p>}
+          {drafts.length === 0 && <p>No Draft Added</p>}
         </div>
       </div>
     </>

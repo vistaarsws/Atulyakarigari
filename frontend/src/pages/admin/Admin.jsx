@@ -5,12 +5,6 @@ import DraftSection from "../../components/layout/admin/draftSection/draftSectio
 import { useState } from "react";
 
 export default function Admin() {
-  const [draftProduct, setDraftProduct] = useState([]);
-
-  const getDraftProduct = (draftProduct) => {
-    setDraftProduct(draftProduct);
-  };
-
   return (
     <div>
       <Navbar />
@@ -19,10 +13,10 @@ export default function Admin() {
           <div className="form-header">
             <h1 className="form-title">Add Product</h1>
           </div>
-          <ProductForm getDraftProduct={getDraftProduct} />
+          <ProductForm />
         </section>
         <section>
-          <DraftSection draftProducts={draftProduct} />
+          <DraftSection />
         </section>
       </main>
     </div>

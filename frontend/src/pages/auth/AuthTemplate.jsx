@@ -70,7 +70,9 @@ export default function AuthTemplate({ page }) {
     setLoading(true);
 
     try {
-      const res = await login(userDetails.loginId);
+      const res = await login(
+        userDetails.loginId || localStorage.getItem("loginId")
+      );
       if (res?.status === 200) {
         if (isLoginPage) {
           navigate("/otp", { state: { type: "login" } });
@@ -78,6 +80,7 @@ export default function AuthTemplate({ page }) {
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
         });
+
         setCustomDimension("dimension1", userDetails.role); // Example: Set user role
         setCustomDimension("dimension2", userDetails.id); // Example: Set user ID;
       } else {
@@ -98,7 +101,9 @@ export default function AuthTemplate({ page }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await sendOtp(userDetails.loginId);
+      const res = await sendOtp(
+        userDetails.loginId || localStorage.getItem("loginId")
+      );
       if (res?.status === 200) {
         navigate("/otp", {
           state: { type: "signup" },
@@ -136,7 +141,7 @@ export default function AuthTemplate({ page }) {
 
       const args =
         otpType === "login"
-          ? [userDetails.loginId, otp]
+          ? [userDetails.loginId || localStorage.getItem("loginId"), otp]
           : [userDetails.fullName, userDetails.loginId, otp];
 
       const res = await action(...args);
@@ -173,15 +178,8 @@ export default function AuthTemplate({ page }) {
   // -----------------------------------------------------------------------------------------------------------------------------
 
   const handleOTPChange = (value) => {
-    console.log(value);
-
-    setOtp(numericValue);
+    setOtp(value);
   };
-
-  // const handleOTPInput = (e) => {
-  //   const input = e.target.value.replace(/[^0-9]/g, ""); // Filter non-numeric characters
-  //   e.target.value = input; // Update the input field immediately
-  // };
 
   useEffect(() => {
     const countdown = setInterval(() => {
@@ -216,6 +214,7 @@ export default function AuthTemplate({ page }) {
     if (isNumber && !value.startsWith("+91")) {
       formattedValue = "+91" + value;
     }
+    localStorage.setItem(`${name}`, formattedValue);
     setUserDetails((prevDetails) => ({
       ...prevDetails,
       [name]: formattedValue,
@@ -260,6 +259,7 @@ export default function AuthTemplate({ page }) {
                       placeholder="Enter Your Email / Phone Number"
                       id="loginId"
                       name="loginId"
+                      value={userDetails.loginId}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -309,6 +309,9 @@ export default function AuthTemplate({ page }) {
                     name="fullName"
                     label=""
                     variant="outlined"
+                    value={
+                      userDetails.fullName || localStorage.getItem("fullName")
+                    }
                     sx={{
                       width: "100%",
                       mb: "1rem",
@@ -349,6 +352,9 @@ export default function AuthTemplate({ page }) {
                       },
                     }}
                     onChange={handleInputChange}
+                    value={
+                      userDetails.loginId || localStorage.getItem("loginId")
+                    }
                   />
                 </div>
                 <div>
@@ -373,7 +379,8 @@ export default function AuthTemplate({ page }) {
 
                 <h2>Verify OTP</h2>
                 <h3>
-                  sent to <span>+91 8175961513</span>
+                  sent to
+                  <span>{localStorage.getItem("loginId")}</span>
                 </h3>
               </div>
 
@@ -385,7 +392,6 @@ export default function AuthTemplate({ page }) {
                       inputMode="numeric"
                       value={otp}
                       onChange={handleOTPChange}
-                      // onInput={handleOTPInput}
                       length={4}
                     />
                   </Flex>

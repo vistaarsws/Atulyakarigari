@@ -75,6 +75,11 @@
   }
 }
 
+.Otp_container > div:first-of-type > h3 > span {
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
 .otp_inputBox {
   & div:first-of-type {
     flex-direction: row !important;
