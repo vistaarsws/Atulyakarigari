@@ -15,6 +15,7 @@ import {
   verifyOtp,
 } from "../utils/otp/index.js";
 import { createProfileForUser } from "./profile.controller.js";
+import Profile from "../models/profile.js";
 
 //  OTP generator
 export const sendOtp = async (req, res) => {
@@ -120,11 +121,10 @@ export const register = async (req, res) => {
       return badRequest(req, res, null, "Invalid login Id format");
     }
     if (isEmailLogin) {
-      let existingUser;
+      // let existingUser;
       try {
-        existingUser = await User.findOne({ email: loginId });
+        const existingUser = await Profile.findOne({ email: loginId });
         if (existingUser) {
-          console.log(`Email already in use: ${existingUser.email}`);
           return badRequest(req, res, null, "Email already in use");
         }
       } catch (err) {
@@ -154,7 +154,7 @@ export const register = async (req, res) => {
 
       // Create a profile for the new user
       try {
-        await createProfileForUser(newUser, isEmailLogin, loginId);
+        await createProfileForUser(newUser, fullName, isEmailLogin, loginId);
       } catch (err) {
         console.error("Error creating profile:", err);
         return internalServerError(req, res, err, "Profile creation failed");
@@ -163,7 +163,7 @@ export const register = async (req, res) => {
       // Generate auth token for the new user
       let token;
       try {
-        token = newUser.generateAuthToken();
+        token = await newUser.generateAuthToken();
         // console.log(`Generated token: ${token}`);
       } catch (error) {
         console.error("Token generation error:", error);
@@ -183,7 +183,7 @@ export const register = async (req, res) => {
         // Check if user with this phone already exists
         let existingUser;
         try {
-          existingUser = await User.findOne({ phone: loginId });
+          existingUser = await Profile.findOne({ phone: loginId });
           if (existingUser) {
             console.log(`Phone number already in use: ${loginId}`);
             return badRequest(req, res, null, "Phone number already in use");
@@ -223,7 +223,7 @@ export const register = async (req, res) => {
 
         // Create a profile for the new user
         try {
-          await createProfileForUser(newUser);
+          await createProfileForUser(newUser, fullName, isEmailLogin, loginId);
         } catch (err) {
           console.error("Error creating profile:", err);
           return internalServerError(req, res, err, "Profile creation failed");
@@ -268,7 +268,7 @@ export const login = async (req, res) => {
     if (isPhoneNumber(loginId)) {
       // Mobile number case
       try {
-        const user = await User.findOne({ phone: loginId });
+        const user = await Profile.findOne({ phone: loginId });
         if (user) {
           // Generate OTP here (this is just a placeholder)
           const otp = await ensureUniqueOtp(SmsOtp);
@@ -294,7 +294,7 @@ export const login = async (req, res) => {
     } else if (isEmail(loginId)) {
       // Email case
       try {
-        const user = await User.findOne({ email: loginId });
+        const user = await Profile.findOne({ email: loginId });
 
         if (user) {
           // Generate OTP here (this is just a placeholder)
@@ -346,7 +346,10 @@ export const validateOtp = async (req, res) => {
         return badRequest(req, res, null, otpVerification.error);
       }
       // after successfully verified generate token
-      const user = await User.findOne({ phone: loginId });
+      const profileDetails = await Profile.findOne({ contactNumber: loginId });
+      const user = await User.findOne({ additionalDetails: profileDetails._id }).populate({
+        path: "additionalDetails",
+      });
       const token = await user.generateAuthToken(user);
       return success(req, res, "OTP verified successfully", {
         _id: user._id,
@@ -361,12 +364,16 @@ export const validateOtp = async (req, res) => {
         return badRequest(req, res, null, otpVerification.error);
       }
       // generate token
-      const user = await User.findOne({ email: loginId });
+      const profileDetails = await Profile.findOne({ email: loginId });
+      const user = await User.findOne({ additionalDetails: profileDetails._id }).populate({
+        path: "additionalDetails",
+      });
+      console.log(user);
       const token = await user.generateAuthToken();
       return success(req, res, "OTP verified successfully", {
         _id: user._id,
-        fullName: user.fullName,
-        email: user.email,
+        fullName: user.additionalDetails.fullName,
+        email: user.additionalDetails.email,
         accountType: user.accountType,
         token,
       });

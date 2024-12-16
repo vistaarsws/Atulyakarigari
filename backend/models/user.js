@@ -5,23 +5,7 @@ import "dotenv/config"
 
 const userSchema = new mongoose.Schema({
     googleId: String,
-    
-    fullName: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        trim: true,
-        unique: true,
-        sparse: true
-    },
-    phone: {
-        type: String,
-        unique: true,
-        sparse: true
-    },
+
     isPhoneVerified: {
         type: Boolean,
         default: false
@@ -36,9 +20,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         enum: ['customer', 'admin', 'super-admin'],
         default: 'customer'
-    },
-    image: {
-        type: String,
     },
     addresses: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -102,11 +83,16 @@ userSchema.methods = {
     //         throw new Error("Password comparison failed");
     //     }
     // },
-    generateAuthToken: function () {
+    generateAuthToken: async function () {
         try {
+            const userWithProfile = await this.populate('additionalDetails')
+
+            const email = userWithProfile?.additionalDetails?.email;
+            const phone = userWithProfile?.additionalDetails?.contactNumber; // Safely access email
+
             const payload = {
                 _id: this._id,
-                email: this.email,
+                loginId: email ? email : phone,
                 role: this.accountType,
             }
             return jwt.sign(
