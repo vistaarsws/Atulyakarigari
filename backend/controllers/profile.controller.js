@@ -10,13 +10,13 @@ import {
 
 
 
-export const createProfileForUser = async (user) => {
+export const createProfileForUser = async (user, fullName, isEmailLogin, loginId) => {
   try {
-    const { _id: userId, fullName, email, phone } = user;
-
+    const email = isEmailLogin ? loginId : "";
+    const phone = isEmailLogin ? "" : loginId;
     // Construct profile data
     const profileData = {
-      userId,
+      userId: user._id,
       fullName,
       email: email || "",
       contactNumber: phone || "",
