@@ -1,5 +1,5 @@
-import BlogCard from "../../../components/ui/cards/blogCard/BlogCard";
-import DatePicker from "../../../components/ui/datePicker/DatePicker";
+import BlogCard from "../../../components/ui/cards/blog-card/BlogCard";
+import DatePicker from "../../../components/ui/date-picker/DatePicker";
 import { blogs_array } from "../../../utils/Constant";
 import { useState } from "react";
 import { Select, Space } from "antd";

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import ProductView from "../../../components/layout/user/productView/ProductView";
+import ProductView from "../../../components/layout/user/product-view/ProductView";
 import share from "../../../assets/images/share.svg";
 import star from "../../../assets/images/reviewStar.svg";
 import { HomeOutlined } from "@ant-design/icons";
@@ -24,9 +24,9 @@ import { useEffect, useRef } from "react";
 import { logEvent } from "../../../utils/analytics/analytics";
 
 import "./Product.css";
-import WishListHeartIcon from "../../../components/ui/micro_elements/wishListHeartIcon/WishListHeartIcon";
+import WishListHeartIcon from "../../../components/ui/micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useState } from "react";
-import ProductSection from "../../../components/layout/user/productSection/ProductSection";
+import ProductSection from "../../../components/layout/user/product-section/ProductSection";
 import cat5_1 from "../../../assets/images/cat5_1.png";
 import cat5_2 from "../../../assets/images/cat5_2.png";
 import cat5_3 from "../../../assets/images/cat5_3.png";

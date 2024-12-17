@@ -18,6 +18,15 @@ export default function DraftSection() {
     },
   ]);
 
+  const formateTimeStamp = (timeStamp) => {
+    const timestamp = timeStamp;
+    const date = new Date(timestamp);
+
+    const formattedDate = `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getFullYear()).slice(2)}`;
+
+    return formattedDate;
+  };
+
   const [isOpen, setIsOpen] = useState(false); // State to toggle the calendar visibility
   const calendarRef = useRef(null);
 
@@ -44,8 +53,11 @@ export default function DraftSection() {
 
   const getAllProducts = async () => {
     const products = await getProducts();
+    const DraftedProducts = products.data.data.products.filter(
+      (prod) => prod.status === "Draft"
+    );
 
-    setDrafts(products.filter((prod) => prod.type === "Draft"));
+    setDrafts(DraftedProducts);
   };
 
   useEffect(() => {
@@ -105,7 +117,7 @@ export default function DraftSection() {
           {drafts?.map((draftProduct, index) => (
             <div key={index} className="draft-item">
               <p>{draftProduct.name}</p>
-              <span>{draftProduct.createdAt}</span>
+              <span>{formateTimeStamp(draftProduct.createdAt)}</span>
             </div>
           ))}
           {drafts.length === 0 && <p>No Draft Added</p>}

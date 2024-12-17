@@ -5,9 +5,10 @@ import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfile from "../../../../assets/images/userProfile.png";
 import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
-// import Cookies from "js-cookie";
+import { login, logout } from "../../../../Redux/features/AuthSlice";
+import { useDispatch, useSelector } from "react-redux";
 // import avatar from "../../../assets/images/avatar.svg";
-import { useAuth } from "../../../../context/AuthContext";
+// import { useAuth } from "../../../../context/authToken";
 // import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
 
@@ -25,8 +26,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
   // const location = useLocation();
-  const { loginContext, logoutContext, authContext, setAuthContext } =
-    useAuth();
+  // const { loginContext, logoutContext, authToken, setauthToken } =
+  //   useAuth();
+
+  const dispatch = useDispatch();
+  const authToken = useSelector((state) => state.auth.token);
 
   const { enqueueSnackbar } = useSnackbar();
   // const cookies = Cookies.get("authToken");
@@ -75,7 +79,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const logoutHandler = (isLogout) => {
     if (isLogout === "Logout") {
       enqueueSnackbar("Logout Successfully", { variant: "success" });
-      logoutContext();
+      // logoutContext();
+      dispatch(logout());
     }
   };
 
@@ -197,9 +202,9 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   };
 
   const menuItems = [
-    { name: "Wishlist", link: "/user/wishlist" },
-    { name: "Orders", link: "/user/orders" },
-    { name: "Address", link: "/user/address" },
+    { name: "Wishlist", link: "/profile/wishlist" },
+    { name: "Orders", link: "/profile/orders" },
+    { name: "Address", link: "/profile/address" },
     { name: "Logout", link: "/" },
 
     // { name: "Contact Us", link: "/user/contact" },
@@ -346,7 +351,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           )}
         </div>
 
-        {authContext && (
+        {authToken && (
           <IconButton
             aria-label={notificationsLabel(100)}
             onClick={() => navigate("/user/wishlist")}
@@ -371,7 +376,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseEnter={() => setIsProfileHovered(true)}
           onMouseLeave={() => setIsProfileHovered(false)}
         >
-          {authContext ? (
+          {authToken ? (
             <img src={userProfile} alt="User Profile" />
           ) : (
             <Avatar src="/broken-image.jpg" />
@@ -379,10 +384,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
           {isProfileHovered && (
             <div className="profile-dropdown">
-              {authContext && (
+              {authToken && (
                 <div
                   onClick={() => {
-                    navigate("/user/profile");
+                    navigate("/profile");
                     setIsProfileHovered(false);
                   }}
                 >
@@ -390,7 +395,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <p>8175961513</p>
                 </div>
               )}
-              {authContext ? (
+              {authToken ? (
                 <ul>
                   {menuItems.map((item, index) => (
                     <li key={index}>

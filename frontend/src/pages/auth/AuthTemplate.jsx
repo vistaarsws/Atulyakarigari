@@ -1,8 +1,7 @@
 import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
-import { useState, useEffect } from "react";
-// import Cookies from "js-cookie";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,8 +13,13 @@ import {
   login,
   varifyOtp,
 } from "../../services/operations/authAPI";
-import { useAuth } from "../../context/AuthContext";
+// import { useAuth } from "../../context/AuthContext";
 import setCustomDimension from "../../utils/helpers";
+import { useDispatch } from "react-redux";
+import {
+  login as authLogin,
+  logout as authLogout,
+} from "../../Redux/features/AuthSlice";
 
 dayjs.extend(customParseFormat);
 
@@ -32,6 +36,7 @@ export default function AuthTemplate({ page }) {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const [otpType, setOtpType] = useState(location.state?.type);
 
@@ -39,24 +44,19 @@ export default function AuthTemplate({ page }) {
   const isSignupPage = page === "signup";
   const isOtp = page === "otp";
 
-  const { loginContext, logoutContext } = useAuth();
-  // const setAuthToken = (token) => {
-  //   if (!token) {
-  //     console.error("Token is undefined or null.");
-  //     return;
-  //   }
-
-  //   Cookies.set("authToken", token, {
-  //     expires: 7, // Expires in 7 days
-  //     sameSite: "Strict", // SameSite policy
-  //     // secure: true, // Uncomment this in production (requires HTTPS)
-  //   });
-  //   console.log("Token set in cookies!");
-  // };
+  // const { loginContext, logoutContext } = useAuth();
 
   // Google Login Handler
   const loginWithGoogle = () => {
     window.location.href = "http://localhost:3000/auth/login"; // Change URL for production
+  };
+
+  const handleValidateOtp = (e) => {
+    const key = e.key;
+    // Allow numeric keys and Backspace
+    if (!/^[0-9]$/.test(key) && key !== "Backspace" && key !== "Enter") {
+      e.preventDefault();
+    }
   };
 
   useEffect(() => {
@@ -66,13 +66,15 @@ export default function AuthTemplate({ page }) {
   // -----------------------------------------------------Login---------------------------------------------------------------------
 
   const loginHandler = async (e) => {
+    debugger;
     e.preventDefault();
     setLoading(true);
-
     try {
       const res = await login(
-        userDetails.loginId || localStorage.getItem("loginId")
+        // localStorage.getItem("loginId") ||
+        userDetails.loginId
       );
+
       if (res?.status === 200) {
         if (isLoginPage) {
           navigate("/otp", { state: { type: "login" } });
@@ -149,10 +151,12 @@ export default function AuthTemplate({ page }) {
       if (res.status === 200) {
         const tokenValue = res.data.data.token;
 
-        loginContext(tokenValue);
+        // loginContext(tokenValue);
+        dispatch(authLogin(tokenValue));
 
         if (!tokenValue) {
-          logoutContext();
+          // logoutContext();
+          dispatch(authLogout());
         }
 
         const successMessage =
@@ -201,9 +205,9 @@ export default function AuthTemplate({ page }) {
     setTimer(30);
     setOtp("");
     if (otpType === "login") {
-      await login(userDetails.loginId);
+      await login(localStorage.getItem("loginId") || userDetails.loginId);
     } else {
-      await sendOtp(userDetails.loginId);
+      await sendOtp(localStorage.getItem("loginId") || userDetails.loginId);
     }
   };
 
@@ -391,13 +395,14 @@ export default function AuthTemplate({ page }) {
                       variant="filled"
                       inputMode="numeric"
                       value={otp}
+                      onKeyDown={handleValidateOtp}
                       onChange={handleOTPChange}
                       length={4}
                     />
                   </Flex>
                 </div>
                 {timer > 0 ? (
-                  <p>
+                  <p style={{ minHeight: "1.5rem" }}>
                     Resent OTP in <span>{timer}s</span>
                   </p>
                 ) : (

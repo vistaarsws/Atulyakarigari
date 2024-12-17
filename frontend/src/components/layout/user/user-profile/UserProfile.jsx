@@ -6,10 +6,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 export default function UserProfile() {
   const location = useLocation();
   const menuItems = [
-    { key: "user/profile", label: "Profile" },
-    { key: "user/wishlist", label: "Wishlist" },
-    { key: "user/orders", label: "Orders" },
-    { key: "user/address", label: "Address" },
+    { key: "profile", label: "Profile" },
+    { key: "profile/wishlist", label: "Wishlist" },
+    { key: "profile/orders", label: "Orders" },
+    { key: "profile/address", label: "Address" },
     // { key: "contact-us", label: "Contact Us" },
     // { key: "terms-of-use", label: "Terms of use" },
     // { key: "privacy-policy", label: "Privacy Policy" },
@@ -18,7 +18,7 @@ export default function UserProfile() {
   console.log(location.pathname);
 
   const isActive = (itemKey) => {
-    return location.pathname.includes(`/${itemKey}`);
+    return location.pathname.endsWith(`/${itemKey}`);
   };
 
   return (
