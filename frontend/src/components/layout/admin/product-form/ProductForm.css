@@ -4,6 +4,7 @@
 
 .form-main {
   display: flex;
+  gap: 2rem;
 }
 
 .image-upload-area {

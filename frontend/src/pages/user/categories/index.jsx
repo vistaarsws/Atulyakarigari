@@ -1,5 +1,5 @@
 import BanarsiSilkFilter from "./BanarsiSilkFilter";
-import ProductCard from "../../../components/ui/cards/productCard/ProductCard";
+import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
 import { top_product_list_from_category } from "../../../utils/Constant";
 import BANNER_IMAGE from "../../../assets/images/categoryImage.png";
 import { Pagination } from "@mui/material";

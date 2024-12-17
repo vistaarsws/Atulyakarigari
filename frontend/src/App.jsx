@@ -23,7 +23,7 @@ import BuyNow from "./pages/user/buy-now/index";
 import PlaceOrder from "./pages/user/place-order";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
-import UserProfile from "./components/layout/user/UserProfile/UserProfile";
+import UserProfile from "./components/layout/user/user-profile/UserProfile";
 import Order from "./pages/user/profile/order/Order";
 import Address from "./pages/user/profile/address/Address";
 import Profile from "./pages/user/profile/profile/Profile";
@@ -31,6 +31,7 @@ import Wishlist from "./pages/user/profile/wishlist/Wishlist";
 import Logout from "./pages/user/profile/logout/Logout";
 import Admin from "./pages/admin/Admin";
 import AdminRoute from "./utils/AdminRoute";
+import PageNotFound from "./pages/PageNotFound";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -48,13 +49,19 @@ const getRoutesConfig = () => ({
     { path: "/otp", element: <AuthTemplate page="otp" /> },
   ],
   protectedRoutes: [
+    { path: "", element: <Profile /> },
     { path: "orders", element: <Order /> },
     { path: "address", element: <Address /> },
-    { path: "profile", element: <Profile /> },
     { path: "wishlist", element: <Wishlist /> },
     { path: "logout", element: <Logout /> },
   ],
-  adminRoutes: [{ path: "dashboard", element: <Admin /> }],
+  adminRoutes: [
+    { path: "dashboard", element: <Admin /> },
+    { path: "add-products", element: <Admin /> },
+    { path: "customers", element: <Admin /> },
+    { path: "orders", element: <Admin /> },
+    { path: "team", element: <Admin /> },
+  ],
 });
 
 // Main App Component
@@ -70,27 +77,43 @@ export default function App() {
 
   console.log("userContext", userContext?.accountType);
 
-  const { hide_nav, hide_footer, navWithoutSearchBar } = useMemo(() => {
+  const { showNavBar, showFooter, navWithoutSearchBar } = useMemo(() => {
     const path = location.pathname;
-    const hideNavBar = ["/login", "/signup", "/otp", "/admin"];
-    const hideFooter = [
-      "/buy-now",
-      "/place-order",
-      "/login",
-      "/signup",
-      "/otp",
-      "/user/wishlist",
-      "/user/orders",
-      "/user/address",
-      "/admin",
+    const showNavBar = [
+      "/",
+      "/categories",
+      "/artisans",
+      "/about",
+      "/blogs",
+      "/profile",
+      "/profile/wishlist",
+      "/profile/orders",
+      "/profile/address",
+    ];
+    const showFooter = [
+      // "/buy-now",
+      // "/place-order",
+      // "/login",
+      // "/signup",
+      // "/otp",
+      // "/user/wishlist",
+      // "/user/orders",
+      // "/user/address",
+      // "/admin",
+      "/",
+      "/categories",
+      "/artisans",
+      "/about",
+      "/blogs",
+      "/product",
     ];
 
     const navWithoutSearchBar = [
       "/blogs",
-      "/user/orders",
-      "/user/wishlist",
-      "/user/address",
-      "/user/profile",
+      "/profile",
+      "/profile/orders",
+      "/profile/wishlist",
+      "/profile/address",
       "/place-order",
       "/artisans",
       "/about",
@@ -98,9 +121,11 @@ export default function App() {
     ];
 
     return {
-      hide_nav: hideNavBar.includes(path),
-      hide_footer: hideFooter.includes(path),
-      navWithoutSearchBar: navWithoutSearchBar.includes(path),
+      showNavBar: showNavBar.some((route) => path.startsWith(route)),
+      showFooter: showFooter.some((route) => path.startsWith(route)),
+      navWithoutSearchBar: navWithoutSearchBar.some((route) =>
+        path.startsWith(route)
+      ),
     };
   }, [location.pathname]);
 
@@ -108,8 +133,8 @@ export default function App() {
     <SnackbarProvider maxSnack={3}>
       <ScrollToTop />
       <TrackPageView /> {/* Track page views on route changes */}
-      {!hide_nav && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
-      <main className={`${hide_nav ? "" : "marginTop"}`}>
+      {showNavBar && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
+      <main className={`${!showNavBar ? "" : "marginTop"}`}>
         <Routes>
           {/* Public Routes */}
           {routesConfig.publicRoutes.map(({ path, element }) => (
@@ -118,18 +143,21 @@ export default function App() {
 
           {/* Protected Routes */}
           <Route
-            path="/user/*"
+            path="/profile/*"
             element={
               <ProtectedRoute>
                 <UserProfile />
               </ProtectedRoute>
             }
           >
+            <Route index element={<Profile />} />
             {routesConfig.protectedRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
             ))}
+            <Route path="*" element={<PageNotFound />} />
           </Route>
 
+          {/* Admin Routes */}
           <Route
             path="/admin/*"
             element={
@@ -141,10 +169,14 @@ export default function App() {
             {routesConfig.adminRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
             ))}
+            <Route path="*" element={<PageNotFound />} />
           </Route>
+
+          {/* Catch-All Route */}
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </main>
-      {!hide_footer && <Footer />}
+      {showFooter && <Footer />}
     </SnackbarProvider>
   );
 }

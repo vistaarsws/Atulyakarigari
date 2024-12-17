@@ -3,7 +3,7 @@ import aboutImg_1 from "../../../assets/images/aboutImg_1.png";
 import aboutImg_2 from "../../../assets/images/aboutImg_2.png";
 import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
 import { ourTeam_array } from "../../../utils/Constant";
-import CategoryView from "../../../components/layout/user/categoryView/CategoryView";
+import CategoryView from "../../../components/layout/user/category-view/CategoryView";
 
 export default function About() {
   return (

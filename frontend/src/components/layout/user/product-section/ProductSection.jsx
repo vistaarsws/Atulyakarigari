@@ -1,4 +1,4 @@
-import ProductCard from "../../../ui/cards/productCard/ProductCard";
+import ProductCard from "../../../ui/cards/product-card/ProductCard";
 import pattern from "../../../../assets/images/designPattern_1.svg";
 import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
 import { top_product_list_from_category } from "../../../../utils/Constant";

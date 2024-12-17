@@ -7,8 +7,9 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Link,
 } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
+import { Label, Menu as MenuIcon } from "@mui/icons-material";
 
 import notificationIcon from "../../../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../../../assets/images/adminLogoutIcon.svg";
@@ -37,24 +38,26 @@ export default function Navbar() {
     >
       <List>
         {[
-          "Dashboard",
-          "Products",
-          "Add New Product",
-          "Customers",
-          "Orders",
-          "Team",
-        ].map((text) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemText
-                primary={text}
-                primaryTypographyProps={{
-                  fontSize: "18px",
-                  fontWeight: "semi-bold",
-                  color: "#8668df",
-                }}
-              />
-            </ListItemButton>
+          { label: "Dashboard", path: "/" },
+          { label: "Products", path: "/products" },
+          { label: "Add New Product", path: "/add-product" },
+          { label: "Customers", path: "/customers" },
+          { label: "Orders", path: "/orders" },
+          { label: "Team", path: "/team" },
+        ].map((obj) => (
+          <ListItem key={obj.label} disablePadding>
+            <Link href={obj.path} underline="none">
+              <ListItemButton>
+                <ListItemText
+                  primary={obj.label}
+                  primaryTypographyProps={{
+                    fontSize: "18px",
+                    fontWeight: "semi-bold",
+                    color: "#8668df",
+                  }}
+                />
+              </ListItemButton>
+            </Link>
           </ListItem>
         ))}
       </List>
