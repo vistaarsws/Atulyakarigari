@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import chalk from "chalk";
 import fileUpload from "express-fileupload";
+import dotenv from "dotenv";
 
 // Import routes
 import connectDB from "./config/DBConnection.js";

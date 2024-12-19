@@ -16,7 +16,73 @@ import {
 } from "../utils/otp/index.js";
 import { createProfileForUser } from "./profile.controller.js";
 import Profile from "../models/profile.js";
+import { OAuth2Client } from "google-auth-library";
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const googleAuthHandler = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    // Verify the Google token and get the user payload
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub } = payload;  // sub = Google user ID
+
+    // Check if the user already exists using Google ID
+    let user = await User.findOne({ googleId: sub });
+
+    if (!user) {
+      // If user does not exist, check if the email is already used by another profile
+      const existingProfile = await Profile.findOne({ email });
+      if (existingProfile) {
+        return badRequest(req, res, null, "Email is already associated with another account");
+      }
+
+      // Create a new user
+      user = new User({
+        googleId: sub,
+        accountType: "customer", // Default account type, can be changed later
+      });
+
+      await user.save();
+
+      // Create and link profile to the new user
+      await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
+    } else if (!user.additionalDetails) {
+      // If user exists but does not have a profile linked, create one
+      await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
+    }
+
+    // Generate auth token for the user
+    let authToken;
+    try {
+      authToken = await user.generateAuthToken();  // Ensure we await the token generation
+    } catch (error) {
+      console.error("Error generating token:", error);
+      return internalServerError(req, res, error, "Token generation failed");
+    }
+
+    // Return the user data along with the auth token
+    return success(req, res, "Google authentication successful", {
+      token: authToken,
+      user: {
+        _id: user._id,
+        email,
+        fullName: name,
+        avatar: picture,
+        accountType: user.accountType,
+      },
+    });
+  } catch (error) {
+    console.error("Google authentication error:", error);
+    return badRequest(req, res, error, "Google authentication failed");
+  }
+};
 //  OTP generator
 export const sendOtp = async (req, res) => {
   try {

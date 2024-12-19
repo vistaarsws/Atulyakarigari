@@ -1,7 +1,7 @@
 import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -20,6 +20,8 @@ import {
   login as authLogin,
   logout as authLogout,
 } from "../../Redux/features/AuthSlice";
+import PropTypes from "prop-types";
+import GoogleAuth from "./google-auth/GoogleAuth";
 
 dayjs.extend(customParseFormat);
 
@@ -46,10 +48,6 @@ export default function AuthTemplate({ page }) {
 
   // const { loginContext, logoutContext } = useAuth();
 
-  // Google Login Handler
-  const loginWithGoogle = () => {
-    window.location.href = "http://localhost:3000/auth/login"; // Change URL for production
-  };
 
   const handleValidateOtp = (e) => {
     const key = e.key;
@@ -66,7 +64,7 @@ export default function AuthTemplate({ page }) {
   // -----------------------------------------------------Login---------------------------------------------------------------------
 
   const loginHandler = async (e) => {
-    debugger;
+    // debugger;
     e.preventDefault();
     setLoading(true);
     try {
@@ -284,13 +282,8 @@ export default function AuthTemplate({ page }) {
                 </div>
               </form>
               {/* Google login button */}
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={loginWithGoogle}
-              >
-                Log in with Google
-              </Button>
+              
+              <GoogleAuth/>
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
@@ -444,4 +437,9 @@ export default function AuthTemplate({ page }) {
       </div>
     </>
   );
+}
+
+
+AuthTemplate.propTypes = {
+  page: PropTypes.string.isRequired,
 }

@@ -1,21 +1,31 @@
-import axios from 'axios';
+import { OAuth2Client } from "google-auth-library";
+const User = require("../../models/user");
 
-export const getGoogleTokens = async (code, clientId, clientSecret, redirectUri) => {
-  const response = await axios.post('https://oauth2.googleapis.com/token', {
-    code,
-    client_id: clientId,
-    client_secret: clientSecret,
-    redirect_uri: redirectUri,
-    grant_type: 'authorization_code',
+const client = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID);
+
+async function verifyGoogleToken(token) {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.VITE_GOOGLE_CLIENT_ID,
   });
+  const payload = ticket.getPayload();
+  return payload;
+}
 
-  return response.data;
-};
+async function googleAuthHandler(token) {
+  const payload = await verifyGoogleToken(token);
+  if (!payload) throw new Error("Invalid Google token");
 
-export const getGoogleUserInfo = async (accessToken) => {
-  const response = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  let user = await User.findOne({ email: payload.email });
+  if (!user) {
+    user = await User.create({
+      email: payload.email,
+      name: payload.name,
+      avatar: payload.picture,
+    });
+  }
 
-  return response.data;
-};
+  return user;
+}
+
+module.exports = googleAuthHandler;
