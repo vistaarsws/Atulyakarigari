@@ -11,17 +11,19 @@ import { uploadImageToCloudinary } from "../utils/image-uploder/index.js";
 
 
 
-export const createProfileForUser = async (user, fullName, isEmailLogin, loginId) => {
+export const createProfileForUser = async (user, fullName, isEmailLogin, loginId, avatar = "") => {
   try {
+    // Determine if the loginId is an email or phone number
     const email = isEmailLogin ? loginId : "";
     const phone = isEmailLogin ? "" : loginId;
+
     // Construct profile data
     const profileData = {
       userId: user._id,
       fullName,
       email: email || "",
       contactNumber: phone || "",
-      profilePicture: "",
+      profilePicture: avatar || "",
       gender: "",
       dateOfBirth: "",
       about: "",
