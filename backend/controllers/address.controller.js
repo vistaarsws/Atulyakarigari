@@ -86,7 +86,7 @@ export const updateAddress = async (req, res) => {
             return notFoundRequest(req, res, null, "Address not found");
         }
 
-        return success(req, res, "Address updated successfully", updatedAddress);
+        return success(req, res, "Address updated successfully", updatedAddress.toObject());
     } catch (error) {
         console.error("Error updating address:", error);
         return internalServerError(req, res, error, "Error updating address");
