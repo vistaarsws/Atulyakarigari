@@ -4,6 +4,7 @@ import {
   internalServerError,
   unauthorized,
 } from "../helpers/api-response.js";
+import mongoose from "mongoose";
 import User from "../models/user.js";
 import Otp from "../models/emailOtp.js";
 import SmsOtp from "../models/smsOtp.js";
@@ -13,7 +14,75 @@ import {
   isPhoneNumber,
   verifyOtp,
 } from "../utils/otp/index.js";
+import { createProfileForUser } from "./profile.controller.js";
+import Profile from "../models/profile.js";
+import { OAuth2Client } from "google-auth-library";
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const googleAuthHandler = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    // Verify the Google token and get the user payload
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub } = payload;  // sub = Google user ID
+
+    // Check if the user already exists using Google ID
+    let user = await User.findOne({ googleId: sub });
+
+    if (!user) {
+      // If user does not exist, check if the email is already used by another profile
+      const existingProfile = await Profile.findOne({ email });
+      if (existingProfile) {
+        return badRequest(req, res, null, "Email is already associated with another account");
+      }
+
+      // Create a new user
+      user = new User({
+        googleId: sub,
+        accountType: "customer", // Default account type, can be changed later
+      });
+
+      await user.save();
+
+      // Create and link profile to the new user
+      await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
+    } else if (!user.additionalDetails) {
+      // If user exists but does not have a profile linked, create one
+      await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
+    }
+
+    // Generate auth token for the user
+    let authToken;
+    try {
+      authToken = await user.generateAuthToken();  // Ensure we await the token generation
+    } catch (error) {
+      console.error("Error generating token:", error);
+      return internalServerError(req, res, error, "Token generation failed");
+    }
+
+    // Return the user data along with the auth token
+    return success(req, res, "Google authentication successful", {
+      token: authToken,
+      user: {
+        _id: user._id,
+        email,
+        fullName: name,
+        avatar: picture,
+        accountType: user.accountType,
+      },
+    });
+  } catch (error) {
+    console.error("Google authentication error:", error);
+    return badRequest(req, res, error, "Google authentication failed");
+  }
+};
 //  OTP generator
 export const sendOtp = async (req, res) => {
   try {
@@ -118,11 +187,10 @@ export const register = async (req, res) => {
       return badRequest(req, res, null, "Invalid login Id format");
     }
     if (isEmailLogin) {
-      let existingUser;
+      // let existingUser;
       try {
-        existingUser = await User.findOne({ email: loginId });
+        const existingUser = await Profile.findOne({ email: loginId });
         if (existingUser) {
-          console.log(`Email already in use: ${existingUser.email}`);
           return badRequest(req, res, null, "Email already in use");
         }
       } catch (err) {
@@ -149,11 +217,20 @@ export const register = async (req, res) => {
         console.error("Error saving new user to database:", err);
         return internalServerError(req, res, err, "User registration failed");
       }
+
+      // Create a profile for the new user
+      try {
+        await createProfileForUser(newUser, fullName, isEmailLogin, loginId);
+      } catch (err) {
+        console.error("Error creating profile:", err);
+        return internalServerError(req, res, err, "Profile creation failed");
+      }
+
       // Generate auth token for the new user
       let token;
       try {
-        token = newUser.generateAuthToken();
-        console.log(`Generated token: ${token}`);
+        token = await newUser.generateAuthToken();
+        // console.log(`Generated token: ${token}`);
       } catch (error) {
         console.error("Token generation error:", error);
         return internalServerError(req, res, error, "Token generation failed");
@@ -172,7 +249,7 @@ export const register = async (req, res) => {
         // Check if user with this phone already exists
         let existingUser;
         try {
-          existingUser = await User.findOne({ phone: loginId });
+          existingUser = await Profile.findOne({ phone: loginId });
           if (existingUser) {
             console.log(`Phone number already in use: ${loginId}`);
             return badRequest(req, res, null, "Phone number already in use");
@@ -208,6 +285,14 @@ export const register = async (req, res) => {
         } catch (err) {
           console.error("Error saving new user to database:", err);
           return internalServerError(req, res, err, "User registration failed");
+        }
+
+        // Create a profile for the new user
+        try {
+          await createProfileForUser(newUser, fullName, isEmailLogin, loginId);
+        } catch (err) {
+          console.error("Error creating profile:", err);
+          return internalServerError(req, res, err, "Profile creation failed");
         }
 
         // Generate auth token
@@ -249,7 +334,7 @@ export const login = async (req, res) => {
     if (isPhoneNumber(loginId)) {
       // Mobile number case
       try {
-        const user = await User.findOne({ phone: loginId });
+        const user = await Profile.findOne({ phone: loginId });
         if (user) {
           // Generate OTP here (this is just a placeholder)
           const otp = await ensureUniqueOtp(SmsOtp);
@@ -275,7 +360,7 @@ export const login = async (req, res) => {
     } else if (isEmail(loginId)) {
       // Email case
       try {
-        const user = await User.findOne({ email: loginId });
+        const user = await Profile.findOne({ email: loginId });
 
         if (user) {
           // Generate OTP here (this is just a placeholder)
@@ -327,7 +412,10 @@ export const validateOtp = async (req, res) => {
         return badRequest(req, res, null, otpVerification.error);
       }
       // after successfully verified generate token
-      const user = await User.findOne({ phone: loginId });
+      const profileDetails = await Profile.findOne({ contactNumber: loginId });
+      const user = await User.findOne({ additionalDetails: profileDetails._id }).populate({
+        path: "additionalDetails",
+      });
       const token = await user.generateAuthToken(user);
       return success(req, res, "OTP verified successfully", {
         _id: user._id,
@@ -342,12 +430,16 @@ export const validateOtp = async (req, res) => {
         return badRequest(req, res, null, otpVerification.error);
       }
       // generate token
-      const user = await User.findOne({ email: loginId });
+      const profileDetails = await Profile.findOne({ email: loginId });
+      const user = await User.findOne({ additionalDetails: profileDetails._id }).populate({
+        path: "additionalDetails",
+      });
+      console.log(user);
       const token = await user.generateAuthToken();
       return success(req, res, "OTP verified successfully", {
         _id: user._id,
-        fullName: user.fullName,
-        email: user.email,
+        fullName: user.additionalDetails.fullName,
+        email: user.additionalDetails.email,
         accountType: user.accountType,
         token,
       });
@@ -356,3 +448,35 @@ export const validateOtp = async (req, res) => {
     return internalServerError(req, res, err, "Unable to validate OTP");
   }
 };
+export const backup = async (req, res) => {
+  try {
+    const { BACKUP_ATLAS_URI } = req.body
+    // Connect to the backup database
+    const backupConnection = await mongoose.createConnection(BACKUP_ATLAS_URI,);
+
+    // Get collections from the current database
+    const collections = await mongoose.connection.db.collections();
+
+    for (const collection of collections) {
+      const collectionName = collection.collectionName;
+
+      // Fetch data from the current database
+      const data = await collection.find({}).toArray();
+
+      // Create a collection in the backup database and insert the data
+      const backupCollection = backupConnection.collection(collectionName);
+      if (data.length > 0) {
+        await backupCollection.insertMany(data);
+      }
+    }
+
+    // for (const collection of collections) {
+    //   await collection.deleteMany({});
+    // }
+
+    res.status(200).send({ message: 'Backup completed successfully in Atlas.' });
+  } catch (error) {
+    console.error('Error during backup:', error);
+    res.status(500).send({ error: 'Backup failed.' });
+  }
+} 
