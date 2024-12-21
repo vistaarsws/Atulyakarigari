@@ -28,7 +28,7 @@ export default function Navbar() {
       sx={{
         width: 250,
         alignItems: "center",
-        border: "1px solid red",
+
         height: "100vh",
         display: "flex",
         padding: "2rem",
@@ -38,12 +38,12 @@ export default function Navbar() {
     >
       <List>
         {[
-          { label: "Dashboard", path: "/" },
-          { label: "Products", path: "/products" },
-          { label: "Add New Product", path: "/add-product" },
-          { label: "Customers", path: "/customers" },
-          { label: "Orders", path: "/orders" },
-          { label: "Team", path: "/team" },
+          { label: "Dashboard", path: "/admin" },
+          { label: "Products", path: "/admin/products" },
+          { label: "Add New Product", path: "/admin/add-product" },
+          { label: "Customers", path: "/admin/customers" },
+          { label: "Orders", path: "/admin/orders" },
+          { label: "Team", path: "/admin/team" },
         ].map((obj) => (
           <ListItem key={obj.label} disablePadding>
             <Link href={obj.path} underline="none">

@@ -3,7 +3,6 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import ScrollToTop from "./hooks/ScrollToTop";
 import ProtectedRoute from "./utils/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
 import { initializeMetaPixel } from "./utils/pixel/metaPixel";
 import { initializeAnalytics } from "./utils/analytics/analytics";
 import TrackPageView from "./utils/analytics/TrackPageView"; // Import the tracking component
@@ -29,9 +28,15 @@ import Address from "./pages/user/profile/address/Address";
 import Profile from "./pages/user/profile/profile/Profile";
 import Wishlist from "./pages/user/profile/wishlist/Wishlist";
 import Logout from "./pages/user/profile/logout/Logout";
-import Admin from "./pages/admin/Admin";
 import AdminRoute from "./utils/AdminRoute";
 import PageNotFound from "./pages/PageNotFound";
+import AddNewProduct from "./pages/admin/add-new-product/AddNewProduct";
+import Dashboard from "./pages/admin/dashboard/Dashboard";
+import Customers from "./pages/admin/customers/Customers";
+import Orders from "./pages/admin/orders/Orders";
+import Team from "./pages/admin/team/Team";
+import Products from "./pages/admin/products/Products";
+import Admin from "./pages/admin/Admin";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -56,11 +61,11 @@ const getRoutesConfig = () => ({
     { path: "logout", element: <Logout /> },
   ],
   adminRoutes: [
-    { path: "dashboard", element: <Admin /> },
-    { path: "add-products", element: <Admin /> },
-    { path: "customers", element: <Admin /> },
-    { path: "orders", element: <Admin /> },
-    { path: "team", element: <Admin /> },
+    { path: "add-product", element: <AddNewProduct /> },
+    { path: "customers", element: <Customers /> },
+    { path: "orders", element: <Orders /> },
+    { path: "team", element: <Team /> },
+    { path: "products", element: <Products /> },
   ],
 });
 
@@ -68,7 +73,7 @@ const getRoutesConfig = () => ({
 export default function App() {
   const location = useLocation();
   const routesConfig = getRoutesConfig();
-  const { userContext } = useAuth();
+  // const { userContext } = useAuth();
 
   useEffect(() => {
     initializeAnalytics();
@@ -76,7 +81,7 @@ export default function App() {
     initializeMetaPixel(import.meta.env.VITE_PIXEL_ID);
   }, []);
 
-  console.log("userContext", userContext?.accountType);
+  // console.log("userContext", userContext?.accountType);
 
   const { showNavBar, showFooter, navWithoutSearchBar } = useMemo(() => {
     const path = location.pathname;
@@ -121,9 +126,16 @@ export default function App() {
       "/buy-now",
     ];
 
+    const excludedNavBarRoutes = ["/admin"];
+    const excludedFooterRoutes = ["/admin"];
+
     return {
-      showNavBar: showNavBar.some((route) => path.startsWith(route)),
-      showFooter: showFooter.some((route) => path.startsWith(route)),
+      showNavBar:
+        showNavBar.some((route) => path.startsWith(route)) &&
+        !excludedNavBarRoutes.some((excluded) => path.startsWith(excluded)),
+      showFooter:
+        showFooter.some((route) => path.startsWith(route)) &&
+        !excludedFooterRoutes.some((exclude) => path.startsWith(exclude)),
       navWithoutSearchBar: navWithoutSearchBar.some((route) =>
         path.startsWith(route)
       ),
@@ -167,6 +179,7 @@ export default function App() {
               </AdminRoute>
             }
           >
+            <Route index element={<Dashboard />} />
             {routesConfig.adminRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
             ))}
