@@ -1,0 +1,31 @@
+.image-cell img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.stock-cell {
+  color: green;
+  font-weight: bold;
+}
+
+.out-stock-cell {
+  color: red;
+  font-weight: bold;
+}
+
+.action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-icon {
+  cursor: pointer;
+  color: blue;
+}
+
+.delete-icon {
+  cursor: pointer;
+  color: red;
+}

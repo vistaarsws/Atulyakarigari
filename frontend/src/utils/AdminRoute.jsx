@@ -1,10 +1,17 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useSelector } from "react-redux";
 
 const AdminRoute = ({ children }) => {
-  const { userContext } = useAuth();
-  return userContext?.accountType === "admin" ? children : children;
-  // <Navigate to="/login" replace />
+  // Access the token from Redux
+  const token = useSelector((state) => state.auth.token);
+
+  // Check if the user is authenticated
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Render the children if authenticated
+  return children;
 };
 
 export default AdminRoute;
