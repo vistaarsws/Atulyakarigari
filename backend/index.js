@@ -13,7 +13,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import subCategoryRoutes from "./routes/sub-category.routes.js";
 import profileRoutes from "./routes/prfile.routes.js";
-import reviewRoutes from "./routes/review.routes.js";
+import ratingAndReviewsRoutes from "./routes/ratingAndReviews.routes.js";
 import healthRoutes from "./routes/health.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js"
 
@@ -106,7 +106,7 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/sub-category", subCategoryRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/profile", profileRoutes);
-app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/ratingAndReviews", ratingAndReviewsRoutes);
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/wishlist", wishlistRoutes);
 
