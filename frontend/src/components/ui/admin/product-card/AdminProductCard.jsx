@@ -1,133 +1,100 @@
-// // import { IconButton } from "@mui/material";
-// // import EditIcon from "@mui/icons-material/Edit";
-// // import DeleteIcon from "@mui/icons-material/Delete";
-// // import "./AdminProductCard.css";
-// // import adminCardImg from "../../../../assets/images/adminProductCardImg.png";
+import { useEffect, useState } from "react";
+import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry } from "ag-grid-community";
+import { ClientSideRowModelModule } from "ag-grid-community";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import { getProducts } from "../../../../services/user/userAPI";
 
-// // const AdminProductCard = () => {
-// //   return (
-// //     <article className="adminProduct-container">
-// //       <div className="adminProduct-details">
-// //         <figure className="adminProduct-image-container">
-// //           <img
-// //             src={adminCardImg}
-// //             alt="Banarsi Nikhar Silk Saari"
-// //             className="adminProduct-image"
-// //           />
-// //         </figure>
-// //         <h4 className="adminProduct-title">Banarsi Nikhar Silk Saari</h4>
-// //       </div>
-// //       <div className="adminProduct-category">
-// //         <p className="adminProduct-subtitle">Banarsi Saari</p>
-// //       </div>
-// //       <div className="adminProduct-stock">
-// //         <span className="adminProduct-stock-status">Stock</span>
-// //       </div>
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-// //       <div className="adminProduct-price">
-// //         <span className="adminProduct-discount-price">₹12,000</span>
-// //         <span className="adminProduct-original-price">₹20,000</span>
-// //       </div>
-// //       <div className="adminProduct-date">12 Sep 2024</div>
-// //       <div className="adminProduct-actions">
-// //         <IconButton>
-// //           <EditIcon color="primary" />
-// //         </IconButton>
-// //         <IconButton>
-// //           <DeleteIcon color="error" />
-// //         </IconButton>
-// //       </div>
-// //     </article>
-// //   );
-// // };
+export default function AdminProductCard() {
+  const transformData = products.map((product) => ({
+    profileImg: product.images[0], // Assuming the first image is used
+    category: product.category,
+    stock: product.stock,
+    price: product.priceAfterDiscount || product.price, // Use discounted price if available
+    date: new Date(product.updatedAt).toLocaleDateString(), // Format the date
+    name: product.name, // Add the name for the product title
+  }));
 
-// // export default AdminProductCard;
-// import "./AdminProductCard.css"; // Custom styles
-// import React from "react";
-// import { AgGridReact } from "ag-grid-react"; // Named import for AgGridReact
-// import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
-// import { ModuleRegistry } from "@ag-grid-community/core";
-// import "@ag-grid-community/styles/ag-grid.css";
-// import "@ag-grid-community/styles/ag-theme-alpine.css";
+  console.log(transformData, "transsssssss");
 
-// // Register the required module
-// ModuleRegistry.registerModules([ClientSideRowModelModule]);
+  // Custom Cell Renderer for Profile Image
+  const profileImageRenderer = (params) => {
+    return (
+      <div>
+        <figure>
+          <img
+            src={params.value}
+            alt="Profile"
+            style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+          />
+        </figure>
+        {/* <p>Banarasi Saree</p> */}
+      </div>
+    );
+  };
 
-// const Table = () => {
-//   const columnDefs = [
-//     {
-//       headerName: "Product & Title",
-//       field: "product",
-//       cellRenderer: (params) => (
-//         <div className="image-cell">
-//           <img src={params.data.image} alt="Product" />
-//           <span>{params.value}</span>
-//         </div>
-//       ),
-//     },
-//     { headerName: "Categories", field: "category" },
-//     {
-//       headerName: "Stock Status",
-//       field: "stockStatus",
-//       cellClass: (params) =>
-//         params.value === "Stock" ? "stock-cell" : "out-stock-cell",
-//     },
-//     {
-//       headerName: "Attributes",
-//       field: "attributes",
-//       cellRenderer: (params) => (
-//         <div>
-//           <span>Color: {params.data.color}</span>
-//           <br />
-//           <span>Size: {params.data.size}</span>
-//         </div>
-//       ),
-//     },
-//     { headerName: "Price", field: "price" },
-//     { headerName: "Date", field: "date" },
-//     {
-//       headerName: "Action",
-//       field: "action",
-//       cellRenderer: () => (
-//         <div className="action-icons">
-//           <i className="edit-icon">✏️</i>
-//           <i className="delete-icon">🗑️</i>
-//         </div>
-//       ),
-//     },
-//   ];
+  // Custom Cell Renderer for Action Icons
+  const actionCellRenderer = (params) => {
+    const handleEdit = () => {
+      // Implement edit functionality here
+      console.log("Edit action on row:", params.data);
+    };
 
-//   const rowData = [
-//     {
-//       product: "Banarsi Nikhar Silk Saari",
-//       category: "Banarsi Saari",
-//       stockStatus: "Stock",
-//       color: "🟡",
-//       size: "5.5m",
-//       price: "₹12,000 ₹20,000",
-//       date: "12 Sep 2024",
-//       image: "https://via.placeholder.com/54", // Replace with actual image URL
-//     },
-//     // Repeat for more rows...
-//   ];
+    const handleDelete = () => {
+      // Implement delete functionality here
+      console.log("Delete action on row:", params.data);
+    };
 
-//   return (
-//     <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
-//       <AgGridReact
-//         rowData={rowData}
-//         columnDefs={columnDefs}
-//         domLayout="autoHeight"
-//         rowModelType="clientSide" // Specify row model type
-//       />
-//     </div>
-//   );
-// };
+    return (
+      <div>
+        <IconButton onClick={handleEdit} aria-label="edit">
+          <EditIcon />
+        </IconButton>
+        <IconButton onClick={handleDelete} aria-label="delete">
+          <DeleteIcon />
+        </IconButton>
+      </div>
+    );
+  };
 
-// export default Table;
-import React from "react";
+  // Column Definitions: Defines & controls grid columns.
+  const [colDefs, setColDefs] = useState([
+    {
+      field: "profileImg",
+      headerName: "PRODUCT & TITLE",
+      cellRenderer: profileImageRenderer,
+      flex: 1,
+    },
+    { field: "category", headerName: "CATEGORIES", flex: 1 },
+    { field: "stock", headerName: "STOCK STATUS", flex: 1 },
+    { field: "price", headerName: "PRICE", flex: 1 },
+    { field: "date", headerName: "DATE", flex: 1 },
+    {
+      headerName: "ACTION",
+      cellRenderer: actionCellRenderer,
+      sortable: false,
+      filter: true,
+      flex: 1,
+    },
+  ]);
 
-const AdminProductCard = () => {
-  return <div>AdminProductCard AdminProductCard</div>;
-};
+  const defaultColDef = {
+    flex: 1,
+  };
 
-export default AdminProductCard;
+  // Container: Defines the grid's theme & dimensions.
+  return (
+    <div style={{ width: "100%", height: "auto", padding: "1rem" }}>
+      <AgGridReact
+        rowData={transformData}
+        columnDefs={colDefs}
+        defaultColDef={defaultColDef}
+        domLayout="autoHeight"
+      />
+    </div>
+  );
+}

@@ -77,7 +77,7 @@ export default function App() {
 
   useEffect(() => {
     initializeAnalytics();
-     
+
     initializeMetaPixel(import.meta.env.VITE_PIXEL_ID);
   }, []);
 
@@ -126,8 +126,8 @@ export default function App() {
       "/buy-now",
     ];
 
-    const excludedNavBarRoutes = ["/admin"];
-    const excludedFooterRoutes = ["/admin"];
+    const excludedNavBarRoutes = ["/admin", "/login"];
+    const excludedFooterRoutes = ["/admin", "/login"];
 
     return {
       showNavBar:

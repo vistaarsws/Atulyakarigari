@@ -78,9 +78,11 @@ export default function DraftSection() {
               onClick={handleDateClick} // Opens the calendar when clicked
               style={{
                 padding: "10px",
-                border: "none",
+                border: "1px solid #6F6F6F33",
                 borderRadius: "4px",
+                width: "17rem",
                 cursor: "pointer",
+                backgroundColor: "#f4f4f4",
               }}
             />
 
