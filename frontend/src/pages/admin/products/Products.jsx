@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import AdminProductCard from "../../../components/ui/admin/product-card/AdminProductCard";
 // import TableHeader from "./TableHeader"; // Import your TableHeader component
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Products.css";
 
 function CustomTabPanel(props) {

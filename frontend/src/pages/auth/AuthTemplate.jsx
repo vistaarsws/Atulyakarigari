@@ -1,7 +1,7 @@
 import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -47,7 +47,6 @@ export default function AuthTemplate({ page }) {
   const isOtp = page === "otp";
 
   // const { loginContext, logoutContext } = useAuth();
-
 
   const handleValidateOtp = (e) => {
     const key = e.key;
@@ -173,6 +172,7 @@ export default function AuthTemplate({ page }) {
         variant: "error",
       });
     } finally {
+      setOtp("");
       setLoading(false);
     }
   };
@@ -282,8 +282,8 @@ export default function AuthTemplate({ page }) {
                 </div>
               </form>
               {/* Google login button */}
-              
-              <GoogleAuth/>
+
+              <GoogleAuth />
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
@@ -306,9 +306,7 @@ export default function AuthTemplate({ page }) {
                     name="fullName"
                     label=""
                     variant="outlined"
-                    value={
-                      userDetails.fullName || localStorage.getItem("fullName")
-                    }
+                    value={userDetails.fullName}
                     sx={{
                       width: "100%",
                       mb: "1rem",
@@ -349,9 +347,7 @@ export default function AuthTemplate({ page }) {
                       },
                     }}
                     onChange={handleInputChange}
-                    value={
-                      userDetails.loginId || localStorage.getItem("loginId")
-                    }
+                    value={userDetails.loginId}
                   />
                 </div>
                 <div>
@@ -439,7 +435,6 @@ export default function AuthTemplate({ page }) {
   );
 }
 
-
 AuthTemplate.propTypes = {
   page: PropTypes.string.isRequired,
-}
+};
