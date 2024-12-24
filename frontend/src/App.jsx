@@ -126,8 +126,8 @@ export default function App() {
       "/buy-now",
     ];
 
-    const excludedNavBarRoutes = ["/admin", "/login"];
-    const excludedFooterRoutes = ["/admin", "/login"];
+    const excludedNavBarRoutes = ["/admin", "/login", "/signup"];
+    const excludedFooterRoutes = ["/admin", "/login", "/signup"];
 
     return {
       showNavBar:
