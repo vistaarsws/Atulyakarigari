@@ -1,10 +1,12 @@
-import * as React from "react";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import AdminProductCard from "../../../components/ui/admin/product-card/AdminProductCard";
 // import TableHeader from "./TableHeader"; // Import your TableHeader component
+
+import { useState } from "react";
+import "./Products.css";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -36,14 +38,32 @@ function a11yProps(index) {
 }
 
 export default function Products() {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
+  const [products, setProducts] = useState([]);
+
+  const getAllProducts = async () => {
+    try {
+      const productData = await getProducts();
+      setProducts(productData.data.data.products);
+      console.log(productData.data.data.products, "asdas");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box
+      className="adminProduct_container"
+      sx={{ width: "100%", bgcolor: "#fbfbfb" }}
+    >
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -58,13 +78,13 @@ export default function Products() {
       </Box>
       <Box></Box>
       <CustomTabPanel value={value} index={0}>
-        All
+        <AdminProductCard />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Published
+        <AdminProductCard />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        Draft
+        <AdminProductCard />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
         <AdminProductCard />

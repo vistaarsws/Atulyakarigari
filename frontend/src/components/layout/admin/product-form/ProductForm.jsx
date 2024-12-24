@@ -33,7 +33,6 @@ import {
 import { createProduct, getProducts } from "../../../../services/user/userAPI";
 
 import { Add as AddIcon } from "@mui/icons-material";
-import { useForm } from "react-hook-form";
 import {
   AddCategoryDialog,
   AddEditVariantDialog,
@@ -43,13 +42,6 @@ import {
 } from "../dialogs/Dialogs";
 
 export default function ProductForm() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
-
   const [loadingStates, setLoadingStates] = useState({
     category: false,
     subcategory: false,

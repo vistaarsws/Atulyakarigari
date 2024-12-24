@@ -8,6 +8,7 @@ import {
   ListItemButton,
   ListItemText,
   Link,
+  Typography,
 } from "@mui/material";
 import { Label, Menu as MenuIcon } from "@mui/icons-material";
 
@@ -72,11 +73,11 @@ export default function Navbar() {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0.5rem 1rem",
-        backgroundColor: "#5f3dc3",
-        color: "#fff",
+        backgroundColor: "white",
+        color: "#383737",
       }}
     >
-      <article style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+      <article>
         {/* Menu Icon and Drawer */}
         <Box
           sx={{
@@ -86,12 +87,12 @@ export default function Navbar() {
           }}
         >
           <IconButton
-            edge="start"
+            edge="end"
             color="inherit"
             aria-label="menu"
             onClick={toggleDrawer(true)}
           >
-            <MenuIcon style={{ color: "#fff" }} />
+            <MenuIcon fontSize="large" style={{ color: "#5f3dc3" }} />
           </IconButton>
           <Drawer open={open} onClose={toggleDrawer(false)}>
             {DrawerList}
@@ -112,56 +113,63 @@ export default function Navbar() {
             lineHeight: 1.2,
           }}
         >
-          <h1 style={{ margin: 0, fontSize: "1.25rem", fontWeight: "bold" }}>
+          <Typography
+            component="h1"
+            sx={{ fontSize: "1.6rem", fontWeight: "700", color: "#383737" }}
+          >
             Rishit
-          </h1>
-          <h2 style={{ margin: 0, fontSize: "1rem", color: "#ddd" }}>Admin</h2>
+          </Typography>
+
+          <h2 style={{ margin: 0, fontSize: "1rem", color: "#6F6F6F" }}>
+            Admin
+          </h2>
         </Box>
       </article>
 
-      <article style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+      <article>
         {/* Search Input */}
         <input
           type="text"
           placeholder="Search..."
           style={{
             padding: "0.5rem 1rem",
-            borderRadius: "20px",
+            borderRadius: "0.8rem",
             border: "1px solid #ccc",
-            fontSize: "1rem",
-            width: "250px",
+            fontSize: "1.4rem",
+            height: "5rem",
+            minWidth: "30rem",
             backgroundColor: "transparent",
-            color: "#fff",
             outline: "none",
+            flexGrow: 1,
           }}
         />
 
         {/* Notification Icon */}
-        <div>
+        <Box sx={{ backgroundColor: "white", border: "1px solid white" }}>
           <img
             src={notificationIcon}
             alt="Notification Icon"
             style={{
               cursor: "pointer",
-              width: "30px",
-              height: "30px",
+              width: "2.4rem",
+              height: "2.4rem",
               visibility: notificationIcon ? "visible" : "hidden",
             }}
           />
-        </div>
+        </Box>
 
         {/* Logout Icon */}
-        <div>
+        <Box sx={{ border: "1px solid white", padding: "1rem" }}>
           <img
             src={adminLogoutIcon}
             alt="Admin Logout Icon"
             style={{
               cursor: "pointer",
-              width: "30px",
-              height: "30px",
+              width: "2rem",
+              height: "2.4rem",
             }}
           />
-        </div>
+        </Box>
       </article>
     </nav>
   );
