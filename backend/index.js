@@ -17,6 +17,8 @@ import ratingAndReviewsRoutes from "./routes/ratingAndReviews.routes.js";
 import healthRoutes from "./routes/health.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js"
 import addressRoutes from "./routes/address.routes.js"
+import ordersRoutes from "./routes/order.routes.js";
+import addToCardRoutes from "./routes/addToCard.routes.js";
 
 // Enhanced console styling with emojis and better formatting
 const log = {
@@ -111,6 +113,8 @@ app.use("/api/v1/ratingAndReviews", ratingAndReviewsRoutes);
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/wishlist", wishlistRoutes);
 app.use("/api/v1/address", addressRoutes);
+app.use("/api/v1/orders", ordersRoutes);
+app.use("/api/v1/addToCard", addToCardRoutes);
 
 
 
