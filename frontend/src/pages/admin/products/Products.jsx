@@ -77,7 +77,7 @@ export default function Products() {
         </Tabs>
       </Box>
       <Box></Box>
-      <CustomTabPanel value={value} index={0}>
+      {/* <CustomTabPanel value={value} index={0}>
         <AdminProductCard />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
@@ -88,7 +88,7 @@ export default function Products() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
         <AdminProductCard />
-      </CustomTabPanel>
+      </CustomTabPanel> */}
     </Box>
   );
 }

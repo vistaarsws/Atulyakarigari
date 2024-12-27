@@ -354,7 +354,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         {authToken && (
           <IconButton
             aria-label={notificationsLabel(100)}
-            onClick={() => navigate("/user/wishlist")}
+            onClick={() => navigate("profile/wishlist")}
           >
             <Badge
               badgeContent={8}
