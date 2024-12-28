@@ -36,18 +36,16 @@ export const googleAuthHandler = async (req, res) => {
     // Check if the user already exists using Google ID
     let user = await User.findOne({ googleId: sub });
 
+    // updated by Dhanjeet sharma : 28-12-24 :: fix google auth issue
     if (!user) {
       // If user does not exist, check if the email is already used by another profile
       const existingProfile = await Profile.findOne({ email });
-      if (existingProfile) {
-        return badRequest(req, res, null, "Email is already associated with another account");
-      }
-
-      // Create a new user
-      user = new User({
-        googleId: sub,
-        accountType: "customer", // Default account type, can be changed later
-      });
+      if (!existingProfile && !user) {
+        // Create a new user
+        user = new User({
+          googleId: sub,
+          accountType: "customer", // Default account type, can be changed later
+        });
 
       await user.save();
 
@@ -57,7 +55,7 @@ export const googleAuthHandler = async (req, res) => {
       // If user exists but does not have a profile linked, create one
       await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
     }
-
+    }
     // Generate auth token for the user
     let authToken;
     try {
