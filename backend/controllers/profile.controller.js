@@ -62,7 +62,8 @@ export const updateProfile = async (req, res) => {
       hintName,
       location
     } = req.body;
-    const { profileImage } = req.files
+
+    const profileImage  = req.files?.profileImage; // Safely access profileImage
 
     // Validate input fields
     const validationErrors = {};
