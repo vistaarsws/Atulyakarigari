@@ -27,4 +27,9 @@ const updateProfile = async (_id, updatedData) => {
   return response;
 };
 
-export { createProduct, getProducts, getProfile, updateProfile };
+const getUserWishlist = async () => {
+  const response = await apiConnector("GET", user_endpoints.USER_WISHLIST);
+  return response;
+};
+
+export { createProduct, getProducts, getProfile, updateProfile, getUserWishlist };
