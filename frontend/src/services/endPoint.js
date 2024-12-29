@@ -28,4 +28,5 @@ export const user_endpoints = {
   CREATE_PRODUCT: BASE_URL + "/api/v1/product/create",
   USER_PROFILE: BASE_URL + "/api/v1/profile/get",
   USER_PROFILE_UPDATE: BASE_URL + "/api/v1/profile/update",
+  USER_WISHLIST: BASE_URL + "/api/v1/wishlist/get",
 };
