@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 // import { useAuth } from "../../../../context/authToken";
 // import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
+import { jwtDecode } from "jwt-decode";
+import { getProfile } from "../../../../services/user/userAPI";
 
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
@@ -57,6 +59,39 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     }
     return `${count} notifications`;
   }
+  const [profileData, setProfileData] = useState(null);
+
+  // Fetch Profile Data
+  const fetchProfileData = async () => {
+    try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
+
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+
+      const response = await getProfile(_id);
+      const profile = response?.data?.data;
+
+      const fetchedData = {
+        fullName: profile.fullName,
+        profilePicture: profile.profilePicture || "/broken-image.jpg",
+      };
+
+      setProfileData(fetchedData);
+    } catch (error) {
+      console.error("Error fetching profile data: ", error.message || error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfileData();
+  },[authToken]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -377,7 +412,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseLeave={() => setIsProfileHovered(false)}
         >
           {authToken ? (
-            <img src={userProfile} alt="User Profile" />
+            <img  src={profileData?.profilePicture} alt="User Profile" />
           ) : (
             <Avatar src="/broken-image.jpg" />
           )}
@@ -391,8 +426,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                     setIsProfileHovered(false);
                   }}
                 >
-                  <p>Hello, Savvy Srivastava</p>
-                  <p>8175961513</p>
+                  <p>Hello, {profileData?.fullName}</p>
+                  <p>My profile</p>
                 </div>
               )}
               {authToken ? (
