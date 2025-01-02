@@ -6,14 +6,14 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   signUp,
   sendOtp,
   login,
   varifyOtp,
 } from "../../services/operations/authAPI";
-// import { useAuth } from "../../context/AuthContext";
 import setCustomDimension from "../../utils/helpers";
 import { useDispatch } from "react-redux";
 import {
@@ -25,6 +25,15 @@ import GoogleAuth from "./google-auth/GoogleAuth";
 
 dayjs.extend(customParseFormat);
 
+const loadingBtnStyles = {
+  padding: "1rem",
+  height: "4rem",
+  fontSize: "1.4rem",
+  backgroundColor: "#60a487",
+  color: "white",
+  border: "none",
+  width: "100%",
+};
 export default function AuthTemplate({ page }) {
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -67,13 +76,11 @@ export default function AuthTemplate({ page }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await login(
-        // localStorage.getItem("loginId") ||
-        userDetails.loginId
-      );
+      const res = await login(userDetails.loginId);
 
       if (res?.status === 200) {
         if (isLoginPage) {
+          localStorage.setItem("loginId", userDetails.loginId);
           navigate("/otp", { state: { type: "login" } });
         }
         enqueueSnackbar(res.data.message || "Login Successful!", {
@@ -100,10 +107,10 @@ export default function AuthTemplate({ page }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await sendOtp(
-        userDetails.loginId || localStorage.getItem("loginId")
-      );
+      const res = await sendOtp(userDetails.loginId);
       if (res?.status === 200) {
+        localStorage.setItem("loginId", userDetails.loginId);
+
         navigate("/otp", {
           state: { type: "signup" },
         });
@@ -203,9 +210,9 @@ export default function AuthTemplate({ page }) {
     setTimer(30);
     setOtp("");
     if (otpType === "login") {
-      await login(localStorage.getItem("loginId") || userDetails.loginId);
+      await login(userDetails.loginId || localStorage.getItem("loginId"));
     } else {
-      await sendOtp(localStorage.getItem("loginId") || userDetails.loginId);
+      await sendOtp(userDetails.loginId || localStorage.getItem("loginId"));
     }
   };
 
@@ -216,7 +223,7 @@ export default function AuthTemplate({ page }) {
     if (isNumber && !value.startsWith("+91")) {
       formattedValue = "+91" + value;
     }
-    localStorage.setItem(`${name}`, formattedValue);
+    // localStorage.setItem(`${name}`, formattedValue);
     setUserDetails((prevDetails) => ({
       ...prevDetails,
       [name]: formattedValue,
@@ -250,12 +257,6 @@ export default function AuthTemplate({ page }) {
                         "& .MuiInputBase-input": {
                           fontSize: "1.4rem",
                           padding: "1rem",
-                          height: "unset",
-                          lineHeight: "1.75",
-                        },
-
-                        "& .MuiInputBase-input::placeholder": {
-                          fontSize: "1.4rem",
                         },
                       }}
                       placeholder="Enter Your Email / Phone Number"
@@ -267,17 +268,14 @@ export default function AuthTemplate({ page }) {
                   </div>
 
                   <div>
-                    <Button
+                    <LoadingButton
                       variant="contained"
                       type="submit"
-                      disabled={loading}
+                      loading={loading}
+                      sx={loadingBtnStyles}
                     >
-                      {loading ? (
-                        <CircularProgress size={24} color="white" />
-                      ) : (
-                        "Login"
-                      )}
-                    </Button>
+                      Login
+                    </LoadingButton>
                   </div>
                 </div>
               </form>
@@ -313,12 +311,6 @@ export default function AuthTemplate({ page }) {
                       "& .MuiInputBase-input": {
                         fontSize: "1.4rem",
                         padding: "1rem",
-                        height: "unset",
-                        lineHeight: "1.75",
-                      },
-
-                      "& .MuiInputBase-input::placeholder": {
-                        fontSize: "1.4rem",
                       },
                     }}
                     onChange={handleInputChange}
@@ -338,12 +330,6 @@ export default function AuthTemplate({ page }) {
                       "& .MuiInputBase-input": {
                         fontSize: "1.4rem",
                         padding: "1rem",
-                        height: "unset",
-                        lineHeight: "1.75",
-                      },
-
-                      "& .MuiInputBase-input::placeholder": {
-                        fontSize: "1.4rem",
                       },
                     }}
                     onChange={handleInputChange}
@@ -351,13 +337,14 @@ export default function AuthTemplate({ page }) {
                   />
                 </div>
                 <div>
-                  <Button variant="contained" type="submit" disabled={loading}>
-                    {loading ? (
-                      <CircularProgress size={24} color="white" />
-                    ) : (
-                      "Sign Up"
-                    )}
-                  </Button>
+                  <LoadingButton
+                    sx={loadingBtnStyles}
+                    variant="contained"
+                    type="submit"
+                    loading={loading}
+                  >
+                    Sign Up
+                  </LoadingButton>
                 </div>
               </form>
             </article>
@@ -405,13 +392,14 @@ export default function AuthTemplate({ page }) {
                 )}
 
                 <div>
-                  <Button variant="contained" type="submit" disabled={loading}>
-                    {loading ? (
-                      <CircularProgress size={24} color="white" />
-                    ) : (
-                      "Continue"
-                    )}
-                  </Button>
+                  <LoadingButton
+                    variant="contained"
+                    type="submit"
+                    loading={loading}
+                    sx={loadingBtnStyles}
+                  >
+                    Continue
+                  </LoadingButton>
                 </div>
               </form>
             </article>
@@ -420,7 +408,15 @@ export default function AuthTemplate({ page }) {
           {isLoginPage || otpType === "login" ? (
             <p>
               Don&apos;t have an account yet?{"  "}
-              <span onClick={() => navigate("/signup")}> Sign Up</span>
+              <span
+                onClick={() => {
+                  navigate("/signup");
+                  setUserDetails("");
+                }}
+              >
+                {" "}
+                Sign Up
+              </span>
             </p>
           ) : (
             <p>
