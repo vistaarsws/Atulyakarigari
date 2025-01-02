@@ -40,8 +40,12 @@ import {
   ViewSubCategoryDialog,
   ViewCategoriesDialog,
 } from "../dialogs/Dialogs";
+import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function ProductForm() {
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.products.products);
   const [loadingStates, setLoadingStates] = useState({
     category: false,
     subcategory: false,
@@ -78,7 +82,7 @@ export default function ProductForm() {
 
   const [parentCategory, setParentCategory] = useState("");
 
-  const [products, setProducts] = useState([]);
+  // const [products, setProducts] = useState([]);
 
   const initialState = {
     name: "",
@@ -244,6 +248,7 @@ export default function ProductForm() {
   const getCategoryData = async () => {
     try {
       setLoadingStates((prev) => ({ ...prev, category: true }));
+
       const response = await getCategory();
 
       const categories_arr = Object.values(response.data.data).map(
@@ -251,6 +256,7 @@ export default function ProductForm() {
       );
 
       setCategories(categories_arr);
+
       setLoadingStates((prev) => ({ ...prev, category: false }));
     } catch (error) {
       console.log(error);
@@ -260,6 +266,7 @@ export default function ProductForm() {
   const getSubCategoryData = async (categoryId) => {
     try {
       setLoadingStates((prev) => ({ ...prev, subcategory: true }));
+
       // const enteredCategory = searchCategoryByName(category);
 
       const response = await getSubCategoryByCategoryId(categoryId);
@@ -267,6 +274,8 @@ export default function ProductForm() {
       const subCategories_array = response.data.data.subcategory;
 
       setSubCategories(subCategories_array);
+
+      // dispatch(setSubCategories(subCategories_array));
       setLoadingStates((prev) => ({ ...prev, subcategory: false }));
     } catch (error) {
       console.log(error);
@@ -325,20 +334,23 @@ export default function ProductForm() {
   };
 
   // --------------------------------------------------------------------------------------------------
-  const getProductsData = async () => {
-    try {
-      const response = await getProducts();
-      console.log("Response", response);
-      setProducts(response.data.data.products);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getAllProducts = async () => {
+  //   try {
+  //     const products = await getProducts();
+  //     dispatch(setProducts(products.data.data.products));
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   // --------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    if (products.length === 0) {
+      dispatch(fetchAllProducts());
+    }
+  }, [dispatch, products]);
 
   useEffect(() => {
     getCategoryData();
-    getProductsData();
   }, []);
 
   // --------------------------------------------------------------------------------------------------------
@@ -347,7 +359,11 @@ export default function ProductForm() {
     e.preventDefault();
     const buttonClicked = e.nativeEvent.submitter?.value;
     try {
-      setLoadingStates({ ...loadingStates, addProduct: true });
+      setLoadingStates({
+        ...loadingStates,
+        addProduct: buttonClicked !== "Draft",
+        draftProduct: buttonClicked === "Draft",
+      });
 
       const formDataInstance = new FormData();
 
@@ -401,13 +417,22 @@ export default function ProductForm() {
       await createProduct(formDataInstance);
 
       if (buttonClicked === "Draft") {
-        getProductsData();
+        getAllProducts();
       }
 
       setFormData(initialState);
-      setLoadingStates({ ...loadingStates, addProduct: false });
+      setLoadingStates({
+        ...loadingStates,
+        addProduct: false,
+        draftProduct: false,
+      });
     } catch (error) {
-      setLoadingStates({ ...loadingStates, addProduct: false });
+      setLoadingStates({
+        ...loadingStates,
+        addProduct: false,
+        draftProduct: false,
+      });
+
       console.error("Error creating product:", error);
     }
   };
@@ -467,7 +492,7 @@ export default function ProductForm() {
               cursor: "pointer",
             }}
           >
-            <input {...getInputPropsMultiple()} />
+            <input {...getInputPropsMultiple()} required />
             {isDragActiveMultiple ? (
               <p>Drop the files here...</p>
             ) : (
@@ -504,6 +529,7 @@ export default function ProductForm() {
                 sx={{
                   width: "100%",
                 }}
+                required
                 id="productTitle"
                 label="Product & Title"
                 variant="outlined"
@@ -530,119 +556,177 @@ export default function ProductForm() {
               />
             </div>
           </article>
-          {/* -----------------------------------------------Category Section----------------------------------------------------------------------------------------- */}
-          <article>
-            <div>
-              <Autocomplete
-                sx={{ width: "100%" }}
-                disablePortal
-                options={categories}
-                getOptionLabel={(option) => option?.name || ""}
-                value={
-                  categories.find((cat) => cat._id === formData.category) ||
-                  null
-                }
-                onChange={(e, newCategory) => {
-                  getSubCategoryData(newCategory._id);
-                  setFormData({
-                    ...formData,
-                    category: newCategory._id,
-                    subCategory: "",
-                  });
-                }}
-                loading={loadingStates.category}
-                renderInput={(params) => (
-                  <TextField {...params} label="Category" />
-                )}
+
+          <div>
+            {/* -----------------------------------------------Category Section----------------------------------------------------------------------------------------- */}
+            <article>
+              <section>
+                <Autocomplete
+                  sx={{ width: "100%" }}
+                  disablePortal
+                  required
+                  options={categories}
+                  getOptionLabel={(option) => option?.name || ""}
+                  value={
+                    categories.find((cat) => cat._id === formData.category) ||
+                    null
+                  }
+                  onChange={(e, newCategory) => {
+                    getSubCategoryData(newCategory._id);
+                    setFormData({
+                      ...formData,
+                      category: newCategory._id,
+                      subCategory: "",
+                    });
+                  }}
+                  loading={loadingStates.category}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Category" />
+                  )}
+                />
+              </section>
+              <section>
+                <div>
+                  <IconButton
+                    sx={{
+                      width: "5rem",
+                      height: "100%",
+
+                      backgroundColor: "#e2e3e3",
+                      color: "#383737",
+                      borderRadius: "0.4rem",
+                      "&:hover": {
+                        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+                        color: "black",
+                      },
+                    }}
+                    onClick={() => setAddCategoryPopup(true)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </div>
+                <div>
+                  <IconButton
+                    sx={{
+                      color: "#383737",
+                      width: "5rem",
+                      height: "100%",
+
+                      backgroundColor: "#e2e3e3",
+                      borderRadius: "0.4rem",
+                      "&:hover": {
+                        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+                        color: "black",
+                      },
+                    }}
+                    size="small"
+                    onClick={() => setViewCategoriesPopup(true)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </div>
+              </section>
+
+              {/* ----------------------------------------------ADD Category Dialog Box-------------------------------------------------------------------------- */}
+
+              <AddCategoryDialog
+                open={addCategoryPopup}
+                onClose={() => setAddCategoryPopup(false)}
+                categoryName={categoryName}
+                setCategoryName={setCategoryName}
+                handleAddCategory={handleAddCategory}
+                loading={loadingStates.addCategory}
               />
-            </div>
-            <Box sx={{ display: "flex" }}>
-              <div>
-                <IconButton
-                  color="primary"
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "#5f3dc3",
-                    color: "white",
-                    borderRadius: "0.4rem",
-                    "&:hover": {
-                      backgroundColor: "#5f3dc3",
-                    },
+              {/* ----------------------------------------------EDIT Category Dialog Box-------------------------------------------------------------------------- */}
+
+              <ViewCategoriesDialog
+                open={viewCategoriesPopup}
+                onClose={() => setViewCategoriesPopup(false)}
+                categories={categories}
+                editCategoryId={editCategoryId}
+                editCategoryName={editCategoryName}
+                setEditCategoryName={setEditCategoryName}
+                handleEditCategory={handleEditCategory}
+                handleSaveCategory={handleSaveCategory}
+                handleCancelCategory={handleCancelCategory}
+                handleDeleteCategory={handleDeleteCategory}
+              />
+            </article>
+            {/* -----------------------------------------------Sub Category Section----------------------------------------------------------------------------------------- */}
+            <article>
+              <section>
+                <Autocomplete
+                  sx={{ width: "100%" }}
+                  disablePortal
+                  required
+                  options={subCategories}
+                  getOptionLabel={(option) => option?.name || ""}
+                  value={
+                    subCategories.find(
+                      (subCat) => subCat._id === formData.subCategory
+                    ) || null
+                  }
+                  loading={loadingStates.subcategory}
+                  onChange={(e, newValue) => {
+                    setFormData({
+                      ...formData,
+                      subCategory: newValue._id,
+                    });
                   }}
-                  onClick={() => setAddCategoryPopup(true)}
-                >
-                  <AddIcon />
-                </IconButton>
-              </div>
-              <div>
-                <IconButton
-                  sx={{
-                    color: "white",
-                    width: "100%",
-                    backgroundColor: "#5f3dc3",
-                    borderRadius: "0.4rem",
-                    "&:hover": {
-                      backgroundColor: "#5f3dc3",
-                    },
-                  }}
-                  size="small"
-                  onClick={() => setViewCategoriesPopup(true)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </div>
-            </Box>
+                  renderInput={(params) => (
+                    <TextField {...params} label="Sub Category" />
+                  )}
+                />
+              </section>
+              <section>
+                <div>
+                  <IconButton
+                    sx={{
+                      width: "5rem",
+                      height: "100%",
+                      color: "#383737",
+                      backgroundColor: "#e2e3e3",
+                      borderRadius: "0.4rem",
+                      "&:hover": {
+                        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+                        color: "black",
+                      },
+                    }}
+                    onClick={() => setAddSubCategoryPopup(true)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </div>
+                <div>
+                  <IconButton
+                    sx={{
+                      color: "#383737",
+                      width: "5rem",
+                      height: "100%",
+                      backgroundColor: "#e2e3e3",
+                      borderRadius: "0.4rem",
+                      "&:hover": {
+                        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+                        color: "black",
+                      },
+                    }}
+                    size="small"
+                    onClick={() => setViewSubCategoriesPopup(true)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </div>
+              </section>
+            </article>
+          </div>
 
-            {/* ----------------------------------------------ADD Category Dialog Box-------------------------------------------------------------------------- */}
-
-            <AddCategoryDialog
-              open={addCategoryPopup}
-              onClose={() => setAddCategoryPopup(false)}
-              categoryName={categoryName}
-              setCategoryName={setCategoryName}
-              handleAddCategory={handleAddCategory}
-              loading={loadingStates.addCategory}
-            />
-            {/* ----------------------------------------------EDIT Category Dialog Box-------------------------------------------------------------------------- */}
-
-            <ViewCategoriesDialog
-              open={viewCategoriesPopup}
-              onClose={() => setViewCategoriesPopup(false)}
-              categories={categories}
-              editCategoryId={editCategoryId}
-              editCategoryName={editCategoryName}
-              setEditCategoryName={setEditCategoryName}
-              handleEditCategory={handleEditCategory}
-              handleSaveCategory={handleSaveCategory}
-              handleCancelCategory={handleCancelCategory}
-              handleDeleteCategory={handleDeleteCategory}
-            />
-          </article>
-          <article>
-            <TextField
-              sx={{ width: "100%" }}
-              id="productCategory "
-              label="Description"
-              multiline
-              value={formData.description}
-              rows={4}
-              variant="outlined"
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  description: e.target.value,
-                })
-              }
-            />
-          </article>
-          {/* -----------------------------------------------Sub Category Section----------------------------------------------------------------------------------------- */}
           <article>
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "0.3fr 0.2fr 0.3fr 0.1fr 0.1fr",
+                gridTemplateColumns: "1fr 1fr",
                 gap: 2,
+                my: "2rem",
               }}
             >
               <div>
@@ -651,6 +735,7 @@ export default function ProductForm() {
                   id="price"
                   label="Price (₹)"
                   variant="outlined"
+                  required
                   value={formData.price}
                   type="number"
                   onChange={(e) =>
@@ -676,66 +761,6 @@ export default function ProductForm() {
                     })
                   }
                 />
-              </div>
-              <div>
-                <Autocomplete
-                  sx={{ width: "100%" }}
-                  disablePortal
-                  options={subCategories}
-                  getOptionLabel={(option) => option?.name || ""}
-                  value={
-                    subCategories.find(
-                      (subCat) => subCat._id === formData.subCategory
-                    ) || null
-                  }
-                  loading={loadingStates.subcategory}
-                  onChange={(e, newValue) => {
-                    setFormData({
-                      ...formData,
-                      subCategory: newValue._id,
-                    });
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Sub Category" />
-                  )}
-                />
-              </div>
-
-              <div style={{ minWidth: "5rem" }}>
-                <IconButton
-                  color="primary"
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "#5f3dc3",
-                    color: "white",
-                    borderRadius: "0.4rem",
-                    "&:hover": {
-                      backgroundColor: "#5f3dc3",
-                    },
-                  }}
-                  onClick={() => setAddSubCategoryPopup(true)}
-                >
-                  <AddIcon />
-                </IconButton>
-              </div>
-              <div style={{ minWidth: "5rem" }}>
-                <IconButton
-                  sx={{
-                    color: "white",
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "#5f3dc3",
-                    borderRadius: "0.4rem",
-                    "&:hover": {
-                      backgroundColor: "#5f3dc3",
-                    },
-                  }}
-                  size="small"
-                  onClick={() => setViewSubCategoriesPopup(true)}
-                >
-                  <EditIcon />
-                </IconButton>
               </div>
             </Box>
             {/* ----------------------------------------------ADD Sub Category Dialog Box-------------------------------------------------------------------------- */}
@@ -765,13 +790,34 @@ export default function ProductForm() {
               handleDeleteSubCategory={handleDeleteSubCategory}
             />
           </article>
-
+          {/* -----------------------------------------------Product Description----------------------------------------------------------------------------------------- */}
+          <article>
+            <TextField
+              sx={{ width: "100%" }}
+              id="productCategory "
+              label="Description"
+              multiline
+              value={formData.description}
+              rows={4}
+              variant="outlined"
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  description: e.target.value,
+                })
+              }
+            />
+          </article>
           <article className="addVariant_container">
             <Box sx={{ margin: "auto" }}>
               <Button
                 variant="contained"
                 onClick={() => handleOpenDialog(null)}
-                sx={{ backgroundColor: "#5f3dc3" }}
+                sx={{
+                  backgroundColor: "#d9d9d9",
+                  color: "#383737",
+                  boxShadow: "none",
+                }}
               >
                 Add Variant
               </Button>
@@ -938,20 +984,22 @@ export default function ProductForm() {
               }}
             >
               <LoadingButton
+                size="large"
                 loading={loadingStates.addProduct}
                 variant="contained"
                 type="submit"
+                disabled={loadingStates.draftProduct}
                 value="Published"
                 sx={{ backgroundColor: "#5f3dc3" }}
-                // onClick={(e) => addProductHandler(e, "Published")}
               >
                 Add Product
               </LoadingButton>
 
               <LoadingButton
+                size="large"
                 loading={loadingStates.draftProduct}
                 type="submit"
-                // onClick={(e) => addProductHandler(e, "Draft")}
+                disabled={loadingStates.addProduct}
                 variant="outlined"
                 color="success"
                 value="Draft"

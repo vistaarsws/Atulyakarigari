@@ -58,18 +58,6 @@
 .authTemplate_container > section:first-of-type article form {
   margin-inline: auto;
 
-  & div:last-of-type {
-    button {
-      padding: 1rem 2rem;
-      font-size: 1.4rem;
-      background-color: #60a487;
-      border: none;
-      width: 100%;
-      color: white;
-      border-radius: 0.6rem;
-    }
-  }
-
   & > p:last-of-type {
     margin: 1rem auto 2rem;
   }

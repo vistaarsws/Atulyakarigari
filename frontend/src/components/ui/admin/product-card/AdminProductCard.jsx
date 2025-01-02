@@ -9,7 +9,7 @@ import { getProducts } from "../../../../services/user/userAPI";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-export default function AdminProductCard() {
+export default function AdminProductCard({ products }) {
   const transformData = products.map((product) => ({
     profileImg: product.images[0], // Assuming the first image is used
     category: product.category,

@@ -4,12 +4,14 @@ import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 // -------------------------------------------------------------------------------------------------
-import { getProducts } from "../../../../services/user/userAPI";
+
+import { useSelector } from "react-redux";
 
 import "./DraftSection.css";
 
 export default function DraftSection() {
-  const [drafts, setDrafts] = useState([]);
+  const allProducts = useSelector((state) => state.products.products);
+
   const [range, setRange] = useState([
     {
       startDate: new Date(),
@@ -51,18 +53,7 @@ export default function DraftSection() {
     return date.toLocaleDateString("en-GB"); // This will return the date in "DD/MM/YYYY"
   };
 
-  const getAllProducts = async () => {
-    const products = await getProducts();
-    const DraftedProducts = products.data.data.products.filter(
-      (prod) => prod.status === "Draft"
-    );
-
-    setDrafts(DraftedProducts);
-  };
-
-  useEffect(() => {
-    getAllProducts();
-  }, []);
+  const draftedProducts = allProducts.filter((prod) => prod.status === "Draft");
 
   return (
     <>
@@ -77,7 +68,7 @@ export default function DraftSection() {
               value={`${formatDate(range[0].startDate)} - ${formatDate(range[0].endDate)}`} // Apply the format
               onClick={handleDateClick} // Opens the calendar when clicked
               style={{
-                padding: "10px",
+                padding: "8px",
                 border: "1px solid #6F6F6F33",
                 borderRadius: "4px",
                 width: "17rem",
@@ -116,13 +107,13 @@ export default function DraftSection() {
         </div>
 
         <div className="draft-list">
-          {drafts?.map((draftProduct, index) => (
+          {draftedProducts?.map((draftProduct, index) => (
             <div key={index} className="draft-item">
               <p>{draftProduct.name}</p>
               <span>{formateTimeStamp(draftProduct.createdAt)}</span>
             </div>
           ))}
-          {drafts.length === 0 && <p>No Draft Added</p>}
+          {draftedProducts.length === 0 && <p>No Draft Added</p>}
         </div>
       </div>
     </>
