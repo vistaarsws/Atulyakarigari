@@ -81,7 +81,7 @@ const Index = () => {
         </div>
       </section>
       <div className="paginationContainer">
-        <Pagination count={4} />
+        <Pagination count={totalPages} />
       </div>
     </div>
   );
