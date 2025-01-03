@@ -32,4 +32,13 @@ const getUserWishlist = async () => {
   return response;
 };
 
-export { createProduct, getProducts, getProfile, updateProfile, getUserWishlist };
+const getcategoryById = async (id) => {
+  const response = await apiConnector("GET", user_endpoints.GET_CATEGORY_BY_ID+`${id}`);
+  return response;
+};
+const getcategory = async () => {
+  const response = await apiConnector("GET", user_endpoints.GET_CATEGORY);
+  return response;
+};
+
+export { createProduct, getProducts, getProfile, updateProfile, getUserWishlist, getcategory, getcategoryById };

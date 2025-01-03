@@ -64,19 +64,18 @@ export const getCategoryById = async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return badRequest(req, res, null, "invalid id");
+            return badRequest(req, res, null, "Invalid category ID");
         }
         const category = await Category.findById(id)
-        // .populate({
-        //     path: 'Subcategory',
-        //     select: 'name',
-        //     populate: {
-        //         path: 'products',
-        //         model: 'Product'
-        //     }
-        // })
-        // .populate('products');
+            .populate({
+                path: 'products', // Populating products field in Category
+                populate: {
+                    path: 'ratingAndReviews', // Populating ratingAndReviews field in each product
+                    model: 'RatingAndReviews' // Specifying the model for ratingAndReviews
+                }
+            });
 
+        // If category is not found
         if (!category) {
             return notFoundRequest(req, res, null, "Category not found");
         }

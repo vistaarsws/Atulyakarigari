@@ -43,7 +43,7 @@ const getRoutesConfig = () => ({
   publicRoutes: [
     { path: "/", element: <Home /> },
     { path: "/about", element: <About /> },
-    { path: "/categories", element: <Categories /> },
+    { path: "/categories/:id", element: <Categories /> },
     { path: "/blogs", element: <Blogs /> },
     { path: "/artisans", element: <Artisans /> },
     { path: "/product/:id", element: <Product /> },
