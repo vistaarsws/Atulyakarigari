@@ -1,11 +1,54 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import BanarsiSilkFilter from "./BanarsiSilkFilter";
 import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
-import { top_product_list_from_category } from "../../../utils/Constant";
-import BANNER_IMAGE from "../../../assets/images/categoryImage.png";
 import { Pagination } from "@mui/material";
-
+import { getcategoryById } from "../../../../src/services/user/userAPI";
 import "./CategoryPage.css";
+
 const Index = () => {
+  const { id } = useParams(); // Get the category ID from the route params
+  const [categoryData, setCategoryData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) {
+      console.error("Invalid category ID");
+      return;
+    }
+
+    const fetchCategoryData = async () => {
+      try {
+        const response = await getcategoryById(id); // Pass the ID to the API call
+        if (response?.data?.data) {
+          setCategoryData(response?.data?.data);
+          // console.log("Fetched category data:", categoryData);
+        } else {
+          console.error("API response does not contain data:", response);
+        }
+      } catch (error) {
+        console.error("Error fetching category data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategoryData();
+  }, [id]);
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (!categoryData) {
+    return <div className="error">Failed to load category data.</div>;
+  }
+
+  const products = categoryData.products || []; // Ensure products is an array
+  console.log("Products:", products);
+
+  const totalPages = Math.ceil(products.length / 10); // Example pagination logic
+
   return (
     <div className="categoryPage_container">
       {/* <img src={BANNER_IMAGE} style={{ width: "100%" }} /> */}
@@ -14,20 +57,31 @@ const Index = () => {
         <div>
           <BanarsiSilkFilter />
         </div>
-        <div>
-          {top_product_list_from_category?.products?.map((ele) => (
-            <ProductCard
-              key={ele.key}
-              id={ele.key}
-              title={ele.title}
-              picture={ele.picture}
-              price={ele.price}
-            />
-          ))}
+        <div className="productList">
+          {products.length > 0 ? (
+            products.map(
+              (product) => (
+                // console.log("products.map", product?.name),
+                (
+                  <ProductCard
+                    key={product?._id}
+                    id={product?._id}
+                    title={product?.name || "No Title"}
+                    picture={product?.artisanImage || ""}
+                    price={product?.price || "N/A"}
+                    shortDescription={product?.description || "No Description"}
+                    offer_inPercent={product?.discountPercentage || 0}
+                  />
+                )
+              )
+            )
+          ) : (
+            <div>No products available.</div>
+          )}
         </div>
       </section>
       <div className="paginationContainer">
-        <Pagination count={4} />
+        <Pagination count={totalPages} />
       </div>
     </div>
   );
