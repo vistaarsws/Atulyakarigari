@@ -19,7 +19,7 @@ export const getWishlist = async (req, res) => {
     }
 };
 
-
+// Toggle Item in Wishlist
 export const toggleItemInWishlist = async (req, res) => {
     const { _id } = req.user;
     const { productId } = req.body;
@@ -55,24 +55,5 @@ export const toggleItemInWishlist = async (req, res) => {
         return success(req, res, "Product added to wishlist", wishlist.toObject());
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-
-// Clear Wishlist
-export const clearWishlist = async (req, res) => {
-    const { _id } = req.user
-    try {
-        const wishlist = await Wishlist.findOneAndUpdate(
-            { userId: _id },
-            { $set: { items: [] } },
-            { new: true }
-        );
-        if (!wishlist) {
-            return notFoundRequest(req, res, null, 'Wishlist not found')
-        }
-        return success(req, res, "Wishlist retrieved successfully", wishlist.toObject());
-    } catch (error) {
-        return internalServerError(req, res, error, 'Failed to retrieve wishlist');
     }
 };
