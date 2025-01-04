@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+
 import AdminProductCard from "../../../components/ui/admin/product-card/AdminProductCard";
 import { useEffect, useState } from "react";
 import "./Products.css";
@@ -38,15 +39,15 @@ function a11yProps(index) {
 }
 
 export default function Products() {
+  const [value, setValue] = useState(0);
   const dispatch = useDispatch();
+
   const allProducts = useSelector((state) => state.products.products);
   useEffect(() => {
     if (allProducts.length === 0) {
       dispatch(fetchAllProducts());
     }
   }, [allProducts]);
-
-  const [value, setValue] = useState(0);
 
   const draftedProducts = allProducts?.filter(
     (prod) => prod.status === "Draft"
@@ -77,19 +78,20 @@ export default function Products() {
           <Tab label={`Out Of Stock (1000)`} {...a11yProps(3)} />
         </Tabs>
       </Box>
-      <Box></Box>
-      <CustomTabPanel value={value} index={0}>
-        <AdminProductCard products={allProducts} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <AdminProductCard products={publishedProducts} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        <AdminProductCard products={draftedProducts} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={3}>
-        <AdminProductCard products={outOfStock} />
-      </CustomTabPanel>
+      <Box>
+        <CustomTabPanel value={value} index={0}>
+          <AdminProductCard products={allProducts} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <AdminProductCard products={publishedProducts} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={2}>
+          <AdminProductCard products={draftedProducts} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={3}>
+          <AdminProductCard products={outOfStock} />
+        </CustomTabPanel>
+      </Box>
     </Box>
   );
 }

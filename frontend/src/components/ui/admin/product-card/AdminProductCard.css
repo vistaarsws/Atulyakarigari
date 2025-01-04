@@ -29,3 +29,11 @@
   cursor: pointer;
   color: red;
 }
+
+.ag-center-cols-viewport {
+  min-height: 100% !important;
+}
+
+.ag-layout-auto-height {
+  min-height: 4rem !important;
+}

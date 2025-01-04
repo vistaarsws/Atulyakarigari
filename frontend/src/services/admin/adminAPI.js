@@ -93,6 +93,18 @@ const getSubCategoryByCategoryId = async (id) => {
   return response;
 };
 
+const getCategoryById = async (id) => {
+  const response = await apiConnector(
+    "GET",
+    `${admin_endpoints.GET_CATEGORY_BY_ID}/${id}`,
+    {
+      id,
+    }
+  );
+
+  return response;
+};
+
 export {
   getCategory,
   createCategory,
@@ -103,4 +115,5 @@ export {
   deleteSubCategory,
   updateSubCategory,
   getSubCategoryByCategoryId,
+  getCategoryById,
 };
