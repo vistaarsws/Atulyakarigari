@@ -1,12 +1,14 @@
 import "./WishListHeartIcon.css";
+import { toggleWishlistItem } from "../../../../services/user/userAPI";
+export default function WishListHeartIcon({ productId }) {
 
-export default function WishListHeartIcon() {
   return (
     <>
       <div
         className="wishListHeart_box"
         onClick={(e) => {
           e.stopPropagation();
+          toggleWishlistItem(productId);   
         }}
       >
         <input

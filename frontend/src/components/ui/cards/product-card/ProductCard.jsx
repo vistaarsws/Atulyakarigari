@@ -55,7 +55,7 @@ function ProductCard({
         </div>
         <section>
           <div>
-            <WishListHeartIcon />
+            <WishListHeartIcon productId={id} />
           </div>
           
         </section>
