@@ -43,7 +43,7 @@ import {
 import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function ProductForm() {
+export default function ProductForm({ productDetails, isProductEditing }) {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products.products);
   const [loadingStates, setLoadingStates] = useState({
@@ -75,7 +75,7 @@ export default function ProductForm() {
   const [editSubCategoryId, setEditSubCategoryId] = useState(null);
   const [editSubCategoryName, setEditSubCategoryName] = useState("");
 
-  const [subCategoryName, setSubCategoryName] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("juhygtf");
   const [viewSubCategoriesPopup, setViewSubCategoriesPopup] = useState(false);
   const [addSubCategoryPopup, setAddSubCategoryPopup] = useState(false);
   const [subCategories, setSubCategories] = useState([]);
@@ -83,7 +83,7 @@ export default function ProductForm() {
   const [parentCategory, setParentCategory] = useState("");
 
   // const [products, setProducts] = useState([]);
-
+  console.log("zz", productDetails);
   const initialState = {
     name: "",
     productImage: [],
@@ -100,7 +100,39 @@ export default function ProductForm() {
     artisanImage: null,
   };
 
-  const [formData, setFormData] = useState(initialState);
+  const [formData, setFormData] = useState(() => ({
+    name: productDetails?.name || "",
+    productImage: productDetails?.images || [],
+    description: productDetails?.description || "",
+    price: productDetails?.price || "",
+    category: productDetails?.category || null,
+    subCategory: productDetails?.subCategory || "",
+    _attributes: productDetails?._attributes || [],
+    stock: productDetails?.stock || "",
+    status: productDetails?.status || "",
+    discountPercentage: productDetails?.discountPercentage || "",
+    artisanName: productDetails?.artisanName || "",
+    artisanAbout: productDetails?.artisanAbout || "",
+    artisanImage: productDetails?.artisanImage || null,
+  }));
+
+  //   if (productDetails) {
+  //   setFormData({
+  //     name: productDetails.name,
+  //     productImage: productDetails.images,
+  //     description: productDetails.description,
+  //     price: productDetails.price,
+  //     category: productDetails.category,
+  //     subCategory: productDetails.subCategory,
+  //     _attributes: productDetails._attributes,
+  //     stock: productDetails.stock,
+  //     status: productDetails.status,
+  //     discountPercentage: productDetails.discountPercentage,
+  //     artisanName: productDetails.artisanName,
+  //     artisanAbout: productDetails.artisanAbout,
+  //     artisanImage: null,
+  //   });
+  // }
 
   const handleOpenDialog = (variant = null) => {
     if (variant) {
@@ -344,9 +376,9 @@ export default function ProductForm() {
   // };
   // --------------------------------------------------------------------------------------------------
   useEffect(() => {
-    if (products.length === 0) {
-      dispatch(fetchAllProducts());
-    }
+    dispatch(fetchAllProducts());
+    console.log(formData.subCategory);
+    // getSubCategoryData(formData.subCategory);
   }, [dispatch, products]);
 
   useEffect(() => {
@@ -416,10 +448,6 @@ export default function ProductForm() {
       // API call
       await createProduct(formDataInstance);
 
-      if (buttonClicked === "Draft") {
-        getAllProducts();
-      }
-
       setFormData(initialState);
       setLoadingStates({
         ...loadingStates,
@@ -477,6 +505,17 @@ export default function ProductForm() {
     maxFiles: 1, // Limit to 1 image
   });
 
+  const handleImageChange = (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => {
+        const updatedImages = [...prev.productImage];
+        updatedImages[index] = file; // Replace the clicked image with the new one
+        return { ...prev, productImage: updatedImages };
+      });
+    }
+  };
+
   return (
     <form onSubmit={addProductHandler}>
       <div className="form-main">
@@ -502,26 +541,44 @@ export default function ProductForm() {
           {/* Image Thumbnails */}
           <div className="image-thumbnails" style={{ marginTop: "20px" }}>
             {formData.productImage.map((file, index) => (
-              <img
+              <div
                 key={index}
-                src={URL.createObjectURL(file)}
-                alt={`Preview ${index + 1}`}
-                className="thumbnail"
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  margin: "10px",
-                  borderRadius: "8px",
-                }}
-              />
+                style={{ display: "inline-block", position: "relative" }}
+              >
+                <img
+                  src={
+                    typeof file === "string"
+                      ? file // Use the URL if it's a string
+                      : URL.createObjectURL(file) // Create a preview for File objects
+                  }
+                  alt={`Preview ${index + 1}`}
+                  className="thumbnail"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    margin: "10px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() =>
+                    document.getElementById(`file-input-${index}`).click()
+                  } // Trigger file input on click
+                />
+                <input
+                  id={`file-input-${index}`}
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={(e) => handleImageChange(e, index)} // Handle image change
+                />
+              </div>
             ))}
           </div>
         </div>
 
         {/* Form */}
         <div className="form-fields">
-          <h2>New Product Details</h2>
+          <h2>{`${isProductEditing ? "Edit" : "New"} Product Details`} </h2>
 
           <article>
             <div>
@@ -939,22 +996,40 @@ export default function ProductForm() {
                 )}
 
                 {/* Show the image inside the dotted area */}
-                {formData.artisanImage && (
-                  <img
-                    src={URL.createObjectURL(formData.artisanImage)}
-                    alt="Preview"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      zIndex: 1, // Ensure the image appears above the text
-                    }}
-                  />
-                )}
+                {formData.artisanImage &&
+                  (typeof formData.artisanImage === "string" ? (
+                    // If artisanImage is a URL string, use it directly
+                    <img
+                      src={formData.artisanImage}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        zIndex: 1, // Ensure the image appears above the text
+                      }}
+                    />
+                  ) : (
+                    // If artisanImage is a File/Blob, use URL.createObjectURL
+                    <img
+                      src={URL.createObjectURL(formData.artisanImage)}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        zIndex: 1, // Ensure the image appears above the text
+                      }}
+                    />
+                  ))}
               </div>
               <div>
                 <TextField
@@ -975,39 +1050,41 @@ export default function ProductForm() {
               </div>
             </div>
           </article>
-          <article>
-            <Box
-              sx={{
-                display: "flex",
-                gap: "1rem",
-                justifyContent: "end",
-              }}
-            >
-              <LoadingButton
-                size="large"
-                loading={loadingStates.addProduct}
-                variant="contained"
-                type="submit"
-                disabled={loadingStates.draftProduct}
-                value="Published"
-                sx={{ backgroundColor: "#5f3dc3" }}
+          {!isProductEditing && (
+            <article>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "1rem",
+                  justifyContent: "end",
+                }}
               >
-                Add Product
-              </LoadingButton>
+                <LoadingButton
+                  size="large"
+                  loading={loadingStates.addProduct}
+                  variant="contained"
+                  type="submit"
+                  disabled={loadingStates.draftProduct}
+                  value="Published"
+                  sx={{ backgroundColor: "#5f3dc3" }}
+                >
+                  Add Product
+                </LoadingButton>
 
-              <LoadingButton
-                size="large"
-                loading={loadingStates.draftProduct}
-                type="submit"
-                disabled={loadingStates.addProduct}
-                variant="outlined"
-                color="success"
-                value="Draft"
-              >
-                Save As Draft
-              </LoadingButton>
-            </Box>
-          </article>
+                <LoadingButton
+                  size="large"
+                  loading={loadingStates.draftProduct}
+                  type="submit"
+                  disabled={loadingStates.addProduct}
+                  variant="outlined"
+                  color="success"
+                  value="Draft"
+                >
+                  Save As Draft
+                </LoadingButton>
+              </Box>
+            </article>
+          )}
         </div>
       </div>
     </form>

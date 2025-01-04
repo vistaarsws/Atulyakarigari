@@ -1,13 +1,14 @@
 .image-upload {
-  flex: 1;
+  flex: 40%;
   & > h2 {
     padding: 1rem 0 2rem;
   }
 }
 
 .form-main {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
+  display: flex;
+  flex-wrap: wrap;
+  /* grid-template-columns: 1fr 2fr; */
   gap: 2rem;
 }
 
@@ -105,8 +106,7 @@
 }
 
 .form-fields {
-  flex: 1;
-
+  flex: 50%;
   & > h2 {
     padding: 1rem 0 2rem;
   }
@@ -142,6 +142,11 @@
       }
     }
   }
+}
+
+.css-10d30g3-MuiPaper-root-MuiDialog-paper {
+  max-width: unset !important;
+  width: 60% !important;
 }
 
 @media screen and (max-width: 768px) {
