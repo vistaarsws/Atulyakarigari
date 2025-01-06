@@ -6,7 +6,6 @@ import { HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb } from "antd";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-// import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import about_artisan from "../../../assets/images/about_artisan.png";
 import review_person from "../../../assets/images/reviewPerson.png";
@@ -32,7 +31,7 @@ import cat5_2 from "../../../assets/images/cat5_2.png";
 import cat5_3 from "../../../assets/images/cat5_3.png";
 import cat5_4 from "../../../assets/images/cat5_4.png";
 import cat5_5 from "../../../assets/images/cat5_5.png";
-import cat5_6 from "../../../assets/images/cat5_1.png";
+import { getProductById } from "../../../../src/services/user/userAPI";
 
 // ----------------------------------------------------------------------------------------
 function CustomTabPanel(props) {
@@ -72,7 +71,7 @@ const theme = createTheme({
 });
 
 export default function Product() {
-  let { userId } = useParams();
+  let { id: productId } = useParams();
   const [productQuantity, setProductQuantity] = useState(0);
   const navigate = useNavigate();
 
@@ -82,6 +81,7 @@ export default function Product() {
     setValue(newValue);
   };
   const breadcrumbItems = [
+    
     // { title: "Home", href: "/" },
     { title: "Banarsi Silk ", href: "/categories" },
     { title: "Banarasi Nikhaar", href: "/categories" },
@@ -209,55 +209,56 @@ export default function Product() {
   };
 
   const startTime = useRef(null); // Track when the user enters the page
+  const [product, setProduct] = useState(null);
+  const fetchProduct = async () => {
+    const response = await getProductById(productId);
+    setProduct(response?.data?.data);
+    console.log("response", response?.data?.data);
+  };
 
   useEffect(() => {
     // Record the time the user enters the page
     startTime.current = new Date();
-
+    fetchProduct();
     return () => {
       // Calculate time spent when the user leaves the page
       const endTime = new Date();
       const timeSpent = Math.floor((endTime - startTime.current) / 1000); // Time in seconds
 
       // Log to analytics
-      logEvent("Product", "Time Spent", userId, timeSpent);
-      console.log(`User spent ${timeSpent} seconds on product ${userId}`);
+      logEvent("Product", "Time Spent", productId, timeSpent);
+      console.log(`User spent ${timeSpent} seconds on product ${productId}`);
     };
-  }, [userId]); // Track changes to the product ID in case the route changes
+  }, [productId]); // Track changes to the product ID in case the route changes
 
   return (
     <ThemeProvider theme={theme}>
       <div className="product_container">
         <div>
-          <Breadcrumb items={items} />
+          <Breadcrumb items={[{title:product?.category?.name||"category",href:`/categories/${product?.category?._id}`},{title:product?.subcategory?.name|| "subcategory",href:""}]} />
         </div>
         <div>
           <section>
-            <ProductView />
+            <ProductView productImages={product?.images} />
+            {/* {console.log(<ProductView images={product?.images} />)} */}
           </section>
           <section className="product_details_header">
             <div>
-              <h1>Banarsi Nikhaar</h1>
+              <h1>{product?.name}</h1>
               <div>
-                <WishListHeartIcon />
+                <WishListHeartIcon productId={product?._id} />
                 <figure>
                   <img src={share} alt="Share" />
                 </figure>
               </div>
             </div>
-            <p>
-              Banarasi silk fabric is a fine quality silk variant originating
-              from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in
-              the rich history of India. Saree woven from silk is known as
-              Banarasi silk Saree, which is an extremely famous fabric all over
-              India and the world.
-            </p>
+            <p>{product?.description || "No Description"}</p>
             <div className="priceRatingContainer">
               <div>
                 <div className="priceBox">
-                  <h2>₹26,700</h2>
-                  <strike>₹32,700</strike>
-                  <h4>(-{15}%)</h4>
+                  <h2>₹{product?.priceAfterDiscount || "N/A"}</h2>
+                  <strike>₹{product?.price || "N/A"}</strike>
+                  <h4>(-{product?.discountPercentage || 0}%)</h4>
                 </div>
 
                 <div className="ratingBox">
@@ -284,11 +285,14 @@ export default function Product() {
             <article className="product_details_description">
               <h2>Product Description</h2>
               <ul>
-                {product_description.properties.map((property, index) => {
+                {product?.attributes.map((property, index) => {
+                  console.log("property", property);
                   return (
                     <li key={index}>
-                      <div>{property.type}</div>
-                      <div>{property.value}</div>
+                      <div>{property.key}</div>
+                      {property.value.map((val, i) => (
+                        <span key={i}>{val}</span>
+                      ))}
                       <div className="bottomLine"></div>
                     </li>
                   );
@@ -352,20 +356,11 @@ export default function Product() {
               <CustomTabPanel value={value} index={0}>
                 <div className="about_artisan">
                   <figure>
-                    <img src={about_artisan} alt="About Artisan" />
+                    <img src={product?.artisanImage} alt="About Artisan" />
                   </figure>
                   <div>
-                    <h3>Khilesh Sahu</h3>
-                    <p>
-                      Khilesh Sahu is a master artisan specializing in the
-                      intricate art of sari-making. With over [number] years of
-                      experience, Khilesh has developed a signature style that
-                      blends traditional craftsmanship with contemporary design.
-                      Each sari is handwoven using fine materials such as silk,
-                      cotton, and linen, showcasing exquisite patterns inspired
-                      by [cultural references or regions]. Passionate about
-                      preserving the rich heritage of Indian textiles,{" "}
-                    </p>
+                    <h3>{product?.artisanName}</h3>
+                    <p>{product?.artisanAbout}</p>
                   </div>
                 </div>
               </CustomTabPanel>

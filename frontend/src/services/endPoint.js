@@ -25,6 +25,7 @@ export const admin_endpoints = {
 
 export const user_endpoints = {
   GET_PRODUCT: BASE_URL + "/api/v1/product/get",
+  GET_PRODUCT_BY_ID: BASE_URL + "/api/v1/product/get/",
   CREATE_PRODUCT: BASE_URL + "/api/v1/product/create",
   USER_PROFILE: BASE_URL + "/api/v1/profile/get",
   USER_PROFILE_UPDATE: BASE_URL + "/api/v1/profile/update",
