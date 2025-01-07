@@ -42,8 +42,6 @@ export default function AdminProductCard({ products }) {
     }
   }, [dispatch, getCategory]);
 
-  console.log("Categories:", getCategory);
-
   const transformData = products.map((product) => ({
     profileImg: product.images[0], // Assuming the first image is used
     category: getCategoryName(product.category)?.name,

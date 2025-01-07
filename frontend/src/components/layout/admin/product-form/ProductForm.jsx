@@ -45,6 +45,23 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function ProductForm({ productDetails, isProductEditing }) {
   const dispatch = useDispatch();
+
+  const [formData, setFormData] = useState(() => ({
+    name: productDetails?.name || "",
+    productImage: productDetails?.images || [],
+    description: productDetails?.description || "",
+    price: productDetails?.price || "",
+    category: productDetails?.category || null,
+    subCategory: productDetails?.subCategory || "",
+    _attributes: productDetails?.attributes || [],
+    stock: productDetails?.stock || "",
+    status: productDetails?.status || "",
+    discountPercentage: productDetails?.discountPercentage || "",
+    artisanName: productDetails?.artisanName || "",
+    artisanAbout: productDetails?.artisanAbout || "",
+    artisanImage: productDetails?.artisanImage || null,
+  }));
+
   const products = useSelector((state) => state.products.products);
   const [loadingStates, setLoadingStates] = useState({
     category: false,
@@ -61,7 +78,9 @@ export default function ProductForm({ productDetails, isProductEditing }) {
   const [variantOption, setVariantOption] = useState("");
   const [variantValues, setVariantValues] = useState([]);
   const [currentVariantValue, setCurrentVariantValue] = useState("");
-  const [savedVariants, setSavedVariants] = useState([]);
+  const [savedVariants, setSavedVariants] = useState(() =>
+    productDetails ? productDetails.attributes : []
+  );
   const [variantToEdit, setVariantToEdit] = useState(null);
 
   const [categoryName, setCategoryName] = useState("");
@@ -75,14 +94,13 @@ export default function ProductForm({ productDetails, isProductEditing }) {
   const [editSubCategoryId, setEditSubCategoryId] = useState(null);
   const [editSubCategoryName, setEditSubCategoryName] = useState("");
 
-  const [subCategoryName, setSubCategoryName] = useState("juhygtf");
+  const [subCategoryName, setSubCategoryName] = useState("");
   const [viewSubCategoriesPopup, setViewSubCategoriesPopup] = useState(false);
   const [addSubCategoryPopup, setAddSubCategoryPopup] = useState(false);
   const [subCategories, setSubCategories] = useState([]);
 
   const [parentCategory, setParentCategory] = useState("");
 
-  // const [products, setProducts] = useState([]);
   console.log("zz", productDetails);
   const initialState = {
     name: "",
@@ -99,22 +117,6 @@ export default function ProductForm({ productDetails, isProductEditing }) {
     artisanAbout: "",
     artisanImage: null,
   };
-
-  const [formData, setFormData] = useState(() => ({
-    name: productDetails?.name || "",
-    productImage: productDetails?.images || [],
-    description: productDetails?.description || "",
-    price: productDetails?.price || "",
-    category: productDetails?.category || null,
-    subCategory: productDetails?.subCategory || "",
-    _attributes: productDetails?._attributes || [],
-    stock: productDetails?.stock || "",
-    status: productDetails?.status || "",
-    discountPercentage: productDetails?.discountPercentage || "",
-    artisanName: productDetails?.artisanName || "",
-    artisanAbout: productDetails?.artisanAbout || "",
-    artisanImage: productDetails?.artisanImage || null,
-  }));
 
   //   if (productDetails) {
   //   setFormData({
@@ -136,6 +138,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
   const handleOpenDialog = (variant = null) => {
     if (variant) {
+      console.log("TTTPTPTPTPTPT", variant);
       // Editing mode: Populate fields with variant data
       setVariantOption(variant.key);
       setVariantValues(variant.value);
@@ -183,25 +186,27 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
   // Handle saving the variant
   const handleSave = () => {
+    // Normalize variantValues to always be an array
+    const normalizedValues = Array.isArray(variantValues)
+      ? variantValues
+      : [variantValues]; // If it's not an array, convert it to an array
+
     if (isEditing && variantToEdit) {
-      // Update variant
+      // Update an existing variant
       setSavedVariants((prev) =>
         prev.map((variant) =>
           variant.key === variantToEdit
-            ? { ...variant, key: variantOption, value: variantValues }
+            ? { ...variant, key: variantOption, value: normalizedValues }
             : variant
         )
       );
     } else {
-      // Add new variant
-      console.log(variantOption, variantValues, "rishit");
-
+      // Add a new variant
       setSavedVariants((prev) => [
         ...prev,
-        { key: variantOption, value: variantValues },
+        { key: variantOption, value: normalizedValues },
       ]);
     }
-    // debugger;
 
     handleCloseDialog();
   };
@@ -365,21 +370,20 @@ export default function ProductForm({ productDetails, isProductEditing }) {
     setEditSubCategoryName("");
   };
 
-  // --------------------------------------------------------------------------------------------------
-  // const getAllProducts = async () => {
-  //   try {
-  //     const products = await getProducts();
-  //     dispatch(setProducts(products.data.data.products));
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // --------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    if (formData.category) {
+      getSubCategoryData(formData.category);
+    }
+
+    console.log("YYYYYYYYY", productDetails);
+  }, []);
+
   useEffect(() => {
     dispatch(fetchAllProducts());
-    console.log(formData.subCategory);
+
+    // console.log(formData.subCategory);
     // getSubCategoryData(formData.subCategory);
-  }, [dispatch, products]);
+  }, [dispatch]);
 
   useEffect(() => {
     getCategoryData();
@@ -418,7 +422,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
       if (formData._attributes) {
         formDataInstance.append(
           "_attributes",
-          JSON.stringify(formData._attributes)
+          JSON.stringify([...formData._attributes])
         );
       }
 
@@ -447,7 +451,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
       // API call
       await createProduct(formDataInstance);
-
+      setSavedVariants([]);
       setFormData(initialState);
       setLoadingStates({
         ...loadingStates,
@@ -548,8 +552,10 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                 <img
                   src={
                     typeof file === "string"
-                      ? file // Use the URL if it's a string
-                      : URL.createObjectURL(file) // Create a preview for File objects
+                      ? file // If file is a string, use it as the URL
+                      : file instanceof File
+                        ? URL.createObjectURL(file) // If it's a File object, create a preview URL
+                        : "" // Fallback in case file is neither
                   }
                   alt={`Preview ${index + 1}`}
                   className="thumbnail"
@@ -881,7 +887,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
               {/* Saved Variants Display */}
               <div className="attributeCards_container">
-                {savedVariants.map((variant) => (
+                {savedVariants?.map((variant) => (
                   <Paper
                     key={variant.key}
                     elevation={3}
@@ -906,6 +912,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                         {variant.key}
                       </Typography>
 
+                      {console.log("VVVVVVVVVV", variant)}
                       <Box>
                         <IconButton
                           color="primary"
@@ -931,14 +938,17 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                         marginTop: 1,
                       }}
                     >
-                      {variant.value.map((value) => (
-                        <Chip
-                          key={value}
-                          label={value}
-                          color="primary"
-                          variant="outlined"
-                        />
-                      ))}
+                      {variant.value.map((value) => {
+                        console.log(variant.value);
+                        return (
+                          <Chip
+                            key={value}
+                            label={value}
+                            color="primary"
+                            variant="outlined"
+                          />
+                        );
+                      })}
                     </Box>
                   </Paper>
                 ))}
