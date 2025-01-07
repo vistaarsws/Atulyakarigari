@@ -14,6 +14,15 @@ const getProducts = async () => {
   const response = await apiConnector("GET", user_endpoints.GET_PRODUCT);
   return response;
 };
+
+const getProductById = async (productId) => {
+  const response = await apiConnector(
+    "GET",
+    user_endpoints.GET_PRODUCT_BY_ID + `${productId}`
+  );
+  return response;
+}
+
 const getProfile = async () => {
   const response = await apiConnector("GET", user_endpoints.USER_PROFILE);
   return response;
@@ -32,6 +41,13 @@ const getUserWishlist = async () => {
   return response;
 };
 
+const toggleWishlistItem = async (productId) => {
+  const response = await apiConnector("POST", user_endpoints.TOGGLE_WISHLIST, {
+    productId,
+  });
+  return response;
+}
+
 const getcategoryById = async (id) => {
   const response = await apiConnector("GET", user_endpoints.GET_CATEGORY_BY_ID+`${id}`);
   return response;
@@ -41,4 +57,4 @@ const getcategory = async () => {
   return response;
 };
 
-export { createProduct, getProducts, getProfile, updateProfile, getUserWishlist, getcategory, getcategoryById };
+export { createProduct, getProducts, getProductById, getProfile, updateProfile, getUserWishlist, toggleWishlistItem, getcategory, getcategoryById };

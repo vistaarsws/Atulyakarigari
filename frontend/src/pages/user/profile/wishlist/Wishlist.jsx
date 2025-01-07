@@ -49,6 +49,7 @@ const Wishlist = () => {
     try {
       const response = await getUserWishlist(userId);
       const wishlist = response?.data?.data?.wishlist || [];
+      console.log(wishlist);
 
       if (response?.data?.success && wishlist.length > 0) {
         setWishlistItems(wishlist[0]?.items || []);

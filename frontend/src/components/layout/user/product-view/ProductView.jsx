@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import productpage_1 from "../../../../assets/images/cat5_2.png";
 import productpage_2 from "../../../../assets/images/productpage_2.png";
 import productpage_3 from "../../../../assets/images/productpage_3.png";
@@ -67,3 +68,8 @@ export default function ProductView({ productImages = images }) {
     </>
   );
 }
+
+ProductView.propTypes  = {
+  productImages: PropTypes.array,
+
+  }
