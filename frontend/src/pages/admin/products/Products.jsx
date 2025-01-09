@@ -43,6 +43,7 @@ export default function Products() {
   const dispatch = useDispatch();
 
   const allProducts = useSelector((state) => state.products.products);
+
   useEffect(() => {
     if (allProducts.length === 0) {
       dispatch(fetchAllProducts());
