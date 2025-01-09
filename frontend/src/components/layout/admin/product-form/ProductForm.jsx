@@ -23,14 +23,18 @@ import {
   createCategory,
   deleteCategory,
   updateCategory,
-  //   getSubCategory,
+  // getSubCategory,
   createSubCategory,
   updateSubCategory,
   deleteSubCategory,
   getSubCategoryByCategoryId,
 } from "../../../../services/admin/adminAPI";
 
-import { createProduct, getProducts } from "../../../../services/user/userAPI";
+import {
+  createProduct,
+  getProducts,
+  updateProduct,
+} from "../../../../services/user/userAPI";
 
 import { Add as AddIcon } from "@mui/icons-material";
 import {
@@ -44,6 +48,8 @@ import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function ProductForm({ productDetails, isProductEditing }) {
+  console.log("X Product", productDetails);
+
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState(() => ({
@@ -52,7 +58,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
     description: productDetails?.description || "",
     price: productDetails?.price || "",
     category: productDetails?.category || null,
-    subCategory: productDetails?.subCategory || "",
+    subcategory: productDetails?.subcategory || "",
     _attributes: productDetails?.attributes || [],
     stock: productDetails?.stock || "",
     status: productDetails?.status || "",
@@ -101,14 +107,13 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
   const [parentCategory, setParentCategory] = useState("");
 
-  console.log("zz", productDetails);
   const initialState = {
     name: "",
     productImage: [],
     description: "",
     price: "",
     category: null,
-    subCategory: "",
+    subcategory: "",
     _attributes: [],
     stock: "",
     status: "",
@@ -118,27 +123,8 @@ export default function ProductForm({ productDetails, isProductEditing }) {
     artisanImage: null,
   };
 
-  //   if (productDetails) {
-  //   setFormData({
-  //     name: productDetails.name,
-  //     productImage: productDetails.images,
-  //     description: productDetails.description,
-  //     price: productDetails.price,
-  //     category: productDetails.category,
-  //     subCategory: productDetails.subCategory,
-  //     _attributes: productDetails._attributes,
-  //     stock: productDetails.stock,
-  //     status: productDetails.status,
-  //     discountPercentage: productDetails.discountPercentage,
-  //     artisanName: productDetails.artisanName,
-  //     artisanAbout: productDetails.artisanAbout,
-  //     artisanImage: null,
-  //   });
-  // }
-
   const handleOpenDialog = (variant = null) => {
     if (variant) {
-      console.log("TTTPTPTPTPTPT", variant);
       // Editing mode: Populate fields with variant data
       setVariantOption(variant.key);
       setVariantValues(variant.value);
@@ -292,6 +278,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
         (cat) => cat
       );
 
+      console.log("Categories", categories_arr);
       setCategories(categories_arr);
 
       setLoadingStates((prev) => ({ ...prev, category: false }));
@@ -337,15 +324,6 @@ export default function ProductForm({ productDetails, isProductEditing }) {
     setEditCategoryName("");
   };
 
-  // const handleEdit = (type, id, name) => {
-  //   if (type === 'category') {
-  //     setEditCategoryId(id);
-  //     setEditCategoryName(name);
-  //   } else if (type === 'subCategory') {
-  //     setEditSubCategoryId(id);
-  //     setEditSubCategoryName(name);
-  //   }
-  // };
   // ------------------------------------------------------------------------------------------------
 
   const handleEditSubCategory = (subCategoryName, subCategoryId) => {
@@ -355,7 +333,6 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
   const handleSaveSubCategory = async (subCategoryId) => {
     try {
-      console.log(subCategoryId, editCategoryId, "ooooo");
       await updateSubCategory(editSubCategoryName, subCategoryId);
       setEditSubCategoryId(null);
       const catId = getCategoryBySubcategoryId(subCategoryId);
@@ -371,22 +348,13 @@ export default function ProductForm({ productDetails, isProductEditing }) {
   };
 
   useEffect(() => {
-    if (formData.category) {
-      getSubCategoryData(formData.category);
-    }
-
-    console.log("YYYYYYYYY", productDetails);
-  }, []);
-
-  useEffect(() => {
     dispatch(fetchAllProducts());
-
-    // console.log(formData.subCategory);
-    // getSubCategoryData(formData.subCategory);
   }, [dispatch]);
 
   useEffect(() => {
     getCategoryData();
+
+    getSubCategoryData(productDetails.category);
   }, []);
 
   // --------------------------------------------------------------------------------------------------------
@@ -400,15 +368,14 @@ export default function ProductForm({ productDetails, isProductEditing }) {
         addProduct: buttonClicked !== "Draft",
         draftProduct: buttonClicked === "Draft",
       });
-
       const formDataInstance = new FormData();
-
+      console.log("Form DATA", formData);
       // Add simple fields directly
       formDataInstance.append("name", formData.name);
       formDataInstance.append("description", formData.description);
       formDataInstance.append("price", formData.price);
       formDataInstance.append("category", formData.category);
-      formDataInstance.append("subCategory", formData.subCategory);
+      formDataInstance.append("subcategory", formData.subcategory);
       formDataInstance.append("stock", formData.stock);
       formDataInstance.append("status", buttonClicked);
       formDataInstance.append(
@@ -450,7 +417,13 @@ export default function ProductForm({ productDetails, isProductEditing }) {
       }
 
       // API call
-      await createProduct(formDataInstance);
+      if (isProductEditing) {
+        console.log("FORM DATA", formDataInstance);
+        await updateProduct(productDetails._id, formDataInstance);
+      } else {
+        await createProduct(formDataInstance);
+      }
+
       setSavedVariants([]);
       setFormData(initialState);
       setLoadingStates({
@@ -468,6 +441,8 @@ export default function ProductForm({ productDetails, isProductEditing }) {
       console.error("Error creating product:", error);
     }
   };
+
+  // -------------------------------------------------------------------------------------------------------------
 
   useEffect(() => {
     setFormData({ ...formData, _attributes: savedVariants });
@@ -639,7 +614,7 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                     setFormData({
                       ...formData,
                       category: newCategory._id,
-                      subCategory: "",
+                      subcategory: "",
                     });
                   }}
                   loading={loadingStates.category}
@@ -724,16 +699,14 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                   required
                   options={subCategories}
                   getOptionLabel={(option) => option?.name || ""}
-                  value={
-                    subCategories.find(
-                      (subCat) => subCat._id === formData.subCategory
-                    ) || null
-                  }
+                  value={subCategories.find(
+                    (subCat) => subCat._id === formData.subcategory || null
+                  )}
                   loading={loadingStates.subcategory}
                   onChange={(e, newValue) => {
                     setFormData({
                       ...formData,
-                      subCategory: newValue._id,
+                      subcategory: newValue._id,
                     });
                   }}
                   renderInput={(params) => (
@@ -912,7 +885,6 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                         {variant.key}
                       </Typography>
 
-                      {console.log("VVVVVVVVVV", variant)}
                       <Box>
                         <IconButton
                           color="primary"
@@ -939,7 +911,6 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                       }}
                     >
                       {variant.value.map((value) => {
-                        console.log(variant.value);
                         return (
                           <Chip
                             key={value}
@@ -1060,8 +1031,9 @@ export default function ProductForm({ productDetails, isProductEditing }) {
               </div>
             </div>
           </article>
-          {!isProductEditing && (
-            <article>
+
+          <article>
+            {!isProductEditing && (
               <Box
                 sx={{
                   display: "flex",
@@ -1093,8 +1065,30 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                   Save As Draft
                 </LoadingButton>
               </Box>
-            </article>
-          )}
+            )}
+
+            {isProductEditing && (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "1rem",
+                  justifyContent: "end",
+                }}
+              >
+                <LoadingButton
+                  size="large"
+                  // loading={loadingStates.draftProduct}
+                  type="submit"
+                  // disabled={loadingStates.addProduct}
+                  variant="outlined"
+                  color="success"
+                  onClick={addProductHandler}
+                >
+                  Update Product
+                </LoadingButton>
+              </Box>
+            )}
+          </article>
         </div>
       </div>
     </form>

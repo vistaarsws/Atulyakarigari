@@ -29,7 +29,7 @@ export default function AdminProductCard({ products }) {
     setOpen(false);
     setSelectedProduct(null);
   };
-
+  console.log("PRODUCTS", products);
   const getCategory = useSelector((state) => state.categories.categories);
 
   const getCategoryName = (id) => {
@@ -43,7 +43,10 @@ export default function AdminProductCard({ products }) {
   }, [dispatch, getCategory]);
 
   const transformData = products.map((product) => ({
-    profileImg: product.images[0], // Assuming the first image is used
+    productImgTitle: {
+      prodImg: product.images?.[0] || "default-image-path.jpg", // Fallback for missing images
+      prodName: product.name,
+    },
     category: getCategoryName(product.category)?.name,
     stock: product.stock,
     price: product.priceAfterDiscount || product.price, // Use discounted price if available
@@ -54,16 +57,21 @@ export default function AdminProductCard({ products }) {
 
   // Custom Cell Renderer for Profile Image
   const profileImageRenderer = (params) => {
+    const { prodImg, prodName } = params.value;
+
     return (
-      <div>
-        <figure>
-          <img
-            src={params.value}
-            alt="Profile"
-            style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-          />
-        </figure>
-        {/* <p>Banarasi Saree</p> */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <img
+          src={prodImg}
+          alt={prodName}
+          style={{
+            width: "35px",
+            height: "35px",
+            borderRadius: "5px",
+            objectFit: "cover",
+          }}
+        />
+        <span style={{ marginLeft: "1rem" }}>{prodName}</span>
       </div>
     );
   };
@@ -97,11 +105,12 @@ export default function AdminProductCard({ products }) {
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState([
     {
-      field: "profileImg",
-      headerName: "PRODUCT & TITLE",
+      field: "productImgTitle",
+      headerName: "PRODUCT IMAGE & TITLE",
       cellRenderer: profileImageRenderer,
       flex: 1,
     },
+
     { field: "category", headerName: "CATEGORIES", flex: 1 },
     { field: "stock", headerName: "STOCK STATUS", flex: 1 },
     { field: "price", headerName: "PRICE", flex: 1 },
