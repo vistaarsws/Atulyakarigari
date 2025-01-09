@@ -699,15 +699,18 @@ export default function ProductForm({ productDetails, isProductEditing }) {
                   required
                   options={subCategories}
                   getOptionLabel={(option) => option?.name || ""}
-                  value={subCategories.find(
-                    (subCat) => subCat._id === formData.subcategory || null
-                  )}
+                  value={
+                    subCategories.find(
+                      (subCat) => subCat._id === formData.subcategory
+                    ) || null
+                  }
                   loading={loadingStates.subcategory}
                   onChange={(e, newValue) => {
                     setFormData({
                       ...formData,
-                      subcategory: newValue._id,
+                      subcategory: newValue ? newValue._id : "", // Ensure empty string if no value
                     });
+                    console.log("Sub Category Selected:", newValue);
                   }}
                   renderInput={(params) => (
                     <TextField {...params} label="Sub Category" />
