@@ -12,7 +12,6 @@ import {
   Box,
   Typography,
   Paper,
-  Tooltip,
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -32,7 +31,6 @@ import {
 
 import {
   createProduct,
-  getProducts,
   updateProduct,
 } from "../../../../services/user/userAPI";
 
@@ -353,8 +351,10 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
   useEffect(() => {
     getCategoryData();
+if(productDetails){
 
-    getSubCategoryData(productDetails.category);
+  getSubCategoryData(productDetails.category);
+}
   }, []);
 
   // --------------------------------------------------------------------------------------------------------
