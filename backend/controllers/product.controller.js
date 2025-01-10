@@ -220,79 +220,6 @@ export const getProductById = async (req, res) => {
 
 };
 
-// export const updateProduct = async (req, res) => {
-
-
-//     try {
-//         const { id } = req.params;
-//         if (!id) {
-//             return badRequest(req, res, null, "fields are missing");
-//         }
-//         const currentProduct = await Product.findById(id);
-
-//         if (!currentProduct) {
-//             return notFoundRequest(req, res, null, "product not found");
-//         }
-//         const session = await mongoose.startSession();
-//         session.startTransaction();
-//         // Update product
-//         const product = await Product.findByIdAndUpdate(
-//             id,
-//             req.body,
-//             {
-//                 new: true,
-//                 runValidators: true,
-//                 session
-//             }
-//         );
-
-//         // Handle category updates
-//         if (req.body.category &&
-//             req.body.category.toString() !== currentProduct.category.toString()) {
-//             // Remove from old category
-//             await Category.findByIdAndUpdate(
-//                 currentProduct.category,
-//                 { $pull: { products: currentProduct._id } },
-//                 { session }
-//             );
-
-//             // Add to new category
-//             await Category.findByIdAndUpdate(
-//                 req.body.category,
-//                 { $addToSet: { products: product._id } },
-//                 { session }
-//             );
-//         }
-
-//         // Handle subcategory updates
-//         if (req.body.subcategory &&
-//             (!currentProduct.subcategory ||
-//                 req.body.subcategory.toString() !== currentProduct.subcategory.toString())) {
-//             // Remove from old subcategory if exists
-//             if (currentProduct.subcategory) {
-//                 await Subcategory.findByIdAndUpdate(
-//                     currentProduct.subcategory,
-//                     { $pull: { products: currentProduct._id } },
-//                     { session }
-//                 );
-//             }
-
-//             // Add to new subcategory
-//             await SubCategory.findByIdAndUpdate(
-//                 req.body.subcategory,
-//                 { $addToSet: { products: product._id } },
-//                 { session }
-//             );
-//         }
-//         await session.commitTransaction();
-//         session.endSession();
-//         return success(req, res, "product updated successfully", product.toObject());
-//     } catch (error) {
-//         await session.abortTransaction();
-//         session.endSession();
-//         return internalServerError(req, res, error, "unable to update product");
-//     }
-// };
 export const updateProduct = async (req, res) => {
     let session;
     try {
@@ -317,56 +244,53 @@ export const updateProduct = async (req, res) => {
             return badRequest(req, res, null, "Invalid product ID");
         }
 
-        // Fetch the product
+        // Fetch the existing product
         const existingProduct = await Product.findById(id);
         if (!existingProduct) {
             return notFoundRequest(req, res, null, "Product not found");
         }
 
-        // Optional: Validate attributes
+        // Validate attributes if provided
         const attributes = _attributes ? JSON.parse(_attributes) : existingProduct.attributes;
         if (_attributes && (!attributes || !Array.isArray(attributes))) {
             return badRequest(req, res, null, "Invalid Attributes");
         }
 
-        // Check if category exists
-        if (category && !mongoose.Types.ObjectId.isValid(category)) {
-            return badRequest(req, res, null, "Invalid category ID");
+        // Validate category if provided
+        if (category) {
+            if (!mongoose.Types.ObjectId.isValid(category)) {
+                return badRequest(req, res, null, "Invalid category ID");
+            }
+            const existingCategory = await Category.findById(category);
+            if (!existingCategory) {
+                return badRequest(req, res, null, "Category not found");
+            }
         }
 
-        const existingCategory = category ? await Category.findById(category) : null;
-        if (category && !existingCategory) {
-            return badRequest(req, res, null, "Category not found");
-        }
-
-        // Optional: Validate subcategory
+        // Validate subcategory if provided
         if (subcategory) {
             if (!mongoose.Types.ObjectId.isValid(subcategory)) {
                 return badRequest(req, res, null, "Invalid subcategory ID");
             }
-
             const existingSubcategory = await SubCategory.findById(subcategory);
             if (!existingSubcategory) {
                 return notFoundRequest(req, res, null, "Subcategory not found");
             }
-
             if (!existingSubcategory.parentCategory.equals(category || existingProduct.category)) {
                 return badRequest(req, res, null, "Subcategory does not belong to the selected category");
             }
         }
 
-        // Start mongoose transaction
+        // Start a transaction
         session = await mongoose.startSession();
         session.startTransaction();
 
         const productImages = [...existingProduct.images];
-        if (req.files && req.files.productImage) {
+        if (req.files?.productImage) {
             const imagePromises = req.files.productImage.map(async (image) => {
                 try {
                     const uploadedImage = await uploadImageToCloudinary(image, "product");
-                    if (uploadedImage && uploadedImage.url) {
-                        return uploadedImage.url;
-                    }
+                    return uploadedImage?.url || null;
                 } catch (error) {
                     console.error(`Error uploading image: ${image.originalname}`, error);
                     return null;
@@ -375,18 +299,17 @@ export const updateProduct = async (req, res) => {
 
             const uploadedUrls = await Promise.all(imagePromises);
             const validUrls = uploadedUrls.filter(url => url !== null);
+
             if (validUrls.length === 0 && req.files.productImage.length > 0) {
                 return internalServerError(req, res, null, "Failed to upload product images");
             }
             productImages.push(...validUrls);
         }
 
-        // Artisan image upload
-        const artisanPicture = req.files && req.files.artisanImage
+        const artisanImage = req.files?.artisanImage
             ? await uploadImageToCloudinary(req.files.artisanImage, "artisan")
             : { url: existingProduct.artisanImage };
 
-        // Update product data
         const updatedData = {
             name: name?.trim() || existingProduct.name,
             description: description?.trim() || existingProduct.description,
@@ -401,10 +324,9 @@ export const updateProduct = async (req, res) => {
             images: productImages,
             artisanName: artisanName || existingProduct.artisanName,
             artisanAbout: artisanAbout || existingProduct.artisanAbout,
-            artisanImage: artisanPicture.url,
+            artisanImage: artisanImage.url,
         };
 
-        // Update product
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
             updatedData,
@@ -415,14 +337,12 @@ export const updateProduct = async (req, res) => {
             return internalServerError(req, res, null, "Failed to update product");
         }
 
-        // Update category references if category was changed
         if (category && !existingProduct.category.equals(category)) {
             await Category.findByIdAndUpdate(
                 existingProduct.category,
                 { $pull: { products: existingProduct._id }, $set: { updatedAt: new Date() } },
                 { session }
             );
-
             await Category.findByIdAndUpdate(
                 category,
                 { $addToSet: { products: updatedProduct._id }, $set: { updatedAt: new Date() } },
@@ -430,7 +350,6 @@ export const updateProduct = async (req, res) => {
             );
         }
 
-        // Update subcategory references if subcategory was changed
         if (subcategory && !existingProduct.subcategory?.equals(subcategory)) {
             if (existingProduct.subcategory) {
                 await SubCategory.findByIdAndUpdate(
@@ -439,7 +358,6 @@ export const updateProduct = async (req, res) => {
                     { session }
                 );
             }
-
             await SubCategory.findByIdAndUpdate(
                 subcategory,
                 { $addToSet: { products: updatedProduct._id }, $set: { updatedAt: new Date() } },
@@ -447,9 +365,7 @@ export const updateProduct = async (req, res) => {
             );
         }
 
-        // Commit transaction
         await session.commitTransaction();
-
         return success(req, res, "Product updated successfully", updatedProduct.toObject());
     } catch (error) {
         console.error(error);
