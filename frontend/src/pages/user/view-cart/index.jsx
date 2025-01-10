@@ -1,4 +1,3 @@
-import React from "react";
 import OrderCard from "./OrderCard";
 import Payment from "./Payment";
 import Stepper from "./Stepper";

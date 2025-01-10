@@ -64,6 +64,20 @@ const getcategory = async () => {
   const response = await apiConnector("GET", user_endpoints.GET_CATEGORY);
   return response;
 };
+const addToCart = async () => {
+  const response = await apiConnector("POST", user_endpoints.USER_ADD_TO_CART);
+  return response;
+};
+
+const getCart = async () => {
+  try {
+    const response = await apiConnector("GET", user_endpoints.USER_GET_CART);
+    return response;
+  } catch (err) {
+    console.error("Error fetching cart data:", err);
+    throw err;
+  }
+};
 
 export {
   createProduct,
@@ -76,4 +90,6 @@ export {
   toggleWishlistItem,
   getcategory,
   getcategoryById,
+  addToCart,
+  getCart,
 };

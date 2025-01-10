@@ -18,7 +18,7 @@ import Categories from "./pages/user/categories/index";
 import Blogs from "./pages/user/blogs/Blogs";
 import Product from "./pages/user/product/Product";
 import Artisans from "./pages/user/artisans/Artisans";
-import BuyNow from "./pages/user/buy-now/index";
+import ViewCart from "./pages/user/view-cart/index";
 import PlaceOrder from "./pages/user/place-order";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
@@ -47,7 +47,7 @@ const getRoutesConfig = () => ({
     { path: "/blogs", element: <Blogs /> },
     { path: "/artisans", element: <Artisans /> },
     { path: "/product/:id", element: <Product /> },
-    { path: "/buy-now", element: <BuyNow /> },
+    { path: "/view-cart", element: <ViewCart /> },
     { path: "/place-order", element: <PlaceOrder /> },
     { path: "/login", element: <AuthTemplate page="login" /> },
     { path: "/signup", element: <AuthTemplate page="signup" /> },

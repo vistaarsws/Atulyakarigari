@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import { getProfile } from "../../../../services/user/userAPI";
+import {getCart, getProfile } from "../../../../services/user/userAPI";
 
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
@@ -247,6 +247,34 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     // { name: "Privacy Policy", link: "/user/privacy" },
     // { name: "Log Out", link: "/user/logout" },
   ];
+  const [cartData, setCartData] = useState(null);
+  const fetchCartData = async () => {
+    try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
+
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+
+      const response = await getCart()
+      setCartData(response?.data?.data)
+      console.log("response",cartData);
+      
+
+    }
+    catch (err) {
+      console.log(err.message);
+      
+    }
+  }
+  useEffect(()=>{
+    fetchCartData()
+  },[])
 
   return (
     <nav className="navbar_container">
@@ -389,10 +417,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         {authToken && (
           <IconButton
             aria-label={notificationsLabel(100)}
-            onClick={() => navigate("profile/wishlist")}
+            onClick={() => navigate("/view-cart")}
           >
             <Badge
-              badgeContent={8}
+              badgeContent={cartData?.items?.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",

@@ -1,4 +1,4 @@
-import Cart from "../models/addToCard.js";
+import Cart from "../models/addToCart.js";
 import Product from "../models/product.js";
 import { badRequest, internalServerError, notFoundRequest } from "../helpers/api-response.js";
 
