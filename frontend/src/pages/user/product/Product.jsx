@@ -81,7 +81,6 @@ export default function Product() {
     setValue(newValue);
   };
   const breadcrumbItems = [
-    
     // { title: "Home", href: "/" },
     { title: "Banarsi Silk ", href: "/categories" },
     { title: "Banarasi Nikhaar", href: "/categories" },
@@ -235,7 +234,15 @@ export default function Product() {
     <ThemeProvider theme={theme}>
       <div className="product_container">
         <div>
-          <Breadcrumb items={[{title:product?.category?.name||"category",href:`/categories/${product?.category?._id}`},{title:product?.subcategory?.name|| "subcategory",href:""}]} />
+          <Breadcrumb
+            items={[
+              {
+                title: product?.category?.name || "category",
+                href: `/categories/${product?.category?._id}`,
+              },
+              { title: product?.subcategory?.name || "subcategory", href: "" },
+            ]}
+          />
         </div>
         <div>
           <section>
@@ -277,7 +284,7 @@ export default function Product() {
                     />
                   </div>
                   <div>
-                    <button type="button">Check Pincode</button>
+                    <button type="button">Check</button>
                   </div>
                 </div>
               </div>
