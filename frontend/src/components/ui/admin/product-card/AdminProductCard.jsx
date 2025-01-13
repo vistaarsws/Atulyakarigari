@@ -7,7 +7,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import "./AdminProductCard.css";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchAllCategory } from "../../../../Redux/features/CategorySlice";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -17,6 +16,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
 import ProductForm from "../../../../components/layout/admin/product-form/ProductForm";
+import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
+
+import { deleteProduct } from "../../../../services/user/userAPI";
+import { fetchAllCategory } from "../../../../Redux/features/CategorySlice";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -28,6 +31,7 @@ export default function AdminProductCard({ products }) {
   const handleClose = () => {
     setOpen(false);
     setSelectedProduct(null);
+    dispatch(fetchAllProducts());
   };
   console.log("PRODUCTS", products);
   const getCategory = useSelector((state) => state.categories.categories);
@@ -37,10 +41,47 @@ export default function AdminProductCard({ products }) {
   };
 
   useEffect(() => {
-    if (!getCategory || getCategory.length === 0) {
-      dispatch(fetchAllCategory());
-    }
-  }, [dispatch, getCategory]);
+    dispatch(fetchAllProducts());
+    dispatch(fetchAllCategory());
+  }, [dispatch]);
+
+  const priceRenderer = (params) => {
+    const originalPrice = params.data.price;
+    const discount = params.data.fullProduct.discountPercentage;
+    console.log("D", discount);
+
+    const effectivePrice = originalPrice - (originalPrice * discount) / 100;
+
+    console.log("EEEEEEE", effectivePrice);
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        {/* Display the discounted price (current price) */}
+        <span style={{ fontWeight: 700, fontSize: "14px", color: "#000" }}>
+          ₹{effectivePrice.toFixed(0)}
+          {"  "}
+          <span
+            style={{
+              textDecoration: "line-through",
+              fontSize: "14px",
+              color: "#9F9F9F",
+              fontWeight: 400,
+            }}
+          >
+            ₹{originalPrice.toFixed(0)}
+          </span>
+        </span>
+
+        {/* Display the original price as strikethrough */}
+      </div>
+    );
+  };
 
   const transformData = products.map((product) => ({
     productImgTitle: {
@@ -49,7 +90,8 @@ export default function AdminProductCard({ products }) {
     },
     category: getCategoryName(product.category)?.name,
     stock: product.stock,
-    price: product.priceAfterDiscount || product.price, // Use discounted price if available
+    attributes: product.attributes.map((obj) => obj.key),
+    price: product.price,
     date: new Date(product.updatedAt).toLocaleDateString(), // Format the date
     name: product.name,
     fullProduct: product,
@@ -85,18 +127,23 @@ export default function AdminProductCard({ products }) {
       console.log("Edit action on row:", params.data);
     };
 
-    const handleDelete = () => {
-      // Implement delete functionality here
-      console.log("Delete action on row:", params.data);
+    const deleteProductHandler = async () => {
+      try {
+        const response = await deleteProduct(params.data.fullProduct._id);
+        dispatch(fetchAllProducts());
+        console.log("RRRRRRRR", response);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     return (
       <div>
         <IconButton onClick={handleEdit} aria-label="edit">
-          <EditIcon />
+          <EditIcon sx={{ fill: "#383737" }} />
         </IconButton>
-        <IconButton onClick={handleDelete} aria-label="delete">
-          <DeleteIcon />
+        <IconButton onClick={deleteProductHandler} aria-label="delete">
+          <DeleteIcon sx={{ fill: "#AD3F38" }} />
         </IconButton>
       </div>
     );
@@ -109,18 +156,25 @@ export default function AdminProductCard({ products }) {
       headerName: "PRODUCT IMAGE & TITLE",
       cellRenderer: profileImageRenderer,
       flex: 1,
+      cellStyle: { fontWeight: "bold" },
     },
 
-    { field: "category", headerName: "CATEGORIES", flex: 1 },
-    { field: "stock", headerName: "STOCK STATUS", flex: 1 },
-    { field: "price", headerName: "PRICE", flex: 1 },
-    { field: "date", headerName: "DATE", flex: 1 },
+    { field: "category", headerName: "CATEGORIES", flex: 0.8 },
+    { field: "stock", headerName: "STOCK STATUS", flex: 0.8 },
+    { field: "attributes", headerName: "ATTRIBUTES", flex: 0.8 },
+    {
+      field: "price",
+      headerName: "PRICE",
+      cellRenderer: priceRenderer,
+      flex: 0.7,
+    },
+    { field: "date", headerName: "DATE", flex: 0.5 },
     {
       headerName: "ACTION",
       cellRenderer: actionCellRenderer,
       sortable: false,
       filter: true,
-      flex: 1,
+      flex: 0.5,
     },
   ]);
 
@@ -161,6 +215,7 @@ export default function AdminProductCard({ products }) {
             <ProductForm
               productDetails={selectedProduct}
               isProductEditing={true}
+              closeDialog={handleClose}
             />
           </DialogContent>
           <DialogActions sx={{ padding: "0 2.4rem 2rem" }}>

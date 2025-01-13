@@ -15,8 +15,20 @@ const getProducts = async () => {
   return response;
 };
 
-const updateProduct = async () => {
-  const response = await apiConnector("PUT", user_endpoints.UPDATE_PRODUCT);
+const updateProduct = async (productId, formData) => {
+  const response = await apiConnector(
+    "PUT",
+    `${user_endpoints.UPDATE_PRODUCT}/${productId}`,
+    formData
+  );
+  return response;
+};
+
+const deleteProduct = async (productId) => {
+  const response = await apiConnector(
+    "DELETE",
+    `${user_endpoints.DELETE_PRODUCT}/${productId}`
+  );
   return response;
 };
 
@@ -64,10 +76,25 @@ const getcategory = async () => {
   const response = await apiConnector("GET", user_endpoints.GET_CATEGORY);
   return response;
 };
+const addToCart = async () => {
+  const response = await apiConnector("POST", user_endpoints.USER_ADD_TO_CART);
+  return response;
+};
+
+const getCart = async () => {
+  try {
+    const response = await apiConnector("GET", user_endpoints.USER_GET_CART);
+    return response;
+  } catch (err) {
+    console.error("Error fetching cart data:", err);
+    throw err;
+  }
+};
 
 export {
   createProduct,
   getProducts,
+  deleteProduct,
   getProductById,
   getProfile,
   updateProfile,
@@ -76,4 +103,6 @@ export {
   toggleWishlistItem,
   getcategory,
   getcategoryById,
+  addToCart,
+  getCart,
 };
