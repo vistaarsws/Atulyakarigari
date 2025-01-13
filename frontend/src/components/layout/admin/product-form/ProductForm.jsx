@@ -45,7 +45,11 @@ import {
 import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function ProductForm({ productDetails, isProductEditing }) {
+export default function ProductForm({
+  productDetails,
+  isProductEditing,
+  closeDialog,
+}) {
   console.log("X Product", productDetails);
 
   const dispatch = useDispatch();
@@ -66,7 +70,6 @@ export default function ProductForm({ productDetails, isProductEditing }) {
     artisanImage: productDetails?.artisanImage || null,
   }));
 
-  const products = useSelector((state) => state.products.products);
   const [loadingStates, setLoadingStates] = useState({
     category: false,
     subcategory: false,
@@ -351,15 +354,14 @@ export default function ProductForm({ productDetails, isProductEditing }) {
 
   useEffect(() => {
     getCategoryData();
-if(productDetails){
-
-  getSubCategoryData(productDetails.category);
-}
+    if (productDetails) {
+      getSubCategoryData(productDetails.category);
+    }
   }, []);
 
   // --------------------------------------------------------------------------------------------------------
 
-  const addProductHandler = async (e) => {
+  const productFormHandler = async (e) => {
     e.preventDefault();
     const buttonClicked = e.nativeEvent.submitter?.value;
     try {
@@ -368,48 +370,73 @@ if(productDetails){
         addProduct: buttonClicked !== "Draft",
         draftProduct: buttonClicked === "Draft",
       });
+
       const formDataInstance = new FormData();
       console.log("Form DATA", formData);
-      // Add simple fields directly
-      formDataInstance.append("name", formData.name);
-      formDataInstance.append("description", formData.description);
-      formDataInstance.append("price", formData.price);
-      formDataInstance.append("category", formData.category);
-      formDataInstance.append("subcategory", formData.subcategory);
-      formDataInstance.append("stock", formData.stock);
-      formDataInstance.append("status", buttonClicked);
+
+      formDataInstance.append("name", formData?.name);
+      formDataInstance.append("description", formData?.description);
+      formDataInstance.append("price", formData?.price);
+      formDataInstance.append("category", formData?.category);
+      formDataInstance.append("subcategory", formData?.subcategory);
+      formDataInstance.append("stock", formData?.stock);
+      formDataInstance.append("status", buttonClicked || formData?.status);
       formDataInstance.append(
         "discountPercentage",
-        formData.discountPercentage
+        formData?.discountPercentage
       );
-      formDataInstance.append("artisanName", formData.artisanName);
-      formDataInstance.append("artisanAbout", formData.artisanAbout);
+      formDataInstance.append("artisanName", formData?.artisanName);
+      formDataInstance.append("artisanAbout", formData?.artisanAbout);
 
       // Serialize _attributes
       if (formData._attributes) {
         formDataInstance.append(
           "_attributes",
-          JSON.stringify([...formData._attributes])
+          JSON.stringify([...formData?._attributes])
         );
       }
 
-      // Append productImage files
-      if (Array.isArray(formData.productImage)) {
-        formData.productImage.forEach((file, index) => {
-          if (file instanceof File) {
-            formDataInstance.append(`productImage`, file);
-          } else {
-            console.error("Invalid productImage file:", file);
-          }
-        });
-      }
+      const appendFiles = async (key, files) => {
+        // Clear the key from formDataInstance
+        formDataInstance.delete(key);
 
-      // Append artisanImage file
-      if (formData.artisanImage && formData.artisanImage instanceof File) {
-        formDataInstance.append("artisanImage", formData.artisanImage);
-      } else {
-        console.error("Invalid artisanImage file:", formData.artisanImage);
-      }
+        if (!files) return; // Exit if no files are provided
+
+        const urlToFile = async (url, filename) => {
+          const response = await fetch(url);
+          const blob = await response.blob();
+          return new File([blob], filename, { type: blob.type });
+        };
+
+        const appendSingle = async (file) => {
+          // If it's a new File upload, append it
+          if (file instanceof File) {
+            formDataInstance.append(key, file);
+          }
+          // If it's an unchanged image URL, convert to a File and append
+          else if (typeof file === "string" && file.startsWith("http")) {
+            const filename = file.split("/").pop() || "file"; // Extract filename from URL
+            const fileFromUrl = await urlToFile(file, filename);
+            formDataInstance.append(key, fileFromUrl);
+          }
+        };
+
+        // If `files` is an array, process each item, otherwise process the single file
+        if (Array.isArray(files)) {
+          for (const file of files) {
+            await appendSingle(file);
+          }
+        } else {
+          await appendSingle(files);
+        }
+
+        // Debug: Log the current formDataInstance content
+        console.log([...formDataInstance.entries()]);
+      };
+
+      // Usage
+      await appendFiles("productImage", formData?.productImage);
+      await appendFiles("artisanImage", formData?.artisanImage);
 
       // Debugging: Log the FormData content
       for (let pair of formDataInstance.entries()) {
@@ -431,6 +458,7 @@ if(productDetails){
         addProduct: false,
         draftProduct: false,
       });
+      closeDialog();
     } catch (error) {
       setLoadingStates({
         ...loadingStates,
@@ -496,7 +524,7 @@ if(productDetails){
   };
 
   return (
-    <form onSubmit={addProductHandler}>
+    <form id="productForm" onSubmit={productFormHandler}>
       <div className="form-main">
         <div className="image-upload">
           <h2>Upload Image </h2>
@@ -1085,7 +1113,7 @@ if(productDetails){
                   // disabled={loadingStates.addProduct}
                   variant="outlined"
                   color="success"
-                  onClick={addProductHandler}
+                  onClick={productFormHandler}
                 >
                   Update Product
                 </LoadingButton>
