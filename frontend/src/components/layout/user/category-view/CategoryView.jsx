@@ -31,29 +31,24 @@ export default function CategoryView() {
           <div key={index}>
             <img src={collection.picture} alt={collection.collection_name} />
 
-            <div
-              className="collection_descriptionCard"
-              style={{
-                backgroundColor: collection.hoverBgColor,
-              }}
-            >
-              {/* {console.log([index],ourCollection[index]?._id) 
-              } */}
-              <Link
-                to={`/categories/${ourCollection[index]?._id}`}
-                key={index}
+            <Link to={`/categories/${ourCollection[index]?._id}`} key={index}>
+              <div
+                className="collection_descriptionCard"
+                style={{
+                  backgroundColor: collection.hoverBgColor,
+                }}
               >
-                <div key={index}>
-                  <h3>{ourCollection[index]?.name}</h3>
-                </div>
-              </Link>
+                {/* {console.log([index],ourCollection[index]?._id) 
+              } */}
+                <h3>{ourCollection[index]?.name}</h3>
 
-              <div></div>
-              <p>{collection.collection_description}</p>
-              <div>
-                <img src={rightArrow} alt="Right Arrow" />
+                <div></div>
+                <p>{collection.collection_description}</p>
+                <div>
+                  <img src={rightArrow} alt="Right Arrow" />
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         );
       })}

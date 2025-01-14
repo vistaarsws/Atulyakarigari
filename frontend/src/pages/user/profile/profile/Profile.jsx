@@ -108,7 +108,6 @@ const Profile = () => {
 
   // Save Updated Profile
   const handleSave = async () => {
-   
     try {
       if (!userProfileToken) {
         toast.error("User token is missing. Please log in again.");
@@ -132,7 +131,6 @@ const Profile = () => {
         alternativeContactNumber: formData.alternateMobile || "",
         profilePicture: formData.profilePicture || "null",
       };
-      
 
       const formDataToSend = new FormData();
       Object.keys(updatedData).forEach((key) => {
@@ -147,7 +145,7 @@ const Profile = () => {
       console.log("Sending updated data to API:", updatedData); // Debug log
 
       toast.loading("Updating profile...");
-      const response = await updateProfile(_id, formDataToSend); 
+      const response = await updateProfile(_id, formDataToSend);
 
       // Debugging API response
       console.log("API Response:", response);
@@ -181,19 +179,21 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-image-container">
-        <img
-          src={formData.profilePicture}
-          alt="Profile"
-          className="profile-image"
-        />
-        {isEditing && (
-          <input
-            type="file"
-            accept="image/jpeg, image/png"
-            onChange={handleFileChange}
-            className="file-input"
+        <div className="profile-image-input-box">
+          <img
+            src={formData.profilePicture}
+            alt="Profile"
+            className="profile-image"
           />
-        )}
+          {isEditing && (
+            <input
+              type="file"
+              accept="image/jpeg, image/png"
+              onChange={handleFileChange}
+              className="file-input"
+            />
+          )}
+        </div>
       </div>
       <div className="profile-form">
         <div className="profile-fields">
