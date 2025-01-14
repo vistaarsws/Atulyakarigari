@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Typography,
@@ -10,12 +9,9 @@ import {
   ThemeProvider,
   Checkbox,
 } from "@mui/material";
-import { margin, styled } from "@mui/system";
+import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
-import TEST_IMG1 from "../../../assets/images/banarshi sharee.png";
-import TEST_IMG2 from "../../../assets/images/Necklace.png";
-import TEST_IMG3 from "../../../assets/images/Necklace1.png";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const theme = createTheme({
@@ -82,60 +78,15 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   flexBasis: useMediaQuery("(max-width: 458px)") ? "30%" : "25%",
 }));
-const productData = [
-  {
-    id: 1,
-    name: "BANARSI SAARI",
-    description:
-      "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-    price: 27000,
-    quantity: 10,
-    returnPeriod: 10,
-    deliveryDates: "5 Oct - 7 Oct",
-    image: TEST_IMG1,
-  },
-  {
-    id: 2,
-    name: "BANARSI SAARI",
-    description:
-      "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-    price: 7000,
-    quantity: 10,
-    returnPeriod: 10,
-    deliveryDates: "5 Oct - 7 Oct",
-    image: TEST_IMG2,
-  },
-  {
-    id: 3,
-    name: "BANARSI SAARI",
-    description:
-      "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-    price: 3000,
-    quantity: 10,
-    returnPeriod: 10,
-    deliveryDates: "5 Oct - 7 Oct",
-    image: TEST_IMG3,
-  },
-  {
-    id: 4,
-    name: "BANARSI SAARI",
-    description:
-      "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-    price: 27000,
-    quantity: 10,
-    returnPeriod: 10,
-    deliveryDates: "5 Oct - 7 Oct",
-    image: TEST_IMG1,
-  },
-  // Add more product objects here if needed
-];
-const ProductCard = ({ product }) => {
-  const is458px = useMediaQuery("(min-width: 458px)");
 
+const ProductCard = ({ product }) => {
   return (
     <StyledCard>
       <ProductImageWrapper>
-        <ProductImage src={product?.image} alt={product?.name} />
+        <ProductImage
+          src={product?.productId?.images?.[0]}
+          alt={product?.productId?.name}
+        />
         <Checkbox
           sx={{
             position: "absolute",
@@ -173,7 +124,7 @@ const ProductCard = ({ product }) => {
             color: "rgba(56, 55, 55, 1)",
           }}
         >
-          {product?.name}
+          {product?.productId?.name}
         </Typography>
         <Typography
           variant="body2"
@@ -191,7 +142,7 @@ const ProductCard = ({ product }) => {
             WebkitLineClamp: 1, // Limits the number of lines (change this number to suit your needs)
           }}
         >
-          {product?.description}
+          {product?.productId?.description || "No description available"}
         </Typography>
         <Box
           sx={{
@@ -224,7 +175,7 @@ const ProductCard = ({ product }) => {
                 fontSize: "16px",
               }}
             >
-              ₹{product?.price?.toLocaleString()}
+              ₹{product?.productId?.price?.toLocaleString()}
             </Typography>
             <QuantityContainer
               sx={{
@@ -253,8 +204,8 @@ const ProductCard = ({ product }) => {
                   fontSize: "12px",
                 }}
               >
-                {product.returnPeriod} Days{" "}
-              </span>
+                10 Days
+              </span>{" "}
               return available
             </Typography>
             <Box
@@ -286,7 +237,7 @@ const ProductCard = ({ product }) => {
                   }}
                 >
                   {" "}
-                  {product.deliveryDates}
+                  5 Oct - 7 Oct
                 </span>
               </Typography>
             </Box>
@@ -297,7 +248,7 @@ const ProductCard = ({ product }) => {
   );
 };
 
-const OrderCard = () => {
+const OrderCard = ({ cartData }) => {
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -312,8 +263,8 @@ const OrderCard = () => {
           scrollbarWidth: "none",
         }}
       >
-        {productData.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {cartData?.items?.map((item) => (
+          <ProductCard key={item._id} product={item} />
         ))}
       </Box>
     </ThemeProvider>

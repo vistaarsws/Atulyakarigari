@@ -3,8 +3,41 @@ import Payment from "./Payment";
 import Stepper from "./Stepper";
 import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
+import  { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import {getCart } from "../../../services/user/userAPI";
 
 const Index = () => {
+  const authToken = useSelector((state) => state.auth.token);
+  const [cartData, setCartData] = useState(null);
+  const fetchCartData = async () => {
+    try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
+
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+
+      const response = await getCart()
+      setCartData(response?.data?.data)
+     
+      
+
+    }
+    catch (err) {
+      console.log(err.message);
+      
+    }
+  }
+  useEffect(()=>{
+    fetchCartData()
+  },[])
   return (
     <Box
       sx={{
@@ -34,7 +67,7 @@ const Index = () => {
           }}
         >
           <AddressComponent />
-          <OrderCard />
+          <OrderCard cartData={cartData} />
         </Box>
         <Box
           sx={{
@@ -42,7 +75,7 @@ const Index = () => {
             width: { xs: "100%", md: "35%", marginBottom: "7rem" },
           }}
         >
-          <Payment />
+          <Payment cartData={cartData} />
         </Box>{" "}
       </Box>
     </Box>

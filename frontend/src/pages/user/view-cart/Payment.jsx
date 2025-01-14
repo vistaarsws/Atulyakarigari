@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Payment = () => {
+const Payment = ({ cartData }) => {
   const navigate = useNavigate();
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
 
@@ -148,7 +148,8 @@ const Payment = () => {
               color: "rgba(56, 55, 55, 1)",
             }}
           >
-            Price Details (6 items)
+            {/* {console.log(cartData)} */}
+            Price Details ({cartData?.items?.length} {cartData?.items?.length <= 1 ? "item" : "items"})
           </Typography>
           <Box sx={{ marginTop: 2 }}>
             <Box
@@ -176,7 +177,7 @@ const Payment = () => {
                   lineHeight: "25px",
                 }}
               >
-                3,682
+                {cartData?.total}
               </Typography>
             </Box>
             <Box
@@ -332,7 +333,7 @@ const Payment = () => {
               navigate("/place-order");
             }}
           >
-            Place Order
+            Continue
           </Button>
         </Box>
       </Box>
