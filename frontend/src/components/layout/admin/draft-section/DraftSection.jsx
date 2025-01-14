@@ -53,7 +53,9 @@ export default function DraftSection() {
     return date.toLocaleDateString("en-GB"); // This will return the date in "DD/MM/YYYY"
   };
 
-  const draftedProducts = allProducts?.filter((prod) => prod.status === "Draft");
+  const draftedProducts = allProducts?.filter(
+    (prod) => prod.status === "Draft"
+  );
 
   return (
     <>

@@ -15,8 +15,20 @@ const getProducts = async () => {
   return response;
 };
 
-const updateProduct = async () => {
-  const response = await apiConnector("PUT", user_endpoints.UPDATE_PRODUCT);
+const updateProduct = async (productId, formData) => {
+  const response = await apiConnector(
+    "PUT",
+    `${user_endpoints.UPDATE_PRODUCT}/${productId}`,
+    formData
+  );
+  return response;
+};
+
+const deleteProduct = async (productId) => {
+  const response = await apiConnector(
+    "DELETE",
+    `${user_endpoints.DELETE_PRODUCT}/${productId}`
+  );
   return response;
 };
 
@@ -82,6 +94,7 @@ const getCart = async () => {
 export {
   createProduct,
   getProducts,
+  deleteProduct,
   getProductById,
   getProfile,
   updateProfile,

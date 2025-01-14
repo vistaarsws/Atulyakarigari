@@ -92,13 +92,14 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      margin-left: 1.5rem;
+      margin: 0 1.5rem;
       background-color: #60a4871a;
       padding: 1.2rem 1rem;
       border-radius: 0.5rem;
       font-size: 1.4rem;
       font-weight: 500;
       color: #6f6f6f;
+      flex-shrink: 0;
 
       div:nth-of-type(2) {
         border-left: 1px solid #c0c0c0;
@@ -285,7 +286,8 @@
 
 /* About artisan */
 .about_artisan {
-  display: flex;
+  display: grid;
+  grid-template-columns: 0.2fr 0.6fr;
   align-items: flex-start !important;
   gap: 1.5rem;
 
@@ -417,6 +419,7 @@
 
     .ratingBox {
       margin-left: auto;
+      margin-right: 0;
     }
 
     .pincodeBox {
