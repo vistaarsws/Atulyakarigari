@@ -2,23 +2,38 @@ import "./AuthTemplate.css";
 import { Flex, Input } from "antd";
 import authIcon from "../../assets/images/authIcon.svg";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { Button, CircularProgress } from "@mui/material";
+import { TextField } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   signUp,
   sendOtp,
   login,
   varifyOtp,
 } from "../../services/operations/authAPI";
-import { useAuth } from "../../context/AuthContext";
-import  setCustomDimension  from '../../utils/helpers';
+import setCustomDimension from "../../utils/helpers";
+import { useDispatch } from "react-redux";
+import {
+  login as authLogin,
+  logout as authLogout,
+} from "../../Redux/features/AuthSlice";
+import PropTypes from "prop-types";
+import GoogleAuth from "./google-auth/GoogleAuth";
 
 dayjs.extend(customParseFormat);
 
+const loadingBtnStyles = {
+  padding: "1rem",
+  height: "4rem",
+  fontSize: "1.4rem",
+  backgroundColor: "#60a487",
+  color: "white",
+  border: "none",
+  width: "100%",
+};
 export default function AuthTemplate({ page }) {
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -32,6 +47,7 @@ export default function AuthTemplate({ page }) {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const [otpType, setOtpType] = useState(location.state?.type);
 
@@ -39,24 +55,14 @@ export default function AuthTemplate({ page }) {
   const isSignupPage = page === "signup";
   const isOtp = page === "otp";
 
-  const { setUserContext } = useAuth();
-  const setAuthToken = (token) => {
-    if (!token) {
-      console.error("Token is undefined or null.");
-      return;
+  // const { loginContext, logoutContext } = useAuth();
+
+  const handleValidateOtp = (e) => {
+    const key = e.key;
+    // Allow numeric keys and Backspace
+    if (!/^[0-9]$/.test(key) && key !== "Backspace" && key !== "Enter") {
+      e.preventDefault();
     }
-
-    Cookies.set("authToken", token, {
-      expires: 7, // Expires in 7 days
-      sameSite: "Strict", // SameSite policy
-      // secure: true, // Uncomment this in production (requires HTTPS)
-    });
-    console.log("Token set in cookies!");
-  };
-
-  // Google Login Handler
-  const loginWithGoogle = () => {
-    window.location.href = "http://localhost:3000/auth/login"; // Change URL for production
   };
 
   useEffect(() => {
@@ -66,20 +72,23 @@ export default function AuthTemplate({ page }) {
   // -----------------------------------------------------Login---------------------------------------------------------------------
 
   const loginHandler = async (e) => {
+    // debugger;
     e.preventDefault();
     setLoading(true);
-
     try {
       const res = await login(userDetails.loginId);
+
       if (res?.status === 200) {
         if (isLoginPage) {
+          localStorage.setItem("loginId", userDetails.loginId);
           navigate("/otp", { state: { type: "login" } });
         }
         enqueueSnackbar(res.data.message || "Login Successful!", {
           variant: "success",
-        })
-        setCustomDimension('dimension1', userDetails.role);  // Example: Set user role
-    setCustomDimension('dimension2', userDetails.id);    // Example: Set user ID;
+        });
+
+        setCustomDimension("dimension1", userDetails.role); // Example: Set user role
+        setCustomDimension("dimension2", userDetails.id); // Example: Set user ID;
       } else {
         enqueueSnackbar(res.data.message, {
           variant: "warning",
@@ -100,6 +109,8 @@ export default function AuthTemplate({ page }) {
     try {
       const res = await sendOtp(userDetails.loginId);
       if (res?.status === 200) {
+        localStorage.setItem("loginId", userDetails.loginId);
+
         navigate("/otp", {
           state: { type: "signup" },
         });
@@ -136,17 +147,20 @@ export default function AuthTemplate({ page }) {
 
       const args =
         otpType === "login"
-          ? [userDetails.loginId, otp]
+          ? [userDetails.loginId || localStorage.getItem("loginId"), otp]
           : [userDetails.fullName, userDetails.loginId, otp];
 
       const res = await action(...args);
 
       if (res.status === 200) {
-        const token = res.data.data.token;
-        setUserContext(res.data.data);
+        const tokenValue = res.data.data.token;
 
-        if (token) {
-          setAuthToken(token);
+        // loginContext(tokenValue);
+        dispatch(authLogin(tokenValue));
+
+        if (!tokenValue) {
+          // logoutContext();
+          dispatch(authLogout());
         }
 
         const successMessage =
@@ -165,6 +179,7 @@ export default function AuthTemplate({ page }) {
         variant: "error",
       });
     } finally {
+      setOtp("");
       setLoading(false);
     }
   };
@@ -195,15 +210,24 @@ export default function AuthTemplate({ page }) {
     setTimer(30);
     setOtp("");
     if (otpType === "login") {
-      await login(userDetails.loginId);
+      await login(userDetails.loginId || localStorage.getItem("loginId"));
     } else {
-      await sendOtp(userDetails.loginId);
+      await sendOtp(userDetails.loginId || localStorage.getItem("loginId"));
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+    const isNumber = /^[0-9]+$/.test(value);
+    let formattedValue = value;
+    if (isNumber && !value.startsWith("+91")) {
+      formattedValue = "+91" + value;
+    }
+    // localStorage.setItem(`${name}`, formattedValue);
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: formattedValue,
+    }));
   };
 
   return (
@@ -225,35 +249,39 @@ export default function AuthTemplate({ page }) {
               <form onSubmit={loginHandler}>
                 <div>
                   <div>
-                    <label htmlFor="loginId">Email/Phone Number</label>
-                    <input
-                      type="text"
-                      name="loginId"
+                    <TextField
+                      label=""
+                      sx={{
+                        width: "100%",
+                        marginBottom: "2rem",
+                        "& .MuiInputBase-input": {
+                          fontSize: "1.4rem",
+                          padding: "1rem",
+                        },
+                      }}
+                      placeholder="Enter Your Email / Phone Number"
                       id="loginId"
-                      placeholder="Enter Your Email/Phone Number"
+                      name="loginId"
+                      value={userDetails.loginId}
                       onChange={handleInputChange}
                     />
                   </div>
 
                   <div>
-                    <Button
+                    <LoadingButton
                       variant="contained"
                       type="submit"
-                      disabled={loading}
+                      loading={loading}
+                      sx={loadingBtnStyles}
                     >
-                      {loading ? (
-                        <CircularProgress size={24} color="white" />
-                      ) : (
-                        "Login"
-                      )}
-                    </Button>
+                      Login
+                    </LoadingButton>
                   </div>
                 </div>
               </form>
-               {/* Google login button */}
-            <Button variant="contained" color="primary" onClick={loginWithGoogle}>
-              Log in with Google
-            </Button>
+              {/* Google login button */}
+
+              <GoogleAuth />
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
@@ -268,42 +296,55 @@ export default function AuthTemplate({ page }) {
                 <h3>Use your email or phone number to sign up</h3>
               </div>
 
-              <form onSubmit={signupHandler}>
+              <form onSubmit={signupHandler} className="signUpForm">
                 <div>
-                  <div>
-                    <label htmlFor="fullName">Full Name*</label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      id="fullName"
-                      placeholder="Enter Your Full Name"
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                  <TextField
+                    placeholder="Enter Your Full Name"
+                    id="fullName"
+                    name="fullName"
+                    label=""
+                    variant="outlined"
+                    value={userDetails.fullName}
+                    sx={{
+                      width: "100%",
+                      mb: "1rem",
+                      "& .MuiInputBase-input": {
+                        fontSize: "1.4rem",
+                        padding: "1rem",
+                      },
+                    }}
+                    onChange={handleInputChange}
+                  />
+                </div>
 
-                  <div>
-                    <label>Phone Number or Email*</label>
-                    <input
-                      type="text"
-                      name="loginId"
-                      id="loginId"
-                      placeholder="Enter Phone Number or Email"
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <CircularProgress size={24} color="white" />
-                      ) : (
-                        "Sign Up"
-                      )}
-                    </Button>
-                  </div>
+                <div>
+                  <TextField
+                    placeholder="Enter Phone Number or Email"
+                    id="loginId"
+                    name="loginId"
+                    label=""
+                    variant="outlined"
+                    sx={{
+                      width: "100%",
+                      mb: "2rem",
+                      "& .MuiInputBase-input": {
+                        fontSize: "1.4rem",
+                        padding: "1rem",
+                      },
+                    }}
+                    onChange={handleInputChange}
+                    value={userDetails.loginId}
+                  />
+                </div>
+                <div>
+                  <LoadingButton
+                    sx={loadingBtnStyles}
+                    variant="contained"
+                    type="submit"
+                    loading={loading}
+                  >
+                    Sign Up
+                  </LoadingButton>
                 </div>
               </form>
             </article>
@@ -318,7 +359,8 @@ export default function AuthTemplate({ page }) {
 
                 <h2>Verify OTP</h2>
                 <h3>
-                  sent to <span>+91 8175961513</span>
+                  sent to
+                  <span>{localStorage.getItem("loginId")}</span>
                 </h3>
               </div>
 
@@ -329,13 +371,14 @@ export default function AuthTemplate({ page }) {
                       variant="filled"
                       inputMode="numeric"
                       value={otp}
+                      onKeyDown={handleValidateOtp}
                       onChange={handleOTPChange}
                       length={4}
                     />
                   </Flex>
                 </div>
                 {timer > 0 ? (
-                  <p>
+                  <p style={{ minHeight: "1.5rem" }}>
                     Resent OTP in <span>{timer}s</span>
                   </p>
                 ) : (
@@ -349,13 +392,14 @@ export default function AuthTemplate({ page }) {
                 )}
 
                 <div>
-                  <Button variant="contained" type="submit" disabled={loading}>
-                    {loading ? (
-                      <CircularProgress size={24} color="white" />
-                    ) : (
-                      "Continue"
-                    )}
-                  </Button>
+                  <LoadingButton
+                    variant="contained"
+                    type="submit"
+                    loading={loading}
+                    sx={loadingBtnStyles}
+                  >
+                    Continue
+                  </LoadingButton>
                 </div>
               </form>
             </article>
@@ -364,7 +408,15 @@ export default function AuthTemplate({ page }) {
           {isLoginPage || otpType === "login" ? (
             <p>
               Don&apos;t have an account yet?{"  "}
-              <span onClick={() => navigate("/signup")}> Sign Up</span>
+              <span
+                onClick={() => {
+                  navigate("/signup");
+                  setUserDetails("");
+                }}
+              >
+                {" "}
+                Sign Up
+              </span>
             </p>
           ) : (
             <p>
@@ -378,3 +430,7 @@ export default function AuthTemplate({ page }) {
     </>
   );
 }
+
+AuthTemplate.propTypes = {
+  page: PropTypes.string.isRequired,
+};

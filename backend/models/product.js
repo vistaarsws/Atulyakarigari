@@ -90,7 +90,13 @@ const ProductSchema = new mongoose.Schema({
             },
             message: 'Invalid image URL'
         }
-    }
+    },
+    ratingAndReviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "RatingAndReviews",
+        },
+    ],
 }, {
     timestamps: true
 });

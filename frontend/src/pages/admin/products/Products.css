@@ -1,0 +1,8 @@
+.adminProduct_container {
+}
+
+@media screen and (max-width: 768px) {
+  .adminProduct_container {
+    margin-top: 5rem;
+  }
+}

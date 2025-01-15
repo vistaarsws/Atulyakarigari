@@ -1,0 +1,41 @@
+.addProduct_container {
+  height: 100%;
+}
+
+.form-container {
+  height: 90vh;
+  padding: 1.5rem 2%;
+  background-color: #f9fafb;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 2rem;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-title {
+  font-size: 2.4rem;
+  font-weight: 600;
+  padding: 2rem 2% 0;
+  width: 100%;
+  background-color: #f9fafb;
+}
+
+@media screen and (max-width: 1160px) {
+  .form-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .addProduct_container {
+    margin-top: 5rem;
+  }
+  .form-container {
+    height: auto;
+  }
+}

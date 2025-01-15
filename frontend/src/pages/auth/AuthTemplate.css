@@ -57,44 +57,15 @@
 
 .authTemplate_container > section:first-of-type article form {
   margin-inline: auto;
-  & div > div label {
-    display: block;
-    text-align: start;
-    font-size: 1.4rem;
-    margin-bottom: 0.8rem;
-  }
-
-  & div > div {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    margin-bottom: 2rem;
-  }
-
-  & div > div input,
-  & div > div select {
-    padding: 1.2rem 1.4rem;
-    border-radius: 0.6rem;
-    font-size: 1.4rem;
-    width: 100%;
-    border: 1px solid #dee4ed;
-  }
-
-  & div:last-of-type {
-    button {
-      padding: 1rem 2rem;
-      font-size: 1.4rem;
-      background-color: #60a487;
-      border: none;
-      width: 100%;
-      color: white;
-      border-radius: 0.6rem;
-    }
-  }
 
   & > p:last-of-type {
     margin: 1rem auto 2rem;
   }
+}
+
+.Otp_container > div:first-of-type > h3 > span {
+  font-weight: 600;
+  margin-left: 0.5rem;
 }
 
 .otp_inputBox {
@@ -105,6 +76,9 @@
     }
 
     & > div {
+      display: flex;
+      justify-content: center;
+      width: 100%;
       margin-bottom: 0 !important;
     }
   }
