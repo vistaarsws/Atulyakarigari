@@ -263,7 +263,13 @@ export default function Product() {
             <div className="priceRatingContainer">
               <div>
                 <div className="priceBox">
-                  <h2>₹{product?.priceAfterDiscount || "N/A"}</h2>
+                  <h2>
+                    ₹
+                    {(
+                      product?.price -
+                      (product?.price * product?.discountPercentage) / 100
+                    ).toFixed() || "N/A"}
+                  </h2>
                   <strike>₹{product?.price || "N/A"}</strike>
                   <h4>(-{product?.discountPercentage || 0}%)</h4>
                 </div>

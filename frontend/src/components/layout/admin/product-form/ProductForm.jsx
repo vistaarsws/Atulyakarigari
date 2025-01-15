@@ -376,7 +376,7 @@ export default function ProductForm({
 
       formDataInstance.append("name", formData?.name);
       formDataInstance.append("description", formData?.description);
-      formDataInstance.append("price", formData?.price);
+      formDataInstance.append("price", Number(formData.price).toFixed(0));
       formDataInstance.append("category", formData?.category);
       formDataInstance.append("subcategory", formData?.subcategory);
       formDataInstance.append("stock", formData?.stock);
@@ -611,12 +611,13 @@ export default function ProductForm({
                 id="productQuantity"
                 label="Quantity"
                 type="number"
+                slotProps={{ min: 0 }}
                 variant="outlined"
                 value={formData.stock}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    stock: e.target.value,
+                    stock: Math.max(1, parseInt(e.target.value) || 1),
                   })
                 }
               />
@@ -821,6 +822,7 @@ export default function ProductForm({
                   variant="outlined"
                   value={formData.discountPercentage}
                   type="number"
+                  slotProps={{ min: 0, max: 100 }}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
