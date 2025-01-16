@@ -67,7 +67,7 @@ const Index = () => {
                     key={product?._id}
                     id={product?._id}
                     title={product?.name || "No Title"}
-                    picture={product?.artisanImage || ""}
+                    picture={product?.images[0] || ""}
                     price={product?.price || "N/A"}
                     shortDescription={product?.description || "No Description"}
                     offer_inPercent={product?.discountPercentage || 0}

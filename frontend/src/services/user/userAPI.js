@@ -76,8 +76,10 @@ const getcategory = async () => {
   const response = await apiConnector("GET", user_endpoints.GET_CATEGORY);
   return response;
 };
-const addToCart = async () => {
-  const response = await apiConnector("POST", user_endpoints.USER_ADD_TO_CART);
+const addToCart = async (productId,quantity) => {
+  const response = await apiConnector("POST", user_endpoints.USER_ADD_TO_CART,{productId,
+    quantity
+  });
   return response;
 };
 
@@ -90,6 +92,18 @@ const getCart = async () => {
     throw err;
   }
 };
+
+const removeFromCart = async (productId)=>{
+  try {
+    const response = await apiConnector("DELETE",user_endpoints.REMOVE_FROM_CART,
+      {productId}
+    );
+    return response
+  } catch (error) {
+    console.log(error.message);
+    throw error;
+  }
+}
 
 export {
   createProduct,
@@ -105,4 +119,5 @@ export {
   getcategoryById,
   addToCart,
   getCart,
+  removeFromCart
 };
