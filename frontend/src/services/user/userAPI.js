@@ -105,6 +105,18 @@ const removeFromCart = async (productId)=>{
   }
 }
 
+const createAddress = async (addressDetails) => {
+  try {
+    const response = await apiConnector("POST", user_endpoints.CREATE_ADDRESS,
+      addressDetails);
+    console.log("API Response:", response);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export {
   createProduct,
   getProducts,
@@ -119,5 +131,6 @@ export {
   getcategoryById,
   addToCart,
   getCart,
-  removeFromCart
+  removeFromCart,
+  createAddress
 };

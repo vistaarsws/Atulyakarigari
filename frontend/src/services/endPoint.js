@@ -41,4 +41,6 @@ export const user_endpoints = {
 
   GET_CATEGORY: BASE_URL + "/api/v1/category/get",
   GET_CATEGORY_BY_ID: BASE_URL + "/api/v1/category/get/",
+
+  CREATE_ADDRESS : BASE_URL + "/api/v1/address/create"
 };

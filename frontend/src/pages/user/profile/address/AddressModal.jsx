@@ -12,6 +12,9 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import {createAddress} from "../../../../services/user/userAPI"
 
 const EditAddressModal = ({ open, handleClose, addressData, title }) => {
   const isMobile = useMediaQuery("(max-width:768px)");
@@ -23,9 +26,31 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
     address: addressData?.address || "",
     locality: addressData?.locality || "",
     city: addressData?.city?.split(" - ")[0] || "",
-    addressType: addressData?.type?.toLowerCase() || "home",
+    typeOfAddress: addressData?.type?.toLowerCase() || "home",
     isDefault: addressData?.isDefault || false,
   });
+  const authToken = useSelector((state) => state.auth.token);
+  const createAddressHandler = async () =>{
+    // debugger;
+   try {
+    if (!authToken) {
+      console.error("No user profile token found");
+      return;
+    }
+    
+    const { _id } = jwtDecode(authToken);
+    if (!_id) {
+      console.error("Invalid token structure");
+      return;
+    }
+
+    const response = await createAddress(formData)
+    console.log("address response",response);
+    
+   } catch (error) {
+    console.log(error.message)
+   }
+  }
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -45,7 +70,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
   const handleRadioChange = (event) => {
     setFormData((prev) => ({
       ...prev,
-      addressType: event.target.value,
+      typeOfAddress: event.target.value,
     }));
   };
   const textFieldSx = {
@@ -156,12 +181,12 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
             onChange={handleChange}
           />
           <TextField
-            name="phoneNumber"
+            name="mobileNumber"
             label="Phone Number"
             variant="outlined"
             fullWidth
             sx={{ ...textFieldSx, marginBottom: "2rem" }}
-            value={formData.phoneNumber}
+            value={formData.mobileNumber}
             onChange={handleChange}
           />
           <TextField
@@ -214,7 +239,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
                 control={
                   <Radio
                     size="large"
-                    checked={formData.addressType === "home"}
+                    checked={formData.typeOfAddress === "home"}
                     onChange={handleRadioChange}
                     value="home"
                     sx={{
@@ -234,7 +259,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
               <FormControlLabel
                 control={
                   <Radio
-                    checked={formData.addressType === "office"}
+                    checked={formData.typeOfAddress === "office"}
                     onChange={handleRadioChange}
                     value="office"
                     size="large"
@@ -334,7 +359,10 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
               },
               flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
             }}
-            onClick={handleClose}
+            onClick={()=>{
+              handleClose,
+              createAddressHandler()
+            }}
           >
             Save
           </Button>
