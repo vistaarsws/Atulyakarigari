@@ -13,6 +13,9 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { removeFromCart } from "../../../services/user/userAPI";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
@@ -80,13 +83,30 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const ProductCard = ({ product }) => {
+  console.log("ProductCard",product.productId)
+  const authToken = useSelector((state) => state.auth.token);
+  const removeFromCartHandler = async () => {
+    try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
+      
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+      await removeFromCart(product?.productId);
+      
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
   return (
     <StyledCard>
       <ProductImageWrapper>
-        <ProductImage
-          src={product?.productId?.images?.[0]}
-          alt={product?.productId?.name}
-        />
+        <ProductImage src={product?.images?.[0]} alt={product?.name} />
         <Checkbox
           sx={{
             position: "absolute",
@@ -114,7 +134,12 @@ const ProductCard = ({ product }) => {
           padding: "0 0 0  1rem!important",
         }}
       >
-        <CloseButton size="small">
+        <CloseButton
+          onClick={
+            removeFromCartHandler
+        }
+          size="small"
+        >
           <CloseIcon fontSize="small" />
         </CloseButton>
         <Typography
@@ -124,7 +149,7 @@ const ProductCard = ({ product }) => {
             color: "rgba(56, 55, 55, 1)",
           }}
         >
-          {product?.productId?.name}
+          {product?.name}
         </Typography>
         <Typography
           variant="body2"
@@ -142,7 +167,7 @@ const ProductCard = ({ product }) => {
             WebkitLineClamp: 1, // Limits the number of lines (change this number to suit your needs)
           }}
         >
-          {product?.productId?.description || "No description available"}
+          {product?.description || "No description available"}
         </Typography>
         <Box
           sx={{
@@ -175,7 +200,7 @@ const ProductCard = ({ product }) => {
                 fontSize: "16px",
               }}
             >
-              ₹{product?.productId?.price?.toLocaleString()}
+              ₹{product?.price?.toLocaleString()}
             </Typography>
             <QuantityContainer
               sx={{
