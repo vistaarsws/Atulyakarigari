@@ -177,7 +177,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {cartData?.total}
+                {cartData?.totalMRP}
               </Typography>
             </Box>
             <Box
@@ -206,7 +206,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                -1,972
+                {cartData?.totalDiscount}
               </Typography>
             </Box>
             <Box
@@ -297,7 +297,7 @@ const Payment = ({ cartData }) => {
                 lineHeight: "25px",
               }}
             >
-              8,663
+              {cartData?.total}
             </Typography>
           </Box>
         </Box>
@@ -333,7 +333,7 @@ const Payment = ({ cartData }) => {
               navigate("/place-order");
             }}
           >
-            Continue
+            Place order
           </Button>
         </Box>
       </Box>

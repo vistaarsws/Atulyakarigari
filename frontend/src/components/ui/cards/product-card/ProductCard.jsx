@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
-
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import { addToCart } from "../../../../services/user/userAPI";
 
 function ProductCard({
   title,
@@ -18,10 +20,27 @@ function ProductCard({
   const [isHover, setIsHover] = useState(false);
   const [isMobileView, setIsMobileView] = useState();
   const navigate = useNavigate();
-  // const [isAddedToWishList, setIsAddedToWishList] = useState(false);
-  // const addToWishListHandler = () => {
-  //   setIsAddedToWishList(!isAddedToWishList);
-  // };
+  const authToken = useSelector((state) => state.auth.token);
+
+  const addToCartHandler = async (productId={id}, quantity) => {
+    try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
+
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+
+      const response = await addToCart(productId, quantity);
+
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   useEffect(() => {
     // Check if the URL contains "user/wishlist"
@@ -79,7 +98,7 @@ function ProductCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              navigate("/buy-now");
+              addToCartHandler(id)
             }}
             style={{ visibility: isHover === true && "visible" }}
           >

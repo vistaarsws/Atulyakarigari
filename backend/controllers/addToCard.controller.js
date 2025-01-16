@@ -13,24 +13,31 @@ const successResponse = (res, data, message) => {
 };
 
 // Helper function to format the cart data
-const formatCart = (cart) => ({
+const formatCart = (cart, totals) => ({
     userId: cart.userId,
     items: cart.items.map(item => ({
-        productId: item.productId,
+        productId: item.productId._id,
         quantity: item.quantity,
+        description: item.productId.description,
+        price: item.productId.price,
+        priceAfterDiscount: item.productId.priceAfterDiscount,
+        images: item.productId.images,
+        name: item.productId.name,
         _id: item._id,
     })),
-    total: cart.total,
+    total: totals.total, // Total after discounts
+    totalMRP: totals.totalMRP, // Total original price
+    totalDiscount: totals.totalDiscount, // Total discount
     _id: cart._id,
 });
 
 // Add or update item in the cart
 export const addToCart = async (req, res) => {
     try {
-        const { productId, quantity } = req.body;
-        const userId = req.user._id; // Assuming user ID is in the token
+        const { productId, quantity = 1 } = req.body; // Default quantity to 1
+        const userId = req.user._id; // Assuming user ID is available in the token
 
-        if (!productId || !quantity || quantity < 1) {
+        if (!productId || quantity < 1) {
             return badRequest(req, res, null, "Invalid product ID or quantity");
         }
 
@@ -46,46 +53,53 @@ export const addToCart = async (req, res) => {
         // Find or create the cart
         let cart = await Cart.findOne({ userId });
         if (!cart) {
-            cart = new Cart({ userId, items: [], total: 0 });
+            cart = new Cart({ userId, items: [], total: 0, totalMRP: 0, totalDiscount: 0 });
         }
 
         // Check if the product is already in the cart
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
 
         if (itemIndex > -1) {
-            // Update quantity if the product exists in the cart
-            cart.items[itemIndex].quantity += quantity;
+            // Replace the quantity if the product exists in the cart
+            cart.items[itemIndex].quantity = quantity;
         } else {
             // Add new item to the cart
             cart.items.push({ productId, quantity });
         }
 
-        // Recalculate the total
-        cart.total = await calculateCartTotal(cart.items);
+        // Recalculate the totals
+        const { total, totalMRP, totalDiscount } = await calculateCartTotal(cart.items);
+        cart.total = total;
+        cart.totalMRP = totalMRP;
+        cart.totalDiscount = totalDiscount;
 
         // Save the cart
         await cart.save();
 
         // Return success response
-        successResponse(res, formatCart(cart), "Product successfully added to cart.");
+        successResponse(res, formatCart(cart), "Product successfully added or updated in the cart.");
     } catch (error) {
         console.error("Error in addToCart:", error);
-        return internalServerError(req, res, error, "Unable to add product to cart");
+        return internalServerError(req, res, error, "Unable to add or update product in cart");
     }
 };
 
 // Get the cart for the user
 export const getCart = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user._id; // Assuming user ID is available in the request
 
-        const cart = await Cart.findOne({ userId }).populate("items.productId", "name price images");
+        // Fetch the user's cart and populate product details
+        const cart = await Cart.findOne({ userId }).populate("items.productId", "name price description priceAfterDiscount images");
         if (!cart) {
             return notFoundRequest(req, res, null, "Cart not found");
         }
 
-        // Return success response
-        successResponse(res, formatCart(cart), "Cart retrieved successfully.");
+        // Calculate totals
+        const totals = await calculateCartTotal(cart.items);
+
+        // Return formatted cart data with totals
+        successResponse(res, formatCart(cart, totals), "Cart retrieved successfully.");
     } catch (error) {
         console.error("Error in getCart:", error);
         return internalServerError(req, res, error, "Unable to fetch cart");
@@ -96,22 +110,32 @@ export const getCart = async (req, res) => {
 export const removeFromCart = async (req, res) => {
     try {
         const { productId } = req.body;
-        const userId = req.user._id;
+        const userId = req.user._id; // Assuming user ID is in the token
 
+        // Validate request
         if (!productId) {
             return badRequest(req, res, null, "Product ID is required");
         }
 
+        // Fetch the user's cart
         const cart = await Cart.findOne({ userId });
         if (!cart) {
             return notFoundRequest(req, res, null, "Cart not found");
         }
 
-        // Remove the product from the cart
-        cart.items = cart.items.filter(item => item.productId.toString() !== productId);
+        // Find the index of the product in the cart
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+        if (itemIndex === -1) {
+            return notFoundRequest(req, res, null, "Product not found in the cart");
+        }
+
+        // Remove the item from the cart
+        cart.items.splice(itemIndex, 1);
 
         // Recalculate the total
-        cart.total = await calculateCartTotal(cart.items);
+        const totals = await calculateCartTotal(cart.items);
+        cart.total = totals.total;
 
         // If there are no items left in the cart, delete the cart
         if (cart.items.length === 0) {
@@ -119,11 +143,11 @@ export const removeFromCart = async (req, res) => {
             return successResponse(res, null, "Cart is empty and has been deleted.");
         }
 
-        // Save the cart if it still has items
+        // Save the updated cart
         await cart.save();
 
         // Return success response
-        successResponse(res, formatCart(cart), "Product successfully removed from cart.");
+        successResponse(res, formatCart(cart, totals), "Product successfully removed from cart.");
     } catch (error) {
         console.error("Error in removeFromCart:", error);
         return internalServerError(req, res, error, "Unable to remove product from cart");
@@ -131,14 +155,21 @@ export const removeFromCart = async (req, res) => {
 };
 
 
-// Helper function to calculate total
+// Helper function to calculate totals
 const calculateCartTotal = async (items) => {
-    let total = 0;
+    let total = 0; // Total price after discounts
+    let totalMRP = 0; // Total original price without discounts
+    let totalDiscount = 0; // Total discount amount
+
     for (const item of items) {
         const product = await Product.findById(item.productId);
         if (product) {
-            total += product.price * item.quantity;
+            const priceAfterDiscount = product.priceAfterDiscount || product.price;
+            total += priceAfterDiscount * item.quantity;
+            totalMRP += product.price * item.quantity;
+            totalDiscount += (product.price - priceAfterDiscount) * item.quantity;
         }
     }
-    return total;
+
+    return { total, totalMRP, totalDiscount };
 };
