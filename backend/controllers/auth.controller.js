@@ -37,7 +37,7 @@ export const googleAuthHandler = async (req, res) => {
     let user = await User.findOne({ googleId: sub });
 
     // updated by Dhanjeet sharma : 28-12-24 :: fix google auth issue
-    if (!user) {
+    if (!user || user ==="") {
       // If user does not exist, check if the email is already used by another profile
       const existingProfile = await Profile.findOne({ email });
       if (!existingProfile && !user) {
