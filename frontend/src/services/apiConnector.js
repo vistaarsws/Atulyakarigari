@@ -4,7 +4,6 @@ import Cookies from "js-cookie";
 const axiosInstance = axios.create({});
 
 const token = Cookies.get("authToken");
-
 // Add request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
