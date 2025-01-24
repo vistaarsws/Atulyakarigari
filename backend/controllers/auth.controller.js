@@ -31,35 +31,35 @@ export const googleAuthHandler = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    const { email, name, picture, sub } = payload;  // sub = Google user ID
+    const { email, name, picture, sub } = payload; // sub = Google user ID
 
     // Check if the user already exists using Google ID
     let user = await User.findOne({ googleId: sub });
 
-    // updated by Dhanjeet sharma : 28-12-24 :: fix google auth issue
-    if (!user || user ==="") {
+    // updated by  Mohit Mehto : 24-01-25 :: fix google auth issue
+    const existingProfile = await Profile.findOne({ email });
+    const id = existingProfile.userId._id;
+    user = await User.findById(id);
+
+    if (!user) {
       // If user does not exist, check if the email is already used by another profile
-      const existingProfile = await Profile.findOne({ email });
-      if (!existingProfile && !user) {
+      if (!existingProfile.email) {
         // Create a new user
         user = new User({
           googleId: sub,
           accountType: "customer", // Default account type, can be changed later
         });
 
-      await user.save();
+        await user.save();
 
-      // Create and link profile to the new user
-      await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
-    } else if (!user.additionalDetails) {
-      // If user exists but does not have a profile linked, create one
-      await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
-    }
+        // Create and link profile to the new user
+        await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
+      }
     }
     // Generate auth token for the user
     let authToken;
     try {
-      authToken = await user.generateAuthToken();  // Ensure we await the token generation
+      authToken = await user.generateAuthToken(); // Ensure we await the token generation
     } catch (error) {
       console.error("Error generating token:", error);
       return internalServerError(req, res, error, "Token generation failed");
@@ -411,7 +411,9 @@ export const validateOtp = async (req, res) => {
       }
       // after successfully verified generate token
       const profileDetails = await Profile.findOne({ contactNumber: loginId });
-      const user = await User.findOne({ additionalDetails: profileDetails._id }).populate({
+      const user = await User.findOne({
+        additionalDetails: profileDetails._id,
+      }).populate({
         path: "additionalDetails",
       });
       const token = await user.generateAuthToken(user);
@@ -429,7 +431,9 @@ export const validateOtp = async (req, res) => {
       }
       // generate token
       const profileDetails = await Profile.findOne({ email: loginId });
-      const user = await User.findOne({ additionalDetails: profileDetails._id }).populate({
+      const user = await User.findOne({
+        additionalDetails: profileDetails._id,
+      }).populate({
         path: "additionalDetails",
       });
       console.log(user);
@@ -448,9 +452,9 @@ export const validateOtp = async (req, res) => {
 };
 export const backup = async (req, res) => {
   try {
-    const { BACKUP_ATLAS_URI } = req.body
+    const { BACKUP_ATLAS_URI } = req.body;
     // Connect to the backup database
-    const backupConnection = await mongoose.createConnection(BACKUP_ATLAS_URI,);
+    const backupConnection = await mongoose.createConnection(BACKUP_ATLAS_URI);
 
     // Get collections from the current database
     const collections = await mongoose.connection.db.collections();
@@ -472,9 +476,11 @@ export const backup = async (req, res) => {
     //   await collection.deleteMany({});
     // }
 
-    res.status(200).send({ message: 'Backup completed successfully in Atlas.' });
+    res
+      .status(200)
+      .send({ message: "Backup completed successfully in Atlas." });
   } catch (error) {
-    console.error('Error during backup:', error);
-    res.status(500).send({ error: 'Backup failed.' });
+    console.error("Error during backup:", error);
+    res.status(500).send({ error: "Backup failed." });
   }
-} 
+};
