@@ -8,12 +8,11 @@ import ProductSection from "../../../components/layout/user/product-section/Prod
 import CategoryView from "../../../components/layout/user/category-view/CategoryView";
 import { useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getCategory, getSubCategory } from "../../../services/admin/adminAPI";
+import { getCategory } from "../../../services/admin/adminAPI";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const [getAllCategories,setGetAllCategories ] = useState([]);
-  const [getAllSubCategories, setGetAllSubCategories] = useState([]);
 
   const fetchCategoriesData = async () => {
     try {
@@ -27,23 +26,10 @@ export default function Home() {
     }
   };
 
-  const fetchSubCategoriesData = async () => {
-    try {
-      const response = await getSubCategory();
-      
-      setGetAllSubCategories(Object.values(response?.data?.data));
-      console.log("SubCategory",getAllSubCategories);
-      
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
-    }
-  };
-
   
 
   useEffect(() => {
     fetchCategoriesData();
-    fetchSubCategoriesData();
   }, []);
 
   return (
@@ -66,23 +52,35 @@ export default function Home() {
 
       <section className="category-mapping">
         {getAllCategories.length > 0 ? (
-          getAllCategories.map((category,index) => (
-            <div key={index} className="category-container">
-              <h3>{category.name}</h3>
+          getAllCategories.map((category) => (
+            <div key={category._id} className="category-container">
               <div className="subcategories">
-                {category.subcategory?.map((subcat,index) => (
-                  <div key={subcat[index]?._id} className="subcategory-item">
-                    {subcat[index]?.name}
-                  </div>
-                ))}
+                {category.subcategory?.length > 0 ? (
+                  category.subcategory.map((subcat) => (
+                    <div key={subcat._id} className="subcategory-container">
+                      {console.log("subcat", subcat.products)}
+                      
+                      <ProductSection  
+                      productCategorySection={{
+                        title: subcat.name,
+                        subtitle: `Explore products in ${subcat.name}`,
+                        products: subcat.products, // Now includes detailed product info.
+                      }}
+                      bgColor="#fff"
+                    />
+                    </div>
+                  ))
+                ) : (
+                  <p>No subcategories available</p>
+                )}
               </div>
-              
             </div>
           ))
         ) : (
           <p>No categories or subcategories available at the moment.</p>
         )}
       </section>
+
       <section className="noDiscount_container">
         <img src={bg_pattern} alt="Background Pattern" />
 
