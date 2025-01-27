@@ -37,7 +37,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd frontend
-          npm install
+          npm ci
 
   build:
     name: 🛠️ Build Application
@@ -76,7 +76,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --prod --yes --confirm
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --prod --scope vistaarsws-projects --project atulyakarigari --yes --confirm
 
   deploy-to-production:
     name: 🚀 Deploy to Production (main branch)
@@ -93,4 +93,4 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes --confirm
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --scope vistaarsws-projects --project atulyakarigari --yes --confirm
