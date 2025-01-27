@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import {getCart, getProfile } from "../../../../services/user/userAPI";
+import { getCart, getProfile } from "../../../../services/user/userAPI";
 
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
@@ -24,6 +24,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
+
+  const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
+
+  const toggleCollapse = (index) => {
+    setOpenCategoryIndex((prev) => (prev === index ? null : index));
+  };
 
   // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
@@ -91,7 +97,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     fetchProfileData();
-  },[authToken]);
+  }, [authToken]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -137,7 +143,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
       {
         name: "CATEGORIES",
-        path: "/categories",
+        path: "#",
         dropdown: [
           {
             category: "HANDLOOM",
@@ -261,20 +267,16 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         return;
       }
 
-      const response = await getCart()
-      setCartData(response?.data?.data)
+      const response = await getCart();
+      setCartData(response?.data?.data);
       // console.log("response",cartData);
-      
-
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err.message);
-      
     }
-  }
-  useEffect(()=>{
-    fetchCartData()
-  },[])
+  };
+  useEffect(() => {
+    fetchCartData();
+  }, []);
 
   return (
     <nav className="navbar_container">
@@ -298,30 +300,59 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               onMouseOut={() => setIsCategoryHovered(null)}
             >
               <NavLink
+                style={{
+                  marginInline: "2rem",
+                }}
                 to={link.path}
                 onClick={() => {
-                  setIsNavVisible(false);
+                  if (link.dropdown) {
+                    setIsNavVisible(true);
+                  } else {
+                    setIsNavVisible(false);
+                  }
                 }}
               >
                 {link.name}
               </NavLink>
               {link.dropdown && (
                 <div
-                  style={{ position: "absolute", zIndex: "999" }}
-                  className={`category ${
+                  className={`categoryDropdown ${
                     isCategoryHovered === index ? "" : "hide"
                   }`}
                 >
                   <div className="categories-container">
                     {link.dropdown.map((categoryObj, index) => (
                       <div
-                        className={`category ${
+                        id="category"
+                        className={` ${
                           index !== 0 ? "smallNavMenuSection" : ""
                         }`}
                         key={index}
                       >
-                        <h1>{categoryObj.category}</h1>
-                        <section>
+                        <div
+                          className="category-header"
+                          onClick={() => toggleCollapse(index)}
+                          aria-expanded={openCategoryIndex === index}
+                        >
+                          <h1>{categoryObj.category}</h1>
+                          <svg
+                            className={`collapse-icon ${
+                              openCategoryIndex === index ? "open" : ""
+                            }`}
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M12 16L6 10H18L12 16Z" fill="#60A487" />
+                          </svg>
+                        </div>
+                        <section
+                          className={`collapse-content ${
+                            openCategoryIndex === index ? "show" : ""
+                          }`}
+                        >
                           {categoryObj.subcategories.map(
                             (subcategory, subIndex) => (
                               <div key={subIndex}>
@@ -440,7 +471,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseLeave={() => setIsProfileHovered(false)}
         >
           {authToken ? (
-            <img  src={profileData?.profilePicture} alt="User Profile" />
+            <img src={profileData?.profilePicture} alt="User Profile" />
           ) : (
             <Avatar src="/broken-image.jpg" />
           )}
