@@ -1,4 +1,4 @@
-name: Front-end CI/CD Pipeline
+name: Frontend CI/CD Pipeline
 
 on:
   pull_request:
@@ -76,9 +76,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
         run: |
           cd frontend
-          rm -rf .vercel
-          npx vercel link --token $VERCEL_TOKEN --yes
-          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --prod --yes --confirm
 
   deploy-to-production:
     name: 🚀 Deploy to Production (main branch)
@@ -95,4 +93,4 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes --confirm
