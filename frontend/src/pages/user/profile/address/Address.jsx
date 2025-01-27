@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -15,8 +15,13 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import EditAddressModal from "./AddressModal";
+import AddressModal from "./AddressModal";
 import { useLocation } from "react-router-dom";
+import {
+  deleteAddress,
+  getAddress,
+  updateAddress,
+} from "../../../../services/user/userAPI";
 
 const theme = createTheme({
   typography: {
@@ -33,16 +38,18 @@ const theme = createTheme({
 });
 
 const AddressCard = ({
-  isDefault,
-  date,
-  type,
-  name,
   address,
   city,
-  state,
-  mobile,
+  fullName,
+  isDefault,
+  date,
+  locality,
+  mobileNumber,
+  pincode,
+  typeOfAddress,
   isSelected,
   onSelect,
+  getAllAddress,
   addressId,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +57,16 @@ const AddressCard = ({
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
+
+  const deleteAddressHandler = async (id) => {
+    try {
+      await deleteAddress(id);
+      getAllAddress();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <Box position="relative" mb={2}>
@@ -129,7 +146,7 @@ const AddressCard = ({
                 textTransform: "capitalize",
               }}
             >
-              {type}
+              {typeOfAddress}
             </Button>
           </Box>
           <Box color="#374151">
@@ -139,7 +156,7 @@ const AddressCard = ({
               color="rgba(56, 55, 55, 1)"
               mb="1rem"
             >
-              {name}
+              {fullName}
             </Typography>
             <Typography
               color="rgba(111, 111, 111, 1)"
@@ -160,7 +177,7 @@ const AddressCard = ({
               fontSize="14px"
               fontWeight={400}
             >
-              {state}
+              {locality}
             </Typography>
             <Typography
               color="rgba(111, 111, 111, 1)"
@@ -168,7 +185,7 @@ const AddressCard = ({
               fontWeight={400}
               mt="3rem"
             >
-              Mobile: {mobile}
+              Mobile: {mobileNumber}
             </Typography>
           </Box>
           <Box
@@ -290,25 +307,31 @@ const AddressCard = ({
                     },
                     flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
                   }}
+                  onClick={() => deleteAddressHandler(addressId)}
                 >
-                  Save
+                  Delete
                 </Button>
               </Box>
             )}
           </Box>
         </Paper>
       </Box>
-      <EditAddressModal
+      <AddressModal
+        title={"Edit"}
+        getAllAddress={getAllAddress}
         open={isModalOpen}
+        addressId={addressId}
         handleClose={handleCloseModal}
         addressData={{
-          name,
-          mobile,
           address,
           city,
-          state,
-          type,
+          fullName,
           isDefault,
+          date,
+          locality,
+          mobileNumber,
+          pincode,
+          typeOfAddress,
         }}
       />
     </>
@@ -317,6 +340,7 @@ const AddressCard = ({
 
 const AddressUI = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [addresses, setAddresses] = useState([]);
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -326,76 +350,19 @@ const AddressUI = () => {
   const handleAddressSelection = (addressId) => {
     setSelectedAddress(addressId === selectedAddress ? null : addressId);
   };
-  const addresses = {
-    defaultAddress: {
-      id: "addr1",
-      isDefault: true,
-      date: "Wed, 3 Apr 2024",
-      type: "Home",
-      name: "MAYURI SRIVASTAVA",
-      address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-      city: "Bhopal - 462030",
-      state: "Madhya Pradesh",
-      mobile: "817596153315",
-    },
-    otherAddress: [
-      {
-        id: "addr1",
-        isDefault: true,
-        date: "Wed, 3 Apr 2024",
-        type: "Home",
-        name: "MAYURI SRIVASTAVA",
-        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-        city: "Bhopal - 462030",
-        state: "Madhya Pradesh",
-        mobile: "817596153315",
-      },
-      {
-        id: "addr2",
-        isDefault: false,
-        date: "Wed, 3 Apr 2024",
-        type: "Office",
-        name: "MAYURI SRIVASTAVA",
-        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-        city: "Bhopal - 462030",
-        state: "Madhya Pradesh",
-        mobile: "817596153315",
-      },
-      {
-        id: "addr3",
-        isDefault: false,
-        date: "Wed, 3 Apr 2024",
-        type: "Office",
-        name: "MAYURI SRIVASTAVA",
-        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-        city: "Bhopal - 462030",
-        state: "Madhya Pradesh",
-        mobile: "817596153315",
-      },
-      {
-        id: "addr4",
-        isDefault: false,
-        date: "Wed, 3 Apr 2024",
-        type: "Office",
-        name: "MAYURI SRIVASTAVA",
-        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-        city: "Bhopal - 462030",
-        state: "Madhya Pradesh",
-        mobile: "817596153315",
-      },
-      {
-        id: "addr5",
-        isDefault: false,
-        date: "Wed, 3 Apr 2024",
-        type: "Office",
-        name: "MAYURI SRIVASTAVA",
-        address: "House no. 140, puja shree nagar cto, bairagarh, Bhopal",
-        city: "Bhopal - 462030",
-        state: "Madhya Pradesh",
-        mobile: "817596153315",
-      },
-    ],
+
+  const getAllAddress = async () => {
+    try {
+      const response = await getAddress();
+      setAddresses(response.data.data);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
+
+  useEffect(() => {
+    getAllAddress();
+  }, []);
 
   return (
     <>
@@ -488,13 +455,20 @@ const AddressUI = () => {
                 Default Address
               </Typography>
 
-              <AddressCard
-                key={addresses.defaultAddress.id}
-                {...addresses.defaultAddress}
-                isSelected={selectedAddress === addresses.defaultAddress.id}
-                onSelect={handleAddressSelection}
-                addressId={addresses.defaultAddress.id}
-              />
+              {Object.values(addresses).map((addr) => {
+                if (addr.isDefault) {
+                  return (
+                    <AddressCard
+                      key={addr?._id}
+                      {...addr}
+                      getAllAddress={getAllAddress}
+                      isSelected={selectedAddress === addr?._id}
+                      onSelect={handleAddressSelection}
+                      addressId={addr?._id}
+                    />
+                  );
+                }
+              })}
 
               <Typography
                 color="rgba(96, 164, 135, 1)"
@@ -505,24 +479,30 @@ const AddressUI = () => {
               >
                 Other Address
               </Typography>
-              {addresses.otherAddress.map((addr) => (
-                <AddressCard
-                  key={addr.id}
-                  {...addr}
-                  isSelected={selectedAddress === addr.id}
-                  onSelect={handleAddressSelection}
-                  addressId={addr.id}
-                />
-              ))}
+              {Object.values(addresses).map((addr) => {
+                if (!addr.isDefault) {
+                  return (
+                    <AddressCard
+                      key={addr?._id}
+                      {...addr}
+                      getAllAddress={getAllAddress}
+                      isSelected={selectedAddress === addr?._id}
+                      onSelect={handleAddressSelection}
+                      addressId={addr?._id}
+                    />
+                  );
+                }
+              })}
             </RadioGroup>
           </Box>
         </Box>
       </ThemeProvider>
-      <EditAddressModal
+      <AddressModal
+        getAllAddress={getAllAddress}
+        title={"Add"}
         open={isModalOpen}
         handleClose={handleCloseModal}
         addressData={null}
-        title={"Add New"}
       />
     </>
   );

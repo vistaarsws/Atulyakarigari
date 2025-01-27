@@ -376,7 +376,7 @@ export default function ProductForm({
 
       formDataInstance.append("name", formData?.name);
       formDataInstance.append("description", formData?.description);
-      formDataInstance.append("price", Number(formData.price).toFixed(0));
+      formDataInstance.append("price", Number(formData?.price).toFixed(0));
       formDataInstance.append("category", formData?.category);
       formDataInstance.append("subcategory", formData?.subcategory);
       formDataInstance.append("stock", formData?.stock);

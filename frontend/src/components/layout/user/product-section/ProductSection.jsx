@@ -1,35 +1,35 @@
+import PropTypes from "prop-types";
 import ProductCard from "../../../ui/cards/product-card/ProductCard";
 import pattern from "../../../../assets/images/designPattern_1.svg";
 import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
-import { top_product_list_from_category } from "../../../../utils/Constant";
 
 import "./ProductSection.css";
-import PropTypes from "prop-types";
 
-export default function ProductSection({
-  productCategorySection = top_product_list_from_category,
-  bgColor,
-}) {
-  const productCategorySection_products = productCategorySection.products.map(
-    (product, index) => {
-      return (
-        <ProductCard
-          key={index}
-          id={product.title + index}
-          title={product.title}
-          picture={product.picture}
-          price={product.price}
-        />
-      );
-    }
-  );
+// Utility function to handle product fallbacks
+const formatProductData = (product) => ({
+  id: product._id,
+  title: product.name || "Unnamed Product",
+  picture: product.images?.[0] || "default-image-url", // Fallback for image
+  price: product.price || "N/A",
+  shortDescription: product.description || "No Description",
+  priceAfterDiscount: product.priceAfterDiscount || "N/A",
+  offer_inPercent: product.discountPercentage || "N/A",
+});
+
+export default function ProductSection({ productCategorySection, bgColor }) {
+  const { title, subtitle, products } = productCategorySection;
+
+  const productCards = products.map((product, index) => (
+    <ProductCard key={index} {...formatProductData(product)} />
+  ));
+
   return (
     <div
       className="productCategorySection_container"
-      style={{ backgroundColor: bgColor ? bgColor : "#f4f4f4" }}
+      style={{ backgroundColor: bgColor || "#f4f4f4" }}
     >
-      <h1>{productCategorySection.title}</h1>
-      <h2>{productCategorySection.subtitle}</h2>
+      <h1>{title}</h1>
+      <h2>{subtitle}</h2>
       <figure>
         <img src={pattern} alt="Wing Pattern" />
       </figure>
@@ -42,7 +42,7 @@ export default function ProductSection({
             plugins={["autoplay"]}
             slides_in_view={{ xl: 6, lg: 5, md: 4, sm: 2, xs: 2 }}
             options={{ delay: 8000, dragFree: true }}
-            slides={productCategorySection_products}
+            slides={productCards}
             no_of_slides={5}
             navigationDots={false}
           />
@@ -53,5 +53,26 @@ export default function ProductSection({
 }
 
 ProductSection.propTypes = {
-  productCategorySection: PropTypes.object,
+  productCategorySection: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    subtitle: PropTypes.string.isRequired,
+    products: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        name: PropTypes.string,
+        images: PropTypes.arrayOf(PropTypes.string),
+        price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        description: PropTypes.string,
+        priceAfterDiscount: PropTypes.oneOfType([
+          PropTypes.string,
+          PropTypes.number,
+        ]),
+        discountPercentage: PropTypes.oneOfType([
+          PropTypes.string,
+          PropTypes.number,
+        ]),
+      })
+    ).isRequired,
+  }).isRequired,
+  bgColor: PropTypes.string,
 };

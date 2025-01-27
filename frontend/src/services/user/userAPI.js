@@ -76,9 +76,10 @@ const getcategory = async () => {
   const response = await apiConnector("GET", user_endpoints.GET_CATEGORY);
   return response;
 };
-const addToCart = async (productId,quantity) => {
-  const response = await apiConnector("POST", user_endpoints.USER_ADD_TO_CART,{productId,
-    quantity
+const addToCart = async (productId, quantity) => {
+  const response = await apiConnector("POST", user_endpoints.USER_ADD_TO_CART, {
+    productId,
+    quantity,
   });
   return response;
 };
@@ -93,17 +94,67 @@ const getCart = async () => {
   }
 };
 
-const removeFromCart = async (productId)=>{
+const removeFromCart = async (productId) => {
   try {
-    const response = await apiConnector("DELETE",user_endpoints.REMOVE_FROM_CART,
-      {productId}
+    const response = await apiConnector(
+      "DELETE",
+      user_endpoints.REMOVE_FROM_CART,
+      { productId }
     );
-    return response
+    return response;
   } catch (error) {
     console.log(error.message);
     throw error;
   }
-}
+};
+
+const createAddress = async (addressDetails) => {
+  try {
+    const response = await apiConnector(
+      "POST",
+      user_endpoints.CREATE_ADDRESS,
+      addressDetails
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getAddress = async () => {
+  try {
+    const response = await apiConnector("GET", user_endpoints.GET_ADDRESS);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteAddress = async (id) => {
+  try {
+    const response = await apiConnector(
+      "DELETE",
+      `${user_endpoints.DELETE_ADDRESS}/${id}`
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateAddress = async (id, newAddressDetails) => {
+  try {
+    const response = await apiConnector(
+      "PUT",
+      `${user_endpoints.UPDATE_ADDRESS}/${id}`,
+      newAddressDetails
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export {
   createProduct,
@@ -119,5 +170,9 @@ export {
   getcategoryById,
   addToCart,
   getCart,
-  removeFromCart
+  removeFromCart,
+  createAddress,
+  getAddress,
+  deleteAddress,
+  updateAddress,
 };

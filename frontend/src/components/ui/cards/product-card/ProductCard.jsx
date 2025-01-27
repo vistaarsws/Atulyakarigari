@@ -16,6 +16,7 @@ function ProductCard({
   offer_inPercent ,
   id,
   isAddedToWislist,
+  priceAfterDiscount,
 }) {
   const [isHover, setIsHover] = useState(false);
   const [isMobileView, setIsMobileView] = useState();
@@ -89,7 +90,7 @@ function ProductCard({
           <h1>{title}</h1>
           <p>{shortDescription}</p>
           <div>
-            <h2>₹{price - price * offer_inPercent * 0.01}</h2>
+            <h2>₹{priceAfterDiscount}</h2>
             <strike>₹{price}</strike>
             <h4>(-{offer_inPercent}%)</h4>
           </div>
@@ -98,7 +99,7 @@ function ProductCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              addToCartHandler(id)
+              addToCartHandler(id);
             }}
             style={{ visibility: isHover === true && "visible" }}
           >

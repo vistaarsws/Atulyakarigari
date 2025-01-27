@@ -8,7 +8,8 @@ export default function WishListHeartIcon({ productId }) {
         className="wishListHeart_box"
         onClick={(e) => {
           e.stopPropagation();
-          toggleWishlistItem(productId);   
+          toggleWishlistItem(productId);
+             
         }}
       >
         <input

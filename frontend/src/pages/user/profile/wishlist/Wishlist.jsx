@@ -87,6 +87,7 @@ const Wishlist = () => {
         picture={product.images?.[0] || "fallback_image_url"} // Fallback image URL
         price={product.priceAfterDiscount || product.price || "N/A"} // Fallback price
         isAddedToWishlist={true}
+        priceAfterDiscount={product.priceAfterDiscount}
       />
     ));
 
