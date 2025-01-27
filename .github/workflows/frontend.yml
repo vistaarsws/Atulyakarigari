@@ -79,7 +79,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes --confirm
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes
 
   deploy-to-production:
     name: 🚀 Deploy to Production (main branch)
