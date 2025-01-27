@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -13,19 +13,51 @@ import {
 import { Close as CloseIcon } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
-const EditAddressModal = ({ open, handleClose, addressData, title }) => {
+import {
+  createAddress,
+  updateAddress,
+} from "../../../../services/user/userAPI";
+
+const AddressModal = ({
+  open,
+  handleClose,
+  addressData,
+  title,
+  getAllAddress,
+  addressId,
+}) => {
   const isMobile = useMediaQuery("(max-width:768px)");
 
   const [formData, setFormData] = useState({
-    fullName: addressData?.name || "",
-    mobileNumber: addressData?.mobile || "",
-    pincode: addressData?.city?.split(" - ")[1] || "",
+    fullName: addressData?.fullName || "",
+    mobileNumber: addressData?.mobileNumber || "",
+    pincode: addressData?.pincode || "",
     address: addressData?.address || "",
     locality: addressData?.locality || "",
     city: addressData?.city?.split(" - ")[0] || "",
-    addressType: addressData?.type?.toLowerCase() || "home",
+    typeOfAddress: addressData?.type?.toLowerCase() || "home",
     isDefault: addressData?.isDefault || false,
   });
+
+  const createAddressHandler = async () => {
+    try {
+      const response = await createAddress(formData);
+      handleClose();
+      getAllAddress();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const EditAddressHandler = async () => {
+    try {
+      await updateAddress(addressId, formData);
+      handleClose();
+      getAllAddress();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -45,7 +77,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
   const handleRadioChange = (event) => {
     setFormData((prev) => ({
       ...prev,
-      addressType: event.target.value,
+      typeOfAddress: event.target.value,
     }));
   };
   const textFieldSx = {
@@ -120,7 +152,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: "600", color: "#383737" }}>
-            {title ? title : "Edit"} Address
+            {title === "Edit" ? "Edit Address" : "Add New Address"}
           </Typography>
           <IconButton
             onClick={handleClose}
@@ -156,12 +188,12 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
             onChange={handleChange}
           />
           <TextField
-            name="phoneNumber"
-            label="Phone Number"
+            name="mobileNumber"
+            label="Mobile Number"
             variant="outlined"
             fullWidth
             sx={{ ...textFieldSx, marginBottom: "2rem" }}
-            value={formData.phoneNumber}
+            value={formData.mobileNumber}
             onChange={handleChange}
           />
           <TextField
@@ -214,7 +246,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
                 control={
                   <Radio
                     size="large"
-                    checked={formData.addressType === "home"}
+                    checked={formData.typeOfAddress === "home"}
                     onChange={handleRadioChange}
                     value="home"
                     sx={{
@@ -234,7 +266,7 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
               <FormControlLabel
                 control={
                   <Radio
-                    checked={formData.addressType === "office"}
+                    checked={formData.typeOfAddress === "office"}
                     onChange={handleRadioChange}
                     value="office"
                     size="large"
@@ -334,7 +366,9 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
               },
               flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
             }}
-            onClick={handleClose}
+            onClick={
+              title === "Edit" ? EditAddressHandler : createAddressHandler
+            }
           >
             Save
           </Button>
@@ -344,4 +378,4 @@ const EditAddressModal = ({ open, handleClose, addressData, title }) => {
   );
 };
 
-export default EditAddressModal;
+export default AddressModal;
