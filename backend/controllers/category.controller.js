@@ -12,13 +12,11 @@ export const getAllCategories = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const categories = await Category.find()
-        // .populate({
-        //     path: 'subcategories',
-        //     populate: {
-        //         path: 'products',
-        //         model: 'Product'
-        //     }
-        // })
+        .populate( 'subcategory')
+        .populate({
+            path: 'subcategory',
+            populate: { path: 'products' }, // Populates products within each subcategory
+        })
         // .populate('products')
         // .skip(skip)
         // .limit(limit);

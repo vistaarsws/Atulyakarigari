@@ -1,235 +1,37 @@
 import "./Home.css";
 import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
 import { HeroBanner_array } from "../../../utils/Constant";
-import artistry_1 from "../../../assets/images/cat5_2.png";
-import artistry_2 from "../../../assets/images/artistry_2.png";
-import artistry_3 from "../../../assets/images/artistry_3.png";
+
 import bg_pattern from "../../../assets/images/bgSidePattern.svg";
 import ProductSection from "../../../components/layout/user/product-section/ProductSection";
 
-import cat1_1 from "../../../assets/images/cat2_1.png";
-import cat1_2 from "../../../assets/images/cat2_2.png";
-import cat1_3 from "../../../assets/images/cat2_3.png";
-import cat1_4 from "../../../assets/images/cat2_4.png";
-import cat1_5 from "../../../assets/images/cat2_5.png";
-
-import cat3_1 from "../../../assets/images/cat_3_1.png";
-import cat3_2 from "../../../assets/images/cat_3_2.png";
-import cat3_3 from "../../../assets/images/cat_3_3.png";
-import cat3_4 from "../../../assets/images/cat_3_4.png";
-import cat3_5 from "../../../assets/images/cat_3_5.png";
-import cat3_6 from "../../../assets/images/cat_3_1.png";
-
-import cat4_1 from "../../../assets/images/cat_4_1.png";
-import cat4_2 from "../../../assets/images/cat_4_2.png";
-import cat4_3 from "../../../assets/images/cat_4_3.png";
-import cat4_4 from "../../../assets/images/cat_4_4.png";
-import cat4_5 from "../../../assets/images/cat_4_5.png";
-
-import cat5_1 from "../../../assets/images/cat5_1.png";
-import cat5_2 from "../../../assets/images/cat5_2.png";
-import cat5_3 from "../../../assets/images/cat5_3.png";
-import cat5_4 from "../../../assets/images/cat5_4.png";
-import cat5_5 from "../../../assets/images/cat5_5.png";
-import cat5_6 from "../../../assets/images/cat5_1.png";
 import CategoryView from "../../../components/layout/user/category-view/CategoryView";
 import { useMediaQuery } from "@mui/material";
+import { useEffect, useState } from "react";
+import { getCategory } from "../../../services/admin/adminAPI";
 
 export default function Home() {
-  const top_product_list_from_category_1 = {
-    title: "Organza Sarees",
-    subtitle: "Drape yourself in elegance with a handwoven organza saree.",
-    products: [
-      {
-        key: "1",
-        title: "Kashi Kalaa",
-        picture: cat5_1,
-        price: 2000.0,
-      },
-      {
-        key: "2",
-        title: "Kashi Kalaa",
-        picture: cat5_2,
-        price: 4000.0,
-      },
-      {
-        key: "3",
-        title: "Silken Splendor",
-        picture: cat5_3,
-        price: 2000.0,
-      },
-      {
-        key: "4",
-        title: "Silken Splendor",
-        picture: cat5_4,
-        price: 6000.0,
-      },
-      {
-        key: "5",
-        title: "Silken Splendor",
-        picture: cat5_5,
-        price: 3000.0,
-      },
-      {
-        key: "6",
-        title: "Silken Splendor",
-        picture: cat5_1,
-        price: 12000,
-      },
-      {
-        key: "7",
-        title: "Silken Splendor",
-        picture: cat5_2,
-        price: 12000,
-      },
-    ],
-  };
-  const top_product_list_from_category_2 = {
-    title: "Handcrafted Wonders",
-    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
-    products: [
-      {
-        key: "1",
-        title: "Peacock show",
-        picture: cat1_1,
-        price: 2000.0,
-      },
-      {
-        key: "1",
-        title: "Lantern",
-        picture: cat1_2,
-        price: 4000.0,
-      },
-      {
-        key: "1",
-        title: "Silken Splendor",
-        picture: cat1_3,
-        price: 2000.0,
-      },
-      {
-        key: "1",
-        title: "Silken Splendor",
-        picture: cat1_4,
-        price: 6000.0,
-      },
-      {
-        key: "1",
-        title: "Silken Splendor",
-        picture: cat1_5,
-        price: 3000.0,
-      },
-      {
-        key: "1",
-        title: "Silken Splendor",
-        picture: cat1_1,
-        price: 12000,
-      },
-      {
-        key: "1",
-        title: "Silken Splendor",
-        picture: cat1_3,
-        price: 12000,
-      },
-    ],
+  const isMobile = useMediaQuery("(max-width:768px)");
+  const [getAllCategories,setGetAllCategories ] = useState([]);
+
+  const fetchCategoriesData = async () => {
+    try {
+      const response = await getCategory();
+      
+      console.log("categories",response);
+      setGetAllCategories(Object.values(response?.data?.data));
+      
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
   };
 
-  const top_product_list_from_category_3 = {
-    title: "Explore The Elite Collections Of Men's Tie",
-    subtitle: "A tie completes the man, adding class to every occasion.",
-    products: [
-      {
-        key: "1",
-        title: "Gentleman's Knot",
-        picture: cat3_1,
-        price: 2000.0,
-      },
-      {
-        key: "2",
-        title: "Classic Knotwear",
-        picture: cat3_2,
-        price: 4000.0,
-      },
-      {
-        key: "3",
-        title: "Dapper Threads",
-        picture: cat3_3,
-        price: 2000.0,
-      },
-      {
-        key: "4",
-        title: "Urban Drape",
-        picture: cat3_4,
-        price: 6000.0,
-      },
-      {
-        key: "5",
-        title: "The Tie Affair",
-        picture: cat3_5,
-        price: 3000.0,
-      },
-      {
-        key: "6",
-        title: "Urban Drape",
-        picture: cat3_1,
-        price: 12000,
-      },
-      {
-        key: "7",
-        title: "Silken Splendor",
-        picture: cat3_6,
-        price: 12000,
-      },
-    ],
-  };
-  const top_product_list_from_category_4 = {
-    title: "Atulya’s Jewellery",
-    subtitle: "Wear your personality with jewels that speak louder than words.",
-    products: [
-      {
-        key: "1",
-        title: "Aabharan Mala",
-        picture: cat4_1,
-        price: 9000.0,
-      },
-      {
-        key: "2",
-        title: "Classic Knotwear",
-        picture: cat4_2,
-        price: 4000.0,
-      },
-      {
-        key: "3",
-        title: "Sitara Chudi",
-        picture: cat4_3,
-        price: 10000.0,
-      },
-      {
-        key: "4",
-        title: "Noorbaali Earrings",
-        picture: cat4_4,
-        price: 3000.0,
-      },
-      {
-        key: "5",
-        title: "Vividha Bangles",
-        picture: cat4_5,
-        price: 2000.0,
-      },
-      {
-        key: "6",
-        title: "Rajwada Rani Necklace",
-        picture: cat4_1,
-        price: 6000,
-      },
-      {
-        key: "7",
-        title: "Noorbaali Earrings",
-        picture: cat4_3,
-        price: 15000,
-      },
-    ],
-  };
-  const isMobile = useMediaQuery("(max-width:768px)");
+  
+
+  useEffect(() => {
+    fetchCategoriesData();
+  }, []);
+
   return (
     <>
       <section className="heroSection">
@@ -240,6 +42,7 @@ export default function Home() {
           plugins={["autoplay"]}
         />
       </section>
+
       <div
         className="categoryView_container"
         style={{ marginInline: isMobile ? "0rem" : "0rem" }}
@@ -247,66 +50,37 @@ export default function Home() {
         <CategoryView />
       </div>
 
-      <section className="product_section_1">
-        <ProductSection
-          productCategorySection={top_product_list_from_category_1}
-        />
-      </section>
-      <section className="product_section_1">
-        <ProductSection
-          productCategorySection={top_product_list_from_category_2}
-        />
+      <section className="category-mapping">
+        {getAllCategories.length > 0 ? (
+          getAllCategories.map((category) => (
+            <div key={category._id} className="category-container">
+              <div className="subcategories">
+                {category.subcategory?.length > 0 ? (
+                  category.subcategory.map((subcat) => (
+                    <div key={subcat._id} className="subcategory-container">
+                      {console.log("subcat", subcat.products)}
+                      
+                      <ProductSection  
+                      productCategorySection={{
+                        title: subcat.name,
+                        subtitle: `Explore products in ${subcat.name}`,
+                        products: subcat.products, // Now includes detailed product info.
+                      }}
+                      bgColor="#fff"
+                    />
+                    </div>
+                  ))
+                ) : (
+                  <p>No subcategories available</p>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No categories or subcategories available at the moment.</p>
+        )}
       </section>
 
-      <section className="celebrate_artistry_container">
-        <article>
-          <div className="card-item ">
-            <img src={artistry_1} alt="Artistry" />
-          </div>
-          <div className="card-item ">
-            <img src={artistry_2} alt="Artistry" />
-          </div>
-          <div className="card-item active">
-            <img src={artistry_3} alt="Artistry" />
-          </div>
-        </article>
-        <article>
-          <h2>Curated Elegance, Crafted with Tradition</h2>
-          <h1>
-            Celebrate Artistry:<em>Handicrafts, Handlooms, and Jewellery</em>
-          </h1>
-          <article id="mobileView_loopAnimation">
-            <div className="card-item ">
-              <img src={artistry_1} alt="Artistry" />
-            </div>
-            <div className="card-item ">
-              <img src={artistry_2} alt="Artistry" />
-            </div>
-            <div className="card-item active">
-              <img src={artistry_3} alt="Artistry" />
-            </div>
-          </article>
-          <p>
-            Discover a world where timeless handicrafts, exquisite handloom
-            fabrics, and artisanal jewelry come together. Each piece is a
-            testament to tradition and skilled craftsmanship, designed to bring
-            beauty and meaning to your everyday life. Explore our curated
-            collections and embrace the elegance of true artistry.
-          </p>
-          <button>Explore Now</button>
-        </article>
-      </section>
-
-      <section className="product_section_1">
-        <ProductSection
-          productCategorySection={top_product_list_from_category_3}
-        />
-      </section>
-      <section className="product_section_1">
-        <ProductSection
-          productCategorySection={top_product_list_from_category_4}
-        />
-      </section>
       <section className="noDiscount_container">
         <img src={bg_pattern} alt="Background Pattern" />
 

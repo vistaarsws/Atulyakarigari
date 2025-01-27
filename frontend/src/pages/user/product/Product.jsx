@@ -96,116 +96,116 @@ export default function Product() {
     href: item.href,
   }));
 
-  const product_description = {
-    properties: [
-      { type: "Occasion", value: "Festive/ Party/ Corporate" },
-      { type: "Saree Length", value: "5.50 meter" },
-      { type: "Fabric Care", value: "Dry clean only" },
-      { type: "Colour", value: "Red (Sindoor)" },
-      { type: "Fabric", value: "Pure Raw Silk" },
-      { type: "Style", value: "Floral pattern with gota patti pallu" },
-      { type: "Type", value: "Pure Silk" },
-      { type: "Weight", value: "500 gm" },
-      // { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
-      // { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
-    ],
-  };
-  const similar_product = {
-    title: "Similar Products",
-    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
-    products: [
-      {
-        key: "1",
-        title: "Kashi Kalaa",
-        picture: cat5_1,
-        price: 2000.0,
-      },
-      {
-        key: "2",
-        title: "Kashi Kalaa",
-        picture: cat5_2,
-        price: 4000.0,
-      },
-      {
-        key: "3",
-        title: "Silken Splendor",
-        picture: cat5_3,
-        price: 2000.0,
-      },
-      {
-        key: "4",
-        title: "Silken Splendor",
-        picture: cat5_4,
-        price: 6000.0,
-      },
-      {
-        key: "5",
-        title: "Silken Splendor",
-        picture: cat5_5,
-        price: 3000.0,
-      },
-      {
-        key: "6",
-        title: "Silken Splendor",
-        picture: cat5_1,
-        price: 12000,
-      },
-      {
-        key: "7",
-        title: "Silken Splendor",
-        picture: cat5_2,
-        price: 12000,
-      },
-    ],
-  };
-  const you_may_also_like = {
-    title: "You May Also Like",
-    subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
-    products: [
-      {
-        key: "1",
-        title: "Kashi Kalaa",
-        picture: cat5_1,
-        price: 2000.0,
-      },
-      {
-        key: "2",
-        title: "Kashi Kalaa",
-        picture: cat5_2,
-        price: 4000.0,
-      },
-      {
-        key: "3",
-        title: "Silken Splendor",
-        picture: cat5_3,
-        price: 2000.0,
-      },
-      {
-        key: "4",
-        title: "Silken Splendor",
-        picture: cat5_4,
-        price: 6000.0,
-      },
-      {
-        key: "5",
-        title: "Silken Splendor",
-        picture: cat5_5,
-        price: 3000.0,
-      },
-      {
-        key: "6",
-        title: "Silken Splendor",
-        picture: cat5_1,
-        price: 12000,
-      },
-      {
-        key: "7",
-        title: "Silken Splendor",
-        picture: cat5_2,
-        price: 12000,
-      },
-    ],
-  };
+  // const product_description = {
+  //   properties: [
+  //     { type: "Occasion", value: "Festive/ Party/ Corporate" },
+  //     { type: "Saree Length", value: "5.50 meter" },
+  //     { type: "Fabric Care", value: "Dry clean only" },
+  //     { type: "Colour", value: "Red (Sindoor)" },
+  //     { type: "Fabric", value: "Pure Raw Silk" },
+  //     { type: "Style", value: "Floral pattern with gota patti pallu" },
+  //     { type: "Type", value: "Pure Silk" },
+  //     { type: "Weight", value: "500 gm" },
+  //     // { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
+  //     // { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
+  //   ],
+  // };
+  // const similar_product = {
+  //   title: "Similar Products",
+  //   subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
+  //   products: [
+  //     {
+  //       key: "1",
+  //       title: "Kashi Kalaa",
+  //       picture: cat5_1,
+  //       price: 2000.0,
+  //     },
+  //     {
+  //       key: "2",
+  //       title: "Kashi Kalaa",
+  //       picture: cat5_2,
+  //       price: 4000.0,
+  //     },
+  //     {
+  //       key: "3",
+  //       title: "Silken Splendor",
+  //       picture: cat5_3,
+  //       price: 2000.0,
+  //     },
+  //     {
+  //       key: "4",
+  //       title: "Silken Splendor",
+  //       picture: cat5_4,
+  //       price: 6000.0,
+  //     },
+  //     {
+  //       key: "5",
+  //       title: "Silken Splendor",
+  //       picture: cat5_5,
+  //       price: 3000.0,
+  //     },
+  //     {
+  //       key: "6",
+  //       title: "Silken Splendor",
+  //       picture: cat5_1,
+  //       price: 12000,
+  //     },
+  //     {
+  //       key: "7",
+  //       title: "Silken Splendor",
+  //       picture: cat5_2,
+  //       price: 12000,
+  //     },
+  //   ],
+  // };
+  // const you_may_also_like = {
+  //   title: "You May Also Like",
+  //   subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
+  //   products: [
+  //     {
+  //       key: "1",
+  //       title: "Kashi Kalaa",
+  //       picture: cat5_1,
+  //       price: 2000.0,
+  //     },
+  //     {
+  //       key: "2",
+  //       title: "Kashi Kalaa",
+  //       picture: cat5_2,
+  //       price: 4000.0,
+  //     },
+  //     {
+  //       key: "3",
+  //       title: "Silken Splendor",
+  //       picture: cat5_3,
+  //       price: 2000.0,
+  //     },
+  //     {
+  //       key: "4",
+  //       title: "Silken Splendor",
+  //       picture: cat5_4,
+  //       price: 6000.0,
+  //     },
+  //     {
+  //       key: "5",
+  //       title: "Silken Splendor",
+  //       picture: cat5_5,
+  //       price: 3000.0,
+  //     },
+  //     {
+  //       key: "6",
+  //       title: "Silken Splendor",
+  //       picture: cat5_1,
+  //       price: 12000,
+  //     },
+  //     {
+  //       key: "7",
+  //       title: "Silken Splendor",
+  //       picture: cat5_2,
+  //       price: 12000,
+  //     },
+  //   ],
+  // };
 
   const startTime = useRef(null); // Track when the user enters the page
   const [product, setProduct] = useState(null);
@@ -491,7 +491,7 @@ export default function Product() {
             </article>
           </section>
         </div>
-        <section>
+        {/* <section>
           <ProductSection
             productCategorySection={similar_product}
             bgColor={"#fff"}
@@ -502,7 +502,7 @@ export default function Product() {
             productCategorySection={you_may_also_like}
             bgColor={"#fff"}
           />
-        </section>
+        </section> */}
       </div>
     </ThemeProvider>
   );

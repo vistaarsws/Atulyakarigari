@@ -285,31 +285,31 @@ export const updateProduct = async (req, res) => {
         session = await mongoose.startSession();
         session.startTransaction();
 
-        const productImages = [...existingProduct.images];
-        if (req.files?.productImage) {
-            const imagePromises = req.files.productImage.map(async (image) => {
-                try {
-                    const uploadedImage = await uploadImageToCloudinary(image, "product");
-                    return uploadedImage?.url || null;
-                } catch (error) {
-                    console.error(`Error uploading image: ${image.originalname}`, error);
-                    return null;
-                }
-            });
+        // Handle product images
+        const productImages = req.files?.productImage
+            ? await Promise.all(
+                  req.files.productImage.map(async (image) => {
+                      try {
+                          const uploadedImage = await uploadImageToCloudinary(image, "product");
+                          return uploadedImage?.url || null;
+                      } catch (error) {
+                          console.error(`Error uploading image: ${image.originalname}`, error);
+                          return null;
+                      }
+                  })
+              ).then((uploadedUrls) => uploadedUrls.filter((url) => url !== null))
+            : existingProduct.images; // Retain old images if no new images are uploaded.
 
-            const uploadedUrls = await Promise.all(imagePromises);
-            const validUrls = uploadedUrls.filter(url => url !== null);
-
-            if (validUrls.length === 0 && req.files.productImage.length > 0) {
-                return internalServerError(req, res, null, "Failed to upload product images");
-            }
-            productImages.push(...validUrls);
+        if (productImages.length === 0 && req.files?.productImage) {
+            return internalServerError(req, res, null, "Failed to upload product images");
         }
 
+        // Handle artisan image
         const artisanImage = req.files?.artisanImage
             ? await uploadImageToCloudinary(req.files.artisanImage, "artisan")
             : { url: existingProduct.artisanImage };
 
+        // Prepare updated data
         const updatedData = {
             name: name?.trim() || existingProduct.name,
             description: description?.trim() || existingProduct.description,
@@ -320,13 +320,14 @@ export const updateProduct = async (req, res) => {
             stock: stock || existingProduct.stock,
             status: status || existingProduct.status,
             discountPercentage: discountPercentage || existingProduct.discountPercentage,
-            priceAfterDiscount: calculateDiscountedPrice(price, discountPercentage || existingProduct.discountPercentage),
+            priceAfterDiscount: calculateDiscountedPrice(price || existingProduct.price, discountPercentage || existingProduct.discountPercentage),
             images: productImages,
             artisanName: artisanName || existingProduct.artisanName,
             artisanAbout: artisanAbout || existingProduct.artisanAbout,
             artisanImage: artisanImage.url,
         };
 
+        // Update product
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
             updatedData,
@@ -337,6 +338,7 @@ export const updateProduct = async (req, res) => {
             return internalServerError(req, res, null, "Failed to update product");
         }
 
+        // Update category references if changed
         if (category && !existingProduct.category.equals(category)) {
             await Category.findByIdAndUpdate(
                 existingProduct.category,
@@ -350,6 +352,7 @@ export const updateProduct = async (req, res) => {
             );
         }
 
+        // Update subcategory references if changed
         if (subcategory && !existingProduct.subcategory?.equals(subcategory)) {
             if (existingProduct.subcategory) {
                 await SubCategory.findByIdAndUpdate(
@@ -365,6 +368,7 @@ export const updateProduct = async (req, res) => {
             );
         }
 
+        // Commit transaction
         await session.commitTransaction();
         return success(req, res, "Product updated successfully", updatedProduct.toObject());
     } catch (error) {
@@ -379,6 +383,7 @@ export const updateProduct = async (req, res) => {
         }
     }
 };
+
 // delete product
 export const deleteProduct = async (req, res) => {
     const session = await mongoose.startSession();
