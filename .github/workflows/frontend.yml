@@ -21,9 +21,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: List Files (Debugging Step)
-        run: ls -R
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -64,31 +61,7 @@ jobs:
           cd frontend
           npm run build
 
-      deploy-to-development:
-        name: 🚀 Deploy to Development (develop branch)
-        runs-on: ubuntu-latest
-        needs: build
-        if: github.ref == 'refs/heads/develop'
-    
-        steps:
-          - name: Checkout Code
-            uses: actions/checkout@v4
-    
-          - name: Debugging: List All Files
-            run: ls -alR frontend
-    
-          - name: Debugging: Check Vercel Config
-            run: cat frontend/.vercel/project.json || echo ".vercel directory not found"
-    
-          - name: Deploy to Vercel (Development)
-            env:
-              VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
-            run: |
-              cd frontend
-              rm -rf .vercel
-              npx vercel link --token $VERCEL_TOKEN --yes
-              npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes
-    
+  deploy-to-development:
     name: 🚀 Deploy to Development (develop branch)
     runs-on: ubuntu-latest
     needs: build
@@ -103,6 +76,8 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
         run: |
           cd frontend
+          rm -rf .vercel
+          npx vercel link --token $VERCEL_TOKEN --yes
           npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes
 
   deploy-to-production:
@@ -120,4 +95,4 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes --confirm
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes
