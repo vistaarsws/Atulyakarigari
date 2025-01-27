@@ -38,12 +38,14 @@ export const googleAuthHandler = async (req, res) => {
 
     // updated by  Mohit Mehto : 24-01-25 :: fix google auth issue
     const existingProfile = await Profile.findOne({ email });
-    const id = existingProfile.userId._id;
-    user = await User.findById(id);
+    if (existingProfile != null || existingProfile != undefined) {
+      const id = existingProfile.userId._id;
+      user = await User.findById(id);
+    }
 
     if (!user) {
       // If user does not exist, check if the email is already used by another profile
-      if (!existingProfile.email) {
+      // if (!existingProfile.email) {
         // Create a new user
         user = new User({
           googleId: sub,
@@ -54,7 +56,7 @@ export const googleAuthHandler = async (req, res) => {
 
         // Create and link profile to the new user
         await createProfileForUser(user, name, true, email, picture); // Pass avatar from Google as profilePicture
-      }
+      // }
     }
     // Generate auth token for the user
     let authToken;
