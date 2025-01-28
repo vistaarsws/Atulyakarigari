@@ -2,7 +2,7 @@ import CART from "../../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import userProfile from "../../../../assets/images/userProfile.png";
+import userProfileAvatar from "../../../../assets/images/avatar.svg";
 import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
 import { login, logout } from "../../../../Redux/features/AuthSlice";
@@ -471,7 +471,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           onMouseLeave={() => setIsProfileHovered(false)}
         >
           {authToken ? (
-            <img src={profileData?.profilePicture} alt="User Profile" />
+            // <img src={profileData?.profilePicture} alt="User Profile"  />
+            <Avatar
+              src={profileData?.profilePicture}
+              alt={profileData?.fullName}
+            />
           ) : (
             <Avatar src="/broken-image.jpg" />
           )}

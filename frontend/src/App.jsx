@@ -153,7 +153,7 @@ export default function App() {
       <ScrollToTop />
       <TrackPageView /> {/* Track page views on route changes */}
       {showNavBar && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
-      <main className={`${!showNavBar ? "" : "marginTop"}`}>
+      <main className={`${!showNavBar ? "" : "marginTop"} `}>
         <Routes>
           {/* Public Routes */}
           {routesConfig.publicRoutes.map(({ path, element }) => (
