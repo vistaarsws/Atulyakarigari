@@ -9,6 +9,7 @@ import { jwtDecode } from "jwt-decode";
 import { addToCart } from "../../../../services/user/userAPI";
 
 function ProductCard({
+
   title = "Product Title",
   shortDescription = "Short description here...",
   picture = "",
@@ -17,11 +18,12 @@ function ProductCard({
   id = "",
   isAddedToWishlist = false,
   priceAfterDiscount = price,
-  fetchWishlistData = () => {},
+  fetchWishlistData ,
 }) {
   const [isHover, setIsHover] = useState(false);
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
+
 
   const formatPrice = (value) => {
     return new Intl.NumberFormat("en-IN", {
@@ -45,6 +47,7 @@ function ProductCard({
         console.error("Invalid token structure");
         return;
       }
+
 
       await addToCart(productId, quantity);
     } catch (err) {
