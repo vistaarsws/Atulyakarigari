@@ -7,6 +7,7 @@ import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { addToCart } from "../../../../services/user/userAPI";
+import {formatPrice} from "../../../../utils/helpers";
 
 function ProductCard({
 
@@ -24,15 +25,6 @@ function ProductCard({
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
 
-
-  const formatPrice = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
   
 
   const addToCartHandler = async (productId = { id }, quantity) => {
