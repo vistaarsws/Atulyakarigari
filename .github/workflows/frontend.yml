@@ -92,5 +92,4 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
         run: |
-          cd frontend
           npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes
