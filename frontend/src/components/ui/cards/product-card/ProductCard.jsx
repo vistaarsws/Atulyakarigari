@@ -9,20 +9,31 @@ import { jwtDecode } from "jwt-decode";
 import { addToCart } from "../../../../services/user/userAPI";
 
 function ProductCard({
-  title,
-  shortDescription,
-  picture,
-  price,
-  offer_inPercent,
-  id,
-  isAddedToWishlist,
-  priceAfterDiscount,
-  fetchWishlistData,
+
+  title = "Product Title",
+  shortDescription = "Short description here...",
+  picture = "",
+  price = 0,
+  offer_inPercent = 0,
+  id = "",
+  isAddedToWishlist = false,
+  priceAfterDiscount = price,
+  fetchWishlistData ,
 }) {
   const [isHover, setIsHover] = useState(false);
-  const [isMobileView, setIsMobileView] = useState();
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
+
+
+  const formatPrice = (value) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+  
 
   const addToCartHandler = async (productId = { id }, quantity) => {
     try {
@@ -37,7 +48,8 @@ function ProductCard({
         return;
       }
 
-      const response = await addToCart(productId, quantity);
+
+      await addToCart(productId, quantity);
     } catch (err) {
       console.log(err.message);
     }
@@ -93,8 +105,8 @@ function ProductCard({
           <h1>{title}</h1>
           <p>{shortDescription}</p>
           <div>
-            <h2>₹{priceAfterDiscount}</h2>
-            <strike>₹{price}</strike>
+            <h2>{formatPrice(priceAfterDiscount)}</h2>
+            <strike>{formatPrice(price)}</strike>
             <h4>(-{offer_inPercent}%)</h4>
           </div>
         </article>
@@ -115,10 +127,22 @@ function ProductCard({
 }
 
 ProductCard.propTypes = {
-  title: PropTypes.string,
-  picture: PropTypes.string,
-  price: PropTypes.number,
-  id: PropTypes.string,
+  title: PropTypes.string.isRequired,
+  shortDescription: PropTypes.string,
+  picture: PropTypes.string.isRequired,
+  price: PropTypes.number.isRequired,
+  offer_inPercent: PropTypes.number,
+  id: PropTypes.string.isRequired,
+  isAddedToWishlist: PropTypes.bool,
+  priceAfterDiscount: PropTypes.number.isRequired,
+  fetchWishlistData: PropTypes.func,
+};
+
+ProductCard.defaultProps = {
+  shortDescription: "Short description here...",
+  offer_inPercent: 0,
+  isAddedToWishlist: false,
+  fetchWishlistData: () => {},
 };
 
 export default ProductCard;
