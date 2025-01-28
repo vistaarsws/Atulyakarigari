@@ -303,7 +303,7 @@ export default function Product() {
                   return (
                     <li key={index}>
                       <div>{property.key}</div>
-                      {property.value.map((val, i) => (
+                      {property?.value?.map((val, i) => (
                         <span key={i}>{val}</span>
                       ))}
                       <div className="bottomLine"></div>

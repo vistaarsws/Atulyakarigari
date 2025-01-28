@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { getProfile, updateProfile } from "../../../../services/user/userAPI";
 import PROFILE_IMAGE from "../../../../assets/images/userProfile.png";
-import { Button } from "@mui/material";
+import { Avatar, Button, useMediaQuery } from "@mui/material";
 import toast from "react-hot-toast";
 import "./Profile.css";
 
@@ -180,11 +180,22 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-image-container">
         <div className="profile-image-input-box">
-          <img
+          <Avatar
+            src={formData?.profilePicture && "/broken-image.jpg"}
+            alt={formData?.fullName}
+            sx={{
+              width: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
+
+              height: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
+              fontSize: "4rem",
+            }}
+            className="profile-image"
+          />
+          {/* <img
             src={formData.profilePicture}
             alt="Profile"
             className="profile-image"
-          />
+          /> */}
           {isEditing && (
             <input
               type="file"

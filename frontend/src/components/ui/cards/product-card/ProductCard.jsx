@@ -10,6 +10,7 @@ import { addToCart } from "../../../../services/user/userAPI";
 import {formatPrice} from "../../../../utils/helpers";
 
 function ProductCard({
+
   title = "Product Title",
   shortDescription = "Short description here...",
   picture = "",
@@ -18,7 +19,7 @@ function ProductCard({
   id = "",
   isAddedToWishlist = false,
   priceAfterDiscount = price,
-  fetchWishlistData = () => {},
+  fetchWishlistData ,
 }) {
   const [isHover, setIsHover] = useState(false);
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ function ProductCard({
         console.error("Invalid token structure");
         return;
       }
+
 
       await addToCart(productId, quantity);
     } catch (err) {
