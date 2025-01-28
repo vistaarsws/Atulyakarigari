@@ -8,6 +8,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
+import {formatPrice} from "../../../utils/helpers";
 
 const Payment = ({ cartData }) => {
   const navigate = useNavigate();
@@ -177,7 +178,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {cartData?.totalMRP}
+                {formatPrice(cartData?.totalMRP)}
               </Typography>
             </Box>
             <Box
@@ -206,7 +207,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {cartData?.totalDiscount}
+                {formatPrice(cartData?.totalDiscount)}
               </Typography>
             </Box>
             <Box
@@ -297,7 +298,7 @@ const Payment = ({ cartData }) => {
                 lineHeight: "25px",
               }}
             >
-              {cartData?.total}
+              {formatPrice(cartData?.total)}
             </Typography>
           </Box>
         </Box>
