@@ -1,7 +1,9 @@
 import "./Home.css";
 import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
 import { HeroBanner_array } from "../../../utils/Constant";
-
+import artistry_1 from "../../../assets/images/cat5_2.png";
+import artistry_2 from "../../../assets/images/artistry_2.png";
+import artistry_3 from "../../../assets/images/artistry_3.png";
 import bg_pattern from "../../../assets/images/bgSidePattern.svg";
 import ProductSection from "../../../components/layout/user/product-section/ProductSection";
 
@@ -12,21 +14,18 @@ import { getCategory } from "../../../services/admin/adminAPI";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width:768px)");
-  const [getAllCategories,setGetAllCategories ] = useState([]);
+  const [getAllCategories, setGetAllCategories] = useState([]);
 
   const fetchCategoriesData = async () => {
     try {
       const response = await getCategory();
-      
-      console.log("categories",response);
+
+      console.log("categories", response);
       setGetAllCategories(Object.values(response?.data?.data));
-      
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
-
-  
 
   useEffect(() => {
     fetchCategoriesData();
@@ -52,30 +51,77 @@ export default function Home() {
 
       <section className="category-mapping">
         {getAllCategories.length > 0 ? (
-          getAllCategories.map((category) => (
-            <div key={category._id} className="category-container">
-              <div className="subcategories">
-                {category.subcategory?.length > 0 ? (
-                  category.subcategory.map((subcat) => (
-                    <div key={subcat._id} className="subcategory-container">
-                      {console.log("subcat", subcat.products)}
-                      
-                      <ProductSection  
-                      productCategorySection={{
-                        title: subcat.name,
-                        subtitle: `Explore products in ${subcat.name}`,
-                        products: subcat.products, // Now includes detailed product info.
-                      }}
-                      bgColor="#fff"
-                    />
-                    </div>
-                  ))
-                ) : (
-                  <p>No subcategories available</p>
+          getAllCategories.map((category, index) => {
+            return (
+              <>
+                {index == 1 && (
+                  <section className="celebrate_artistry_container">
+                    <article>
+                      <div className="card-item ">
+                        <img src={artistry_1} alt="Artistry" />
+                      </div>
+                      <div className="card-item ">
+                        <img src={artistry_2} alt="Artistry" />
+                      </div>
+                      <div className="card-item active">
+                        <img src={artistry_3} alt="Artistry" />
+                      </div>
+                    </article>
+                    <article>
+                      <h2>Curated Elegance, Crafted with Tradition</h2>
+                      <h1>
+                        Celebrate Artistry:
+                        <em>Handicrafts, Handlooms, and Jewellery</em>
+                      </h1>
+                      <article id="mobileView_loopAnimation">
+                        <div className="card-item ">
+                          <img src={artistry_1} alt="Artistry" />
+                        </div>
+                        <div className="card-item ">
+                          <img src={artistry_2} alt="Artistry" />
+                        </div>
+                        <div className="card-item active">
+                          <img src={artistry_3} alt="Artistry" />
+                        </div>
+                      </article>
+                      <p>
+                        Discover a world where timeless handicrafts, exquisite
+                        handloom fabrics, and artisanal jewelry come together.
+                        Each piece is a testament to tradition and skilled
+                        craftsmanship, designed to bring beauty and meaning to
+                        your everyday life. Explore our curated collections and
+                        embrace the elegance of true artistry.
+                      </p>
+                      <button>Explore Now</button>
+                    </article>
+                  </section>
                 )}
-              </div>
-            </div>
-          ))
+
+                <div key={category._id} className="category-container">
+                  <div className="subcategories">
+                    {category.subcategory?.length > 0 ? (
+                      category.subcategory.map((subcat) => (
+                        <div key={subcat._id} className="subcategory-container">
+                          {console.log("subcat", subcat.products)}
+
+                          <ProductSection
+                            productCategorySection={{
+                              title: subcat.name,
+                              subtitle: `Explore products in ${subcat.name}`,
+                              products: subcat.products, // Now includes detailed product info.
+                            }}
+                            bgColor="#fff"
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <p>No subcategories available</p>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })
         ) : (
           <p>No categories or subcategories available at the moment.</p>
         )}

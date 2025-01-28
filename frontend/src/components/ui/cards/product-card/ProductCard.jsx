@@ -13,17 +13,18 @@ function ProductCard({
   shortDescription,
   picture,
   price,
-  offer_inPercent ,
+  offer_inPercent,
   id,
-  isAddedToWislist,
+  isAddedToWishlist,
   priceAfterDiscount,
+  fetchWishlistData,
 }) {
   const [isHover, setIsHover] = useState(false);
   const [isMobileView, setIsMobileView] = useState();
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
 
-  const addToCartHandler = async (productId={id}, quantity) => {
+  const addToCartHandler = async (productId = { id }, quantity) => {
     try {
       if (!authToken) {
         console.error("No user profile token found");
@@ -37,7 +38,6 @@ function ProductCard({
       }
 
       const response = await addToCart(productId, quantity);
-
     } catch (err) {
       console.log(err.message);
     }
@@ -75,9 +75,12 @@ function ProductCard({
         </div>
         <section>
           <div>
-            <WishListHeartIcon productId={id} />
+            <WishListHeartIcon
+              productId={id}
+              isWishlist={isAddedToWishlist}
+              fetchWishlist={fetchWishlistData}
+            />
           </div>
-          
         </section>
         <figure>
           <img
@@ -95,7 +98,7 @@ function ProductCard({
             <h4>(-{offer_inPercent}%)</h4>
           </div>
         </article>
-        <div className={`${isAddedToWislist ? "wistListBtnStyle" : ""} `}>
+        <div className={`${isAddedToWishlist ? "wistListBtnStyle" : ""} `}>
           <button
             onClick={(e) => {
               e.stopPropagation();
