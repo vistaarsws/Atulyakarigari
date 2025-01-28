@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import ProductCard from "../../../../components/ui/cards/product-card/ProductCard";
 import { getUserWishlist } from "../../../../services/user/userAPI";
@@ -49,7 +49,6 @@ const Wishlist = () => {
     try {
       const response = await getUserWishlist(userId);
       const wishlist = response?.data?.data?.wishlist || [];
-      console.log(wishlist);
 
       if (response?.data?.success && wishlist.length > 0) {
         setWishlistItems(wishlist[0]?.items || []);
@@ -88,6 +87,7 @@ const Wishlist = () => {
         price={product.priceAfterDiscount || product.price || "N/A"} // Fallback price
         isAddedToWishlist={true}
         priceAfterDiscount={product.priceAfterDiscount}
+        fetchWishlist={fetchWishlistData()}
       />
     ));
 
