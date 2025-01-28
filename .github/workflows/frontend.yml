@@ -74,11 +74,9 @@ jobs:
       - name: Deploy to Vercel (Development)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --project $VERCEL_PROJECT_ID --org-id $VERCEL_ORG_ID --env MERN_PUBLIC_ENV=development --yes
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes
 
   deploy-to-production:
     name: 🚀 Deploy to Production (main branch)
@@ -93,8 +91,6 @@ jobs:
       - name: Deploy to Vercel (Production)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: |
           cd frontend
-          npx vercel --token $VERCEL_TOKEN --project $VERCEL_PROJECT_ID --org-id $VERCEL_ORG_ID --env MERN_PUBLIC_ENV=production --prod --yes
+          npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes
