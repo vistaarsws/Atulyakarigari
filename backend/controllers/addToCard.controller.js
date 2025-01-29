@@ -13,7 +13,7 @@ const successResponse = (res, data, message) => {
 };
 
 // Helper function to format the cart data
-const formatCart = (cart, totals) => ({
+const formatCart = (cart) => ({
     userId: cart.userId,
     items: cart.items.map(item => ({
         productId: item.productId._id,
@@ -25,9 +25,9 @@ const formatCart = (cart, totals) => ({
         name: item.productId.name,
         _id: item._id,
     })),
-    total: totals.total, // Total after discounts
-    totalMRP: totals.totalMRP, // Total original price
-    totalDiscount: totals.totalDiscount, // Total discount
+    total: cart.total, // Total after discounts
+    totalMRP: cart.totalMRP, // Total original price
+    totalDiscount: cart.totalDiscount, // Total discount
     _id: cart._id,
 });
 
