@@ -228,12 +228,6 @@ const Profile = () => {
               type="date"
               isEditable={isEditing}
             />
-            <ProfileField
-              label="Hint Name"
-              value={formData.hintName}
-              onChange={(value) => handleInputChange("hintName", value)}
-              isEditable={isEditing}
-            />
           </div>
           <div>
             <ProfileField
@@ -248,12 +242,7 @@ const Profile = () => {
               onChange={(value) => handleInputChange("gender", value)}
               isEditable={isEditing}
             />
-            <ProfileField
-              label="Location"
-              value={formData.location}
-              onChange={(value) => handleInputChange("location", value)}
-              isEditable={isEditing}
-            />
+
             <ProfileField
               label="Alternate Mobile"
               value={formData.alternateMobile}
@@ -283,6 +272,7 @@ const Profile = () => {
                 Save
               </Button>
               <Button
+                size="large"
                 className="cancel-button"
                 variant="outlined"
                 onClick={handleCancel}

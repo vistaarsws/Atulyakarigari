@@ -86,7 +86,7 @@ export default function About() {
           </p>
         </div>
       </article>
-      <article className="about_sec-3">
+      {/* <article className="about_sec-3">
         <h2>Meet Our Team</h2>
         <p>
           Atulya Karigari unites artisans and designers across India to blend
@@ -111,7 +111,7 @@ export default function About() {
             }}
           />
         </div>
-      </article>
+      </article> */}
       <article className="about_sec-4">
         <h2>Our Collections</h2>
         {/* <div className="collection_container">

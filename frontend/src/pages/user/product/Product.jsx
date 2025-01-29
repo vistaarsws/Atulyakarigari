@@ -299,12 +299,14 @@ export default function Product() {
               <h2>Product Description</h2>
               <ul>
                 {product?.attributes.map((property, index) => {
-                  console.log("property", property);
                   return (
                     <li key={index}>
                       <div>{property.key}</div>
                       {property?.value?.map((val, i) => (
-                        <span key={i}>{val}</span>
+                        <span key={i}>
+                          {i > 0 && " / "}
+                          {val}
+                        </span>
                       ))}
                       <div className="bottomLine"></div>
                     </li>
