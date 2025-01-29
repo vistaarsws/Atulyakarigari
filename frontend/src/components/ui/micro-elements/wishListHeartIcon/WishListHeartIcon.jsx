@@ -1,6 +1,18 @@
 import "./WishListHeartIcon.css";
 import { toggleWishlistItem } from "../../../../services/user/userAPI";
-export default function WishListHeartIcon({ productId }) {
+import { useEffect, useState } from "react";
+
+export default function WishListHeartIcon({
+  productId,
+  isWishlist,
+  fetchWishlist,
+}) {
+  const [wishlist, setWishlist] = useState(isWishlist);
+
+  const toggleWishlistHandler = async () => {
+    fetchWishlist();
+    await toggleWishlistItem(productId);
+  };
 
   return (
     <>
@@ -8,8 +20,8 @@ export default function WishListHeartIcon({ productId }) {
         className="wishListHeart_box"
         onClick={(e) => {
           e.stopPropagation();
+          setWishlist(!isWishlist);
           toggleWishlistItem(productId);
-             
         }}
       >
         <input
@@ -17,12 +29,15 @@ export default function WishListHeartIcon({ productId }) {
           id="favorite"
           name="favorite-checkbox"
           value="favorite-button"
+          checked={wishlist}
+          onChange={toggleWishlistHandler}
         />
         <label htmlFor="favorite" className="container">
           <svg
             width="14"
             height="12"
             viewBox="0 0 14 12"
+            // fill={wishlist ? "#c00000" : "none"}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >

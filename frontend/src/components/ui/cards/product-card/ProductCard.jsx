@@ -7,23 +7,27 @@ import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { addToCart } from "../../../../services/user/userAPI";
+import {formatPrice} from "../../../../utils/helpers";
 
 function ProductCard({
-  title,
-  shortDescription,
-  picture,
-  price,
-  offer_inPercent ,
-  id,
-  isAddedToWislist,
-  priceAfterDiscount,
+
+  title = "Product Title",
+  shortDescription = "Short description here...",
+  picture = "",
+  price = 0,
+  offer_inPercent = 0,
+  id = "",
+  isAddedToWishlist = false,
+  priceAfterDiscount = price,
+  fetchWishlistData ,
 }) {
   const [isHover, setIsHover] = useState(false);
-  const [isMobileView, setIsMobileView] = useState();
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
 
-  const addToCartHandler = async (productId={id}, quantity) => {
+  
+
+  const addToCartHandler = async (productId = { id }, quantity) => {
     try {
       if (!authToken) {
         console.error("No user profile token found");
@@ -36,8 +40,8 @@ function ProductCard({
         return;
       }
 
-      const response = await addToCart(productId, quantity);
 
+      await addToCart(productId, quantity);
     } catch (err) {
       console.log(err.message);
     }
@@ -75,9 +79,12 @@ function ProductCard({
         </div>
         <section>
           <div>
-            <WishListHeartIcon productId={id} />
+            <WishListHeartIcon
+              productId={id}
+              isWishlist={isAddedToWishlist}
+              fetchWishlist={fetchWishlistData}
+            />
           </div>
-          
         </section>
         <figure>
           <img
@@ -90,12 +97,12 @@ function ProductCard({
           <h1>{title}</h1>
           <p>{shortDescription}</p>
           <div>
-            <h2>₹{priceAfterDiscount}</h2>
-            <strike>₹{price}</strike>
+            <h2>{formatPrice(priceAfterDiscount)}</h2>
+            <strike>{formatPrice(price)}</strike>
             <h4>(-{offer_inPercent}%)</h4>
           </div>
         </article>
-        <div className={`${isAddedToWislist ? "wistListBtnStyle" : ""} `}>
+        <div className={`${isAddedToWishlist ? "wistListBtnStyle" : ""} `}>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -112,10 +119,22 @@ function ProductCard({
 }
 
 ProductCard.propTypes = {
-  title: PropTypes.string,
-  picture: PropTypes.string,
-  price: PropTypes.number,
-  id: PropTypes.string,
+  title: PropTypes.string.isRequired,
+  shortDescription: PropTypes.string,
+  picture: PropTypes.string.isRequired,
+  price: PropTypes.number.isRequired,
+  offer_inPercent: PropTypes.number,
+  id: PropTypes.string.isRequired,
+  isAddedToWishlist: PropTypes.bool,
+  priceAfterDiscount: PropTypes.number.isRequired,
+  fetchWishlistData: PropTypes.func,
+};
+
+ProductCard.defaultProps = {
+  shortDescription: "Short description here...",
+  offer_inPercent: 0,
+  isAddedToWishlist: false,
+  fetchWishlistData: () => {},
 };
 
 export default ProductCard;
