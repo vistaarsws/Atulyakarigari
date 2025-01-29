@@ -47,6 +47,7 @@ export const createProduct = async (req, res) => {
         const {
             name,
             description,
+            detailDescription,
             price,
             category,
             subcategory,
@@ -65,7 +66,7 @@ export const createProduct = async (req, res) => {
         //     return badRequest(req, res, null, "artisan image is required");
         // }
         //  input validation
-        if (!name || !price || !category || !stock || !status || !description || !_attributes || !discountPercentage
+        if (!name || !price || !category || !stock || !status || !description || !detailDescription || !_attributes || !discountPercentage
             //  || !artisanName || !artisanAbout
         ) {
             return badRequest(req, res, null, "fields are missing");
@@ -130,6 +131,7 @@ export const createProduct = async (req, res) => {
         const productData = {
             name: name.trim(),
             description: description ? description.trim() : '',
+            detailDescription: detailDescription ? detailDescription.trim() : '',
             price,
             category,
             subcategory: subcategory || null,
@@ -226,6 +228,7 @@ export const updateProduct = async (req, res) => {
         const {
             name,
             description,
+            detailDescription,
             price,
             category,
             subcategory,
@@ -313,6 +316,7 @@ export const updateProduct = async (req, res) => {
         const updatedData = {
             name: name?.trim() || existingProduct.name,
             description: description?.trim() || existingProduct.description,
+            detailDescription: detailDescription?.trim() || existingProduct.detailDescription,
             price: price || existingProduct.price,
             category: category || existingProduct.category,
             subcategory: subcategory || existingProduct.subcategory,

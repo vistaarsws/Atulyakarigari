@@ -28,8 +28,6 @@ export const createProfileForUser = async (user, fullName, isEmailLogin, loginId
       dateOfBirth: "",
       about: "",
       alternativeContactNumber: "",
-      hintName: "",
-      location: "",
     };
 
     // Create and save the profile
@@ -59,8 +57,6 @@ export const updateProfile = async (req, res) => {
       about,
       contactNumber,
       alternativeContactNumber,
-      hintName,
-      location
     } = req.body;
 
     const profileImage  = req.files?.profileImage; // Safely access profileImage
@@ -101,8 +97,6 @@ export const updateProfile = async (req, res) => {
     if (about) updateData.about = about;
     if (contactNumber) updateData.contactNumber = contactNumber;
     if (alternativeContactNumber) updateData.alternativeContactNumber = alternativeContactNumber;
-    if (hintName) updateData.hintName = hintName;
-    if (location) updateData.location = location;
     // Find and update profile
     const profile = await Profile.findOneAndUpdate(
       { userId },

@@ -10,9 +10,6 @@ import Stack from "@mui/material/Stack";
 import "./Blogs.css";
 
 export default function Blogs() {
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
 
   const topBlogs = [
     {
@@ -59,7 +56,6 @@ export default function Blogs() {
               <Select
                 showSearch
                 style={{ fontSize: "1.4rem" }}
-                onChange={handleChange}
                 allowClear
                 placeholder="Category"
                 optionFilterProp="label"

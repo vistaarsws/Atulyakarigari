@@ -1,6 +1,32 @@
 import "./WishListHeartIcon.css";
 import { toggleWishlistItem } from "../../../../services/user/userAPI";
-export default function WishListHeartIcon({ productId }) {
+import { useEffect, useState } from "react";
+
+export default function WishListHeartIcon({
+  productId,
+  isWishlist,
+  fetchWishlist,
+}) {
+  const [wishlist, setWishlist] = useState(isWishlist);
+
+  useEffect(() => {
+    // Sync the local state when the parent component updates the `isWishlist` prop.
+    setWishlist(isWishlist);
+  }, [isWishlist]);
+
+  const toggleWishlistHandler = async (e) => {
+    e.stopPropagation(); // Prevents the click event from propagating.
+    try {
+      const updatedWishlist = !wishlist;
+      setWishlist(updatedWishlist); // Optimistically update the UI.
+      await toggleWishlistItem(productId); // Send the request to toggle the wishlist state in the backend.
+      fetchWishlist();
+    } catch (error) {
+      console.error("Error toggling wishlist item:", error.message || error);
+      // Rollback the state in case of an error.
+      setWishlist(!wishlist);
+    }
+  };
 
   return (
     <>
@@ -8,8 +34,8 @@ export default function WishListHeartIcon({ productId }) {
         className="wishListHeart_box"
         onClick={(e) => {
           e.stopPropagation();
+          setWishlist(!isWishlist);
           toggleWishlistItem(productId);
-             
         }}
       >
         <input
@@ -17,12 +43,15 @@ export default function WishListHeartIcon({ productId }) {
           id="favorite"
           name="favorite-checkbox"
           value="favorite-button"
+          checked={wishlist}
+          onChange={toggleWishlistHandler}
         />
         <label htmlFor="favorite" className="container">
           <svg
             width="14"
             height="12"
             viewBox="0 0 14 12"
+            // fill={wishlist ? "#c00000" : "none"}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >

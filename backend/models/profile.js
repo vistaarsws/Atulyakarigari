@@ -32,14 +32,6 @@ const profileSchema = new mongoose.Schema({
         type: Number,
         trim: true
     },
-    hintName: {
-        type: String,
-        trim: true
-    },
-    location: {
-        type: String,
-        trim: true
-    },
 }, {
     timestamps: true
 })

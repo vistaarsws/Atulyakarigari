@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { getProfile, updateProfile } from "../../../../services/user/userAPI";
 import PROFILE_IMAGE from "../../../../assets/images/userProfile.png";
-import { Button } from "@mui/material";
+import { Avatar, Button, useMediaQuery } from "@mui/material";
 import toast from "react-hot-toast";
 import "./Profile.css";
 
@@ -142,13 +142,9 @@ const Profile = () => {
         formDataToSend.append("profileImage", formData.profilePictureFile);
       }
 
-      console.log("Sending updated data to API:", updatedData); // Debug log
-
       toast.loading("Updating profile...");
       const response = await updateProfile(_id, formDataToSend);
 
-      // Debugging API response
-      console.log("API Response:", response);
 
       if (response.data.success) {
         toast.dismiss();
@@ -180,11 +176,22 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-image-container">
         <div className="profile-image-input-box">
-          <img
+          <Avatar
+            src={formData?.profilePicture && "/broken-image.jpg"}
+            alt={formData?.fullName}
+            sx={{
+              width: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
+
+              height: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
+              fontSize: "4rem",
+            }}
+            className="profile-image"
+          />
+          {/* <img
             src={formData.profilePicture}
             alt="Profile"
             className="profile-image"
-          />
+          /> */}
           {isEditing && (
             <input
               type="file"
@@ -217,12 +224,6 @@ const Profile = () => {
               type="date"
               isEditable={isEditing}
             />
-            <ProfileField
-              label="Hint Name"
-              value={formData.hintName}
-              onChange={(value) => handleInputChange("hintName", value)}
-              isEditable={isEditing}
-            />
           </div>
           <div>
             <ProfileField
@@ -237,12 +238,7 @@ const Profile = () => {
               onChange={(value) => handleInputChange("gender", value)}
               isEditable={isEditing}
             />
-            <ProfileField
-              label="Location"
-              value={formData.location}
-              onChange={(value) => handleInputChange("location", value)}
-              isEditable={isEditing}
-            />
+
             <ProfileField
               label="Alternate Mobile"
               value={formData.alternateMobile}
@@ -272,6 +268,7 @@ const Profile = () => {
                 Save
               </Button>
               <Button
+                size="large"
                 className="cancel-button"
                 variant="outlined"
                 onClick={handleCancel}

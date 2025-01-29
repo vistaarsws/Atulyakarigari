@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import ProductCard from "../../../../components/ui/cards/product-card/ProductCard";
 import { getUserWishlist } from "../../../../services/user/userAPI";
@@ -12,11 +12,7 @@ const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const userProfileToken = useSelector((state) => state.auth.token);
 
-  /**
-   * Extracts and validates the user ID from the token.
-   * @returns {string | null} The user ID if valid, otherwise null.
-   */
-  const getUserIdFromToken = () => {
+  const getUserIdFromToken = useCallback(() => {
     try {
       if (!userProfileToken) {
         toast.error("Please log in to view your wishlist.");
@@ -37,11 +33,8 @@ const Wishlist = () => {
       toast.error("Invalid user session.");
       return null;
     }
-  };
+  }, [userProfileToken]);
 
-  /**
-   * Fetches wishlist data for the user and updates the state.
-   */
   const fetchWishlistData = useCallback(async () => {
     const userId = getUserIdFromToken();
     if (!userId) return;
@@ -49,7 +42,6 @@ const Wishlist = () => {
     try {
       const response = await getUserWishlist(userId);
       const wishlist = response?.data?.data?.wishlist || [];
-      console.log(wishlist);
 
       if (response?.data?.success && wishlist.length > 0) {
         setWishlistItems(wishlist[0]?.items || []);
@@ -61,31 +53,24 @@ const Wishlist = () => {
       console.error("Error fetching wishlist data:", error.message || error);
       toast.error("Failed to fetch wishlist data. Please try again.");
     }
-  }, [userProfileToken]);
+  }, [getUserIdFromToken]);
 
-  // Fetch wishlist data on component mount
   useEffect(() => {
     fetchWishlistData();
   }, [fetchWishlistData]);
 
-  /**
-   * Renders a message if the wishlist is empty.
-   */
   const renderEmptyMessage = () => (
     <p className="empty_message">Your wishlist is empty.</p>
   );
 
-  /**
-   * Renders the list of wishlist items.
-   */
   const renderWishlistItems = () =>
     wishlistItems.map((product) => (
       <ProductCard
         key={product._id}
         id={product._id}
         title={product.name || "Unnamed Product"}
-        picture={product.images?.[0] || "fallback_image_url"} // Fallback image URL
-        price={product.priceAfterDiscount || product.price || "N/A"} // Fallback price
+        picture={product.images?.[0] || "fallback_image_url"}
+        price={product.priceAfterDiscount || product.price || "N/A"}
         isAddedToWishlist={true}
         priceAfterDiscount={product.priceAfterDiscount}
       />

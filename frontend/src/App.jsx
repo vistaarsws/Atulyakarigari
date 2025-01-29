@@ -81,8 +81,6 @@ export default function App() {
     initializeMetaPixel(import.meta.env.VITE_PIXEL_ID);
   }, []);
 
-  // console.log("userContext", userContext?.accountType);
-
   const { showNavBar, showFooter, navWithoutSearchBar } = useMemo(() => {
     const path = location.pathname;
     const showNavBar = [
@@ -153,7 +151,7 @@ export default function App() {
       <ScrollToTop />
       <TrackPageView /> {/* Track page views on route changes */}
       {showNavBar && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
-      <main className={`${!showNavBar ? "" : "marginTop"}`}>
+      <main className={`${!showNavBar ? "" : "marginTop"} `}>
         <Routes>
           {/* Public Routes */}
           {routesConfig.publicRoutes.map(({ path, element }) => (
