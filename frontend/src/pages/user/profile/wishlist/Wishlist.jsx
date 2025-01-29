@@ -12,11 +12,7 @@ const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const userProfileToken = useSelector((state) => state.auth.token);
 
-  /**
-   * Extracts and validates the user ID from the token.
-   * @returns {string | null} The user ID if valid, otherwise null.
-   */
-  const getUserIdFromToken = () => {
+  const getUserIdFromToken = useCallback(() => {
     try {
       if (!userProfileToken) {
         toast.error("Please log in to view your wishlist.");
@@ -37,11 +33,8 @@ const Wishlist = () => {
       toast.error("Invalid user session.");
       return null;
     }
-  };
+  }, [userProfileToken]);
 
-  /**
-   * Fetches wishlist data for the user and updates the state.
-   */
   const fetchWishlistData = useCallback(async () => {
     const userId = getUserIdFromToken();
     if (!userId) return;
@@ -60,34 +53,27 @@ const Wishlist = () => {
       console.error("Error fetching wishlist data:", error.message || error);
       toast.error("Failed to fetch wishlist data. Please try again.");
     }
-  }, [userProfileToken]);
+  }, [getUserIdFromToken]);
 
-  // Fetch wishlist data on component mount
   useEffect(() => {
     fetchWishlistData();
   }, [fetchWishlistData]);
 
-  /**
-   * Renders a message if the wishlist is empty.
-   */
   const renderEmptyMessage = () => (
     <p className="empty_message">Your wishlist is empty.</p>
   );
 
-  /**
-   * Renders the list of wishlist items.
-   */
   const renderWishlistItems = () =>
     wishlistItems.map((product) => (
       <ProductCard
         key={product._id}
         id={product._id}
         title={product.name || "Unnamed Product"}
-        picture={product.images?.[0] || "fallback_image_url"} // Fallback image URL
-        price={product.priceAfterDiscount || product.price || "N/A"} // Fallback price
+        picture={product.images?.[0] || "fallback_image_url"}
+        price={product.priceAfterDiscount || product.price || "N/A"}
         isAddedToWishlist={true}
         priceAfterDiscount={product.priceAfterDiscount}
-        fetchWishlist={fetchWishlistData()}
+        fetchWishlist={fetchWishlistData} // Pass the function reference, not the execution
       />
     ));
 
