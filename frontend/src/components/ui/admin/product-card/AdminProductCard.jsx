@@ -33,7 +33,6 @@ export default function AdminProductCard({ products }) {
     setSelectedProduct(null);
     dispatch(fetchAllProducts());
   };
-  console.log("PRODUCTS", products);
   const getCategory = useSelector((state) => state.categories.categories);
 
   const getCategoryName = (id) => {
@@ -48,11 +47,9 @@ export default function AdminProductCard({ products }) {
   const priceRenderer = (params) => {
     const originalPrice = params.data.price;
     const discount = params.data.fullProduct.discountPercentage;
-    console.log("D", discount);
-
     const effectivePrice = originalPrice - (originalPrice * discount) / 100;
 
-    console.log("EEEEEEE", effectivePrice);
+    
 
     return (
       <div
@@ -124,14 +121,13 @@ export default function AdminProductCard({ products }) {
       setSelectedProduct(params.data.fullProduct);
       setOpen(true);
 
-      console.log("Edit action on row:", params.data);
+      
     };
 
     const deleteProductHandler = async () => {
       try {
-        const response = await deleteProduct(params.data.fullProduct._id);
+        await deleteProduct(params.data.fullProduct._id);
         dispatch(fetchAllProducts());
-        console.log("RRRRRRRR", response);
       } catch (error) {
         console.log(error);
       }
