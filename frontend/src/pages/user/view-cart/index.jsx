@@ -3,10 +3,10 @@ import Payment from "./Payment";
 import Stepper from "./Stepper";
 import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import {getCart } from "../../../services/user/userAPI";
+import { getCart } from "../../../services/user/userAPI";
 
 const Index = () => {
   const authToken = useSelector((state) => state.auth.token);
@@ -24,20 +24,15 @@ const Index = () => {
         return;
       }
 
-      const response = await getCart()
-      setCartData(response?.data?.data)
-     
-      
-
-    }
-    catch (err) {
+      const response = await getCart();
+      setCartData(response?.data?.data);
+    } catch (err) {
       console.log(err.message);
-      
     }
-  }
-  useEffect(()=>{
-    fetchCartData()
-  },[])
+  };
+  useEffect(() => {
+    fetchCartData();
+  }, [authToken]);
   return (
     <Box
       sx={{
