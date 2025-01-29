@@ -81,8 +81,6 @@ export default function App() {
     initializeMetaPixel(import.meta.env.VITE_PIXEL_ID);
   }, []);
 
-  // console.log("userContext", userContext?.accountType);
-
   const { showNavBar, showFooter, navWithoutSearchBar } = useMemo(() => {
     const path = location.pathname;
     const showNavBar = [

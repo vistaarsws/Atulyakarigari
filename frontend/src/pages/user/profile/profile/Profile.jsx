@@ -142,13 +142,9 @@ const Profile = () => {
         formDataToSend.append("profileImage", formData.profilePictureFile);
       }
 
-      console.log("Sending updated data to API:", updatedData); // Debug log
-
       toast.loading("Updating profile...");
       const response = await updateProfile(_id, formDataToSend);
 
-      // Debugging API response
-      console.log("API Response:", response);
 
       if (response.data.success) {
         toast.dismiss();

@@ -105,9 +105,6 @@ export default function SidebarFilter() {
     );
   };
 
-  const handlePriceChange = (value) => {
-    console.log("Price changed:", value);
-  };
 
   return (
     <div
@@ -183,7 +180,7 @@ export default function SidebarFilter() {
           <PriceRangeSlider
             min={2000}
             max={30000}
-            onChange={handlePriceChange}
+            
           />
           {/* Color Filter */}
           <Box sx={sidebarStyles.section}>

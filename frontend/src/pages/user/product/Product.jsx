@@ -212,7 +212,6 @@ export default function Product() {
   const fetchProduct = async () => {
     const response = await getProductById(productId);
     setProduct(response?.data?.data);
-    console.log("response", response?.data?.data);
   };
 
   useEffect(() => {
@@ -226,7 +225,7 @@ export default function Product() {
 
       // Log to analytics
       logEvent("Product", "Time Spent", productId, timeSpent);
-      console.log(`User spent ${timeSpent} seconds on product ${productId}`);
+      // console.log(`User spent ${timeSpent} seconds on product ${productId}`);
     };
   }, [productId]); // Track changes to the product ID in case the route changes
 
@@ -247,7 +246,6 @@ export default function Product() {
         <div>
           <section>
             <ProductView productImages={product?.images} />
-            {/* {console.log(<ProductView images={product?.images} />)} */}
           </section>
           <section className="product_details_header">
             <div>
