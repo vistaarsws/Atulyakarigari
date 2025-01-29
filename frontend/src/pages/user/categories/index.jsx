@@ -69,7 +69,7 @@ const Index = () => {
                     picture={product?.images[0] || ""}
                     price={product?.price || "N/A"}
                     shortDescription={product?.description || "No Description"}
-                    offer_inPercent={product?.discountPercentage || "N/A"}
+                    offer_inPercent={product?.discountPercentage || null}
                     priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
                   />
                 )
