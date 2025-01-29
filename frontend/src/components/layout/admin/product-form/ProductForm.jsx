@@ -50,7 +50,7 @@ export default function ProductForm({
   isProductEditing,
   closeDialog,
 }) {
-  console.log("X Product", productDetails);
+  
 
   const dispatch = useDispatch();
 
@@ -279,7 +279,7 @@ export default function ProductForm({
         (cat) => cat
       );
 
-      console.log("Categories", categories_arr);
+      
       setCategories(categories_arr);
 
       setLoadingStates((prev) => ({ ...prev, category: false }));
@@ -372,7 +372,7 @@ export default function ProductForm({
       });
 
       const formDataInstance = new FormData();
-      console.log("Form DATA", formData);
+      
 
       formDataInstance.append("name", formData?.name);
       formDataInstance.append("description", formData?.description);
@@ -430,8 +430,7 @@ export default function ProductForm({
           await appendSingle(files);
         }
 
-        // Debug: Log the current formDataInstance content
-        console.log([...formDataInstance.entries()]);
+        
       };
 
       // Usage
@@ -445,7 +444,6 @@ export default function ProductForm({
 
       // API call
       if (isProductEditing) {
-        console.log("FORM DATA", formDataInstance);
         await updateProduct(productDetails._id, formDataInstance);
       } else {
         await createProduct(formDataInstance);
@@ -739,7 +737,6 @@ export default function ProductForm({
                       ...formData,
                       subcategory: newValue ? newValue._id : "", // Ensure empty string if no value
                     });
-                    console.log("Sub Category Selected:", newValue);
                   }}
                   renderInput={(params) => (
                     <TextField {...params} label="Sub Category" />

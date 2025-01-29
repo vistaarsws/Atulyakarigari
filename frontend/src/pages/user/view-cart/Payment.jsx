@@ -149,7 +149,7 @@ const Payment = ({ cartData }) => {
               color: "rgba(56, 55, 55, 1)",
             }}
           >
-            {/* {console.log(cartData)} */}
+           
             Price Details ({cartData?.items?.length} {cartData?.items?.length <= 1 ? "item" : "items"})
           </Typography>
           <Box sx={{ marginTop: 2 }}>

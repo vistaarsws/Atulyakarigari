@@ -20,8 +20,7 @@ export default function WishListHeartIcon({
       const updatedWishlist = !wishlist;
       setWishlist(updatedWishlist); // Optimistically update the UI.
       await toggleWishlistItem(productId); // Send the request to toggle the wishlist state in the backend.
-      const wishLi = fetchWishlist();
-      console.log("EWWWW", wishLi);
+      fetchWishlist();
     } catch (error) {
       console.error("Error toggling wishlist item:", error.message || error);
       // Rollback the state in case of an error.

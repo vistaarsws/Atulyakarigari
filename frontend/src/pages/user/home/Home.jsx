@@ -20,7 +20,6 @@ export default function Home() {
     try {
       const response = await getCategory();
 
-      console.log("categories", response);
       setGetAllCategories(Object.values(response?.data?.data));
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -102,7 +101,7 @@ export default function Home() {
                     {category.subcategory?.length > 0 ? (
                       category.subcategory.map((subcat) => (
                         <div key={subcat._id} className="subcategory-container">
-                          {console.log("subcat", subcat.products)}
+                          
 
                           <ProductSection
                             productCategorySection={{

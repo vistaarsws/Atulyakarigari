@@ -22,7 +22,6 @@ export default function CategoryView() {
   useEffect(() => {
     fetchCategoryData();
   }, []);
-  // console.log(ourCollection);
 
   return (
     <div className="collection_container">
@@ -38,8 +37,7 @@ export default function CategoryView() {
                   backgroundColor: collection.hoverBgColor,
                 }}
               >
-                {/* {console.log([index],ourCollection[index]?._id) 
-              } */}
+                
                 <h3>{ourCollection[index]?.name}</h3>
 
                 <div></div>
