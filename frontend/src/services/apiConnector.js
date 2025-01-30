@@ -3,10 +3,10 @@ import Cookies from "js-cookie";
 
 const axiosInstance = axios.create({});
 
-const token = Cookies.get("authToken");
 // Add request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    const token = Cookies.get("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
