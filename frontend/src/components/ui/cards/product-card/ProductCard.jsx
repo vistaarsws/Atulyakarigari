@@ -7,10 +7,9 @@ import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { addToCart } from "../../../../services/user/userAPI";
-import {formatPrice} from "../../../../utils/helpers";
+import { formatPrice } from "../../../../utils/helpers";
 
 function ProductCard({
-
   title = "Product Title",
   shortDescription = "Short description here...",
   picture = "",
@@ -19,13 +18,11 @@ function ProductCard({
   id = "",
   isAddedToWishlist = false,
   priceAfterDiscount = price,
-  fetchWishlistData ,
+  fetchWishlist,
 }) {
   const [isHover, setIsHover] = useState(false);
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
-
-  
 
   const addToCartHandler = async (productId = { id }, quantity) => {
     try {
@@ -39,7 +36,6 @@ function ProductCard({
         console.error("Invalid token structure");
         return;
       }
-
 
       await addToCart(productId, quantity);
     } catch (err) {
@@ -82,7 +78,7 @@ function ProductCard({
             <WishListHeartIcon
               productId={id}
               isWishlist={isAddedToWishlist}
-              fetchWishlist={fetchWishlistData}
+              fetchWishlist={fetchWishlist}
             />
           </div>
         </section>
@@ -127,14 +123,14 @@ ProductCard.propTypes = {
   id: PropTypes.string.isRequired,
   isAddedToWishlist: PropTypes.bool,
   priceAfterDiscount: PropTypes.number.isRequired,
-  fetchWishlistData: PropTypes.func,
+  fetchWishlist: PropTypes.func,
 };
 
-ProductCard.defaultProps = {
-  shortDescription: "Short description here...",
-  offer_inPercent: 0,
-  isAddedToWishlist: false,
-  fetchWishlistData: () => {},
-};
+// ProductCard.defaultProps = {
+//   shortDescription: "Short description here...",
+//   offer_inPercent: 0,
+//   isAddedToWishlist: false,
+//   fetchWishlistData: () => {},
+// };
 
 export default ProductCard;
