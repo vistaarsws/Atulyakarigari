@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import ProductCard from "../../../ui/cards/product-card/ProductCard";
 import pattern from "../../../../assets/images/designPattern_1.svg";
 import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
+import { useNavigate } from "react-router-dom";
 
 import "./ProductSection.css";
 
@@ -17,11 +18,16 @@ const formatProductData = (product) => ({
 });
 
 export default function ProductSection({ productCategorySection, bgColor }) {
-  const { title, subtitle, products } = productCategorySection;
+  const { title, subtitle, products, categoryId } = productCategorySection;
 
   const productCards = products.map((product, index) => (
     <ProductCard key={index} {...formatProductData(product)} />
   ));
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/categories/${categoryId}`);
+  };
 
   return (
     <div
@@ -34,7 +40,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
         <img src={pattern} alt="Wing Pattern" />
       </figure>
       <div>
-        <button>View More &gt;</button>
+        <button onClick={handleNavigate}>View More &gt;</button>
       </div>
       <section>
         <div>
