@@ -16,6 +16,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { removeFromCart } from "../../../services/user/userAPI";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
@@ -83,30 +84,39 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const ProductCard = ({ product }) => {
-  
   const authToken = useSelector((state) => state.auth.token);
+  const navigate = useNavigate();
+
   const removeFromCartHandler = async () => {
     try {
       if (!authToken) {
         console.error("No user profile token found");
         return;
       }
-      
+
       const { _id } = jwtDecode(authToken);
       if (!_id) {
         console.error("Invalid token structure");
         return;
       }
       await removeFromCart(product?.productId);
-      
     } catch (err) {
       console.log(err.message);
     }
   };
+
+  const handleCardClick = () => {
+    navigate(`/product/${product.productId}`);
+  };
+
   return (
     <StyledCard>
       <ProductImageWrapper>
-        <ProductImage src={product?.images?.[0]} alt={product?.name} />
+        <ProductImage
+          src={product?.images?.[0]}
+          alt={product?.name}
+          onClick={handleCardClick}
+        />
         <Checkbox
           sx={{
             position: "absolute",
@@ -134,12 +144,7 @@ const ProductCard = ({ product }) => {
           padding: "0 0 0  1rem!important",
         }}
       >
-        <CloseButton
-          onClick={
-            removeFromCartHandler
-        }
-          size="small"
-        >
+        <CloseButton onClick={removeFromCartHandler} size="small">
           <CloseIcon fontSize="small" />
         </CloseButton>
         <Typography

@@ -1,4 +1,3 @@
-import CART from "../../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
