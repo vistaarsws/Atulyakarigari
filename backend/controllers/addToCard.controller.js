@@ -13,7 +13,7 @@ const successResponse = (res, data, message) => {
 };
 
 // Helper function to format the cart data
-const formatCart = (cart, totals) => ({
+const formatCart = (cart,total) => ({
     userId: cart.userId,
     items: cart.items.map(item => ({
         productId: item.productId._id,
@@ -25,9 +25,9 @@ const formatCart = (cart, totals) => ({
         name: item.productId.name,
         _id: item._id,
     })),
-    total: totals.total, // Total after discounts
-    totalMRP: totals.totalMRP, // Total original price
-    totalDiscount: totals.totalDiscount, // Total discount
+    total: total.total, // Total after discounts
+    totalMRP: total.totalMRP, // Total original price
+    totalDiscount: total.totalDiscount, // Total discount
     _id: cart._id,
 });
 
@@ -77,7 +77,7 @@ export const addToCart = async (req, res) => {
         await cart.save();
 
         // Return success response
-        successResponse(res, formatCart(cart), "Product successfully added or updated in the cart.");
+        successResponse(res, formatCart(cart,total), "Product successfully added or updated in the cart.");
     } catch (error) {
         console.error("Error in addToCart:", error);
         return internalServerError(req, res, error, "Unable to add or update product in cart");

@@ -15,7 +15,6 @@ export default function UserProfile() {
     // { key: "privacy-policy", label: "Privacy Policy" },
     // { key: "user/logout", label: "Log Out" },
   ];
-  console.log(location.pathname);
 
   const isActive = (itemKey) => {
     return location.pathname.endsWith(`/${itemKey}`);

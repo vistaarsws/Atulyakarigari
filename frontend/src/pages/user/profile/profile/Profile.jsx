@@ -142,13 +142,9 @@ const Profile = () => {
         formDataToSend.append("profileImage", formData.profilePictureFile);
       }
 
-      console.log("Sending updated data to API:", updatedData); // Debug log
-
       toast.loading("Updating profile...");
       const response = await updateProfile(_id, formDataToSend);
 
-      // Debugging API response
-      console.log("API Response:", response);
 
       if (response.data.success) {
         toast.dismiss();
@@ -228,12 +224,6 @@ const Profile = () => {
               type="date"
               isEditable={isEditing}
             />
-            <ProfileField
-              label="Hint Name"
-              value={formData.hintName}
-              onChange={(value) => handleInputChange("hintName", value)}
-              isEditable={isEditing}
-            />
           </div>
           <div>
             <ProfileField
@@ -248,12 +238,7 @@ const Profile = () => {
               onChange={(value) => handleInputChange("gender", value)}
               isEditable={isEditing}
             />
-            <ProfileField
-              label="Location"
-              value={formData.location}
-              onChange={(value) => handleInputChange("location", value)}
-              isEditable={isEditing}
-            />
+
             <ProfileField
               label="Alternate Mobile"
               value={formData.alternateMobile}
@@ -283,6 +268,7 @@ const Profile = () => {
                 Save
               </Button>
               <Button
+                size="large"
                 className="cancel-button"
                 variant="outlined"
                 onClick={handleCancel}

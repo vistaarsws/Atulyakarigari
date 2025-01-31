@@ -8,7 +8,7 @@ const router = Router();
 router.post("/add", auth, addToCart);
 
 // Route to fetch the user's cart
-router.get("/", auth, getCart);
+router.get("/get", auth, getCart);
 
 // Route to remove a product from the cart
 router.delete("/remove", auth, removeFromCart);

@@ -83,7 +83,7 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const ProductCard = ({ product }) => {
-  console.log("ProductCard",product.productId)
+  
   const authToken = useSelector((state) => state.auth.token);
   const removeFromCartHandler = async () => {
     try {

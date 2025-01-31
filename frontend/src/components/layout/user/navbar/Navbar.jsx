@@ -269,7 +269,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
       const response = await getCart();
       setCartData(response?.data?.data);
-      // console.log("response",cartData);
     } catch (err) {
       console.log(err.message);
     }

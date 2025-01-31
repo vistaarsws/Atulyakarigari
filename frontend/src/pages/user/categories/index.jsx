@@ -22,7 +22,6 @@ const Index = () => {
         const response = await getcategoryById(id); // Pass the ID to the API call
         if (response?.data?.data) {
           setCategoryData(response?.data?.data);
-          // console.log("Fetched category data:", categoryData);
         } else {
           console.error("API response does not contain data:", response);
         }
@@ -45,7 +44,7 @@ const Index = () => {
   }
 
   const products = categoryData.products || []; // Ensure products is an array
-  console.log("Products:", products);
+ 
 
   const totalPages = Math.ceil(products.length / 10); // Example pagination logic
 
@@ -61,7 +60,7 @@ const Index = () => {
           {products.length > 0 ? (
             products.map(
               (product) => (
-                // console.log("products.map", product?.name),
+                
                 (
                   <ProductCard
                     key={product?._id}
@@ -70,7 +69,7 @@ const Index = () => {
                     picture={product?.images[0] || ""}
                     price={product?.price || "N/A"}
                     shortDescription={product?.description || "No Description"}
-                    offer_inPercent={product?.discountPercentage || "N/A"}
+                    offer_inPercent={product?.discountPercentage || null}
                     priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
                   />
                 )

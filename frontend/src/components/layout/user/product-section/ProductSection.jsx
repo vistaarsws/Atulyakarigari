@@ -13,7 +13,7 @@ const formatProductData = (product) => ({
   price: product.price || "N/A",
   shortDescription: product.description || "No Description",
   priceAfterDiscount: product.priceAfterDiscount || "N/A",
-  offer_inPercent: product.discountPercentage || "N/A",
+  offer_inPercent: product.discountPercentage || null,
 });
 
 export default function ProductSection({ productCategorySection, bgColor }) {

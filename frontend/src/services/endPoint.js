@@ -35,7 +35,7 @@ export const user_endpoints = {
   USER_WISHLIST: BASE_URL + "/api/v1/wishlist/get",
   TOGGLE_WISHLIST: BASE_URL + "/api/v1/wishlist/toggle",
   USER_ADD_TO_CART: BASE_URL + "/api/v1/addToCart/add",
-  USER_GET_CART: BASE_URL + "/api/v1/addToCart",
+  USER_GET_CART: BASE_URL + "/api/v1/addToCart/get",
   REMOVE_FROM_CART: BASE_URL + "/api/v1/addToCart/remove",
 
   GET_CATEGORY: BASE_URL + "/api/v1/category/get",
