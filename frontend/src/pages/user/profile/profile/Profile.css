@@ -15,7 +15,7 @@
 .file-input {
   opacity: 1;
   position: absolute;
-  top: 5%;
+  top: 0%;
   left: 110%;
   transform: translate(-50%, -50%);
 }
