@@ -5,10 +5,12 @@ import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHe
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
-import {jwtDecode} from "jwt-decode";
-import { addToCart, getCart } from "../../../../services/user/userAPI"; // Assuming you have a function to get cart items
-import { formatPrice } from "../../../../utils/helpers";
+import { jwtDecode } from "jwt-decode";
+import { addToCart } from "../../../../services/user/userAPI";
+import {formatPrice} from "../../../../utils/helpers";
+
 function ProductCard({
+
   title = "Product Title",
   shortDescription = "Short description here...",
   picture = "",
@@ -17,47 +19,35 @@ function ProductCard({
   id = "",
   isAddedToWishlist = false,
   priceAfterDiscount = price,
-  fetchWishlist,
+  fetchWishlistData ,
 }) {
   const [isHover, setIsHover] = useState(false);
-  const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.token);
-  const addToCartHandler = async (productId, quantity = 1) => {
+
+  
+
+  const addToCartHandler = async (productId = { id }, quantity) => {
     try {
       if (!authToken) {
         console.error("No user profile token found");
         return;
       }
+
       const { _id } = jwtDecode(authToken);
       if (!_id) {
         console.error("Invalid token structure");
         return;
       }
+
+
       await addToCart(productId, quantity);
-      setIsInCart(true);
     } catch (err) {
       console.log(err.message);
     }
   };
-  const checkIfInCart = async () => {
-    try {
-      const response = await getCart();
-      const cartItems = response.data.data.items;
-      if (Array.isArray(cartItems)) {
-        const productInCart = cartItems.some((item) => item.productId === id);
-        if (productInCart) {
-          setIsInCart(true);
-        }
-      } else {
-        console.error("cartItems is not an array:", cartItems);
-      }
-    } catch (err) {
-      console.log("Error fetching cart items:", err.message);
-    }
-  };
+
   useEffect(() => {
-    checkIfInCart();
     // Check if the URL contains "user/wishlist"
     const path = window.location.pathname;
     if (path.includes("user/wishlist")) {
@@ -66,14 +56,7 @@ function ProductCard({
       setIsHover(false);
     }
   }, []);
-  const handleButtonClick = (e) => {
-    e.stopPropagation();
-    if (isInCart) {
-      navigate("/view-cart");
-    } else {
-      addToCartHandler(id);
-    }
-  };
+
   return (
     <>
       <div
@@ -99,7 +82,7 @@ function ProductCard({
             <WishListHeartIcon
               productId={id}
               isWishlist={isAddedToWishlist}
-              fetchWishlist={fetchWishlist}
+              fetchWishlist={fetchWishlistData}
             />
           </div>
         </section>
@@ -121,16 +104,20 @@ function ProductCard({
         </article>
         <div className={`${isAddedToWishlist ? "wistListBtnStyle" : ""} `}>
           <button
-            onClick={handleButtonClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCartHandler(id);
+            }}
             style={{ visibility: isHover === true && "visible" }}
           >
-            {isInCart ? "Go to cart" : "Add to cart"}
+            Add to cart
           </button>
         </div>
       </div>
     </>
   );
 }
+
 ProductCard.propTypes = {
   title: PropTypes.string.isRequired,
   shortDescription: PropTypes.string,
@@ -140,6 +127,14 @@ ProductCard.propTypes = {
   id: PropTypes.string.isRequired,
   isAddedToWishlist: PropTypes.bool,
   priceAfterDiscount: PropTypes.number.isRequired,
-  fetchWishlist: PropTypes.func,
+  fetchWishlistData: PropTypes.func,
 };
+
+ProductCard.defaultProps = {
+  shortDescription: "Short description here...",
+  offer_inPercent: 0,
+  isAddedToWishlist: false,
+  fetchWishlistData: () => {},
+};
+
 export default ProductCard;
