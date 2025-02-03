@@ -17,7 +17,6 @@ import {
   getUserWishlist,
 } from "../../../../services/user/userAPI";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { useSnackbar } from "notistack";
 import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
@@ -25,7 +24,6 @@ import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
-import { UnderlineOutlined } from "@ant-design/icons";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
