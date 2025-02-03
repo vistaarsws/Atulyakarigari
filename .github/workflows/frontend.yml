@@ -80,7 +80,7 @@ jobs:
 
           echo "Deployment URL: $DEPLOYMENT_URL"
 
-          npx vercel alias set $DEPLOYMENT_URL dev.atulyakarigari.vercel.app --token $VERCEL_TOKEN
+          npx vercel alias set $DEPLOYMENT_URL dev-atulyakarigari.vercel.app --token $VERCEL_TOKEN
 
   deploy-to-production:
     name: 🚀 Deploy to Production (main branch)
