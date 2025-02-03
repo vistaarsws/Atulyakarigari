@@ -17,12 +17,15 @@ import {
   getUserWishlist,
 } from "../../../../services/user/userAPI";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useSnackbar } from "notistack";
+import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
+import { UnderlineOutlined } from "@ant-design/icons";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
@@ -40,7 +43,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       setAnchorEl(event.currentTarget); // Open the dropdown
     }
   };
-
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const [getAllCategories, setGetAllCategories] = useState([]);
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
 
   const toggleCollapse = (index) => {
@@ -153,117 +157,19 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       dispatch(logout());
     }
   };
-
-  // useEffect(() => {
-  //   // Check if the URL contains "user/wishlist"
-  //   const path = window.location.pathname;
-  //   if (path.includes("user/") || path.includes("/blogs")) {
-  //     setIsProfileView(true);
-  //   } else {
-  //     setIsProfileView(false);
-  //   }
-  //   return () => {
-  //     setIsProfileView(false);
-  //   };
-  // }, [window.location.pathname]);
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
-
       {
         name: "CATEGORIES",
         path: "#",
-        dropdown: [
-          {
-            category: "HANDLOOM",
-            subcategories: [
-              {
-                name: "Lehenga",
-                items: [
-                  "Zardozi",
-                  "Zari with Kundan Touch",
-                  "Zari",
-                  "Resham",
-                  "Banarsi",
-                ],
-              },
-              {
-                name: "Saree",
-                items: [
-                  "Sambalpuri Cotton",
-                  "Pure Raw Cotton",
-                  "Organza",
-                  "Kota Doria",
-                  "Khandua Silk",
-                  "Georgette",
-                  "Banarsi Silk",
-                ],
-              },
-              {
-                name: "Suit Set",
-                items: ["Woolen Suit"],
-              },
-              {
-                name: "Ready To Wear",
-                items: [
-                  "Bhagalpuri Silk",
-                  "Chanderi Silk",
-                  "Cotton Silk",
-                  "Khadi Silk",
-                ],
-              },
-              {
-                name: "Tie",
-                items: [
-                  "Bhagalpuri Silk",
-                  "Chanderi Silk",
-                  "Cotton Silk",
-                  "Khadi Silk",
-                ],
-              },
-              {
-                name: "Facemask",
-                items: ["Embroidered", "Printed Cotton"],
-              },
-              {
-                name: "Home Decor",
-                items: ["Table Runner"],
-              },
-            ],
-          },
-          {
-            category: "HANDICRAFT",
-            subcategories: [
-              {
-                name: "",
-                items: [
-                  "Golden Grass",
-                  "Dhokra",
-                  "Diary",
-                  "Sabai Grass",
-                  "Palm Leaves Etching",
-                  "Pattachitra",
-                ],
-              },
-            ],
-          },
-          {
-            category: "JEWELLERY",
-            subcategories: [
-              {
-                name: "",
-                items: [
-                  "Jhumka",
-                  "Rings",
-                  "Bracelet",
-                  "Kamarbandh",
-                  "Baju Bnadh",
-                  "Payal/Anklet",
-                ],
-              },
-            ],
-          },
-        ],
+        dropdown: getAllCategories.map((category) => ({
+          category: category.name,
+          category_Details: category,
+          subcategories: category.subcategory.map((sub) => ({
+            name: sub.name,
+          })),
+        })),
       },
       { name: "ARTISANS", path: "/artisans" },
       { name: "ABOUT US", path: "/about" },
@@ -282,10 +188,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
 
-    // { name: "Contact Us", link: "/user/contact" },
-    // { name: "Terms of use", link: "/user/terms" },
-    // { name: "Privacy Policy", link: "/user/privacy" },
-    // { name: "Log Out", link: "/user/logout" },
   ];
   const [cartData, setCartData] = useState(null);
   const fetchCartData = async () => {
@@ -310,6 +212,26 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   useEffect(() => {
     fetchCartData();
   }, []);
+  const fetchCategoriesData = async () => {
+    try {
+      const response = await getCategory();
+      const categories = Object.values(response.data.data);
+  
+      // Ensure data structure matches expectations
+      if (categories.length) {
+        setGetAllCategories(categories);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+  
+  useEffect(() => {
+   
+      fetchCategoriesData();
+    
+  }, []);
+  
 
   return (
     <nav className="navbar_container">
@@ -354,23 +276,24 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   }`}
                 >
                   <div className="categories-container">
-                    {link.dropdown.map((categoryObj, index) => (
+                    {link.dropdown.map((categoryObj, catIndex) => (
                       <div
                         id="category"
-                        className={` ${
-                          index !== 0 ? "smallNavMenuSection" : ""
-                        }`}
-                        key={index}
+                        className={`${catIndex !== 0 ? "smallNavMenuSection" : ""}`}
+                        key={catIndex}
                       >
                         <div
                           className="category-header"
-                          onClick={() => toggleCollapse(index)}
-                          aria-expanded={openCategoryIndex === index}
+                          onClick={() => toggleCollapse(catIndex)}
+                          aria-expanded={openCategoryIndex === catIndex}
                         >
-                          <h1>{categoryObj.category}</h1>
+                          
+                          <Link className="underline" to={`/categories/${categoryObj.category_Details._id}`}>
+                          <h1 >{categoryObj.category}</h1>
+                          </Link>
                           <svg
                             className={`collapse-icon ${
-                              openCategoryIndex === index ? "open" : ""
+                              openCategoryIndex === catIndex ? "open" : ""
                             }`}
                             width="12"
                             height="12"
@@ -383,39 +306,29 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                         </div>
                         <section
                           className={`collapse-content ${
-                            openCategoryIndex === index ? "show" : ""
+                            openCategoryIndex === catIndex ? "show" : ""
                           }`}
                         >
                           {categoryObj.subcategories.map(
                             (subcategory, subIndex) => (
-                              <div key={subIndex}>
-                                {subcategory.name && (
-                                  <h2>{subcategory.name}</h2>
-                                )}
-                                <ul>
-                                  {subcategory.items.map((item, itemIndex) => (
-                                    <li key={itemIndex} id="subcategoryLinks">
-                                      {item}
-                                      <svg
-                                        width="8"
-                                        height="8"
-                                        viewBox="0 0 8 8"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="onHoverRightArrow"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          clipRule="evenodd"
-                                          d="M0 4C0 4.13308 0.0526814 4.26071 0.146455 4.35482C0.240228 4.44892 0.367412 4.50179 0.500027 4.50179H6.29368L4.14689 6.65613C4.05857 6.75125 4.01048 6.87707 4.01277 7.00706C4.01506 7.13706 4.06753 7.26109 4.15915 7.35303C4.25076 7.44497 4.37436 7.49763 4.5039 7.49992C4.63344 7.50222 4.75881 7.45396 4.8536 7.36533L7.85377 4.3546C7.9474 4.26051 8 4.13297 8 4C8 3.86703 7.9474 3.73949 7.85377 3.6454L4.8536 0.634675C4.75881 0.546039 4.63344 0.497785 4.5039 0.500079C4.37436 0.502372 4.25076 0.555035 4.15915 0.646971C4.06753 0.738907 4.01506 0.86294 4.01277 0.992937C4.01048 1.12293 4.05857 1.24875 4.14689 1.34387L6.29368 3.49821L0.500027 3.49821C0.367412 3.49821 0.240228 3.55108 0.146455 3.64518C0.0526814 3.73929 0 3.86692 0 4Z"
-                                          fill="#60A487"
-                                        />
-                                      </svg>
-                                    </li>
-                                  ))}
-                                </ul>
-                                <div className="dividerLine"></div>
-                              </div>
+                              <li key={subIndex} id="subcategoryLinks">
+                                {subcategory.name}
+                                <svg
+                                  width="8"
+                                  height="8"
+                                  viewBox="0 0 8 8"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="onHoverRightArrow"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    clipRule="evenodd"
+                                    d="M0 4C0 4.13308 0.0526814 4.26071 0.146455 4.35482C0.240228 4.44892 0.367412 4.50179 0.500027 4.50179H6.29368L4.14689 6.65613C4.05857 6.75125 4.01048 6.87707 4.01277 7.00706C4.01506 7.13706 4.06753 7.26109 4.15915 7.35303C4.25076 7.44497 4.37436 7.49763 4.5039 7.49992C4.63344 7.50222 4.75881 7.45396 4.8536 7.36533L7.85377 4.3546C7.9474 4.26051 8 4.13297 8 4C8 3.86703 7.9474 3.73949 7.85377 3.6454L4.8536 0.634675C4.75881 0.546039 4.63344 0.497785 4.5039 0.500079C4.37436 0.502372 4.25076 0.555035 4.15915 0.646971C4.06753 0.738907 4.01506 0.86294 4.01277 0.992937C4.01048 1.12293 4.05857 1.24875 4.14689 1.34387L6.29368 3.49821L0.500027 3.49821C0.367412 3.49821 0.240228 3.55108 0.146455 3.64518C0.0526814 3.73929 0 3.86692 0 4Z"
+                                    fill="#60A487"
+                                  />
+                                </svg>
+                              </li>
                             )
                           )}
                         </section>
