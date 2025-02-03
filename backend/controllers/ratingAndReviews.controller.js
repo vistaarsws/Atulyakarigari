@@ -7,6 +7,7 @@ import {
     internalServerError,
     notFoundRequest
 } from "../helpers/api-response.js";
+import Profile from "../models/profile.js";
 
 /**
  * Add or update a review for a product.
@@ -83,7 +84,26 @@ export const getReviewsByProduct = async (req, res) => {
             return notFoundRequest(req, res, null, "No reviews found for the product");
         }
 
-        return success(req, res, "Reviews retrieved successfully", { reviews });
+        // Fetch user profiles for each review
+        const reviewsWithUser = await Promise.all(
+            reviews.map(async (review) => {
+                const userProfile = await Profile.findOne({ userId: review.userId });
+
+                return {
+                    _id: review._id,
+                    productId: review.productId,
+                    userId: review.userId,
+                    rating: review.rating,
+                    comment: review.comment,
+                    createdAt: review.createdAt,
+                    updatedAt: review.updatedAt,
+                    userName: userProfile?.fullName ?? "Unknown User", 
+                    userImage: userProfile?.profilePicture ?? "", 
+                };
+            })
+        );
+
+        return success(req, res, "Reviews retrieved successfully", { reviews: reviewsWithUser });
     } catch (error) {
         return internalServerError(req, res, error, "Failed to retrieve reviews");
     }
