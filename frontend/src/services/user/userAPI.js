@@ -156,6 +156,47 @@ const updateAddress = async (id, newAddressDetails) => {
   }
 };
 
+const getReview = async (productId) => {
+  try {
+    const response = await apiConnector(
+      "POST", 
+      user_endpoints.GET_RATING, 
+      { productId } 
+    );
+    return response;
+  } catch (error) {
+    console.log("Error fetching reviews:", error);
+  }
+};
+
+
+const createOrUpdateReview = async (id, review, comment) => {
+  try {
+    const response = await apiConnector(
+      "PUT",
+      user_endpoints.CREATEANDUPDATE_RATING,
+      id,
+      review, 
+      comment
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteReview = async (id) => {
+  try {
+    const response = await apiConnector(
+      "DELETE",
+      `${user_endpoints.DELETE_RATING}/${id}`
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   createProduct,
   getProducts,
@@ -175,4 +216,7 @@ export {
   getAddress,
   deleteAddress,
   updateAddress,
+  getReview,
+  createOrUpdateReview,
+  deleteReview,
 };

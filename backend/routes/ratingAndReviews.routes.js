@@ -13,7 +13,7 @@ router.use(auth);
 
 // Routes
 router.post("/createOrUpdate", createOrUpdateReview); // Handles both create and update
-router.get("/getAll", getReviewsByProduct); // Retrieves all reviews for a product
+router.post("/getAll", getReviewsByProduct); // Retrieves all reviews for a product
 router.delete("/delete", deleteReview); // Deletes a review
 
 export default router;
