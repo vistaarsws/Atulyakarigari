@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { getProfile, updateProfile } from "../../../../services/user/userAPI";
-import PROFILE_IMAGE from "../../../../assets/images/userProfile.png";
-import { Avatar, Button, useMediaQuery } from "@mui/material";
+import { Avatar, Button, styled, useMediaQuery } from "@mui/material";
 import toast from "react-hot-toast";
 import "./Profile.css";
 
@@ -33,11 +33,23 @@ const Profile = () => {
     gender: "",
     location: "",
     alternateMobile: "",
-    profilePicture: PROFILE_IMAGE,
+    profilePicture: "/broken-image.jpg",
     profilePictureFile: null, // Store the file for uploading
   });
   const [originalData, setOriginalData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
 
   // Fetch Profile Data
   const fetchProfileData = async () => {
@@ -65,12 +77,12 @@ const Profile = () => {
         gender: profile.gender || "",
         location: profile.location || "",
         alternateMobile: profile.alternativeContactNumber || "",
-        profilePicture: profile.profilePicture || PROFILE_IMAGE,
+        profilePicture: profile.profilePicture || "/broken-image.jpg",
         profilePictureFile: null, // Reset file on fetch
       };
 
       setFormData(fetchedData);
-      setOriginalData(fetchedData); // Store the original data for cancel functionality
+      setOriginalData(fetchedData);
     } catch (error) {
       console.error("Error fetching profile data: ", error.message || error);
       toast.error("Failed to fetch profile data.");
@@ -95,11 +107,10 @@ const Profile = () => {
     if (file) {
       const allowedFormats = ["image/jpeg", "image/png"];
       if (allowedFormats.includes(file.type)) {
-        setFormData((prevData) => ({
-          ...prevData,
+        setFormData({
           profilePicture: URL.createObjectURL(file), // Preview the image
           profilePictureFile: file, // Store the file for uploading
-        }));
+        });
       } else {
         toast.error("Please upload a valid image (JPEG/PNG).");
       }
@@ -142,9 +153,13 @@ const Profile = () => {
         formDataToSend.append("profileImage", formData.profilePictureFile);
       }
 
+      console.log("Sending updated data to API:", updatedData); // Debug log
+
       toast.loading("Updating profile...");
       const response = await updateProfile(_id, formDataToSend);
 
+      // Debugging API response
+      console.log("API Response:", response);
 
       if (response.data.success) {
         toast.dismiss();
@@ -177,7 +192,7 @@ const Profile = () => {
       <div className="profile-image-container">
         <div className="profile-image-input-box">
           <Avatar
-            src={formData?.profilePicture && "/broken-image.jpg"}
+            src={formData?.profilePicture}
             alt={formData?.fullName}
             sx={{
               width: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
@@ -192,13 +207,25 @@ const Profile = () => {
             alt="Profile"
             className="profile-image"
           /> */}
+
           {isEditing && (
-            <input
-              type="file"
-              accept="image/jpeg, image/png"
-              onChange={handleFileChange}
+            // <input
+            //   type="file"
+            //   accept="image/jpeg, image/png"
+            //   onChange={handleFileChange}
+            //   className="file-input"
+            // />
+            <Button
               className="file-input"
-            />
+              component="label"
+              role={undefined}
+              sx={{ width: "100%" }}
+              variant="outlilned"
+              tabIndex={-1}
+              startIcon={<EditIcon />}
+            >
+              <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+            </Button>
           )}
         </div>
       </div>
@@ -268,8 +295,8 @@ const Profile = () => {
                 Save
               </Button>
               <Button
-                size="large"
                 className="cancel-button"
+                size="large"
                 variant="outlined"
                 onClick={handleCancel}
               >
