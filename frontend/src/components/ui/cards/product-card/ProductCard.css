@@ -163,6 +163,15 @@
   }
 }
 
+.productCard_container > div:last-of-type button.in-cart {
+  background-color: #ad3f38;
+
+    &:hover {
+      background-color: #6d001d;
+    }
+}
+
+
 .productCard_container > section:first-of-type {
   display: flex;
   align-items: center;

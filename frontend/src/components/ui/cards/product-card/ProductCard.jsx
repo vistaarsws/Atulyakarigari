@@ -135,6 +135,7 @@ function ProductCard({
           <button
             onClick={handleButtonClick}
             style={{ visibility: isHover === true && "visible" }}
+            className={isInCart ? "in-cart" : ""}
           >
             {isInCart ? "Go to cart" : "Add to cart"}
           </button>
