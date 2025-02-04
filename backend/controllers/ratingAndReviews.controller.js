@@ -18,6 +18,10 @@ export const createOrUpdateReview = async (req, res) => {
         const { productId, rating, comment } = req.body;
         const userId = req.user._id; // Authenticated user's ID
 
+        if (!userId) {
+            return unauthorizedRequest(req, res, null, "User not authenticated");
+        }
+        
         // Validate required fields
         if (!productId || !userId || !rating || !comment) {
             return badRequest(req, res, null, "All fields are required");
@@ -65,7 +69,7 @@ export const createOrUpdateReview = async (req, res) => {
  */
 export const getReviewsByProduct = async (req, res) => {
     try {
-        const { productId } = req.body;
+        const { productId } = req.params;
 
         // Validate required field
         if (!productId) {
@@ -98,7 +102,7 @@ export const getReviewsByProduct = async (req, res) => {
                     createdAt: review.createdAt,
                     updatedAt: review.updatedAt,
                     userName: userProfile?.fullName ?? "Unknown User", 
-                    userImage: userProfile?.profilePicture ?? "", 
+                    userImage: userProfile?.profilePicture, 
                 };
             })
         );

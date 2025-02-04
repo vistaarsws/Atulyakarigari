@@ -30,7 +30,7 @@ import { useState } from "react";
 // import ProductSection from "../../../components/layout/user/product-section/ProductSection";
 import {
   getProductById,
-  getReview,
+  getReviewById,
   createOrUpdateReview,
   getCart,
   addToCart,
@@ -134,28 +134,18 @@ export default function Product() {
         return;
       }
 
-      const response = await getReview(productId);
+      const response = await getReviewById(productId);
 
-      if (
-        !response ||
-        !response.data ||
-        !response.data.data ||
-        !response.data.data.reviews
-      ) {
-        console.error("Error: Failed to fetch reviews", response);
-        return;
-      }
-
-      const reviews = response.data.data.reviews;
+      const reviews = response?.data?.data?.reviews;
 
       const existingReview = reviews.find(
-        (review) => review.userId === decodedToken._id
+        (review) => review?.userId === decodedToken?._id
       );
       if (existingReview) {
         setUserReview(existingReview);
       }
 
-      const totalReviews = reviews.length;
+      const totalReviews = reviews?.length;
       const totalRating =
         totalReviews > 0
           ? reviews.reduce((sum, review) => sum + review.rating, 0)
@@ -167,7 +157,7 @@ export default function Product() {
         ...review,
         userName: review?.userName || "Anonymous",
         userImage: review?.userImage || review_person,
-      }));
+      }));  
 
       setRatingAndReview({ reviews: updatedReviews, averageRating });
     } catch (error) {
@@ -183,56 +173,46 @@ export default function Product() {
   // Handle review submission (create or update)
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       if (!authToken) {
         console.error("Error: No user profile token found");
         return;
       }
-
+  
       const decodedToken = jwtDecode(authToken);
-      if (!decodedToken || !decodedToken._id) {
+      const userId = decodedToken?._id;
+      if (!userId) {
         console.error("Error: Invalid token structure");
         return;
       }
-
-      const reviewData = {
-        productId,
-        comment: formData.comment,
-        rating: formData.rating,
-      };
-
+  
+      let { rating, comment } = formData;
       let response;
+  
       if (editingReviewId) {
-        // Update review if user has already commented
-        response = await createOrUpdateReview(productId, {
-          comment: formData.comment,
-          rating: formData.rating,
-        });
+        // Update review
+        response = await createOrUpdateReview(productId, rating, comment);
       } else {
-        // Create new review if user has not commented yet
-        response = await createOrUpdateReview(productId, {
-          comment: formData.comment,
-          rating: formData.rating,
-        });
+        // Create new review
+        response = await createOrUpdateReview(productId, rating, comment);
       }
-
-      if (response && response.data && response.data.success) {
-        alert(
-          editingReviewId
-            ? "Review updated successfully!"
-            : "Review submitted successfully!"
-        );
-        fetchRatingAndReview(); // Refresh the reviews after submission or update
-        setFormData({ rating: 5, comment: "" }); // Reset form fields
-        setEditingReviewId(null); // Reset editing state
+  
+      if (response?.data?.success) {
+        alert(editingReviewId ? "Review updated successfully!" : "Review submitted successfully!");
+        fetchRatingAndReview();
+        setFormData({ rating: 5, comment: "" });
+        setEditingReviewId(null);
       } else {
         console.error("Error submitting review:", response);
       }
     } catch (error) {
       console.error("Unexpected error in handleSubmit:", error);
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   // Toggle showing more reviews
   const handleToggleReviews = () => {
@@ -241,11 +221,8 @@ export default function Product() {
 
   // Handle editing a review (pre-fill the form)
   const handleEditReview = (review) => {
-    setFormData({
-      rating: review.rating, // set the review's rating
-      comment: review.comment, // set the review's comment
-    });
-    setEditingReviewId(review.id); // set the editing review ID
+    setFormData({ rating: review.rating, comment: review.comment });
+    setEditingReviewId(review._id || review.id);
   };
 
   // Fetch reviews on component mount
@@ -370,7 +347,7 @@ export default function Product() {
                       style={{
                         appearance: "textfield",
                         MozAppearance: "textfield",
-                        WebkitAppearance: "none", 
+                        WebkitAppearance: "none",
                       }}
                     />
                   </div>
@@ -503,9 +480,9 @@ export default function Product() {
                           0,
                           showAllReviews ? ratingAndReview.reviews.length : 1
                         )
-                        .map((review) => (
+                        .map((review, index) => (
                           <Box
-                            key={review._id}
+                            key={review[index]?._id}
                             sx={{
                               display: "flex",
                               alignItems: "start",
@@ -628,9 +605,12 @@ export default function Product() {
                         <Rating
                           name="rating"
                           value={formData.rating}
-                          onChange={(e, newValue) =>
-                            setFormData({ ...formData, rating: newValue })
-                          }
+                          onChange={(event, newValue) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              rating: newValue,
+                            }));
+                          }}
                           sx={{ fontSize: "2rem" }}
                         />
 
