@@ -97,6 +97,11 @@
     font-size: 1.6rem;
     margin-top: 0.9rem;
     font-weight: 400;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
   }
 
   & > p {

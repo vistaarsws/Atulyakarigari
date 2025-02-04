@@ -1,4 +1,3 @@
-import CART from "../../../../assets/images/cart.svg";
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
@@ -9,21 +8,38 @@ import { login, logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 // import avatar from "../../../assets/images/avatar.svg";
 // import { useAuth } from "../../../../context/authToken";
-// import { Button } from "@mui/material";
+import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import { getCart, getProfile } from "../../../../services/user/userAPI";
-
+import {
+  getCart,
+  getProfile,
+  getUserWishlist,
+} from "../../../../services/user/userAPI";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { MenuItem } from "@mui/material";
+import Logout from "@mui/icons-material/Logout";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
-  const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const [wishlistData, setWishlistData] = useState([]);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    if (anchorEl) {
+      setAnchorEl(null); // Close the dropdown if it's already open
+    } else {
+      setAnchorEl(event.currentTarget); // Open the dropdown
+    }
+  };
 
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
 
@@ -55,6 +71,19 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   //     height: "1.5rem",
   //   },
   // }));
+
+  const fetchWishlistData = async () => {
+    try {
+      const response = await getUserWishlist();
+      setWishlistData(response?.data?.data?.wishlist);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchWishlistData();
+  }, []);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -101,7 +130,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1210) {
+      if (window.innerWidth < 849) {
         setIsMobileView(true);
         setIsNavVisible(false);
       } else {
@@ -243,10 +272,15 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   };
 
   const menuItems = [
+    { name: "My Profile", link: "/profile" },
     { name: "Wishlist", link: "/profile/wishlist" },
     { name: "Orders", link: "/profile/orders" },
     { name: "Address", link: "/profile/address" },
-    { name: "Logout", link: "/" },
+    {
+      name: "Logout",
+      link: "/",
+      icon: <Logout fontSize="small" />,
+    },
 
     // { name: "Contact Us", link: "/user/contact" },
     // { name: "Terms of use", link: "/user/terms" },
@@ -447,6 +481,25 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         {authToken && (
           <IconButton
             aria-label={notificationsLabel(100)}
+            onClick={() => navigate("/profile/wishlist")}
+          >
+            <Badge
+              badgeContent={wishlistData?.length}
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: "#b56f82",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                },
+              }}
+            >
+              <FavoriteIcon fontSize="large" sx={{ fill: "white" }} />
+            </Badge>
+          </IconButton>
+        )}
+        {authToken && (
+          <IconButton
+            aria-label={notificationsLabel(100)}
             onClick={() => navigate("/view-cart")}
           >
             <Badge
@@ -464,62 +517,87 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           </IconButton>
         )}
 
-        <div
-          className="profileBox"
-          onMouseEnter={() => setIsProfileHovered(true)}
-          onMouseLeave={() => setIsProfileHovered(false)}
-        >
-          {authToken ? (
-            // <img src={profileData?.profilePicture} alt="User Profile"  />
-            <Avatar
-              src={profileData?.profilePicture}
-              alt={profileData?.fullName}
-            />
-          ) : (
-            <Avatar src="/broken-image.jpg" />
-          )}
+        <div>
+          <Button
+            id="basic-button"
+            aria-controls={open ? "basic-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
+            <div className="profileBox">
+              {authToken ? (
+                <Avatar
+                  src={profileData?.profilePicture}
+                  alt={profileData?.fullName}
+                />
+              ) : (
+                <Avatar src="/broken-image.jpg" />
+              )}
 
-          {isProfileHovered && (
-            <div className="profile-dropdown">
-              {authToken && (
-                <div
+              {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
+            </div>
+          </Button>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            {authToken && (
+              <MenuItem>
+                <p>Hello, {profileData?.fullName}</p>
+              </MenuItem>
+            )}
+            {authToken ? (
+              <ul>
+                {menuItems.map((item, index) => (
+                  <MenuItem
+                    key={index}
+                    onClick={() => {
+                      logoutHandler(item.name);
+                      setAnchorEl(null);
+                      navigate(item.link);
+                    }}
+                  >
+                    {item.icon && (
+                      <ListItemIcon
+                        sx={{
+                          minWidth: "unset !important",
+                          marginRight: "0.5rem",
+                        }}
+                      >
+                        {item.icon}
+                      </ListItemIcon>
+                    )}
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </ul>
+            ) : (
+              <ul>
+                <MenuItem
                   onClick={() => {
-                    navigate("/profile");
-                    setIsProfileHovered(false);
+                    setAnchorEl(null);
+                    navigate("/login");
                   }}
                 >
-                  <p>Hello, {profileData?.fullName}</p>
-                  <p>My profile</p>
-                </div>
-              )}
-              {authToken ? (
-                <ul>
-                  {menuItems.map((item, index) => (
-                    <li key={index}>
-                      <Link
-                        onClick={() => {
-                          setIsProfileHovered(false);
-                          logoutHandler(item.name);
-                        }}
-                        to={item.link}
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <ul>
-                  <li>
-                    <Link to={"/login"}>Login</Link>
-                  </li>
-                  <li>
-                    <Link to={"/signup"}>Sign Up</Link>
-                  </li>
-                </ul>
-              )}
-            </div>
-          )}
+                  Login
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setAnchorEl(null);
+                    navigate("/signup");
+                  }}
+                >
+                  Sign Up
+                </MenuItem>
+              </ul>
+            )}
+          </Menu>
         </div>
       </div>
 

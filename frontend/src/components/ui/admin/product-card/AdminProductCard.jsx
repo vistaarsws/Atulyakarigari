@@ -49,8 +49,6 @@ export default function AdminProductCard({ products }) {
     const discount = params.data.fullProduct.discountPercentage;
     const effectivePrice = originalPrice - (originalPrice * discount) / 100;
 
-    
-
     return (
       <div
         style={{
@@ -120,8 +118,6 @@ export default function AdminProductCard({ products }) {
     const handleEdit = () => {
       setSelectedProduct(params.data.fullProduct);
       setOpen(true);
-
-      
     };
 
     const deleteProductHandler = async () => {
@@ -215,12 +211,12 @@ export default function AdminProductCard({ products }) {
             />
           </DialogContent>
           <DialogActions sx={{ padding: "0 2.4rem 2rem" }}>
-            <Button onClick={handleClose} variant="contained" color="error">
+            {/* <Button onClick={handleClose} variant="contained" color="error">
               Cancel
-            </Button>
-            <Button type="submit" variant="contained">
+            </Button> */}
+            {/* <Button type="submit" variant="contained">
               Submit
-            </Button>
+            </Button> */}
           </DialogActions>
         </Dialog>
       </Box>
