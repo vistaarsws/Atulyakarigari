@@ -5,7 +5,7 @@ import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHe
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { addToCart, getCart } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
 
@@ -28,7 +28,7 @@ function ProductCard({
   const addToCartHandler = async (productId = { id }, quantity) => {
     try {
       if (!authToken) {
-        console.error("No user profile token found"); 
+        console.error("No user profile token found");
         return;
       }
 
@@ -62,8 +62,6 @@ function ProductCard({
       console.log("Error fetching cart items:", err.message);
     }
   };
-  
-  
 
   useEffect(() => {
     checkIfInCart();
@@ -127,8 +125,12 @@ function ProductCard({
           <p>{shortDescription}</p>
           <div>
             <h2>{formatPrice(priceAfterDiscount)}</h2>
-            <strike>{formatPrice(price)}</strike>
-            <h4>(-{offer_inPercent}%)</h4>
+            {!offer_inPercent <= 0 && (
+              <>
+                <strike>{formatPrice(price)}</strike>
+                <h4>(-{offer_inPercent}%)</h4>
+              </>
+            )}
           </div>
         </article>
         <div className={`${isAddedToWishlist ? "wistListBtnStyle" : ""} `}>

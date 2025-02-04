@@ -9,24 +9,24 @@ export default function WishListHeartIcon({
 }) {
   const [wishlist, setWishlist] = useState(isWishlist);
 
-  useEffect(() => {
-    // Sync the local state when the parent component updates the `isWishlist` prop.
-    setWishlist(isWishlist);
-  }, [isWishlist]);
-
   const toggleWishlistHandler = async (e) => {
     e.stopPropagation(); // Prevents the click event from propagating.
     try {
       const updatedWishlist = !wishlist;
-      setWishlist(updatedWishlist); // Optimistically update the UI.
-      await toggleWishlistItem(productId); // Send the request to toggle the wishlist state in the backend.
+      setWishlist(updatedWishlist);
+      const tw = await toggleWishlistItem(productId);
+      console.log("TTTTTWWWWWW", tw);
       fetchWishlist();
     } catch (error) {
       console.error("Error toggling wishlist item:", error.message || error);
-      // Rollback the state in case of an error.
-      setWishlist(!wishlist);
+
+      setWishlist(false);
     }
   };
+
+  useEffect(() => {
+    setWishlist(isWishlist);
+  }, [isWishlist]);
 
   return (
     <>
