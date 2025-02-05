@@ -2,8 +2,13 @@ import PropTypes from "prop-types";
 import ProductCard from "../../../ui/cards/product-card/ProductCard";
 import pattern from "../../../../assets/images/designPattern_1.svg";
 import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
+import { useNavigate } from "react-router-dom";
 
 import "./ProductSection.css";
+import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import { getUserWishlist } from "../../../../services/user/userAPI";
 
 // Utility function to handle product fallbacks
 const formatProductData = (product) => ({
@@ -17,11 +22,79 @@ const formatProductData = (product) => ({
 });
 
 export default function ProductSection({ productCategorySection, bgColor }) {
-  const { title, subtitle, products } = productCategorySection;
+  const { title, subtitle, products, categoryId } = productCategorySection;
+  const userProfileToken = useSelector((state) => state.auth.token);
+  const [wishlist, setWishlist] = useState([]);
 
-  const productCards = products.map((product, index) => (
-    <ProductCard key={index} {...formatProductData(product)} />
-  ));
+  const getUserIdFromToken = useCallback(() => {
+    try {
+      if (!userProfileToken) {
+        toast.error("Please log in to view your wishlist.");
+        return null;
+      }
+
+      const decodedToken = jwtDecode(userProfileToken);
+      const userId = decodedToken?._id;
+
+      if (!userId) {
+        toast.error("Invalid user session.");
+        return null;
+      }
+
+      return userId;
+    } catch (error) {
+      console.error("Error decoding token:", error.message || error);
+      toast.error("Invalid user session.");
+      return null;
+    }
+  }, [userProfileToken]);
+
+  const fetchWishlistData = useCallback(async () => {
+    const userId = getUserIdFromToken();
+    if (!userId) return;
+
+    try {
+      const response = await getUserWishlist(userId);
+      const wishlistArray = response?.data?.data?.wishlist?.[0];
+
+      console.log("Wishlist Data:", wishlistArray);
+
+      if (response?.data?.success && wishlistArray?.items?.length > 0) {
+        setWishlist(wishlistArray.items);
+      } else {
+        setWishlist([]);
+      }
+    } catch (error) {
+      console.error("Error fetching wishlist data:", error.message || error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWishlistData();
+  }, [fetchWishlistData]);
+
+  const productCards = products.map((product, index) => {
+    // debugger;
+    console.log("p", product._id);
+    console.log("W", product._id);
+    console.log("p", product._id);
+    const isAddedToWishlist = wishlist.some((item) => item._id == product._id);
+
+    console.log("isAddedToWishlist", isAddedToWishlist);
+    return (
+      <ProductCard
+        key={index}
+        {...formatProductData(product)}
+        isAddedToWishlist={isAddedToWishlist}
+        // fetchWishlist={getWishlistData}
+      />
+    );
+  });
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/categories/${categoryId}`);
+  };
 
   return (
     <div
@@ -34,7 +107,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
         <img src={pattern} alt="Wing Pattern" />
       </figure>
       <div>
-        <button>View More &gt;</button>
+        <button onClick={handleNavigate}>View More &gt;</button>
       </div>
       <section>
         <div>
