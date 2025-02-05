@@ -20,6 +20,7 @@ import {
   Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useEffect, useRef } from "react";
 import { logEvent } from "../../../utils/analytics/analytics";
@@ -31,6 +32,7 @@ import { useState } from "react";
 import {
   getProductById,
   getReviewById,
+  deleteReview,
   createOrUpdateReview,
   getCart,
   addToCart,
@@ -157,7 +159,7 @@ export default function Product() {
         ...review,
         userName: review?.userName || "Anonymous",
         userImage: review?.userImage || review_person,
-      }));  
+      }));
 
       setRatingAndReview({ reviews: updatedReviews, averageRating });
     } catch (error) {
@@ -179,17 +181,17 @@ export default function Product() {
         console.error("Error: No user profile token found");
         return;
       }
-  
+
       const decodedToken = jwtDecode(authToken);
       const userId = decodedToken?._id;
       if (!userId) {
         console.error("Error: Invalid token structure");
         return;
       }
-  
+
       let { rating, comment } = formData;
       let response;
-  
+
       if (editingReviewId) {
         // Update review
         response = await createOrUpdateReview(productId, rating, comment);
@@ -197,9 +199,13 @@ export default function Product() {
         // Create new review
         response = await createOrUpdateReview(productId, rating, comment);
       }
-  
+
       if (response?.data?.success) {
-        alert(editingReviewId ? "Review updated successfully!" : "Review submitted successfully!");
+        alert(
+          editingReviewId
+            ? "Review updated successfully!"
+            : "Review submitted successfully!"
+        );
         fetchRatingAndReview();
         setFormData({ rating: 5, comment: "" });
         setEditingReviewId(null);
@@ -212,6 +218,38 @@ export default function Product() {
       setLoading(false);
     }
   };
+
+  // Handle deleting a review
+const handleDeleteReview = async (reviewId) => {
+  try {
+    if (!reviewId) {
+      console.error("Error: Review ID is required");
+      alert("Review ID is missing!");
+      return;
+    }
+
+    const confirmation = window.confirm(
+      "Are you sure you want to delete this review?"
+    );
+
+    if (!confirmation) return;
+
+    const response = await deleteReview(reviewId);
+
+    if (response?.success) {
+      alert("Review deleted successfully!");
+      // Optionally refetch reviews or update the UI to reflect the deletion
+      fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
+    } else {
+      console.error("Failed to delete review:", response);
+      alert("Failed to delete review. Please try again later.");
+    }
+  } catch (error) {
+    console.error("Unexpected error in handleDeleteReview:", error);
+    alert("An error occurred while deleting the review.");
+  }
+};
+
   
 
   // Toggle showing more reviews
@@ -474,7 +512,6 @@ export default function Product() {
                 <div className="reviews_section">
                   {ratingAndReview.reviews.length > 0 ? (
                     <>
-                      {/* Show only one review initially or all reviews */}
                       {ratingAndReview.reviews
                         .slice(
                           0,
@@ -492,7 +529,6 @@ export default function Product() {
                               borderRadius: "8px",
                             }}
                           >
-                            {/* User Avatar */}
                             <Avatar
                               alt={review.userName}
                               src={review.userImage || "/default-avatar.png"}
@@ -502,8 +538,6 @@ export default function Product() {
                                 marginBottom: "auto",
                               }}
                             />
-
-                            {/* Review Content */}
                             <Box sx={{ ml: 2, flex: 1 }}>
                               <Stack
                                 display="grid"
@@ -514,14 +548,11 @@ export default function Product() {
                                 justifyContent="start"
                                 spacing={1}
                               >
-                                {/* Rating */}
                                 <Rating
                                   name="read-only"
                                   value={review.rating}
                                   readOnly
                                 />
-
-                                {/* User Name */}
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
@@ -529,8 +560,6 @@ export default function Product() {
                                 >
                                   - {review.userName}
                                 </Typography>
-
-                                {/* Review Date */}
                                 <Typography
                                   sx={{
                                     margin: "0 !important",
@@ -543,36 +572,45 @@ export default function Product() {
                                   ).toLocaleDateString()}
                                 </Typography>
                               </Stack>
-
-                              {/* Review Comment */}
                               <Typography
                                 variant="body1"
-                                sx={{
-                                  mt: 1,
-                                  color: "#5d5c5c",
-                                }}
+                                sx={{ mt: 1, color: "#5d5c5c" }}
                               >
                                 {review.comment}
                                 {userReview &&
                                   review.userId === userReview.userId && (
-                                    <Button
-                                      onClick={() => handleEditReview(review)}
-                                      sx={{
-                                        marginLeft: "10px",
-                                        padding: "5px",
-                                        cursor: "pointer",
-                                      }}
-                                      startIcon={<EditIcon />}
-                                    >
-                                      Edit
-                                    </Button>
+                                    <>
+                                      <Button
+                                        onClick={() => handleEditReview(review)}
+                                        sx={{
+                                          marginLeft: "10px",
+                                          padding: "5px",
+                                          cursor: "pointer",
+                                        }}
+                                        startIcon={<EditIcon />}
+                                      >
+                                        Edit
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleDeleteReview(review._id)
+                                        }
+                                        sx={{
+                                          marginLeft: "10px",
+                                          padding: "5px",
+                                          cursor: "pointer",
+                                          color: "error.main",
+                                        }}
+                                        startIcon={<DeleteIcon />}
+                                      >
+                                        Delete
+                                      </Button>
+                                    </>
                                   )}
                               </Typography>
                             </Box>
                           </Box>
                         ))}
-
-                      {/* Toggle Button: View More / View Less */}
                       <Button
                         onClick={handleToggleReviews}
                         sx={{

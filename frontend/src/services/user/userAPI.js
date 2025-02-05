@@ -158,19 +158,23 @@ const updateAddress = async (id, newAddressDetails) => {
 
 const getReviewById = async (productId) => {
   try {
-    
     const response = await apiConnector(
-      "GET",`${user_endpoints.GET_RATING_BY_ID}${productId}`);
+      "GET",
+      `${user_endpoints.GET_RATING_BY_ID}${productId}`
+    );
     return response;
   } catch (error) {
     console.log("Error fetching reviews:", error);
   }
 };
 
-
 const createOrUpdateReview = async (productId, rating, comment) => {
   try {
-    const response = await apiConnector("POST", user_endpoints.CREATE_OR_UPDATE_RATING, { productId, rating, comment });
+    const response = await apiConnector(
+      "POST",
+      user_endpoints.CREATE_OR_UPDATE_RATING,
+      { productId, rating, comment }
+    );
     return response;
   } catch (error) {
     console.log(error);
@@ -180,12 +184,23 @@ const createOrUpdateReview = async (productId, rating, comment) => {
 
 const deleteReview = async (reviewId) => {
   try {
+    if (!reviewId) {
+      throw new Error("Review ID is required");
+    }
+
     const response = await apiConnector(
-      "DELETE",user_endpoints.DELETE_RATING,reviewId
+      "DELETE",
+      `${user_endpoints.DELETE_RATING}/${reviewId}`
     );
-    return response;
+
+    if (!response || response.status !== 200) {
+      throw new Error("Failed to delete review");
+    }
+
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Error in deleteReview:", error);
+    throw error; // Rethrow for higher-level handling
   }
 };
 
