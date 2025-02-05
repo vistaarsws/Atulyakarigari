@@ -80,7 +80,7 @@ const theme = createTheme({
 
 export default function Product() {
   let { id: productId } = useParams();
-  const [productQuantity, setProductQuantity] = useState(0);
+  const [productQuantity, setProductQuantity] = useState(1);
   const navigate = useNavigate();
 
   const [value, setValue] = useState(0);
@@ -115,7 +115,7 @@ export default function Product() {
   const authToken = useSelector((state) => state.auth.token);
   const [ratingAndReview, setRatingAndReview] = useState({
     reviews: [],
-    averageRating: "N/A",
+    averageRating: "0 ",
   });
   const [formData, setFormData] = useState({ rating: 5, comment: "" });
   const [userReview, setUserReview] = useState(null);
@@ -314,7 +314,7 @@ const handleDeleteReview = async (reviewId) => {
     setLoading(true);
 
     try {
-      isInCart ? await removeFromCart(productId) : await addToCart(productId);
+      isInCart ? await removeFromCart(productId) : await addToCart(productId, productQuantity);
       setIsInCart(!isInCart);
     } catch (error) {
       console.error("Error updating cart:", error);
@@ -322,6 +322,32 @@ const handleDeleteReview = async (reviewId) => {
       setLoading(false);
     }
   };
+
+  // buy now button
+  const handleBuyToggle = (productId) => {
+    navigate("/place-order", { state: { productId, productQuantity } });
+  };
+
+  // START Share Product
+  
+    const productUrl = `${window.location.origin}/product/${productId}`;
+    
+    const handleNativeShare = async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: product?.name,
+            text: `Check out this product: ${product?.name}`,
+            url: productUrl,
+          });
+        } catch (error) {
+          console.error("Error sharing:", error);
+        }
+      } else {
+        alert("Sharing not supported in this browser.");
+      }
+    };
+  // END Share Product
 
   return (
     <ThemeProvider theme={theme}>
@@ -346,7 +372,7 @@ const handleDeleteReview = async (reviewId) => {
               <h1>{product?.name}</h1>
               <div>
                 <WishListHeartIcon productId={product?._id} />
-                <figure>
+                <figure onClick={handleNativeShare} style={{ cursor: "pointer" }}>
                   <img src={share} alt="Share" />
                 </figure>
               </div>
@@ -362,13 +388,17 @@ const handleDeleteReview = async (reviewId) => {
                       (product?.price * product?.discountPercentage) / 100
                     ).toFixed() || "N/A"}
                   </h2>
-                  <strike>₹{product?.price || "N/A"}</strike>
-                  <h4>(-{product?.discountPercentage || 0}%)</h4>
+                  {product?.discountPercentage > 0 && (
+                    <>
+                      <strike>₹{product?.price || "N/A"}</strike>
+                      <h4>(-{product?.discountPercentage}%)</h4>
+                    </>
+                  )}
                 </div>
 
                 <div className="ratingBox">
                   <div>
-                    <span>{ratingAndReview.averageRating}</span>
+                  <span>{ratingAndReview?.averageRating}</span>
                     <img src={star} alt="Star" />
                   </div>
                   <div>{ratingAndReview.reviews.length} Ratings</div>
@@ -430,7 +460,9 @@ const handleDeleteReview = async (reviewId) => {
                 </button>
               </div>
               <div>
-                <button onClick={() => navigate("/buy-now")}>Buy Now</button>
+                <button onClick={() => handleBuyToggle(productId)}>
+                  Buy Now
+                </button>
               </div>
               <div>
                 <button onClick={handleCartToggle} disabled={loading}>

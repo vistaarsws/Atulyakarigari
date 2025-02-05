@@ -1,11 +1,59 @@
-import React from "react";
-import Progress from "../view-cart/Stepper";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 import { Box, useMediaQuery } from "@mui/material";
+import Progress from "../view-cart/Stepper";
 import DeliveryEstimate from "./DeliveryEstimate";
 import AddressUI from "../profile/address/Address";
 import Payment from "../view-cart/Payment";
+import { getCart, getProductById } from "../../../services/user/userAPI"; // Import product fetch function
+
 const PlaceOrder = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
+  const authToken = useSelector((state) => state.auth.token);
+  const location = useLocation();
+  const productId = location.state?.productId; // Get productId if coming from "Buy Now"
+  const productQuantity = location.state?.productQuantity; // Get product quantity if coming from "Buy Now"
+
+  const [cartData, setCartData] = useState(null);
+
+  const fetchOrderData = async () => {
+    try {
+      if (!authToken) {
+        console.error("No user token found");
+        return;
+      }
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+
+      if (productId) {
+        const response = await getProductById(productId);
+        const rate = {
+          items : productQuantity,
+          totalMRP :(response?.data?.data?.priceAfterDiscount * productQuantity),
+          totalDiscount :((response?.data?.data?.price - response?.data?.data?.priceAfterDiscount) * productQuantity),
+          total : (response?.data?.data?.priceAfterDiscount * productQuantity),
+
+        }
+        console.log("Rate Data:", rate);
+        setCartData(rate);
+      } else {
+        const response = await getCart();
+        setCartData(response?.data?.data);
+      }
+    } catch (err) {
+      console.log("Error fetching order data:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrderData();
+  }, [authToken, productId]);
+
   return (
     <Box>
       <Progress />
@@ -31,7 +79,7 @@ const PlaceOrder = () => {
           }}
         >
           <DeliveryEstimate />
-          <Payment />
+          <Payment cartData={cartData}/>
         </Box>
       </Box>
     </Box>
