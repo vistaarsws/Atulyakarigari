@@ -16,28 +16,15 @@ function ProductCard({
   price = 0,
   offer_inPercent = 0,
   id = "",
-  isAddedToWishlist = false,
   priceAfterDiscount = price,
-  fetchWishlist,
+  isAddedToWishlist,
+  // fetchWishlist,
 }) {
   const [isHover, setIsHover] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
-  const authToken = useSelector((state) => state.auth.token);
-
   const addToCartHandler = async (productId = { id }, quantity) => {
     try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
       await addToCart(productId, quantity);
       setIsInCart(true);
     } catch (err) {
@@ -109,7 +96,7 @@ function ProductCard({
             <WishListHeartIcon
               productId={id}
               isWishlist={isAddedToWishlist}
-              fetchWishlist={fetchWishlist}
+              // fetchWishlist={fetchWishlist}
             />
           </div>
         </section>
