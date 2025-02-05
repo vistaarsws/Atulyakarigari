@@ -11,10 +11,12 @@ import CategoryView from "../../../components/layout/user/category-view/Category
 import { useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const [getAllCategories, setGetAllCategories] = useState([]);
+  const navigate = useNavigate();
 
   const fetchCategoriesData = async () => {
     try {
@@ -29,6 +31,15 @@ export default function Home() {
   useEffect(() => {
     fetchCategoriesData();
   }, []);
+
+  const handleShopNow = () => {
+    navigate(`/categories/6799c7d3464f0c78506ba778`); // Redirect to category page
+  };
+  const handleExploreNow = () => {
+    navigate(`/categories/6799c7eb464f0c78506ba77c`); // Redirect to category
+  };
+
+
 
   return (
     <>
@@ -91,7 +102,7 @@ export default function Home() {
                         your everyday life. Explore our curated collections and
                         embrace the elegance of true artistry.
                       </p>
-                      <button>Explore Now</button>
+                      <button onClick={handleExploreNow}>Explore Now</button>
                     </article>
                   </section>
                 )}
@@ -235,7 +246,7 @@ export default function Home() {
                 long-term satisfaction. It&apos;s time to consider the value and
                 quality elegance.
               </em>
-              <button>Shop Now</button>
+              <button onClick={handleShopNow}>Shop Now</button>
             </div>
           </div>
         </article>
