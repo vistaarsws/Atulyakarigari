@@ -20,6 +20,7 @@ import {
   Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useEffect, useRef } from "react";
 import { logEvent } from "../../../utils/analytics/analytics";
@@ -30,7 +31,8 @@ import { useState } from "react";
 // import ProductSection from "../../../components/layout/user/product-section/ProductSection";
 import {
   getProductById,
-  getReview,
+  getReviewById,
+  deleteReview,
   createOrUpdateReview,
   getCart,
   addToCart,
@@ -134,28 +136,18 @@ export default function Product() {
         return;
       }
 
-      const response = await getReview(productId);
+      const response = await getReviewById(productId);
 
-      if (
-        !response ||
-        !response.data ||
-        !response.data.data ||
-        !response.data.data.reviews
-      ) {
-        console.error("Error: Failed to fetch reviews", response);
-        return;
-      }
-
-      const reviews = response.data.data.reviews;
+      const reviews = response?.data?.data?.reviews;
 
       const existingReview = reviews.find(
-        (review) => review.userId === decodedToken._id
+        (review) => review?.userId === decodedToken?._id
       );
       if (existingReview) {
         setUserReview(existingReview);
       }
 
-      const totalReviews = reviews.length;
+      const totalReviews = reviews?.length;
       const totalRating =
         totalReviews > 0
           ? reviews.reduce((sum, review) => sum + review.rating, 0)
@@ -183,7 +175,7 @@ export default function Product() {
   // Handle review submission (create or update)
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       if (!authToken) {
         console.error("Error: No user profile token found");
@@ -191,48 +183,74 @@ export default function Product() {
       }
 
       const decodedToken = jwtDecode(authToken);
-      if (!decodedToken || !decodedToken._id) {
+      const userId = decodedToken?._id;
+      if (!userId) {
         console.error("Error: Invalid token structure");
         return;
       }
 
-      const reviewData = {
-        productId,
-        comment: formData.comment,
-        rating: formData.rating,
-      };
-
+      let { rating, comment } = formData;
       let response;
+
       if (editingReviewId) {
-        // Update review if user has already commented
-        response = await createOrUpdateReview(productId, {
-          comment: formData.comment,
-          rating: formData.rating,
-        });
+        // Update review
+        response = await createOrUpdateReview(productId, rating, comment);
       } else {
-        // Create new review if user has not commented yet
-        response = await createOrUpdateReview(productId, {
-          comment: formData.comment,
-          rating: formData.rating,
-        });
+        // Create new review
+        response = await createOrUpdateReview(productId, rating, comment);
       }
 
-      if (response && response.data && response.data.success) {
+      if (response?.data?.success) {
         alert(
           editingReviewId
             ? "Review updated successfully!"
             : "Review submitted successfully!"
         );
-        fetchRatingAndReview(); // Refresh the reviews after submission or update
-        setFormData({ rating: 5, comment: "" }); // Reset form fields
-        setEditingReviewId(null); // Reset editing state
+        fetchRatingAndReview();
+        setFormData({ rating: 5, comment: "" });
+        setEditingReviewId(null);
       } else {
         console.error("Error submitting review:", response);
       }
     } catch (error) {
       console.error("Unexpected error in handleSubmit:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Handle deleting a review
+const handleDeleteReview = async (reviewId) => {
+  try {
+    if (!reviewId) {
+      console.error("Error: Review ID is required");
+      alert("Review ID is missing!");
+      return;
+    }
+
+    const confirmation = window.confirm(
+      "Are you sure you want to delete this review?"
+    );
+
+    if (!confirmation) return;
+
+    const response = await deleteReview(reviewId);
+
+    if (response?.success) {
+      alert("Review deleted successfully!");
+      // Optionally refetch reviews or update the UI to reflect the deletion
+      fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
+    } else {
+      console.error("Failed to delete review:", response);
+      alert("Failed to delete review. Please try again later.");
+    }
+  } catch (error) {
+    console.error("Unexpected error in handleDeleteReview:", error);
+    alert("An error occurred while deleting the review.");
+  }
+};
+
+  
 
   // Toggle showing more reviews
   const handleToggleReviews = () => {
@@ -241,11 +259,8 @@ export default function Product() {
 
   // Handle editing a review (pre-fill the form)
   const handleEditReview = (review) => {
-    setFormData({
-      rating: review.rating, // set the review's rating
-      comment: review.comment, // set the review's comment
-    });
-    setEditingReviewId(review.id); // set the editing review ID
+    setFormData({ rating: review.rating, comment: review.comment });
+    setEditingReviewId(review._id || review.id);
   };
 
   // Fetch reviews on component mount
@@ -370,7 +385,7 @@ export default function Product() {
                       style={{
                         appearance: "textfield",
                         MozAppearance: "textfield",
-                        WebkitAppearance: "none", 
+                        WebkitAppearance: "none",
                       }}
                     />
                   </div>
@@ -497,15 +512,14 @@ export default function Product() {
                 <div className="reviews_section">
                   {ratingAndReview.reviews.length > 0 ? (
                     <>
-                      {/* Show only one review initially or all reviews */}
                       {ratingAndReview.reviews
                         .slice(
                           0,
                           showAllReviews ? ratingAndReview.reviews.length : 1
                         )
-                        .map((review) => (
+                        .map((review, index) => (
                           <Box
-                            key={review._id}
+                            key={review[index]?._id}
                             sx={{
                               display: "flex",
                               alignItems: "start",
@@ -515,7 +529,6 @@ export default function Product() {
                               borderRadius: "8px",
                             }}
                           >
-                            {/* User Avatar */}
                             <Avatar
                               alt={review.userName}
                               src={review.userImage || "/default-avatar.png"}
@@ -525,8 +538,6 @@ export default function Product() {
                                 marginBottom: "auto",
                               }}
                             />
-
-                            {/* Review Content */}
                             <Box sx={{ ml: 2, flex: 1 }}>
                               <Stack
                                 display="grid"
@@ -537,14 +548,11 @@ export default function Product() {
                                 justifyContent="start"
                                 spacing={1}
                               >
-                                {/* Rating */}
                                 <Rating
                                   name="read-only"
                                   value={review.rating}
                                   readOnly
                                 />
-
-                                {/* User Name */}
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
@@ -552,8 +560,6 @@ export default function Product() {
                                 >
                                   - {review.userName}
                                 </Typography>
-
-                                {/* Review Date */}
                                 <Typography
                                   sx={{
                                     margin: "0 !important",
@@ -566,36 +572,45 @@ export default function Product() {
                                   ).toLocaleDateString()}
                                 </Typography>
                               </Stack>
-
-                              {/* Review Comment */}
                               <Typography
                                 variant="body1"
-                                sx={{
-                                  mt: 1,
-                                  color: "#5d5c5c",
-                                }}
+                                sx={{ mt: 1, color: "#5d5c5c" }}
                               >
                                 {review.comment}
                                 {userReview &&
                                   review.userId === userReview.userId && (
-                                    <Button
-                                      onClick={() => handleEditReview(review)}
-                                      sx={{
-                                        marginLeft: "10px",
-                                        padding: "5px",
-                                        cursor: "pointer",
-                                      }}
-                                      startIcon={<EditIcon />}
-                                    >
-                                      Edit
-                                    </Button>
+                                    <>
+                                      <Button
+                                        onClick={() => handleEditReview(review)}
+                                        sx={{
+                                          marginLeft: "10px",
+                                          padding: "5px",
+                                          cursor: "pointer",
+                                        }}
+                                        startIcon={<EditIcon />}
+                                      >
+                                        Edit
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleDeleteReview(review._id)
+                                        }
+                                        sx={{
+                                          marginLeft: "10px",
+                                          padding: "5px",
+                                          cursor: "pointer",
+                                          color: "error.main",
+                                        }}
+                                        startIcon={<DeleteIcon />}
+                                      >
+                                        Delete
+                                      </Button>
+                                    </>
                                   )}
                               </Typography>
                             </Box>
                           </Box>
                         ))}
-
-                      {/* Toggle Button: View More / View Less */}
                       <Button
                         onClick={handleToggleReviews}
                         sx={{
@@ -628,9 +643,12 @@ export default function Product() {
                         <Rating
                           name="rating"
                           value={formData.rating}
-                          onChange={(e, newValue) =>
-                            setFormData({ ...formData, rating: newValue })
-                          }
+                          onChange={(event, newValue) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              rating: newValue,
+                            }));
+                          }}
                           sx={{ fontSize: "2rem" }}
                         />
 
