@@ -2,12 +2,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import ProductView from "../../../components/layout/user/product-view/ProductView";
 import share from "../../../assets/images/share.svg";
 import star from "../../../assets/images/reviewStar.svg";
-import { HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb } from "antd";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import PropTypes from "prop-types";
-import about_artisan from "../../../assets/images/about_artisan.png";
 import review_person from "../../../assets/images/reviewPerson.png";
 import {
   Avatar,
@@ -18,20 +16,30 @@ import {
   useMediaQuery,
   createTheme,
   ThemeProvider,
+  TextField,
+  Button,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 import { useEffect, useRef } from "react";
 import { logEvent } from "../../../utils/analytics/analytics";
 
 import "./Product.css";
 import WishListHeartIcon from "../../../components/ui/micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useState } from "react";
-import ProductSection from "../../../components/layout/user/product-section/ProductSection";
-import cat5_1 from "../../../assets/images/cat5_1.png";
-import cat5_2 from "../../../assets/images/cat5_2.png";
-import cat5_3 from "../../../assets/images/cat5_3.png";
-import cat5_4 from "../../../assets/images/cat5_4.png";
-import cat5_5 from "../../../assets/images/cat5_5.png";
-import { getProductById } from "../../../../src/services/user/userAPI";
+// import ProductSection from "../../../components/layout/user/product-section/ProductSection";
+import {
+  getProductById,
+  getReviewById,
+  deleteReview,
+  createOrUpdateReview,
+  getCart,
+  addToCart,
+  removeFromCart,
+} from "../../../../src/services/user/userAPI";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 // ----------------------------------------------------------------------------------------
 function CustomTabPanel(props) {
@@ -72,7 +80,7 @@ const theme = createTheme({
 
 export default function Product() {
   let { id: productId } = useParams();
-  const [productQuantity, setProductQuantity] = useState(0);
+  const [productQuantity, setProductQuantity] = useState(1);
   const navigate = useNavigate();
 
   const [value, setValue] = useState(0);
@@ -80,132 +88,6 @@ export default function Product() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  const breadcrumbItems = [
-    // { title: "Home", href: "/" },
-    { title: "Banarsi Silk ", href: "/categories" },
-    { title: "Banarasi Nikhaar", href: "/categories" },
-  ];
-
-  const items = breadcrumbItems.map((item, index) => ({
-    title:
-      index === breadcrumbItems.length - 1 ? (
-        <span style={{ color: "#1890ff" }}>{item.title}</span> // Highlight the last item
-      ) : (
-        item.title
-      ),
-    href: item.href,
-  }));
-
-  // const product_description = {
-  //   properties: [
-  //     { type: "Occasion", value: "Festive/ Party/ Corporate" },
-  //     { type: "Saree Length", value: "5.50 meter" },
-  //     { type: "Fabric Care", value: "Dry clean only" },
-  //     { type: "Colour", value: "Red (Sindoor)" },
-  //     { type: "Fabric", value: "Pure Raw Silk" },
-  //     { type: "Style", value: "Floral pattern with gota patti pallu" },
-  //     { type: "Type", value: "Pure Silk" },
-  //     { type: "Weight", value: "500 gm" },
-  //     // { type: "Blouse", value: "1 Meter unstitched blouse fabric" },
-  //     // { type: "Dimensions", value: "35.56 × 6.35 × 35.56 cm" },
-  //   ],
-  // };
-  // const similar_product = {
-  //   title: "Similar Products",
-  //   subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
-  //   products: [
-  //     {
-  //       key: "1",
-  //       title: "Kashi Kalaa",
-  //       picture: cat5_1,
-  //       price: 2000.0,
-  //     },
-  //     {
-  //       key: "2",
-  //       title: "Kashi Kalaa",
-  //       picture: cat5_2,
-  //       price: 4000.0,
-  //     },
-  //     {
-  //       key: "3",
-  //       title: "Silken Splendor",
-  //       picture: cat5_3,
-  //       price: 2000.0,
-  //     },
-  //     {
-  //       key: "4",
-  //       title: "Silken Splendor",
-  //       picture: cat5_4,
-  //       price: 6000.0,
-  //     },
-  //     {
-  //       key: "5",
-  //       title: "Silken Splendor",
-  //       picture: cat5_5,
-  //       price: 3000.0,
-  //     },
-  //     {
-  //       key: "6",
-  //       title: "Silken Splendor",
-  //       picture: cat5_1,
-  //       price: 12000,
-  //     },
-  //     {
-  //       key: "7",
-  //       title: "Silken Splendor",
-  //       picture: cat5_2,
-  //       price: 12000,
-  //     },
-  //   ],
-  // };
-  // const you_may_also_like = {
-  //   title: "You May Also Like",
-  //   subtitle: "Bringing tradition to life: Explore handcrafted wonders.",
-  //   products: [
-  //     {
-  //       key: "1",
-  //       title: "Kashi Kalaa",
-  //       picture: cat5_1,
-  //       price: 2000.0,
-  //     },
-  //     {
-  //       key: "2",
-  //       title: "Kashi Kalaa",
-  //       picture: cat5_2,
-  //       price: 4000.0,
-  //     },
-  //     {
-  //       key: "3",
-  //       title: "Silken Splendor",
-  //       picture: cat5_3,
-  //       price: 2000.0,
-  //     },
-  //     {
-  //       key: "4",
-  //       title: "Silken Splendor",
-  //       picture: cat5_4,
-  //       price: 6000.0,
-  //     },
-  //     {
-  //       key: "5",
-  //       title: "Silken Splendor",
-  //       picture: cat5_5,
-  //       price: 3000.0,
-  //     },
-  //     {
-  //       key: "6",
-  //       title: "Silken Splendor",
-  //       picture: cat5_1,
-  //       price: 12000,
-  //     },
-  //     {
-  //       key: "7",
-  //       title: "Silken Splendor",
-  //       picture: cat5_2,
-  //       price: 12000,
-  //     },
-  //   ],
-  // };
 
   const startTime = useRef(null); // Track when the user enters the page
   const [product, setProduct] = useState(null);
@@ -225,9 +107,247 @@ export default function Product() {
 
       // Log to analytics
       logEvent("Product", "Time Spent", productId, timeSpent);
-      // console.log(`User spent ${timeSpent} seconds on product ${productId}`);
     };
   }, [productId]); // Track changes to the product ID in case the route changes
+
+  // RATING AND REVIEW START //
+
+  const authToken = useSelector((state) => state.auth.token);
+  const [ratingAndReview, setRatingAndReview] = useState({
+    reviews: [],
+    averageRating: "0 ",
+  });
+  const [formData, setFormData] = useState({ rating: 5, comment: "" });
+  const [userReview, setUserReview] = useState(null);
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  // Fetch reviews and update the state
+  const fetchRatingAndReview = async () => {
+    try {
+      if (!authToken) {
+        console.error("Error: No user profile token found");
+        return;
+      }
+
+      const decodedToken = jwtDecode(authToken);
+      if (!decodedToken || !decodedToken._id) {
+        console.error("Error: Invalid token structure");
+        return;
+      }
+
+      const response = await getReviewById(productId);
+
+      const reviews = response?.data?.data?.reviews;
+
+      const existingReview = reviews.find(
+        (review) => review?.userId === decodedToken?._id
+      );
+      if (existingReview) {
+        setUserReview(existingReview);
+      }
+
+      const totalReviews = reviews?.length;
+      const totalRating =
+        totalReviews > 0
+          ? reviews.reduce((sum, review) => sum + review.rating, 0)
+          : 0;
+      const averageRating =
+        totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : "N/A";
+
+      const updatedReviews = reviews.map((review) => ({
+        ...review,
+        userName: review?.userName || "Anonymous",
+        userImage: review?.userImage || review_person,
+      }));
+
+      setRatingAndReview({ reviews: updatedReviews, averageRating });
+    } catch (error) {
+      console.error("Unexpected error in fetchRatingAndReview:", error);
+    }
+  };
+
+  // Handle changes in the review form fields
+  const handleChangeReview = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle review submission (create or update)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (!authToken) {
+        console.error("Error: No user profile token found");
+        return;
+      }
+
+      const decodedToken = jwtDecode(authToken);
+      const userId = decodedToken?._id;
+      if (!userId) {
+        console.error("Error: Invalid token structure");
+        return;
+      }
+
+      let { rating, comment } = formData;
+      let response;
+
+      if (editingReviewId) {
+        // Update review
+        response = await createOrUpdateReview(productId, rating, comment);
+      } else {
+        // Create new review
+        response = await createOrUpdateReview(productId, rating, comment);
+      }
+
+      if (response?.data?.success) {
+        alert(
+          editingReviewId
+            ? "Review updated successfully!"
+            : "Review submitted successfully!"
+        );
+        fetchRatingAndReview();
+        setFormData({ rating: 5, comment: "" });
+        setEditingReviewId(null);
+      } else {
+        console.error("Error submitting review:", response);
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleSubmit:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle deleting a review
+const handleDeleteReview = async (reviewId) => {
+  try {
+    if (!reviewId) {
+      console.error("Error: Review ID is required");
+      alert("Review ID is missing!");
+      return;
+    }
+
+    const confirmation = window.confirm(
+      "Are you sure you want to delete this review?"
+    );
+
+    if (!confirmation) return;
+
+    const response = await deleteReview(reviewId);
+
+    if (response?.success) {
+      alert("Review deleted successfully!");
+      // Optionally refetch reviews or update the UI to reflect the deletion
+      fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
+    } else {
+      console.error("Failed to delete review:", response);
+      alert("Failed to delete review. Please try again later.");
+    }
+  } catch (error) {
+    console.error("Unexpected error in handleDeleteReview:", error);
+    alert("An error occurred while deleting the review.");
+  }
+};
+
+  
+
+  // Toggle showing more reviews
+  const handleToggleReviews = () => {
+    setShowAllReviews(!showAllReviews);
+  };
+
+  // Handle editing a review (pre-fill the form)
+  const handleEditReview = (review) => {
+    setFormData({ rating: review.rating, comment: review.comment });
+    setEditingReviewId(review._id || review.id);
+  };
+
+  // Fetch reviews on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!authToken) {
+        console.error("Error: No user profile token found");
+        return;
+      }
+
+      const decodedToken = jwtDecode(authToken);
+      if (!decodedToken || !decodedToken._id) {
+        console.error("Error: Invalid token structure");
+        return;
+      }
+
+      await fetchRatingAndReview();
+    };
+
+    fetchData();
+  }, []);
+
+  // // Fetch reviews on component mount
+  // useEffect(() => {
+  //   fetchRatingAndReview();
+  // }, []);
+
+  // RATING AND REVIEW END //
+
+  const [isInCart, setIsInCart] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const checkIfProductInCart = async () => {
+    try {
+      const cart = await getCart();
+      const items = cart?.data?.data?.items;
+
+      const productInCart = items.some((item) => item.productId === productId);
+      setIsInCart(productInCart);
+    } catch (error) {
+      console.error("Error checking cart status:", error);
+    }
+  };
+
+  useEffect(() => {
+    checkIfProductInCart();
+  }, [productId]);
+
+  const handleCartToggle = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      isInCart ? await removeFromCart(productId) : await addToCart(productId, productQuantity);
+      setIsInCart(!isInCart);
+    } catch (error) {
+      console.error("Error updating cart:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // buy now button
+  const handleBuyToggle = (productId) => {
+    navigate("/place-order", { state: { productId, productQuantity } });
+  };
+
+  // START Share Product
+  
+    const productUrl = `${window.location.origin}/product/${productId}`;
+    
+    const handleNativeShare = async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: product?.name,
+            text: `Check out this product: ${product?.name}`,
+            url: productUrl,
+          });
+        } catch (error) {
+          console.error("Error sharing:", error);
+        }
+      } else {
+        alert("Sharing not supported in this browser.");
+      }
+    };
+  // END Share Product
 
   return (
     <ThemeProvider theme={theme}>
@@ -252,7 +372,7 @@ export default function Product() {
               <h1>{product?.name}</h1>
               <div>
                 <WishListHeartIcon productId={product?._id} />
-                <figure>
+                <figure onClick={handleNativeShare} style={{ cursor: "pointer" }}>
                   <img src={share} alt="Share" />
                 </figure>
               </div>
@@ -268,23 +388,35 @@ export default function Product() {
                       (product?.price * product?.discountPercentage) / 100
                     ).toFixed() || "N/A"}
                   </h2>
-                  <strike>₹{product?.price || "N/A"}</strike>
-                  <h4>(-{product?.discountPercentage || 0}%)</h4>
+                  {product?.discountPercentage > 0 && (
+                    <>
+                      <strike>₹{product?.price || "N/A"}</strike>
+                      <h4>(-{product?.discountPercentage}%)</h4>
+                    </>
+                  )}
                 </div>
 
                 <div className="ratingBox">
                   <div>
-                    <span>4</span> <img src={star} alt="Star" />
+                  <span>{ratingAndReview?.averageRating}</span>
+                    <img src={star} alt="Star" />
                   </div>
-                  <div>161 Rating</div>
+                  <div>{ratingAndReview.reviews.length} Ratings</div>
                 </div>
                 <div className="pincodeBox">
                   <div>
                     <input
-                      type="number"
+                      type="text" //
                       name="pincode"
                       id="pincode"
+                      inputMode="numeric"
+                      pattern="[0-6]*"
                       placeholder="Enter Pincode"
+                      style={{
+                        appearance: "textfield",
+                        MozAppearance: "textfield",
+                        WebkitAppearance: "none",
+                      }}
                     />
                   </div>
                   <div>
@@ -328,11 +460,13 @@ export default function Product() {
                 </button>
               </div>
               <div>
-                <button onClick={() => navigate("/buy-now")}>Buy Now</button>
+                <button onClick={() => handleBuyToggle(productId)}>
+                  Buy Now
+                </button>
               </div>
               <div>
-                <button onClick={() => navigate("/buy-now")}>
-                  Add To Cart
+                <button onClick={handleCartToggle} disabled={loading}>
+                  {isInCart ? "Remove From Cart" : "Add to Cart"}
                 </button>
               </div>
             </article>
@@ -354,11 +488,6 @@ export default function Product() {
                   className="Product_tab_items"
                   textColor="secondary"
                   indicatorColor="secondary"
-                  // sx={{
-                  //   // "& .MuiTab-root": { color: "red" }, // Unselected tab text color
-                  //   "& .Mui-selected": { color: "#6d001d" }, // Selected tab text color
-                  //   "& .MuiTabs-indicator": { backgroundColor: "#6d001d" }, // Indicator color
-                  // }}
                 >
                   <Tab label="About Artisan" {...a11yProps(0)} />
                   <Tab label="Detail Description" {...a11yProps(1)} />
@@ -410,69 +539,175 @@ export default function Product() {
                   </ul>
                 </div>
               </CustomTabPanel>
+
               <CustomTabPanel value={value} index={2}>
                 <div className="reviews_section">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "start",
-                      borderBottom: "1px solid #e0e0e0",
-
-                      width: "100%",
-                    }}
-                  >
-                    <Avatar
-                      alt="Priya Sharma"
-                      src={review_person}
-                      sx={{ width: 56, height: 56, marginBottom: "auto" }}
-                    />
-
-                    <Box sx={{ ml: 2, flex: 1 }}>
-                      <Stack
-                        display="grid"
-                        marginTop="1rem"
-                        gridTemplateColumns="1fr 1fr "
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="start"
-                        spacing={1}
+                  {ratingAndReview.reviews.length > 0 ? (
+                    <>
+                      {ratingAndReview.reviews
+                        .slice(
+                          0,
+                          showAllReviews ? ratingAndReview.reviews.length : 1
+                        )
+                        .map((review, index) => (
+                          <Box
+                            key={review[index]?._id}
+                            sx={{
+                              display: "flex",
+                              alignItems: "start",
+                              borderBottom: "1px solid #e0e0e0",
+                              width: "100%",
+                              padding: "1rem",
+                              borderRadius: "8px",
+                            }}
+                          >
+                            <Avatar
+                              alt={review.userName}
+                              src={review.userImage || "/default-avatar.png"}
+                              sx={{
+                                width: 56,
+                                height: 56,
+                                marginBottom: "auto",
+                              }}
+                            />
+                            <Box sx={{ ml: 2, flex: 1 }}>
+                              <Stack
+                                display="grid"
+                                marginTop="1rem"
+                                gridTemplateColumns="1fr 1fr"
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="start"
+                                spacing={1}
+                              >
+                                <Rating
+                                  name="read-only"
+                                  value={review.rating}
+                                  readOnly
+                                />
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ fontSize: "1.2rem" }}
+                                >
+                                  - {review.userName}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    margin: "0 !important",
+                                    textAlign: "right",
+                                    fontSize: "1.2rem !important",
+                                  }}
+                                >
+                                  {new Date(
+                                    review.createdAt
+                                  ).toLocaleDateString()}
+                                </Typography>
+                              </Stack>
+                              <Typography
+                                variant="body1"
+                                sx={{ mt: 1, color: "#5d5c5c" }}
+                              >
+                                {review.comment}
+                                {userReview &&
+                                  review.userId === userReview.userId && (
+                                    <>
+                                      <Button
+                                        onClick={() => handleEditReview(review)}
+                                        sx={{
+                                          marginLeft: "10px",
+                                          padding: "5px",
+                                          cursor: "pointer",
+                                        }}
+                                        startIcon={<EditIcon />}
+                                      >
+                                        Edit
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleDeleteReview(review._id)
+                                        }
+                                        sx={{
+                                          marginLeft: "10px",
+                                          padding: "5px",
+                                          cursor: "pointer",
+                                          color: "error.main",
+                                        }}
+                                        startIcon={<DeleteIcon />}
+                                      >
+                                        Delete
+                                      </Button>
+                                    </>
+                                  )}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        ))}
+                      <Button
+                        onClick={handleToggleReviews}
+                        sx={{
+                          display: "block",
+                          margin: "1rem auto",
+                          color: "primary.main",
+                          textTransform: "none",
+                        }}
                       >
-                        <Rating name="read-only" value={5} readOnly />
-                        <div></div>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: "1.2rem",
-                            marginLeft: "0rem !important",
-                          }}
-                        >
-                          - Priya Sharma
-                        </Typography>
+                        {showAllReviews ? "View Less" : "View More"}
+                      </Button>
+                    </>
+                  ) : (
+                    <Typography
+                      variant="body1"
+                      sx={{ textAlign: "center", mt: 2 }}
+                    >
+                      No reviews yet.
+                    </Typography>
+                  )}
 
-                        <Typography
-                          sx={{
-                            margin: "0 !important",
-                            textAlign: "right",
-                            fontSize: "1.2rem !important",
+                  {/* Review Form Section */}
+                  <Box sx={{ mt: 4 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      {editingReviewId ? "Edit Your Review" : "Leave a Review"}
+                    </Typography>
+                    <form onSubmit={handleSubmit}>
+                      <Stack spacing={2}>
+                        {/* Rating Input */}
+                        <Rating
+                          name="rating"
+                          value={formData.rating}
+                          onChange={(event, newValue) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              rating: newValue,
+                            }));
                           }}
+                          sx={{ fontSize: "2rem" }}
+                        />
+
+                        <TextField
+                          name="comment"
+                          label="Your Review"
+                          variant="outlined"
+                          value={formData.comment} // This value gets updated when user clicks edit
+                          onChange={handleChangeReview}
+                          multiline
+                          rows={4}
+                          fullWidth
+                          placeholder="Your review here..." // Placeholder text for the input field
+                          sx={{ marginBottom: "1rem" }}
+                        />
+
+                        {/* Submit Button */}
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          disabled={loading}
                         >
-                          30-09-2024
-                        </Typography>
+                          {editingReviewId ? "Update Review" : "Submit Review"}
+                        </Button>
                       </Stack>
-
-                      <Typography
-                        variant="body1"
-                        sx={{ mt: 1, color: "#5d5c5c" }}
-                      >
-                        Wearing a Banarsi sari feels like draping a piece of
-                        heritage. The craftsmanship and elegance are unmatched.
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit. Soluta eum officiis, facere libero esse sit
-                        commodi odio autem nihil aliquid odit atque minus
-                        possimus magni
-                      </Typography>
-                    </Box>
+                    </form>
                   </Box>
                 </div>
               </CustomTabPanel>
@@ -491,18 +726,6 @@ export default function Product() {
             </article>
           </section>
         </div>
-        {/* <section>
-          <ProductSection
-            productCategorySection={similar_product}
-            bgColor={"#fff"}
-          />
-        </section>
-        <section>
-          <ProductSection
-            productCategorySection={you_may_also_like}
-            bgColor={"#fff"}
-          />
-        </section> */}
       </div>
     </ThemeProvider>
   );
