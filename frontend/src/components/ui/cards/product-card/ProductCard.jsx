@@ -1,11 +1,10 @@
 import PropTypes from "prop-types";
 import "./ProductCard.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
-import {jwtDecode} from "jwt-decode";
 import { addToCart, getCart } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
 
@@ -16,132 +15,111 @@ function ProductCard({
   price = 0,
   offer_inPercent = 0,
   id = "",
-  isAddedToWishlist = false,
   priceAfterDiscount = price,
-  fetchWishlist,
+  isAddedToWishlist,
+  refreshWishlist,
 }) {
   const [isHover, setIsHover] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
-  const authToken = useSelector((state) => state.auth.token);
+  const location = useLocation();
+  useEffect(() => {
+    const checkIfInCart = async () => {
+      try {
+        const response = await getCart();
+        const cartItems = response?.data?.data?.items || [];
 
-  const addToCartHandler = async (productId = { id }, quantity) => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found"); 
-        return;
-      }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
-      await addToCart(productId, quantity);
-      setIsInCart(true);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
-  const checkIfInCart = async () => {
-    try {
-      const response = await getCart();
-      const cartItems = response.data.data.items;
-
-      if (Array.isArray(cartItems)) {
-        const productInCart = cartItems.some((item) => item.productId === id);
-        if (productInCart) {
-          setIsInCart(true);
+        if (Array.isArray(cartItems)) {
+          setIsInCart(cartItems.some((item) => item.productId === id));
         }
-      } else {
-        console.error("cartItems is not an array:", cartItems);
+      } catch (err) {
+        console.error("Error fetching cart items:", err.message);
       }
-    } catch (err) {
-      console.log("Error fetching cart items:", err.message);
-    }
-  };
-  
-  
+    };
+
+    if (id) checkIfInCart();
+  }, [id]);
 
   useEffect(() => {
-    checkIfInCart();
+    setIsHover(location.pathname.includes("user/wishlist"));
+  }, [location.pathname]);
 
-    // Check if the URL contains "user/wishlist"
-    const path = window.location.pathname;
-    if (path.includes("user/wishlist")) {
-      setIsHover(true);
-    } else {
-      setIsHover(false);
-    }
-  }, []);
-
-  const handleButtonClick = (e) => {
+  const handleAddToCart = async (e) => {
     e.stopPropagation();
     if (isInCart) {
       navigate("/view-cart");
     } else {
-      addToCartHandler(id);
+      try {
+        await addToCart(id, 1);
+        setIsInCart(true);
+      } catch (err) {
+        console.error("Error adding to cart:", err.message);
+      }
     }
   };
 
   return (
-    <>
-      <div
-        style={{
-          backgroundColor: isHover === true ? "white" : "",
-          boxShadow:
-            isHover === true ? "rgba(149, 157, 165, 0.2) 0px 8px 24px" : "none",
-          borderRadius: isHover === true ? "0.4rem" : "0rem",
-        }}
-        className="productCard_container"
-        onClick={() => {
-          navigate(`/product/${id}`);
-        }}
-      >
-        <div className="rating_box">
-          <div>4.5</div>
-          <figure>
-            <img src={rating_star} alt="Rating Star" />
-          </figure>
-        </div>
-        <section>
-          <div>
-            <WishListHeartIcon
-              productId={id}
-              isWishlist={isAddedToWishlist}
-              fetchWishlist={fetchWishlist}
-            />
-          </div>
-        </section>
+    <div
+      style={{
+        backgroundColor: isHover ? "white" : "",
+        boxShadow: isHover ? "rgba(149, 157, 165, 0.2) 0px 8px 24px" : "none",
+        borderRadius: isHover ? "0.4rem" : "0rem",
+      }}
+      className="productCard_container"
+      onClick={() => navigate(`/product/${id}`)}
+    >
+      {/* Rating */}
+      <div className="rating_box">
+        <div>4.5</div>
         <figure>
-          <img
-            style={{ transform: isHover === true && "scale(1.5)" }}
-            src={picture}
-            alt=""
-          />
+          <img src={rating_star} alt="Rating Star" />
         </figure>
-        <article>
-          <h1>{title}</h1>
-          <p>{shortDescription}</p>
-          <div>
-            <h2>{formatPrice(priceAfterDiscount)}</h2>
-            <strike>{formatPrice(price)}</strike>
-            <h4>(-{offer_inPercent}%)</h4>
-          </div>
-        </article>
-        <div className={`${isAddedToWishlist ? "wistListBtnStyle" : ""} `}>
-          <button
-            onClick={handleButtonClick}
-            style={{ visibility: isHover === true && "visible" }}
-            className={isInCart ? "in-cart" : ""}
-          >
-            {isInCart ? "Go to cart" : "Add to cart"}
-          </button>
-        </div>
       </div>
-    </>
+
+      {/* Wishlist Icon */}
+      <section>
+        <WishListHeartIcon
+          productId={id}
+          isWishlist={isAddedToWishlist}
+          refreshWishlist={refreshWishlist}
+        />
+      </section>
+
+      {/* Product Image */}
+      <figure>
+        <img
+          style={{ transform: isHover ? "scale(1.5)" : "scale(1)" }}
+          src={picture}
+          alt={title}
+        />
+      </figure>
+
+      {/* Product Details */}
+      <article>
+        <h1>{title}</h1>
+        <p>{shortDescription}</p>
+        <div>
+          <h2>{formatPrice(priceAfterDiscount)}</h2>
+          {offer_inPercent > 0 && (
+            <>
+              <strike>{formatPrice(price)}</strike>
+              <h4>(-{offer_inPercent}%)</h4>
+            </>
+          )}
+        </div>
+      </article>
+
+      {/* Add to Cart Button */}
+      <div className={isAddedToWishlist ? "wistListBtnStyle" : ""}>
+        <button
+          onClick={handleAddToCart}
+          style={{ visibility: isHover ? "visible" : "hidden" }}
+          className={isInCart ? "in-cart" : ""}
+        >
+          {isInCart ? "Go to Cart" : "Add to Cart"}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -154,14 +132,7 @@ ProductCard.propTypes = {
   id: PropTypes.string.isRequired,
   isAddedToWishlist: PropTypes.bool,
   priceAfterDiscount: PropTypes.number.isRequired,
-  fetchWishlist: PropTypes.func,
+  refreshWishlist: PropTypes.func,
 };
-
-// ProductCard.defaultProps = {
-//   shortDescription: "Short description here...",
-//   offer_inPercent: 0,
-//   isAddedToWishlist: false,
-//   fetchWishlistData: () => {},
-// };
 
 export default ProductCard;

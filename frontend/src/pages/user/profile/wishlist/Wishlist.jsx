@@ -13,21 +13,14 @@ const Wishlist = () => {
   const userProfileToken = useSelector((state) => state.auth.token);
 
   const getUserIdFromToken = useCallback(() => {
+    if (!userProfileToken) {
+      toast.error("Please log in to view your wishlist.");
+      return null;
+    }
+
     try {
-      if (!userProfileToken) {
-        toast.error("Please log in to view your wishlist.");
-        return null;
-      }
-
       const decodedToken = jwtDecode(userProfileToken);
-      const userId = decodedToken?._id;
-
-      if (!userId) {
-        toast.error("Invalid user session.");
-        return null;
-      }
-
-      return userId;
+      return decodedToken?._id || null;
     } catch (error) {
       console.error("Error decoding token:", error.message || error);
       toast.error("Invalid user session.");
@@ -41,10 +34,10 @@ const Wishlist = () => {
 
     try {
       const response = await getUserWishlist(userId);
-      const wishlist = response?.data?.data?.wishlist || [];
+      const wishlist = response?.data?.data?.wishlist || null;
 
-      if (response?.data?.success && wishlist.length > 0) {
-        setWishlistItems(wishlist[0]?.items || []);
+      if (response?.data?.success && wishlist) {
+        setWishlistItems(wishlist.items || []);
       } else {
         setWishlistItems([]);
         toast.info("Your wishlist is empty.");
@@ -57,11 +50,8 @@ const Wishlist = () => {
 
   useEffect(() => {
     fetchWishlistData();
-  }, [fetchWishlistData]);
+  }, [fetchWishlistData]); 
 
-  const renderEmptyMessage = () => (
-    <p className="empty_message">Your wishlist is empty.</p>
-  );
 
   const renderWishlistItems = () =>
     wishlistItems.map((product) => (
@@ -73,12 +63,17 @@ const Wishlist = () => {
         price={product.priceAfterDiscount || product.price || "N/A"}
         isAddedToWishlist={true}
         priceAfterDiscount={product.priceAfterDiscount}
+        refreshWishlist={fetchWishlistData}
       />
     ));
 
   return (
     <div className="wishlist_container">
-      {wishlistItems.length > 0 ? renderWishlistItems() : renderEmptyMessage()}
+      {wishlistItems.length > 0 ? (
+        renderWishlistItems()
+      ) : (
+        <p className="empty_message">Your wishlist is empty.</p>
+      )}
     </div>
   );
 };
