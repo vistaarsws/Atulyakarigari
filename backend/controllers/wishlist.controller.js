@@ -11,7 +11,7 @@ import Wishlist from "../models/wishlist.js";
 export const getWishlist = async (req, res) => {
   const { _id } = req.user;
   try {
-    const wishlist = await Wishlist.find({ userId: _id }).populate("items");
+    const wishlist = await Wishlist.findOne({ userId: _id }).populate("items");
 
     if (!wishlist) {
       return notFoundRequest(req, res, null, "Wishlist not found");
