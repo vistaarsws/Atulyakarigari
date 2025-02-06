@@ -34,6 +34,7 @@ export const toggleItemInWishlist = async (req, res) => {
 
   try {
     let wishlist = await Wishlist.findOne({ userId: _id });
+
     if (!wishlist) {
       wishlist = new Wishlist({ userId: _id, items: [productId] });
       await wishlist.save();
@@ -45,29 +46,26 @@ export const toggleItemInWishlist = async (req, res) => {
       );
     }
 
-    if (!Array.isArray(wishlist.items)) {
-      wishlist.items = [];
-    }
+    const productExists = wishlist.items.some((item) => item.equals(productId));
 
-    const productIndex = wishlist.items.findIndex(
-      (item) => item?.toString() === productId
+    // Toggle Logic: Remove if exists, otherwise add (ensuring no duplicates)
+    wishlist = await Wishlist.findOneAndUpdate(
+      { userId: _id },
+      productExists
+        ? { $pull: { items: productId } } // Remove product
+        : { $addToSet: { items: productId } }, // Add only if not already there
+      { new: true }
     );
 
-    if (productIndex !== -1) {
-      wishlist.items.splice(productIndex, 1);
-      await wishlist.save();
-      return success(
-        req,
-        res,
-        "Product removed from wishlist",
-        wishlist.toObject()
-      );
-    }
-
-    wishlist.items.push(productId);
-    await wishlist.save();
-    return success(req, res, "Product added to wishlist", wishlist.toObject());
+    return success(
+      req,
+      res,
+      productExists
+        ? "Product removed from wishlist"
+        : "Product added to wishlist",
+      wishlist.toObject()
+    );
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
