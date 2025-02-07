@@ -346,7 +346,6 @@ export default function Product() {
     };
   // END Share Product
 
-  const [wishlist, setWishlist] = useState([]);
   const [isWishlisted, setsWishlisted] = useState();
   const fetchhWishlist = async () => {
     if (!authToken) {
@@ -364,7 +363,6 @@ export default function Product() {
     const response = await getUserWishlist(userId);
 
     const wishlistArray = response?.data?.data?.wishlist?.items || [];
-    setWishlist(wishlistArray);
 
     const isAddedToWishlist = wishlistArray.some(
       (item) => item._id === productId
