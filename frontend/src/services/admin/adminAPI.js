@@ -105,6 +105,19 @@ const getCategoryById = async (id) => {
   return response;
 };
 
+const answerQuestion = async (answer, questionId, productId) => {
+  try {
+    const response = await apiConnector(
+      "PUT",
+      `${admin_endpoints.ANSWER_QUESTION}${productId}`,
+      {questionId,answer}
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   getCategory,
   createCategory,
@@ -116,4 +129,5 @@ export {
   updateSubCategory,
   getSubCategoryByCategoryId,
   getCategoryById,
+  answerQuestion,
 };

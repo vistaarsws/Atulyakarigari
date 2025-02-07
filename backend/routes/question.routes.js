@@ -11,9 +11,13 @@ import { auth, isAdmin } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
 router.post("/:id", auth, askQuestion);
-router.put("/answer", isAdmin, answerQuestion);
-router.put("/edit", isAdmin, editQuestionOrAnswer);
-router.delete("/", isAdmin, deleteQuestion);
 router.get("/:id", getQuestionsByProduct);
+
+router.use(auth);
+router.use(isAdmin);
+
+router.put("/answer/:id", answerQuestion);
+router.put("/edit", editQuestionOrAnswer);
+router.delete("/", deleteQuestion);
 
 export default router;

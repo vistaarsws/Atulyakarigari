@@ -490,6 +490,41 @@
   font-style: italic;
   color: #999;
 }
+.admin-answer {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-answer input {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.admin-answer button {
+  padding: 8px 15px;
+  font-size: 14px;
+  background-color: #6d001d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-answer button:hover {
+  background-color: #85001f;
+}
+
+.admin-answer button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

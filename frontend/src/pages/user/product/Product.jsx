@@ -40,6 +40,7 @@ import {
   getQuestionsByProduct,
   askQuestion,
 } from "../../../../src/services/user/userAPI";
+import { answerQuestion } from "../../../../src/services/admin/adminAPI";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 
@@ -329,7 +330,6 @@ export default function Product() {
     try {
       const response = await getQuestionsByProduct(productId);
       setQuestionsAndAnswers(response?.data.questions);
-      console.log("QuestionsAndAnswers", questionsAndAnswers); // Log response directly
     } catch (error) {
       console.log(error.message);
     }
@@ -340,22 +340,21 @@ export default function Product() {
   }, [productId]); // Refetch if productId changes
 
   useEffect(() => {
-    console.log("Updated QuestionsAndAnswers:", questionsAndAnswers); // Log updated state
+
   }, [questionsAndAnswers]);
 
   const [newQuestion, setNewQuestion] = useState(""); // Input field state
 
   const handleAskQuestion = async () => {
-    
     if (newQuestion.length < 5) {
       alert("Question must be at least 5 characters long.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const response = await askQuestion(productId, newQuestion);
-      if (response?.data?.success===true) {
+      if (response?.data?.success === true) {
         alert("Question submitted successfully!");
         setNewQuestion(""); // Clear input field
         fetchQuestionsAndAnswers(); // Refresh questions
@@ -369,7 +368,64 @@ export default function Product() {
       setLoading(false); // Reset loading state
     }
   };
-  
+
+  const [adminAnswer, setAdminAnswer] = useState(""); // Input for admin answer
+  const [selectedQuestionId, setSelectedQuestionId] = useState(""); // Selected question to answer
+  const [role, setRole] = useState("");
+
+  const handleAnswerSubmit = async () => {
+    // debugger
+    setLoading(true);
+    if (!authToken) {
+      console.error("Error: No user profile token found");
+      return;
+    }
+
+    const decodedToken = jwtDecode(authToken);
+    const userId = decodedToken?._id;
+    if (!userId) {
+      console.error("Error: Invalid token structure");
+      return;
+    }
+
+    if (decodedToken) { 
+      setRole(decodedToken?.role);
+    }
+
+    if (!adminAnswer || !selectedQuestionId) {
+      alert("Please select a question and provide an answer.");
+      setLoading(false);
+      return;
+    }
+    debugger
+    let answer= adminAnswer
+    let questionId= selectedQuestionId
+    
+    try {
+      const response = await answerQuestion(
+        answer,
+        questionId,
+        productId
+      );
+      console.log("productId",productId);
+      console.log("Response", response);
+      
+
+      if (response?.status==200) {
+        alert("Answer submitted successfully!");
+        setAdminAnswer(""); // Clear input field
+        setSelectedQuestionId(""); // Clear selected question ID
+        fetchQuestionsAndAnswers(); // Refresh the questions list
+      } else {
+        alert(response?.message || "Failed to submit answer.");
+      }
+    } catch (error) {
+      console.error("Error submitting answer:", error);
+      alert("An error occurred while submitting your answer.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -730,6 +786,14 @@ export default function Product() {
 
               <CustomTabPanel value={value} index={3}>
                 <div className="ask_question">
+                  {/* Fetch and Set Role Once */}
+                  {authToken &&
+                    !role &&
+                    (() => {
+                      const decodedToken = jwtDecode(authToken);
+                      setRole(decodedToken?.role || "");
+                    })()}
+
                   {/* Input Field for Question */}
                   <div>
                     <input
@@ -754,7 +818,38 @@ export default function Product() {
                           {item.answer ? (
                             <h3>A: {item.answer}</h3>
                           ) : (
-                            <p className="no-answer">No answer provided yet.</p>
+                            <>
+                              <p className="no-answer">
+                                No answer provided yet.
+                              </p>
+                              {role === "admin" && ( // Ensure the role is checked correctly
+                                <div className="admin-answer">
+                                  <input
+                                    type="text"
+                                    placeholder="Write your answer..."
+                                    value={
+                                      selectedQuestionId === item._id
+                                        ? adminAnswer
+                                        : ""
+                                    }
+                                    onChange={(e) => {
+                                      setAdminAnswer(e.target.value);
+                                      setSelectedQuestionId(item._id);
+                                    }}
+                                  />
+                                  <button
+                                    onClick={handleAnswerSubmit}
+                                    disabled={
+                                      loading || selectedQuestionId !== item._id
+                                    }
+                                  >
+                                    {loading && selectedQuestionId === item._id
+                                      ? "Submitting..."
+                                      : "Submit"}
+                                  </button>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>

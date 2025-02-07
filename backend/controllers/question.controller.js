@@ -3,20 +3,31 @@ import Question from "../models/Question.js";
 // User: Ask a question
 export const askQuestion = async (req, res) => {
   const { question } = req.body;
-  const  productId  = req.params.id;
+  const productId = req.params.id;
   const userId = req.user._id;
 
   if (!productId || !question || question.length < 5) {
-    return res.status(400).json({ success: false, message: "Product ID and valid question are required." });
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Product ID and valid question are required.",
+      });
   }
 
   const newQuestion = await Question.create({
     productId,
     userId,
-    question
+    question,
   });
 
-  res.status(201).json({ success: true, message: "Question submitted!", question: newQuestion });
+  res
+    .status(201)
+    .json({
+      success: true,
+      message: "Question submitted!",
+      question: newQuestion,
+    });
 };
 
 // ?? Fetch all questions for a specific product
@@ -25,7 +36,9 @@ export const getQuestionsByProduct = async (req, res) => {
     const productId = req.params.id;
 
     if (!productId) {
-      return res.status(400).json({ success: false, message: "Product ID is required." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Product ID is required." });
     }
 
     const questions = await Question.find({ productId })
@@ -34,57 +47,53 @@ export const getQuestionsByProduct = async (req, res) => {
 
     res.json({ success: true, questions });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 // ?? Admin: Answer a question
 export const answerQuestion = async (req, res) => {
   try {
-    const { answer } = req.body; // Destructure `answer` from request body
-    const productId = req.params.id; // Get question/product ID from route params
-    const userId = req.user?._id; // Ensure `req.user` exists and get the user ID
+    const { answer, questionId } = req.body; // Expect `questionId` and `answer` in the body
+    const adminId = req.user?._id; // Ensure admin is authenticated
 
-    // Check if the answer is provided
-    if (!answer) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Answer is required." 
+    if (!answer || !questionId) {
+      return res.status(400).json({
+        success: false,
+        message: "Question ID and answer are required.",
       });
     }
 
     // Find the question by ID
-    const question = await Question.findById(productId);
+    const question = await Question.findById(questionId);
     if (!question) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Question not found." 
+      return res.status(404).json({
+        success: false,
+        message: "Question not found.",
       });
     }
 
-    // Update the question with the answer
+    // Update the question with the provided answer
     question.answer = answer;
-    question.answeredBy = req.user?.name || "Unknown"; // Fallback if `req.user.name` is undefined
-    question.answeredAt = new Date(); // Add a timestamp for when the answer was submitted
+    question.answeredBy = adminId; // Store the admin's ID
     await question.save();
 
-    // Respond with success and the updated question
-    return res.status(200).json({ 
-      success: true, 
-      message: "Answer submitted successfully.", 
-      question 
+    return res.status(200).json({
+      success: true,
+      message: "Answer submitted successfully.",
+      question,
     });
   } catch (error) {
-    // Handle server errors
     console.error("Error answering question:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Server error. Please try again later.", 
-      error: error.message 
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again later.",
+      error: error.message,
     });
   }
 };
-
 
 // ?? Admin: Edit a question or answer
 export const editQuestionOrAnswer = async (req, res) => {
@@ -98,11 +107,20 @@ export const editQuestionOrAnswer = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    if (!updatedQuestion) return res.status(404).json({ success: false, message: "Question not found." });
+    if (!updatedQuestion)
+      return res
+        .status(404)
+        .json({ success: false, message: "Question not found." });
 
-    res.json({ success: true, message: "Updated successfully", updatedQuestion });
+    res.json({
+      success: true,
+      message: "Updated successfully",
+      updatedQuestion,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -112,10 +130,15 @@ export const deleteQuestion = async (req, res) => {
     const questionId = req.params.id;
 
     const question = await Question.findByIdAndDelete(questionId);
-    if (!question) return res.status(404).json({ success: false, message: "Question not found." });
+    if (!question)
+      return res
+        .status(404)
+        .json({ success: false, message: "Question not found." });
 
     res.json({ success: true, message: "Deleted successfully." });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };

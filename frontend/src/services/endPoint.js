@@ -19,8 +19,9 @@ export const admin_endpoints = {
   CREATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/create",
   DELETE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/delete",
   UPDATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/update",
-  GET_SUBCATEGORY_BY_CATEGORY_ID:
-    BASE_URL + "/api/v1/sub-category/get-by-category",
+  GET_SUBCATEGORY_BY_CATEGORY_ID:BASE_URL + "/api/v1/sub-category/get-by-category",
+
+  ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer/",
 };
 
 export const user_endpoints = {
