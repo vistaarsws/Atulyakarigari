@@ -125,7 +125,7 @@ export default function Product() {
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
-  // Fetch reviews and update the state
+  
   const fetchRatingAndReview = async () => {
     try {
       if (!authToken) {
@@ -170,12 +170,12 @@ export default function Product() {
     }
   };
 
-  // Handle changes in the review form fields
+
   const handleChangeReview = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle review submission (create or update)
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -196,10 +196,10 @@ export default function Product() {
       let response;
 
       if (editingReviewId) {
-        // Update review
+        
         response = await createOrUpdateReview(productId, rating, comment);
       } else {
-        // Create new review
+        
         response = await createOrUpdateReview(productId, rating, comment);
       }
 
@@ -222,7 +222,7 @@ export default function Product() {
     }
   };
 
-  // Handle deleting a review
+  
   const handleDeleteReview = async (reviewId) => {
     try {
       if (!reviewId) {
@@ -241,8 +241,8 @@ export default function Product() {
 
       if (response?.success) {
         alert("Review deleted successfully!");
-        // Optionally refetch reviews or update the UI to reflect the deletion
-        fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
+       
+        fetchRatingAndReview(); 
       } else {
         console.error("Failed to delete review:", response);
         alert("Failed to delete review. Please try again later.");
@@ -253,18 +253,15 @@ export default function Product() {
     }
   };
 
-  // Toggle showing more reviews
   const handleToggleReviews = () => {
     setShowAllReviews(!showAllReviews);
   };
 
-  // Handle editing a review (pre-fill the form)
   const handleEditReview = (review) => {
     setFormData({ rating: review.rating, comment: review.comment });
     setEditingReviewId(review._id || review.id);
   };
 
-  // Fetch reviews on component mount
   useEffect(() => {
     const fetchData = async () => {
       if (!authToken) {
@@ -284,12 +281,6 @@ export default function Product() {
     fetchData();
   }, []);
 
-  // // Fetch reviews on component mount
-  // useEffect(() => {
-  //   fetchRatingAndReview();
-  // }, []);
-
-  // RATING AND REVIEW END //
 
   const [isInCart, setIsInCart] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -337,13 +328,13 @@ export default function Product() {
 
   useEffect(() => {
     fetchQuestionsAndAnswers();
-  }, [productId]); // Refetch if productId changes
+  }, [productId]); 
 
   useEffect(() => {
 
   }, [questionsAndAnswers]);
 
-  const [newQuestion, setNewQuestion] = useState(""); // Input field state
+  const [newQuestion, setNewQuestion] = useState("");  
 
   const handleAskQuestion = async () => {
     if (newQuestion.length < 5) {
@@ -356,8 +347,8 @@ export default function Product() {
       const response = await askQuestion(productId, newQuestion);
       if (response?.data?.success === true) {
         alert("Question submitted successfully!");
-        setNewQuestion(""); // Clear input field
-        fetchQuestionsAndAnswers(); // Refresh questions
+        setNewQuestion("");  
+        fetchQuestionsAndAnswers();  
       } else {
         alert(response?.message || "Failed to submit question.");
       }
@@ -365,16 +356,16 @@ export default function Product() {
       console.error("Error submitting question:", error);
       alert("An error occurred while submitting your question.");
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false); 
     }
   };
 
-  const [adminAnswer, setAdminAnswer] = useState(""); // Input for admin answer
-  const [selectedQuestionId, setSelectedQuestionId] = useState(""); // Selected question to answer
+  const [adminAnswer, setAdminAnswer] = useState(""); 
+  const [selectedQuestionId, setSelectedQuestionId] = useState(""); 
   const [role, setRole] = useState("");
 
   const handleAnswerSubmit = async () => {
-    // debugger
+   
     setLoading(true);
     if (!authToken) {
       console.error("Error: No user profile token found");
@@ -397,7 +388,7 @@ export default function Product() {
       setLoading(false);
       return;
     }
-    debugger
+   
     let answer= adminAnswer
     let questionId= selectedQuestionId
     
@@ -411,9 +402,9 @@ export default function Product() {
 
       if (response?.status==200) {
         alert("Answer submitted successfully!");
-        setAdminAnswer(""); // Clear input field
-        setSelectedQuestionId(""); // Clear selected question ID
-        fetchQuestionsAndAnswers(); // Refresh the questions list
+        setAdminAnswer(""); 
+        setSelectedQuestionId(""); 
+        fetchQuestionsAndAnswers(); 
       } else {
         alert(response?.message || "Failed to submit answer.");
       }
