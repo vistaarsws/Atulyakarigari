@@ -3,7 +3,7 @@ import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfileAvatar from "../../../../assets/images/avatar.svg";
 import Avatar from "@mui/material/Avatar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { login, logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 // import avatar from "../../../assets/images/avatar.svg";
@@ -29,7 +29,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
-  const [wishlistData, setWishlistData] = useState([]);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -59,33 +58,26 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const authToken = useSelector((state) => state.auth.token);
 
   const { enqueueSnackbar } = useSnackbar();
-  // const cookies = Cookies.get("authToken");
 
-  // const StyledBadge = styled(Badge)(({ theme }) => ({
-  //   "& .MuiBadge-badge": {
-  //     right: -3,
-  //     top: 13,
-  //     border: `1px solid ${theme.palette.background.paper}`,
-  //     padding: "0 2px",
-  //     backgroundColor: "#b56f82",
-  //     fontSize: "1.2rem",
-  //     width: "1.5rem",
-  //     height: "1.5rem",
-  //   },
-  // }));
+  const [wishlistData, setWishlistData] = useState([]);
 
-  const fetchWishlistData = async () => {
+  const fetchWishlistData = useCallback(async () => {
     try {
       const response = await getUserWishlist();
-      setWishlistData(response?.data?.data?.wishlist);
+      const wishlist = response?.data?.data?.wishlist?.items|| [];
+      setWishlistData(wishlist);
     } catch (err) {
-      console.log(err.message);
+      console.error(
+        "Error fetching wishlist:",
+        err.response?.data || err.message
+      );
+      toast.error("Failed to load wishlist. Please try again.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWishlistData();
-  }, []);
+  }, [fetchWishlistData]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -185,7 +177,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       link: "/",
       icon: <Logout fontSize="small" />,
     },
-
   ];
   const [cartData, setCartData] = useState(null);
   const fetchCartData = async () => {
@@ -214,7 +205,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     try {
       const response = await getCategory();
       const categories = Object.values(response.data.data);
-  
+
       // Ensure data structure matches expectations
       if (categories.length) {
         setGetAllCategories(categories);
@@ -223,13 +214,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       console.error("Error fetching categories:", error);
     }
   };
-  
+
   useEffect(() => {
-   
-      fetchCategoriesData();
-    
+    fetchCategoriesData();
   }, []);
-  
 
   return (
     <nav className="navbar_container">
@@ -285,9 +273,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                           onClick={() => toggleCollapse(catIndex)}
                           aria-expanded={openCategoryIndex === catIndex}
                         >
-                          
-                          <Link className="underline" to={`/categories/${categoryObj.category_Details._id}`}>
-                          <h1 >{categoryObj.category}</h1>
+                          <Link
+                            className="underline"
+                            to={`/categories/${categoryObj.category_Details._id}`}
+                          >
+                            <h1>{categoryObj.category}</h1>
                           </Link>
                           <svg
                             className={`collapse-icon ${
@@ -391,7 +381,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
         {authToken && (
           <IconButton
-            aria-label={notificationsLabel(100)}
+            aria-label={`wishlist with ${wishlistData.length} items`}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
