@@ -407,8 +407,6 @@ export default function Product() {
         questionId,
         productId
       );
-      console.log("productId",productId);
-      console.log("Response", response);
       
 
       if (response?.status==200) {
