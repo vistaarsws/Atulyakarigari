@@ -890,7 +890,7 @@ export default function ProductForm({
           </article>
           {/* -----------------------------------------------Product Description----------------------------------------------------------------------------------------- */}
           <article>
-            <TextField
+            {/* <TextField
               sx={{ width: "100%" }}
               id="productCategory "
               label="Description"
@@ -904,7 +904,7 @@ export default function ProductForm({
                   description: e.target.value,
                 })
               }
-            />
+            /> */}
           </article>
           <article className="addVariant_container">
             <Box sx={{ margin: "auto" }}>
@@ -1006,19 +1006,7 @@ export default function ProductForm({
           </article>
 
           <article>
-            <TextField
-              sx={{ width: "100%" }}
-              id="productTitle"
-              label="Artisans Name"
-              variant="outlined"
-              value={formData.artisanName}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  artisanName: e.target.value,
-                })
-              }
-            />
+            
             <Box
               sx={{
                 width: "100%",
@@ -1084,6 +1072,20 @@ export default function ProductForm({
                 </Button>
               </Box>
             </Box>
+
+            <TextField
+              sx={{ width: "100%" }}
+              id="productTitle"
+              label="Artisans Name"
+              variant="outlined"
+              value={formData.artisanName}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  artisanName: e.target.value,
+                })
+              }
+            />
 
             <div className="artisan_image-desc_container">
               <div

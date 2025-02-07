@@ -13,6 +13,7 @@ import {formatPrice} from "../../../utils/helpers";
 const Payment = ({ cartData }) => {
   const navigate = useNavigate();
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
+  const location = useLocation();
 
   return (
     <Box
@@ -149,8 +150,17 @@ const Payment = ({ cartData }) => {
               color: "rgba(56, 55, 55, 1)",
             }}
           >
-           
-            Price Details ({cartData?.items?.length} {cartData?.items?.length <= 1 ? "item" : "items"})
+            Price Details (
+            {cartData?.items > 1
+              ? `${cartData.items} items`
+              : cartData?.items === 1
+                ? `${cartData.items} item`
+                : cartData?.items?.length === 1
+                  ? `${cartData.items.length} item`
+                  : cartData?.items?.length > 1
+                    ? `${cartData.items.length} items`
+                    : "0 item"}
+            )
           </Typography>
           <Box sx={{ marginTop: 2 }}>
             <Box
@@ -178,7 +188,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(cartData?.totalMRP)}
+                {formatPrice(cartData?.totalMRP || 0)}
               </Typography>
             </Box>
             <Box
@@ -207,7 +217,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(cartData?.totalDiscount)}
+                {formatPrice(cartData?.totalDiscount || 0)}
               </Typography>
             </Box>
             <Box
@@ -298,7 +308,7 @@ const Payment = ({ cartData }) => {
                 lineHeight: "25px",
               }}
             >
-              {formatPrice(cartData?.total)}
+              {formatPrice(cartData?.total || 0)}
             </Typography>
           </Box>
         </Box>
@@ -317,25 +327,49 @@ const Payment = ({ cartData }) => {
             paddingInline: useMediaQuery("(max-width:900px)") ? "1.6rem" : "",
           }}
         >
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "rgba(96, 164, 135, 1)",
-              color: "white",
-              paddingY: 1.5,
-              borderRadius: 1,
-              textTransform: "capitalize",
-              fontSize: "16px",
-              fontWeight: 400,
-              position: "relative",
-              width: "100%",
-            }}
-            onClick={() => {
-              navigate("/place-order");
-            }}
-          >
-            Place order
-          </Button>
+          {location.pathname === "/view-cart" && (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "rgba(96, 164, 135, 1)",
+                color: "white",
+                paddingY: 1.5,
+                borderRadius: 1,
+                textTransform: "capitalize",
+                fontSize: "16px",
+                fontWeight: 400,
+                position: "relative",
+                width: "100%",
+              }}
+              onClick={() => {
+                navigate("/place-order");
+              }}
+            >
+              Place Order
+            </Button>
+          )}
+
+          {location.pathname === "/place-order" && (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "rgba(96, 164, 135, 1)",
+                color: "white",
+                paddingY: 1.5,
+                borderRadius: 1,
+                textTransform: "capitalize",
+                fontSize: "16px",
+                fontWeight: 400,
+                position: "relative",
+                width: "100%",
+              }}
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              Continue
+            </Button>
+          )}
         </Box>
       </Box>
     </Box>

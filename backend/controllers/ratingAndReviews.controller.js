@@ -7,6 +7,7 @@ import {
     internalServerError,
     notFoundRequest
 } from "../helpers/api-response.js";
+import Profile from "../models/profile.js";
 
 /**
  * Add or update a review for a product.
@@ -17,6 +18,10 @@ export const createOrUpdateReview = async (req, res) => {
         const { productId, rating, comment } = req.body;
         const userId = req.user._id; // Authenticated user's ID
 
+        if (!userId) {
+            return unauthorizedRequest(req, res, null, "User not authenticated");
+        }
+        
         // Validate required fields
         if (!productId || !userId || !rating || !comment) {
             return badRequest(req, res, null, "All fields are required");
@@ -64,7 +69,7 @@ export const createOrUpdateReview = async (req, res) => {
  */
 export const getReviewsByProduct = async (req, res) => {
     try {
-        const { productId } = req.body;
+        const { productId } = req.params;
 
         // Validate required field
         if (!productId) {
@@ -80,10 +85,29 @@ export const getReviewsByProduct = async (req, res) => {
         const reviews = await RatingAndReviews.find({ productId });
 
         if (reviews.length === 0) {
-            return notFoundRequest(req, res, null, "No reviews found for the product");
+            return success(req, res, "No reviews found for the product");
         }
 
-        return success(req, res, "Reviews retrieved successfully", { reviews });
+        // Fetch user profiles for each review
+        const reviewsWithUser = await Promise.all(
+            reviews.map(async (review) => {
+                const userProfile = await Profile.findOne({ userId: review.userId });
+
+                return {
+                    _id: review._id,
+                    productId: review.productId,
+                    userId: review.userId,
+                    rating: review.rating,
+                    comment: review.comment,
+                    createdAt: review.createdAt,
+                    updatedAt: review.updatedAt,
+                    userName: userProfile?.fullName ?? "Unknown User", 
+                    userImage: userProfile?.profilePicture, 
+                };
+            })
+        );
+
+        return success(req, res, "Reviews retrieved successfully", { reviews: reviewsWithUser });
     } catch (error) {
         return internalServerError(req, res, error, "Failed to retrieve reviews");
     }
@@ -94,34 +118,17 @@ export const getReviewsByProduct = async (req, res) => {
  */
 export const deleteReview = async (req, res) => {
     try {
-        const userId = req.user._id; // Authenticated user's ID
-        const { id } = req.body;
+        const review = await RatingAndReviews.deleteOne({ _id: req.params.id });
+    
+        res.status(200).json({
+          success: true,
+          message: `review has been deleted successfully!`,
+          review
+        });
+      } catch (error) {
+        return res.status(400).json({
+          error: 'Your request could not be processed. Please try again.'
+        });
+      }
+  };
 
-        // Validate required field
-        if (!id) {
-            return badRequest(req, res, null, "Review ID is required");
-        }
-
-        // Validate review ID format
-        if (!mongoose.isValidObjectId(id)) {
-            return badRequest(req, res, null, "Invalid review ID format");
-        }
-
-        // Delete review
-        const deletedReview = await RatingAndReviews.findOneAndDelete({ _id: id, userId });
-
-        if (!deletedReview) {
-            return notFoundRequest(req, res, null, "Review not found");
-        }
-
-        // Remove review ID from product
-        await Product.findByIdAndUpdate(
-            deletedReview.productId,
-            { $pull: { ratingAndReviews: deletedReview._id } }
-        );
-
-        return success(req, res, "Review deleted successfully");
-    } catch (error) {
-        return internalServerError(req, res, error, "Failed to delete review");
-    }
-};
