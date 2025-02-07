@@ -61,11 +61,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   const [wishlistData, setWishlistData] = useState([]);
 
-  const fetchWishlistData = useCallback(async () => {
+  const fetchWishlistData = async () => {
     try {
-      const response = await getUserWishlist();
-      console.log("WWWW", response.data.data.wishlist[0].items.length);
-      setWishlistData(response.data.data.wishlist[0].items);
+      const { userId } = jwtDecode(authToken);
+      const response = await getUserWishlist(userId);
+      setWishlistData(response.data.data.wishlist.items);
     } catch (err) {
       console.error(
         "Error fetching wishlist:",
@@ -73,11 +73,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       );
       toast.error("Failed to load wishlist. Please try again.");
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchWishlistData();
-  }, [wishlistData]);
+  }, []);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -178,29 +178,20 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  const [cartData, setCartData] = useState(null);
+  const [cartData, setCartData] = useState([]);
+
   const fetchCartData = async () => {
     try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
       const response = await getCart();
-      setCartData(response?.data?.data);
+      console.log("ttt", response.data.data);
+      setCartData(response.data.data);
     } catch (err) {
-      console.log(err.message);
+      console.log(err);
     }
   };
   useEffect(() => {
     fetchCartData();
-  }, [wishlistData]);
+  }, [cartData]);
 
   return (
     <nav className="navbar_container">
@@ -368,7 +359,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData?.length}
+              badgeContent={wishlistData.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",

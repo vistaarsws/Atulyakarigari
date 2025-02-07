@@ -49,5 +49,4 @@ export const user_endpoints = {
   GET_RATING_BY_ID: BASE_URL + "/api/v1/ratingAndReviews/getAll/",
   CREATE_OR_UPDATE_RATING: BASE_URL + "/api/v1/ratingAndReviews/createOrUpdate",
   DELETE_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
-
 };

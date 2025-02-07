@@ -35,7 +35,6 @@ const Wishlist = () => {
     try {
       const response = await getUserWishlist(userId);
       const wishlist = response?.data?.data?.wishlist || null;
-
       if (response?.data?.success && wishlist) {
         setWishlistItems(wishlist.items || []);
       } else {
@@ -50,8 +49,7 @@ const Wishlist = () => {
 
   useEffect(() => {
     fetchWishlistData();
-  }, [fetchWishlistData]); 
-
+  }, [fetchWishlistData]);
 
   const renderWishlistItems = () =>
     wishlistItems.map((product) => (

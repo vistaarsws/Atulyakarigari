@@ -84,9 +84,13 @@ const addToCart = async (productId, quantity) => {
   return response;
 };
 
-const getCart = async () => {
+const getCart = async (id) => {
   try {
-    const response = await apiConnector("GET", user_endpoints.USER_GET_CART);
+    const response = await apiConnector(
+      "GET",
+      user_endpoints.USER_GET_CART,
+      id
+    );
     return response;
   } catch (err) {
     console.error("Error fetching cart data:", err);
@@ -180,7 +184,6 @@ const createOrUpdateReview = async (productId, rating, comment) => {
     console.log(error);
   }
 };
-
 
 const deleteReview = async (reviewId) => {
   try {
