@@ -151,10 +151,8 @@ const Payment = ({ cartData }) => {
             }}
           >
             Price Details (
-            {cartData?.items > 1
-              ? `${cartData.items} items`
-              : cartData?.items === 1
-                ? `${cartData.items} item`
+            {cartData?.items >= 1
+                ? `1 item`
                 : cartData?.items?.length === 1
                   ? `${cartData.items.length} item`
                   : cartData?.items?.length > 1

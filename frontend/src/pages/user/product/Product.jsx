@@ -37,6 +37,7 @@ import {
   getCart,
   addToCart,
   removeFromCart,
+  getUserWishlist,
 } from "../../../../src/services/user/userAPI";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -297,8 +298,12 @@ const handleDeleteReview = async (reviewId) => {
     try {
       const cart = await getCart();
       const items = cart?.data?.data?.items;
+      if (!items) {
+        setIsInCart(false);
+        return;
+      }
 
-      const productInCart = items.some((item) => item.productId === productId);
+      const productInCart = items.map((item) => item.productId === productId);
       setIsInCart(productInCart);
     } catch (error) {
       console.error("Error checking cart status:", error);
@@ -349,6 +354,35 @@ const handleDeleteReview = async (reviewId) => {
     };
   // END Share Product
 
+  const [wishlist, setWishlist] = useState([]);
+  const [isWishlisted, setsWishlisted] = useState();
+  const fetchhWishlist = async () => {
+    if (!authToken) {
+      console.error("Error: No user profile token found");
+      return;
+    }
+
+    const decodedToken = jwtDecode(authToken);
+    const userId = decodedToken?._id;
+    if (!userId) {
+      console.error("Error: Invalid token structure");
+      return;
+    }
+    const response = await getUserWishlist(userId);
+
+    const wishlistArray = response?.data?.data?.wishlist?.items || [];
+    setWishlist(wishlistArray);
+
+    const isAddedToWishlist = wishlistArray.some(
+      (item) => item._id === productId
+    );
+    setsWishlisted(isAddedToWishlist);
+  };
+
+  useEffect(() => {
+    fetchhWishlist();
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <div className="product_container">
@@ -371,8 +405,14 @@ const handleDeleteReview = async (reviewId) => {
             <div>
               <h1>{product?.name}</h1>
               <div>
-                <WishListHeartIcon productId={product?._id} />
-                <figure onClick={handleNativeShare} style={{ cursor: "pointer" }}>
+                <WishListHeartIcon
+                  productId={product?._id}
+                  isWishlist={isWishlisted}
+                />
+                <figure
+                  onClick={handleNativeShare}
+                  style={{ cursor: "pointer" }}
+                >
                   <img src={share} alt="Share" />
                 </figure>
               </div>
@@ -483,7 +523,6 @@ const handleDeleteReview = async (reviewId) => {
                 <Tabs
                   value={value}
                   variant="scrollable"
-                  scrollButtons="false"
                   onChange={handleChange}
                   className="Product_tab_items"
                   textColor="secondary"
@@ -551,7 +590,7 @@ const handleDeleteReview = async (reviewId) => {
                         )
                         .map((review, index) => (
                           <Box
-                            key={review[index]?._id}
+                            key={review._id}
                             sx={{
                               display: "flex",
                               alignItems: "start",

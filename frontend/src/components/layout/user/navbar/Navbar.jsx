@@ -59,14 +59,13 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const [wishlistData, setWishlistData] = useState([]); 
+  const [wishlistData, setWishlistData] = useState([]);
 
   const fetchWishlistData = useCallback(async () => {
     try {
       const response = await getUserWishlist();
-      const wishlist = response?.data?.data?.wishlist || [];
-
-      setWishlistData(wishlist); 
+      const wishlist = response?.data?.data?.wishlist?.items|| [];
+      setWishlistData(wishlist);
     } catch (err) {
       console.error(
         "Error fetching wishlist:",
@@ -178,7 +177,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       link: "/",
       icon: <Logout fontSize="small" />,
     },
-
   ];
   const [cartData, setCartData] = useState(null);
   const fetchCartData = async () => {
@@ -207,7 +205,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     try {
       const response = await getCategory();
       const categories = Object.values(response.data.data);
-  
+
       // Ensure data structure matches expectations
       if (categories.length) {
         setGetAllCategories(categories);
@@ -216,13 +214,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       console.error("Error fetching categories:", error);
     }
   };
-  
+
   useEffect(() => {
-   
-      fetchCategoriesData();
-    
+    fetchCategoriesData();
   }, []);
-  
 
   return (
     <nav className="navbar_container">
@@ -278,9 +273,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                           onClick={() => toggleCollapse(catIndex)}
                           aria-expanded={openCategoryIndex === catIndex}
                         >
-                          
-                          <Link className="underline" to={`/categories/${categoryObj.category_Details._id}`}>
-                          <h1 >{categoryObj.category}</h1>
+                          <Link
+                            className="underline"
+                            to={`/categories/${categoryObj.category_Details._id}`}
+                          >
+                            <h1>{categoryObj.category}</h1>
                           </Link>
                           <svg
                             className={`collapse-icon ${
@@ -384,7 +381,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
         {authToken && (
           <IconButton
-            aria-label={notificationsLabel(100)}
+            aria-label={`wishlist with ${wishlistData.length} items`}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
