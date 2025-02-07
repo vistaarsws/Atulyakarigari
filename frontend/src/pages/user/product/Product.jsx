@@ -37,6 +37,8 @@ import {
   getCart,
   addToCart,
   removeFromCart,
+  getQuestionsByProduct,
+  askQuestion,
 } from "../../../../src/services/user/userAPI";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -220,37 +222,35 @@ export default function Product() {
   };
 
   // Handle deleting a review
-const handleDeleteReview = async (reviewId) => {
-  try {
-    if (!reviewId) {
-      console.error("Error: Review ID is required");
-      alert("Review ID is missing!");
-      return;
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      if (!reviewId) {
+        console.error("Error: Review ID is required");
+        alert("Review ID is missing!");
+        return;
+      }
+
+      const confirmation = window.confirm(
+        "Are you sure you want to delete this review?"
+      );
+
+      if (!confirmation) return;
+
+      const response = await deleteReview(reviewId);
+
+      if (response?.success) {
+        alert("Review deleted successfully!");
+        // Optionally refetch reviews or update the UI to reflect the deletion
+        fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
+      } else {
+        console.error("Failed to delete review:", response);
+        alert("Failed to delete review. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleDeleteReview:", error);
+      alert("An error occurred while deleting the review.");
     }
-
-    const confirmation = window.confirm(
-      "Are you sure you want to delete this review?"
-    );
-
-    if (!confirmation) return;
-
-    const response = await deleteReview(reviewId);
-
-    if (response?.success) {
-      alert("Review deleted successfully!");
-      // Optionally refetch reviews or update the UI to reflect the deletion
-      fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
-    } else {
-      console.error("Failed to delete review:", response);
-      alert("Failed to delete review. Please try again later.");
-    }
-  } catch (error) {
-    console.error("Unexpected error in handleDeleteReview:", error);
-    alert("An error occurred while deleting the review.");
-  }
-};
-
-  
+  };
 
   // Toggle showing more reviews
   const handleToggleReviews = () => {
@@ -322,6 +322,54 @@ const handleDeleteReview = async (reviewId) => {
       setLoading(false);
     }
   };
+
+  const [questionsAndAnswers, setQuestionsAndAnswers] = useState([]);
+
+  const fetchQuestionsAndAnswers = async () => {
+    try {
+      const response = await getQuestionsByProduct(productId);
+      setQuestionsAndAnswers(response?.data.questions);
+      console.log("QuestionsAndAnswers", questionsAndAnswers); // Log response directly
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestionsAndAnswers();
+  }, [productId]); // Refetch if productId changes
+
+  useEffect(() => {
+    console.log("Updated QuestionsAndAnswers:", questionsAndAnswers); // Log updated state
+  }, [questionsAndAnswers]);
+
+  const [newQuestion, setNewQuestion] = useState(""); // Input field state
+
+  const handleAskQuestion = async () => {
+    
+    if (newQuestion.length < 5) {
+      alert("Question must be at least 5 characters long.");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await askQuestion(productId, newQuestion);
+      if (response?.data?.success===true) {
+        alert("Question submitted successfully!");
+        setNewQuestion(""); // Clear input field
+        fetchQuestionsAndAnswers(); // Refresh questions
+      } else {
+        alert(response?.message || "Failed to submit question.");
+      }
+    } catch (error) {
+      console.error("Error submitting question:", error);
+      alert("An error occurred while submitting your question.");
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -682,13 +730,38 @@ const handleDeleteReview = async (reviewId) => {
 
               <CustomTabPanel value={value} index={3}>
                 <div className="ask_question">
+                  {/* Input Field for Question */}
                   <div>
                     <input
                       type="text"
                       placeholder="Ask any question here"
-                    ></input>
-                    <button>Submit</button>
+                      value={newQuestion} // Bind state
+                      onChange={(e) => setNewQuestion(e.target.value)} // Update state dynamically
+                    />
+                    <button onClick={handleAskQuestion} disabled={loading}>
+                      {loading ? "Submitting..." : "Submit"}
+                    </button>
                   </div>
+
+                  {/* Questions and Answers List */}
+                  {questionsAndAnswers.length > 0 ? (
+                    questionsAndAnswers.map((item) => (
+                      <div key={item._id} className="question-container">
+                        <div className="question">
+                          <h3>Q: {item.question}</h3>
+                        </div>
+                        <div className="answer">
+                          {item.answer ? (
+                            <h3>A: {item.answer}</h3>
+                          ) : (
+                            <p className="no-answer">No answer provided yet.</p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No questions asked yet. Be the first to ask!</p>
+                  )}
                 </div>
               </CustomTabPanel>
             </article>
