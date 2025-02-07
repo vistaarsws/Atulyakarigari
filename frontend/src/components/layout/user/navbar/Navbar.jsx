@@ -75,7 +75,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const fetchWishlistData = async () => {
     try {
       const response = await getUserWishlist();
-      setWishlistData(response?.data?.data?.wishlist);
+      console.log("WWWW", response.data.data.wishlist[0].items.length);
+      setWishlistData(response.data.data.wishlist[0].items);
     } catch (err) {
       console.log(err.message);
     }
@@ -83,7 +84,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     fetchWishlistData();
-  }, []);
+  }, [wishlistData]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -309,7 +310,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   };
   useEffect(() => {
     fetchCartData();
-  }, []);
+  }, [wishlistData]);
 
   return (
     <nav className="navbar_container">

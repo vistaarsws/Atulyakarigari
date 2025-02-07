@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import LoadingButton from "@mui/lab/LoadingButton";
+
 import "./ProductForm.css";
 
 import {
@@ -421,18 +422,11 @@ export default function ProductForm({
           JSON.stringify([...formData?._attributes])
         );
       }
-      // Serialize _attributes
-      if (formData._attributes) {
-        formDataInstance.append(
-          "_attributes",
-          JSON.stringify([...formData?._attributes])
-        );
-      }
 
       if (formData.detailDescription) {
         formDataInstance.append(
           "detailDescription",
-          JSON.stringify([...savedData])
+          JSON.stringify([...formData?.detailDescription])
         );
       }
 
