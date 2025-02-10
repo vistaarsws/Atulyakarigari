@@ -35,8 +35,10 @@ export const user_endpoints = {
 
   USER_PROFILE: BASE_URL + "/api/v1/profile/get",
   USER_PROFILE_UPDATE: BASE_URL + "/api/v1/profile/update",
+
   USER_WISHLIST: BASE_URL + "/api/v1/wishlist/get",
   TOGGLE_WISHLIST: BASE_URL + "/api/v1/wishlist/toggle",
+  
   USER_ADD_TO_CART: BASE_URL + "/api/v1/addToCart/add",
   USER_GET_CART: BASE_URL + "/api/v1/addToCart/get",
   REMOVE_FROM_CART: BASE_URL + "/api/v1/addToCart/remove",
