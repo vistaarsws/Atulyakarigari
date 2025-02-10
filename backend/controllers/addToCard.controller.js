@@ -91,6 +91,7 @@ export const addToCart = async (req, res) => {
 // Get the cart for the user
 export const getCart = async (req, res) => {
   try {
+    //updated by mohit 
     const userId = req.user?._id;
     if (!userId) {
       return notFoundRequest(req, res, null, "User not authenticated");
