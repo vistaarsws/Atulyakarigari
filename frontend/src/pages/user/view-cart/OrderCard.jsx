@@ -294,7 +294,7 @@ const OrderCard = ({ cartData }) => {
         }}
       >
         {cartData?.items?.map((item) => (
-          <ProductCard key={item._id} product={item} />
+          <ProductCard key={item._id} product={item}  />
         ))}
       </Box>
     </ThemeProvider>
