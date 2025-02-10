@@ -77,7 +77,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     fetchWishlistData();
-  }, []);
+  }, [wishlistData]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -158,7 +158,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           category_Details: category,
           subcategories: category.subcategory.map((sub) => ({
             name: sub.name,
-            subCategory_Details:sub
+            subCategory_Details: sub,
           })),
         })),
       },
@@ -274,13 +274,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                         >
                           {categoryObj.subcategories.map(
                             (subcategory, subIndex) => (
-                              
                               <li key={subIndex} id="subcategoryLinks">
                                 <Link
-                                className="underline"
-                                to={`/sub-categories/${subcategory?.subCategory_Details?._id}`}
+                                  className="underline"
+                                  to={`/sub-categories/${subcategory?.subCategory_Details?._id}`}
                                 >
-                                {subcategory.name}
+                                  {subcategory.name}
                                 </Link>
                                 <svg
                                   width="8"

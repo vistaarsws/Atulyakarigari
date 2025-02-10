@@ -34,6 +34,7 @@ const Wishlist = () => {
 
     try {
       const response = await getUserWishlist(userId);
+      console.log("wislist page response", response);
       const wishlist = response?.data?.data?.wishlist || null;
       if (response?.data?.success && wishlist) {
         setWishlistItems(wishlist.items || []);
@@ -45,11 +46,11 @@ const Wishlist = () => {
       console.error("Error fetching wishlist data:", error.message || error);
       toast.error("Failed to fetch wishlist data. Please try again.");
     }
-  }, [getUserIdFromToken]);
+  }, []);
 
   useEffect(() => {
     fetchWishlistData();
-  }, [fetchWishlistData]);
+  }, []);
 
   const renderWishlistItems = () =>
     wishlistItems.map((product) => (
