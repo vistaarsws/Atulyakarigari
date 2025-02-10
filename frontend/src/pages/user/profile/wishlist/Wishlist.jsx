@@ -66,7 +66,9 @@ const Wishlist = () => {
     ));
 
   return (
-    <div className="wishlist_container">
+    <div
+      className={`wishlist_container ${wishlistItems.length > 3 ? "responsiveLayout" : ""}`}
+    >
       {wishlistItems.length > 0 ? (
         renderWishlistItems()
       ) : (
