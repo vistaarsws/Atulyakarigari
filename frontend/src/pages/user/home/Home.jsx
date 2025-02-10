@@ -9,7 +9,7 @@ import ProductSection from "../../../components/layout/user/product-section/Prod
 
 import CategoryView from "../../../components/layout/user/category-view/CategoryView";
 import { useMediaQuery } from "@mui/material";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
 import { useNavigate } from "react-router-dom";
 
@@ -63,8 +63,8 @@ export default function Home() {
         {getAllCategories.length > 0 ? (
           getAllCategories.map((category, index) => {
             return (
-              <Fragment key={category._id}>
-                {index === 1 && (
+              <>
+                {index == 1 && (
                   <section className="celebrate_artistry_container">
                     <article>
                       <div className="card-item ">
@@ -107,7 +107,7 @@ export default function Home() {
                   </section>
                 )}
 
-                <div className="category-container">
+                <div key={category._id} className="category-container">
                   <div className="subcategories">
                     {category.subcategory?.length > 0 ? (
                       category.subcategory.map((subcat) => (
@@ -129,7 +129,7 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-              </Fragment>
+              </>
             );
           })
         ) : (

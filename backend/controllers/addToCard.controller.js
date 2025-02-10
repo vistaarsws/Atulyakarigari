@@ -1,10 +1,6 @@
 import Cart from "../models/addToCart.js";
 import Product from "../models/product.js";
-import {
-  badRequest,
-  internalServerError,
-  notFoundRequest,
-} from "../helpers/api-response.js";
+import { badRequest, internalServerError, notFoundRequest } from "../helpers/api-response.js";
 
 // Centralized success response function
 const successResponse = (res, data, message) => {
@@ -97,33 +93,21 @@ export const getCart = async (req, res) => {
       return notFoundRequest(req, res, null, "User not authenticated");
     }
 
-    // Fetch the user's cart and populate product details
-    const cart = await Cart.findOne({ userId }).populate(
-      "items.productId",
-      "name price description priceAfterDiscount images"
-    );
+        // Fetch the user's cart and populate product details
+        const cart = await Cart.findOne({ userId }).populate("items.productId", "name price description priceAfterDiscount images");
+        if (!cart) {
+            return notFoundRequest(req, res, null, "Cart not found");
+        }
 
-    if (!cart || !cart.items.length) {
-      return successResponse(
-        res,
-        { cart: [], totalItems: 0, totalPrice: 0 },
-        "Cart is empty"
-      );
+        // Calculate totals
+        const totals = await calculateCartTotal(cart.items);
+
+        // Return formatted cart data with totals
+        successResponse(res, formatCart(cart, totals), "Cart retrieved successfully.");
+    } catch (error) {
+        console.error("Error in getCart:", error);
+        return internalServerError(req, res, error, "Unable to fetch cart");
     }
-
-    // Calculate totals
-    const totals = await calculateCartTotal(cart.items);
-
-    // Return formatted cart data with totals
-    return successResponse(
-      res,
-      formatCart(cart, totals),
-      "Cart retrieved successfully."
-    );
-  } catch (error) {
-    console.error("Error in getCart:", error);
-    return internalServerError(req, res, error, "Unable to fetch cart");
-  }
 };
 
 // Remove item from cart

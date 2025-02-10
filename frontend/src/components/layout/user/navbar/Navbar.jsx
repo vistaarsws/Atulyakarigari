@@ -61,11 +61,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   const [wishlistData, setWishlistData] = useState([]);
 
-  const fetchWishlistData = useCallback(async () => {
+  const fetchWishlistData = async () => {
     try {
-      const response = await getUserWishlist();
-      const wishlist = response?.data?.data?.wishlist?.items|| [];
-      setWishlistData(wishlist);
+      const { userId } = jwtDecode(authToken);
+      const response = await getUserWishlist(userId);
+      setWishlistData(response.data.data.wishlist.items);
     } catch (err) {
       console.error(
         "Error fetching wishlist:",
@@ -73,11 +73,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       );
       toast.error("Failed to load wishlist. Please try again.");
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchWishlistData();
-  }, [fetchWishlistData]);
+  }, []);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -158,6 +158,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           category_Details: category,
           subcategories: category.subcategory.map((sub) => ({
             name: sub.name,
+            subCategory_Details:sub
           })),
         })),
       },
@@ -178,46 +179,20 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  const [cartData, setCartData] = useState(null);
+  const [cartData, setCartData] = useState([]);
+
   const fetchCartData = async () => {
     try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
       const response = await getCart();
-      setCartData(response?.data?.data);
+      console.log("ttt", response.data.data);
+      setCartData(response.data.data);
     } catch (err) {
-      console.log(err.message);
+      console.log(err);
     }
   };
   useEffect(() => {
     fetchCartData();
-  }, []);
-  const fetchCategoriesData = async () => {
-    try {
-      const response = await getCategory();
-      const categories = Object.values(response.data.data);
-
-      // Ensure data structure matches expectations
-      if (categories.length) {
-        setGetAllCategories(categories);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategoriesData();
-  }, []);
+  }, [cartData]);
 
   return (
     <nav className="navbar_container">
@@ -299,8 +274,14 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                         >
                           {categoryObj.subcategories.map(
                             (subcategory, subIndex) => (
+                              
                               <li key={subIndex} id="subcategoryLinks">
+                                <Link
+                                className="underline"
+                                to={`/sub-categories/${subcategory?.subCategory_Details?._id}`}
+                                >
                                 {subcategory.name}
+                                </Link>
                                 <svg
                                   width="8"
                                   height="8"
@@ -381,11 +362,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
         {authToken && (
           <IconButton
-            aria-label={`wishlist with ${wishlistData.length} items`}
+            aria-label={notificationsLabel(100)}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData?.length}
+              badgeContent={wishlistData.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",

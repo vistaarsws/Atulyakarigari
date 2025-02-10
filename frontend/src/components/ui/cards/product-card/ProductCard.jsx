@@ -7,7 +7,6 @@ import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector } from "react-redux";
 import { addToCart, getCart } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
-
 function ProductCard({
   title = "Product Title",
   shortDescription = "Short description here...",
@@ -28,7 +27,6 @@ function ProductCard({
       try {
         const response = await getCart();
         const cartItems = response?.data?.data?.items || [];
-
         if (Array.isArray(cartItems)) {
           setIsInCart(cartItems.some((item) => item.productId === id));
         }
@@ -36,14 +34,17 @@ function ProductCard({
         console.error("Error fetching cart items:", err.message);
       }
     };
-
     if (id) checkIfInCart();
   }, [id]);
-
-  useEffect(() => {
-    setIsHover(location.pathname.includes("user/wishlist"));
-  }, [location.pathname]);
-
+  // Check if the URL contains "user/wishlist"
+  // useEffect(() => {
+  //   const path = location.pathname;
+  //   if (path.includes("/profile/wishlist")) {
+  //     setIsHover(false);
+  //   } else {
+  //     setIsHover(true);
+  //   }
+  // }, [location.pathname]);
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     if (isInCart) {
@@ -57,7 +58,6 @@ function ProductCard({
       }
     }
   };
-
   return (
     <div
       style={{
@@ -75,7 +75,6 @@ function ProductCard({
           <img src={rating_star} alt="Rating Star" />
         </figure>
       </div>
-
       {/* Wishlist Icon */}
       <section>
         <WishListHeartIcon
@@ -84,16 +83,14 @@ function ProductCard({
           refreshWishlist={refreshWishlist}
         />
       </section>
-
       {/* Product Image */}
       <figure>
         <img
-          style={{ transform: isHover ? "scale(1.5)" : "scale(1)" }}
+          style={{ transform: isHover ? "scale(1.5)" : "" }}
           src={picture}
-          alt={title}
+          alt=""
         />
       </figure>
-
       {/* Product Details */}
       <article>
         <h1>{title}</h1>
@@ -108,7 +105,6 @@ function ProductCard({
           )}
         </div>
       </article>
-
       {/* Add to Cart Button */}
       <div className={isAddedToWishlist ? "wistListBtnStyle" : ""}>
         <button
@@ -122,7 +118,6 @@ function ProductCard({
     </div>
   );
 }
-
 ProductCard.propTypes = {
   title: PropTypes.string.isRequired,
   shortDescription: PropTypes.string,
@@ -134,5 +129,4 @@ ProductCard.propTypes = {
   priceAfterDiscount: PropTypes.number.isRequired,
   refreshWishlist: PropTypes.func,
 };
-
 export default ProductCard;

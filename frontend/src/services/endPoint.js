@@ -19,8 +19,11 @@ export const admin_endpoints = {
   CREATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/create",
   DELETE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/delete",
   UPDATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/update",
+  GET_SUBCATEGORY_BY_ID: BASE_URL + "/api/v1/sub-category/get/",
   GET_SUBCATEGORY_BY_CATEGORY_ID:
     BASE_URL + "/api/v1/sub-category/get-by-category",
+
+  ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer/",
 };
 
 export const user_endpoints = {
@@ -32,8 +35,10 @@ export const user_endpoints = {
 
   USER_PROFILE: BASE_URL + "/api/v1/profile/get",
   USER_PROFILE_UPDATE: BASE_URL + "/api/v1/profile/update",
+
   USER_WISHLIST: BASE_URL + "/api/v1/wishlist/get",
   TOGGLE_WISHLIST: BASE_URL + "/api/v1/wishlist/toggle",
+  
   USER_ADD_TO_CART: BASE_URL + "/api/v1/addToCart/add",
   USER_GET_CART: BASE_URL + "/api/v1/addToCart/get",
   REMOVE_FROM_CART: BASE_URL + "/api/v1/addToCart/remove",
@@ -50,4 +55,6 @@ export const user_endpoints = {
   CREATE_OR_UPDATE_RATING: BASE_URL + "/api/v1/ratingAndReviews/createOrUpdate",
   DELETE_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
 
+  GET_QUESTIONS_BY_PRODUCT: BASE_URL + "/api/v1/questions/",
+  CREATE_QUESTION: BASE_URL + "/api/v1/questions/",
 };

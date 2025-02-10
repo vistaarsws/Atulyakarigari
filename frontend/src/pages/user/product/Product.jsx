@@ -37,8 +37,11 @@ import {
   getCart,
   addToCart,
   removeFromCart,
+  getQuestionsByProduct,
+  askQuestion,
   getUserWishlist,
 } from "../../../../src/services/user/userAPI";
+import { answerQuestion } from "../../../../src/services/admin/adminAPI";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 
@@ -123,7 +126,6 @@ export default function Product() {
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
-  // Fetch reviews and update the state
   const fetchRatingAndReview = async () => {
     try {
       if (!authToken) {
@@ -168,12 +170,10 @@ export default function Product() {
     }
   };
 
-  // Handle changes in the review form fields
   const handleChangeReview = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle review submission (create or update)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -194,10 +194,8 @@ export default function Product() {
       let response;
 
       if (editingReviewId) {
-        // Update review
         response = await createOrUpdateReview(productId, rating, comment);
       } else {
-        // Create new review
         response = await createOrUpdateReview(productId, rating, comment);
       }
 
@@ -220,51 +218,45 @@ export default function Product() {
     }
   };
 
-  // Handle deleting a review
-const handleDeleteReview = async (reviewId) => {
-  try {
-    if (!reviewId) {
-      console.error("Error: Review ID is required");
-      alert("Review ID is missing!");
-      return;
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      if (!reviewId) {
+        console.error("Error: Review ID is required");
+        alert("Review ID is missing!");
+        return;
+      }
+
+      const confirmation = window.confirm(
+        "Are you sure you want to delete this review?"
+      );
+
+      if (!confirmation) return;
+
+      const response = await deleteReview(reviewId);
+
+      if (response?.success) {
+        alert("Review deleted successfully!");
+
+        fetchRatingAndReview();
+      } else {
+        console.error("Failed to delete review:", response);
+        alert("Failed to delete review. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleDeleteReview:", error);
+      alert("An error occurred while deleting the review.");
     }
+  };
 
-    const confirmation = window.confirm(
-      "Are you sure you want to delete this review?"
-    );
-
-    if (!confirmation) return;
-
-    const response = await deleteReview(reviewId);
-
-    if (response?.success) {
-      alert("Review deleted successfully!");
-      // Optionally refetch reviews or update the UI to reflect the deletion
-      fetchRatingAndReview(); // Assuming this is a function in your component to fetch reviews
-    } else {
-      console.error("Failed to delete review:", response);
-      alert("Failed to delete review. Please try again later.");
-    }
-  } catch (error) {
-    console.error("Unexpected error in handleDeleteReview:", error);
-    alert("An error occurred while deleting the review.");
-  }
-};
-
-  
-
-  // Toggle showing more reviews
   const handleToggleReviews = () => {
     setShowAllReviews(!showAllReviews);
   };
 
-  // Handle editing a review (pre-fill the form)
   const handleEditReview = (review) => {
     setFormData({ rating: review.rating, comment: review.comment });
     setEditingReviewId(review._id || review.id);
   };
 
-  // Fetch reviews on component mount
   useEffect(() => {
     const fetchData = async () => {
       if (!authToken) {
@@ -284,13 +276,6 @@ const handleDeleteReview = async (reviewId) => {
     fetchData();
   }, []);
 
-  // // Fetch reviews on component mount
-  // useEffect(() => {
-  //   fetchRatingAndReview();
-  // }, []);
-
-  // RATING AND REVIEW END //
-
   const [isInCart, setIsInCart] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -298,12 +283,8 @@ const handleDeleteReview = async (reviewId) => {
     try {
       const cart = await getCart();
       const items = cart?.data?.data?.items;
-      if (!items) {
-        setIsInCart(false);
-        return;
-      }
 
-      const productInCart = items.map((item) => item.productId === productId);
+      const productInCart = items.some((item) => item.productId === productId);
       setIsInCart(productInCart);
     } catch (error) {
       console.error("Error checking cart status:", error);
@@ -319,7 +300,9 @@ const handleDeleteReview = async (reviewId) => {
     setLoading(true);
 
     try {
-      isInCart ? await removeFromCart(productId) : await addToCart(productId, productQuantity);
+      isInCart
+        ? await removeFromCart(productId)
+        : await addToCart(productId, productQuantity);
       setIsInCart(!isInCart);
     } catch (error) {
       console.error("Error updating cart:", error);
@@ -334,27 +317,26 @@ const handleDeleteReview = async (reviewId) => {
   };
 
   // START Share Product
-  
-    const productUrl = `${window.location.origin}/product/${productId}`;
-    
-    const handleNativeShare = async () => {
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: product?.name,
-            text: `Check out this product: ${product?.name}`,
-            url: productUrl,
-          });
-        } catch (error) {
-          console.error("Error sharing:", error);
-        }
-      } else {
-        alert("Sharing not supported in this browser.");
+
+  const productUrl = `${window.location.origin}/product/${productId}`;
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product?.name,
+          text: `Check out this product: ${product?.name}`,
+          url: productUrl,
+        });
+      } catch (error) {
+        console.error("Error sharing:", error);
       }
-    };
+    } else {
+      alert("Sharing not supported in this browser.");
+    }
+  };
   // END Share Product
 
-  const [wishlist, setWishlist] = useState([]);
   const [isWishlisted, setsWishlisted] = useState();
   const fetchhWishlist = async () => {
     if (!authToken) {
@@ -368,10 +350,10 @@ const handleDeleteReview = async (reviewId) => {
       console.error("Error: Invalid token structure");
       return;
     }
+
     const response = await getUserWishlist(userId);
 
     const wishlistArray = response?.data?.data?.wishlist?.items || [];
-    setWishlist(wishlistArray);
 
     const isAddedToWishlist = wishlistArray.some(
       (item) => item._id === productId
@@ -382,6 +364,99 @@ const handleDeleteReview = async (reviewId) => {
   useEffect(() => {
     fetchhWishlist();
   }, []);
+
+  const [questionsAndAnswers, setQuestionsAndAnswers] = useState([]);
+
+  const fetchQuestionsAndAnswers = async () => {
+    try {
+      const response = await getQuestionsByProduct(productId);
+      setQuestionsAndAnswers(response?.data.questions);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestionsAndAnswers();
+  }, [productId]);
+
+  useEffect(() => {}, [questionsAndAnswers]);
+
+  const [newQuestion, setNewQuestion] = useState("");
+
+  const handleAskQuestion = async () => {
+    if (newQuestion.length < 5) {
+      alert("Question must be at least 5 characters long.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await askQuestion(productId, newQuestion);
+      if (response?.data?.success === true) {
+        alert("Question submitted successfully!");
+        setNewQuestion("");
+        fetchQuestionsAndAnswers();
+      } else {
+        alert(response?.message || "Failed to submit question.");
+      }
+    } catch (error) {
+      console.error("Error submitting question:", error);
+      alert("An error occurred while submitting your question.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [adminAnswer, setAdminAnswer] = useState("");
+  const [selectedQuestionId, setSelectedQuestionId] = useState("");
+  const [role, setRole] = useState("");
+
+  const handleAnswerSubmit = async () => {
+    setLoading(true);
+    if (!authToken) {
+      console.error("Error: No user profile token found");
+      return;
+    }
+
+    const decodedToken = jwtDecode(authToken);
+    const userId = decodedToken?._id;
+    if (!userId) {
+      console.error("Error: Invalid token structure");
+      return;
+    }
+
+    if (decodedToken) {
+      setRole(decodedToken?.role);
+    }
+
+    if (!adminAnswer || !selectedQuestionId) {
+      alert("Please select a question and provide an answer.");
+      setLoading(false);
+      return;
+    }
+
+    let answer = adminAnswer;
+    let questionId = selectedQuestionId;
+
+    try {
+      const response = await answerQuestion(answer, questionId, productId);
+
+      if (response?.status == 200) {
+        alert("Answer submitted successfully!");
+        setAdminAnswer("");
+        setSelectedQuestionId("");
+        fetchQuestionsAndAnswers();
+      } else {
+        alert(response?.message || "Failed to submit answer.");
+      }
+    } catch (error) {
+      console.error("Error submitting answer:", error);
+      alert("An error occurred while submitting your answer.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -405,10 +480,7 @@ const handleDeleteReview = async (reviewId) => {
             <div>
               <h1>{product?.name}</h1>
               <div>
-                <WishListHeartIcon
-                  productId={product?._id}
-                  isWishlist={isWishlisted}
-                />
+                <WishListHeartIcon productId={product?._id} />
                 <figure
                   onClick={handleNativeShare}
                   style={{ cursor: "pointer" }}
@@ -438,7 +510,7 @@ const handleDeleteReview = async (reviewId) => {
 
                 <div className="ratingBox">
                   <div>
-                  <span>{ratingAndReview?.averageRating}</span>
+                    <span>{ratingAndReview?.averageRating}</span>
                     <img src={star} alt="Star" />
                   </div>
                   <div>{ratingAndReview.reviews.length} Ratings</div>
@@ -523,6 +595,7 @@ const handleDeleteReview = async (reviewId) => {
                 <Tabs
                   value={value}
                   variant="scrollable"
+                  scrollButtons="false"
                   onChange={handleChange}
                   className="Product_tab_items"
                   textColor="secondary"
@@ -590,7 +663,7 @@ const handleDeleteReview = async (reviewId) => {
                         )
                         .map((review, index) => (
                           <Box
-                            key={review._id}
+                            key={review[index]?._id}
                             sx={{
                               display: "flex",
                               alignItems: "start",
@@ -753,13 +826,77 @@ const handleDeleteReview = async (reviewId) => {
 
               <CustomTabPanel value={value} index={3}>
                 <div className="ask_question">
+                  {/* Fetch and Set Role Once */}
+                  {authToken &&
+                    !role &&
+                    (() => {
+                      const decodedToken = jwtDecode(authToken);
+                      setRole(decodedToken?.role || "");
+                    })()}
+
+                  {/* Input Field for Question */}
                   <div>
                     <input
                       type="text"
                       placeholder="Ask any question here"
-                    ></input>
-                    <button>Submit</button>
+                      value={newQuestion} // Bind state
+                      onChange={(e) => setNewQuestion(e.target.value)} // Update state dynamically
+                    />
+                    <button onClick={handleAskQuestion} disabled={loading}>
+                      {loading ? "Submitting..." : "Submit"}
+                    </button>
                   </div>
+
+                  {/* Questions and Answers List */}
+                  {questionsAndAnswers.length > 0 ? (
+                    questionsAndAnswers.map((item) => (
+                      <div key={item._id} className="question-container">
+                        <div className="question">
+                          <h3>Q: {item.question}</h3>
+                        </div>
+                        <div className="answer">
+                          {item.answer ? (
+                            <h3>A: {item.answer}</h3>
+                          ) : (
+                            <>
+                              <p className="no-answer">
+                                No answer provided yet.
+                              </p>
+                              {role === "admin" && ( // Ensure the role is checked correctly
+                                <div className="admin-answer">
+                                  <input
+                                    type="text"
+                                    placeholder="Write your answer..."
+                                    value={
+                                      selectedQuestionId === item._id
+                                        ? adminAnswer
+                                        : ""
+                                    }
+                                    onChange={(e) => {
+                                      setAdminAnswer(e.target.value);
+                                      setSelectedQuestionId(item._id);
+                                    }}
+                                  />
+                                  <button
+                                    onClick={handleAnswerSubmit}
+                                    disabled={
+                                      loading || selectedQuestionId !== item._id
+                                    }
+                                  >
+                                    {loading && selectedQuestionId === item._id
+                                      ? "Submitting..."
+                                      : "Submit"}
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No questions asked yet. Be the first to ask!</p>
+                  )}
                 </div>
               </CustomTabPanel>
             </article>
