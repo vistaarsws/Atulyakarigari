@@ -1,4 +1,5 @@
-import { logger, createRotateTransport } from "../config/logger.js";
+import winston from "winston"; 
+import { logger, createRotateTransport } from "../../config/logger.js";
 
 // Cache loggers to avoid multiple instances
 const loggersCache = {};
