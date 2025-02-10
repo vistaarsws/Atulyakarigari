@@ -1,0 +1,50 @@
+.categoryPage_container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .productList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .skeletonCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    width: 220px;
+  }
+  
+  .paginationContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .paginationContainer .MuiPagination-root {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .emptyState {
+    text-align: center;
+    padding: 40px;
+  }
+  
+  .emptyImage {
+    width: 150px;
+    opacity: 0.6;
+  }  
+
+  .underline{
+    text-decoration: none;
+    color: black;
+  }

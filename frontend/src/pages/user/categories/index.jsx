@@ -67,6 +67,7 @@ const Index = () => {
                 shortDescription={product?.description || "No Description"}
                 offer_inPercent={product?.discountPercentage || null}
                 priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
+                loading={loading}
               />
             ))
           ) : (

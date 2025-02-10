@@ -207,6 +207,24 @@ const deleteReview = async (reviewId) => {
   }
 };
 
+const getQuestionsByProduct = async (productId) => {
+  try {
+    const response = await apiConnector("GET",`${user_endpoints.GET_QUESTIONS_BY_PRODUCT}${productId}`)
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const askQuestion = async (productId, question) => {
+  try {
+    const response = await apiConnector("POST", `${user_endpoints.GET_QUESTIONS_BY_PRODUCT}${productId}`, { question });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export {
   createProduct,
   getProducts,
@@ -229,4 +247,6 @@ export {
   getReviewById,
   createOrUpdateReview,
   deleteReview,
+  getQuestionsByProduct,
+  askQuestion
 };
