@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import LoadingButton from "@mui/lab/LoadingButton";
+
 import "./ProductForm.css";
 
 import {
@@ -13,6 +14,7 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
+import { Add, Remove, Save } from "@mui/icons-material";
 
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -50,14 +52,13 @@ export default function ProductForm({
   isProductEditing,
   closeDialog,
 }) {
-  
-
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState(() => ({
     name: productDetails?.name || "",
     productImage: productDetails?.images || [],
     description: productDetails?.description || "",
+    detailDescription: productDetails?.detailDescription || [],
     price: productDetails?.price || "",
     category: productDetails?.category || null,
     subcategory: productDetails?.subcategory || "",
@@ -107,11 +108,39 @@ export default function ProductForm({
   const [subCategories, setSubCategories] = useState([]);
 
   const [parentCategory, setParentCategory] = useState("");
+  const [details, setDetails] = useState([{ title: "", description: "" }]);
+  const [savedData, setSavedData] = useState([]);
+
+  // Handle input changes
+  const handleChange = (index, field, value) => {
+    const newDetails = [...details];
+    newDetails[index][field] = value;
+    setDetails(newDetails);
+  };
+
+  // Add new empty entry
+  const addField = () => {
+    setDetails([...details, { title: "", description: "" }]);
+  };
+
+  // Remove a specific entry
+  const removeField = (index) => {
+    if (details.length > 1) {
+      setDetails(details.filter((_, i) => i !== index));
+    }
+  };
+
+  // Save Data to State
+  const handleSaveDetailDescription = () => {
+    setSavedData(details);
+    console.log("Saved Data:", details);
+  };
 
   const initialState = {
     name: "",
     productImage: [],
     description: "",
+    detailDescription: [],
     price: "",
     category: null,
     subcategory: "",
@@ -279,7 +308,6 @@ export default function ProductForm({
         (cat) => cat
       );
 
-      
       setCategories(categories_arr);
 
       setLoadingStates((prev) => ({ ...prev, category: false }));
@@ -372,7 +400,6 @@ export default function ProductForm({
       });
 
       const formDataInstance = new FormData();
-      
 
       formDataInstance.append("name", formData?.name);
       formDataInstance.append("description", formData?.description);
@@ -393,6 +420,13 @@ export default function ProductForm({
         formDataInstance.append(
           "_attributes",
           JSON.stringify([...formData?._attributes])
+        );
+      }
+
+      if (formData.detailDescription) {
+        formDataInstance.append(
+          "detailDescription",
+          JSON.stringify([...formData?.detailDescription])
         );
       }
 
@@ -429,8 +463,6 @@ export default function ProductForm({
         } else {
           await appendSingle(files);
         }
-
-        
       };
 
       // Usage
@@ -858,7 +890,7 @@ export default function ProductForm({
           </article>
           {/* -----------------------------------------------Product Description----------------------------------------------------------------------------------------- */}
           <article>
-            <TextField
+            {/* <TextField
               sx={{ width: "100%" }}
               id="productCategory "
               label="Description"
@@ -872,7 +904,7 @@ export default function ProductForm({
                   description: e.target.value,
                 })
               }
-            />
+            /> */}
           </article>
           <article className="addVariant_container">
             <Box sx={{ margin: "auto" }}>
@@ -974,6 +1006,73 @@ export default function ProductForm({
           </article>
 
           <article>
+            
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: 600,
+                margin: "auto",
+                p: 2,
+                my: 2,
+                backgroundColor: "#f3f4f6",
+              }}
+            >
+              <Typography variant="h5" sx={{ mb: 2 }}>
+                Detail Input Form
+              </Typography>
+
+              {details.map((item, index) => (
+                <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
+                  <TextField
+                    label="Title"
+                    variant="outlined"
+                    fullWidth
+                    value={item.title}
+                    onChange={(e) =>
+                      handleChange(index, "title", e.target.value)
+                    }
+                  />
+                  <TextField
+                    label="Description"
+                    variant="outlined"
+                    fullWidth
+                    value={item.description}
+                    onChange={(e) =>
+                      handleChange(index, "description", e.target.value)
+                    }
+                  />
+                  <IconButton
+                    onClick={() => removeField(index)}
+                    color="error"
+                    disabled={details.length === 1}
+                  >
+                    <Remove />
+                  </IconButton>
+                </Box>
+              ))}
+
+              <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={addField}
+                  sx={{
+                    backgroundColor: "#d9d9d9",
+                    color: "#383737",
+                    boxShadow: "none",
+                  }}
+                >
+                  Add More
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSaveDetailDescription}
+                >
+                  Save Data
+                </Button>
+              </Box>
+            </Box>
+
             <TextField
               sx={{ width: "100%" }}
               id="productTitle"
@@ -987,6 +1086,7 @@ export default function ProductForm({
                 })
               }
             />
+
             <div className="artisan_image-desc_container">
               <div
                 {...getRootPropsSingle()}
@@ -1105,14 +1205,34 @@ export default function ProductForm({
                   justifyContent: "end",
                 }}
               >
+                <Button onClick={closeDialog} variant="contained" color="error">
+                  Cancel
+                </Button>
+                <LoadingButton
+                  size="large"
+                  loading={loadingStates.draftProduct}
+                  type="submit"
+                  disabled={loadingStates.addProduct}
+                  variant="contained"
+                  color="warning"
+                  value="Draft"
+                  onClick={(e) => {
+                    console.log("MANNN", e);
+                    productFormHandler(e);
+                  }}
+                >
+                  Update & Draft
+                </LoadingButton>
+
                 <LoadingButton
                   size="large"
                   // loading={loadingStates.draftProduct}
                   type="submit"
                   // disabled={loadingStates.addProduct}
-                  variant="outlined"
+                  variant="contained"
                   color="success"
-                  onClick={productFormHandler}
+                  value="Published"
+                  onClick={(e) => productFormHandler(e)}
                 >
                   Update Product
                 </LoadingButton>

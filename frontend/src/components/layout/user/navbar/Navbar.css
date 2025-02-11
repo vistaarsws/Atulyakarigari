@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 3%;
+  padding: 1.5rem 2%;
   background-color: rgba(109, 0, 29, 1);
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
@@ -58,6 +58,12 @@
 }
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
+.navbar_container figure {
+  & > a img {
+    width: 14rem;
+  }
+}
+
 .categoryDropdown {
   background-color: white;
   position: absolute;
@@ -66,7 +72,7 @@
 
 .underline{
   text-decoration: none;
-  
+  color: black;
 }
 
 .categories-container {
@@ -258,33 +264,24 @@ input:not(:placeholder-shown) ~ .reset {
 
 /* -------------------------------------------------------------------------IMAGE SETTING HOVER--------------------------------------------------------------------------- */
 .profileBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: white;
   border-radius: 50%;
   position: relative;
   cursor: pointer;
-  height: 4rem;
-  width: 4rem;
+  height: 3.5rem;
+  width: 3.5rem;
   margin: 0.8rem;
-  object-fit: cover;
-}
 
-.profileBox img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-}
+  border: 1px solid rgb(255, 255, 0);
 
-.profile-dropdown {
-  position: absolute;
-  top: calc(100% + 0px);
-  right: 0;
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  width: 175px;
-  font-family: Arial, sans-serif;
+  & > img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 /* .profile-dropdown::before {
@@ -397,10 +394,10 @@ input:not(:placeholder-shown) ~ .reset {
 @media screen and (max-width: 1580px) {
   .navLinks {
     margin-right: auto;
-    gap: 3rem;
+    gap: 1rem;
   }
 }
-@media screen and (max-width: 1209px) {
+@media screen and (max-width: 800px) {
   #category {
     width: 100%;
   }
@@ -546,13 +543,13 @@ input:not(:placeholder-shown) ~ .reset {
   }
 
   .navbar_container {
-    padding: 1rem 5%;
+    padding: 1rem 2%;
   }
 
   .nav-mobile {
     background: transparent;
     display: block !important;
-    margin-right: 0 !important;
+    margin: 0px !important;
   }
 
   #navbar-toggle {

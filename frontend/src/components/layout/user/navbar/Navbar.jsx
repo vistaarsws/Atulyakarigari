@@ -3,25 +3,43 @@ import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import userProfileAvatar from "../../../../assets/images/avatar.svg";
 import Avatar from "@mui/material/Avatar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { login, logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
+// import avatar from "../../../assets/images/avatar.svg";
+// import { useAuth } from "../../../../context/authToken";
+import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import { getCart, getProfile } from "../../../../services/user/userAPI";
+import {
+  getCart,
+  getProfile,
+  getUserWishlist,
+} from "../../../../services/user/userAPI";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { getCategory } from "../../../../services/admin/adminAPI";
-
 import Badge from "@mui/material/Badge";
 // import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { UnderlineOutlined } from "@ant-design/icons";
+import { MenuItem } from "@mui/material";
+import Logout from "@mui/icons-material/Logout";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
-  const [isProfileHovered, setIsProfileHovered] = useState(false);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    if (anchorEl) {
+      setAnchorEl(null); // Close the dropdown if it's already open
+    } else {
+      setAnchorEl(event.currentTarget); // Open the dropdown
+    }
+  };
   const [getAllCategories, setGetAllCategories] = useState([]);
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
 
@@ -39,20 +57,25 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const authToken = useSelector((state) => state.auth.token);
 
   const { enqueueSnackbar } = useSnackbar();
-  // const cookies = Cookies.get("authToken");
 
-  // const StyledBadge = styled(Badge)(({ theme }) => ({
-  //   "& .MuiBadge-badge": {
-  //     right: -3,
-  //     top: 13,
-  //     border: `1px solid ${theme.palette.background.paper}`,
-  //     padding: "0 2px",
-  //     backgroundColor: "#b56f82",
-  //     fontSize: "1.2rem",
-  //     width: "1.5rem",
-  //     height: "1.5rem",
-  //   },
-  // }));
+  const [wishlistData, setWishlistData] = useState([]);
+
+  const fetchWishlistData = useCallback(async () => {
+    try {
+      const response = await getUserWishlist();
+      const wishlist = response?.data?.data?.wishlist?.items|| [];
+      setWishlistData(wishlist);
+    } catch (err) {
+      console.error(
+        "Error fetching wishlist:",
+        err.response?.data || err.message
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWishlistData();
+  }, [fetchWishlistData]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -99,7 +122,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1210) {
+      if (window.innerWidth < 849) {
         setIsMobileView(true);
         setIsNavVisible(false);
       } else {
@@ -133,6 +156,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           category_Details: category,
           subcategories: category.subcategory.map((sub) => ({
             name: sub.name,
+            subCategory_Details:sub
           })),
         })),
       },
@@ -143,11 +167,15 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   };
 
   const menuItems = [
+    { name: "My Profile", link: "/profile" },
     { name: "Wishlist", link: "/profile/wishlist" },
     { name: "Orders", link: "/profile/orders" },
     { name: "Address", link: "/profile/address" },
-    { name: "Logout", link: "/" },
-
+    {
+      name: "Logout",
+      link: "/",
+      icon: <Logout fontSize="small" />,
+    },
   ];
   const [cartData, setCartData] = useState(null);
   const fetchCartData = async () => {
@@ -176,7 +204,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     try {
       const response = await getCategory();
       const categories = Object.values(response.data.data);
-  
+
       // Ensure data structure matches expectations
       if (categories.length) {
         setGetAllCategories(categories);
@@ -185,13 +213,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       console.error("Error fetching categories:", error);
     }
   };
-  
+
   useEffect(() => {
-   
-      fetchCategoriesData();
-    
+    fetchCategoriesData();
   }, []);
-  
 
   return (
     <nav className="navbar_container">
@@ -247,9 +272,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                           onClick={() => toggleCollapse(catIndex)}
                           aria-expanded={openCategoryIndex === catIndex}
                         >
-                          
-                          <Link className="underline" to={`/categories/${categoryObj.category_Details._id}`}>
-                          <h1 >{categoryObj.category}</h1>
+                          <Link
+                            className="underline"
+                            to={`/categories/${categoryObj.category_Details._id}`}
+                          >
+                            <h1>{categoryObj.category}</h1>
                           </Link>
                           <svg
                             className={`collapse-icon ${
@@ -271,8 +298,14 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                         >
                           {categoryObj.subcategories.map(
                             (subcategory, subIndex) => (
+                              
                               <li key={subIndex} id="subcategoryLinks">
+                                <Link
+                                className="underline"
+                                to={`/sub-categories/${subcategory?.subCategory_Details?._id}`}
+                                >
                                 {subcategory.name}
+                                </Link>
                                 <svg
                                   width="8"
                                   height="8"
@@ -353,6 +386,25 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
         {authToken && (
           <IconButton
+            aria-label={`wishlist with ${wishlistData.length} items`}
+            onClick={() => navigate("/profile/wishlist")}
+          >
+            <Badge
+              badgeContent={wishlistData?.length}
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: "#b56f82",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                },
+              }}
+            >
+              <FavoriteIcon fontSize="large" sx={{ fill: "white" }} />
+            </Badge>
+          </IconButton>
+        )}
+        {authToken && (
+          <IconButton
             aria-label={notificationsLabel(100)}
             onClick={() => navigate("/view-cart")}
           >
@@ -371,62 +423,87 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           </IconButton>
         )}
 
-        <div
-          className="profileBox"
-          onMouseEnter={() => setIsProfileHovered(true)}
-          onMouseLeave={() => setIsProfileHovered(false)}
-        >
-          {authToken ? (
-            // <img src={profileData?.profilePicture} alt="User Profile"  />
-            <Avatar
-              src={profileData?.profilePicture}
-              alt={profileData?.fullName}
-            />
-          ) : (
-            <Avatar src="/broken-image.jpg" />
-          )}
+        <div>
+          <Button
+            id="basic-button"
+            aria-controls={open ? "basic-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
+            <div className="profileBox">
+              {authToken ? (
+                <Avatar
+                  src={profileData?.profilePicture}
+                  alt={profileData?.fullName}
+                />
+              ) : (
+                <Avatar src="/broken-image.jpg" />
+              )}
 
-          {isProfileHovered && (
-            <div className="profile-dropdown">
-              {authToken && (
-                <div
+              {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
+            </div>
+          </Button>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            {authToken && (
+              <MenuItem>
+                <p>Hello, {profileData?.fullName}</p>
+              </MenuItem>
+            )}
+            {authToken ? (
+              <ul>
+                {menuItems.map((item, index) => (
+                  <MenuItem
+                    key={index}
+                    onClick={() => {
+                      logoutHandler(item.name);
+                      setAnchorEl(null);
+                      navigate(item.link);
+                    }}
+                  >
+                    {item.icon && (
+                      <ListItemIcon
+                        sx={{
+                          minWidth: "unset !important",
+                          marginRight: "0.5rem",
+                        }}
+                      >
+                        {item.icon}
+                      </ListItemIcon>
+                    )}
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </ul>
+            ) : (
+              <ul>
+                <MenuItem
                   onClick={() => {
-                    navigate("/profile");
-                    setIsProfileHovered(false);
+                    setAnchorEl(null);
+                    navigate("/login");
                   }}
                 >
-                  <p>Hello, {profileData?.fullName}</p>
-                  <p>My profile</p>
-                </div>
-              )}
-              {authToken ? (
-                <ul>
-                  {menuItems.map((item, index) => (
-                    <li key={index}>
-                      <Link
-                        onClick={() => {
-                          setIsProfileHovered(false);
-                          logoutHandler(item.name);
-                        }}
-                        to={item.link}
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <ul>
-                  <li>
-                    <Link to={"/login"}>Login</Link>
-                  </li>
-                  <li>
-                    <Link to={"/signup"}>Sign Up</Link>
-                  </li>
-                </ul>
-              )}
-            </div>
-          )}
+                  Login
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setAnchorEl(null);
+                    navigate("/signup");
+                  }}
+                >
+                  Sign Up
+                </MenuItem>
+              </ul>
+            )}
+          </Menu>
         </div>
       </div>
 

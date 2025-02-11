@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import BanarsiSilkFilter from "./BanarsiSilkFilter";
 import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
-import { Pagination } from "@mui/material";
+// import { Pagination } from "@mui/material";
 import { getcategoryById } from "../../../../src/services/user/userAPI";
 import "./CategoryPage.css";
 
@@ -44,9 +44,8 @@ const Index = () => {
   }
 
   const products = categoryData.products || []; // Ensure products is an array
- 
 
-  const totalPages = Math.ceil(products.length / 10); // Example pagination logic
+  // const totalPages = Math.ceil(products.length / 10);
 
   return (
     <div className="categoryPage_container">
@@ -58,31 +57,27 @@ const Index = () => {
         </div>
         <div className="productList">
           {products.length > 0 ? (
-            products.map(
-              (product) => (
-                
-                (
-                  <ProductCard
-                    key={product?._id}
-                    id={product?._id}
-                    title={product?.name || "No Title"}
-                    picture={product?.images[0] || ""}
-                    price={product?.price || "N/A"}
-                    shortDescription={product?.description || "No Description"}
-                    offer_inPercent={product?.discountPercentage || null}
-                    priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
-                  />
-                )
-              )
-            )
+            products.map((product) => (
+              <ProductCard
+                key={product?._id}
+                id={product?._id}
+                title={product?.name || "No Title"}
+                picture={product?.images[0] || ""}
+                price={product?.price || "N/A"}
+                shortDescription={product?.description || "No Description"}
+                offer_inPercent={product?.discountPercentage || null}
+                priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
+                loading={loading}
+              />
+            ))
           ) : (
             <div>No products available.</div>
           )}
         </div>
       </section>
-      <div className="paginationContainer">
+      {/* <div className="paginationContainer">
         <Pagination count={totalPages} />
-      </div>
+      </div> */}
     </div>
   );
 };

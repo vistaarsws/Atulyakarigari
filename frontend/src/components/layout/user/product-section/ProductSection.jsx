@@ -1,8 +1,14 @@
+import { Skeleton } from "@mui/material";
 import PropTypes from "prop-types";
 import ProductCard from "../../../ui/cards/product-card/ProductCard";
 import pattern from "../../../../assets/images/designPattern_1.svg";
 import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
 import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
+import { getUserWishlist } from "../../../../services/user/userAPI";
 
 import "./ProductSection.css";
 
@@ -10,23 +16,113 @@ import "./ProductSection.css";
 const formatProductData = (product) => ({
   id: product._id,
   title: product.name || "Unnamed Product",
-  picture: product.images?.[0] || "default-image-url", // Fallback for image
-  price: product.price || "N/A",
+  picture: product.images?.[0] || "default-image-url",
+  price: product.price || 0,
   shortDescription: product.description || "No Description",
-  priceAfterDiscount: product.priceAfterDiscount || "N/A",
+  priceAfterDiscount: product.priceAfterDiscount || 0,
   offer_inPercent: product.discountPercentage || null,
 });
 
 export default function ProductSection({ productCategorySection, bgColor }) {
-  const { title, subtitle, products, categoryId } = productCategorySection;
+  const { title, subtitle, products, subcategory_id } = productCategorySection;
+  const userProfileToken = useSelector((state) => state.auth.token);
+  const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const productCards = products.map((product, index) => (
-    <ProductCard key={index} {...formatProductData(product)} />
-  ));
+  const getUserIdFromToken = useCallback(() => {
+    if (!userProfileToken) {
+      toast.error("Please log in to view your wishlist.");
+      return null;
+    }
+
+    try {
+      const decodedToken = jwtDecode(userProfileToken);
+      return decodedToken?._id || null;
+    } catch (error) {
+      console.error("Error decoding token:", error.message || error);
+      toast.error("Invalid user session.");
+      return null;
+    }
+  }, [userProfileToken]);
+
+  const fetchWishlistData = useCallback(async () => {
+    const userId = getUserIdFromToken();
+    if (!userId) return;
+
+    try {
+      const response = await getUserWishlist(userId);
+      const wishlistArray = response?.data?.data?.wishlist?.items || [];
+      setWishlist(wishlistArray);
+    } catch (error) {
+      console.error(
+        "Error fetching wishlist data:",
+        error.response?.data || error.message
+      );
+    }
+  }, [getUserIdFromToken]);
+
+  useEffect(() => {
+    if (userProfileToken) {
+      fetchWishlistData();
+    }
+  }, [userProfileToken, fetchWishlistData]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      setLoading(false);
+    }
+  }, [products]);
+
+  // Ensure at least 5 product cards (real or skeleton)
+  const productCards = useMemo(() => {
+    if (loading) {
+      // Show 5 skeleton placeholders while loading
+      return [...Array(5)].map((_, index) => (
+        <div className="skeletonCard" key={index}>
+          <div className="skeleton_rating"></div>
+          <div className="skeleton_image"></div>
+          <div className="skeleton_text"></div>
+          <div className="skeleton_text short"></div>
+          <div className="skeleton_price"></div>
+          <div className="skeleton_button"></div>
+        </div>
+      ));
+    }
+
+    const realProducts = products.map((product) => {
+      const isAddedToWishlist = wishlist.some(
+        (item) => item._id === product._id
+      );
+
+      return (
+        <ProductCard
+          key={product._id}
+          {...formatProductData(product)}
+          isAddedToWishlist={isAddedToWishlist}
+          refreshWishlist={fetchWishlistData}
+          loading={loading}
+        />
+      );
+    });
+
+    // Fill with skeletons if fewer than 5 real products exist
+    const skeletons = [...Array(Math.max(0, 5 - realProducts.length))].map(
+      (_, index) => (
+        <div className="skeletonCard" key={`skeleton-${index}`}>
+         
+          <div className="skeleton_image"></div>
+          <div className="skeleton_text"></div>
+          <div className="skeleton_text short"></div>
+        </div>
+      )
+    );
+
+    return [...realProducts, ...skeletons]; // Merge real products and skeletons
+  }, [products, wishlist, fetchWishlistData, loading]);
+
   const navigate = useNavigate();
-
   const handleNavigate = () => {
-    navigate(`/categories/${categoryId}`);
+    navigate(`/sub-categories/${subcategory_id}`);
   };
 
   return (
