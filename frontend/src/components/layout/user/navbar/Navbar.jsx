@@ -1,37 +1,34 @@
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import userProfileAvatar from "../../../../assets/images/avatar.svg";
 import Avatar from "@mui/material/Avatar";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { login, logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-// import avatar from "../../../assets/images/avatar.svg";
-// import { useAuth } from "../../../../context/authToken";
+
 import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import {
-  getCart,
-  getProfile,
-  getUserWishlist,
-} from "../../../../services/user/userAPI";
+import { getProfile } from "../../../../services/user/userAPI";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
-// import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
+import { fetchCart } from "../../../../Redux/features/CartSlice";
+import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
- 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const wishlist = useSelector((state) => state.wishlist.items);
+  const cartData = useSelector((state) => state.cart);
+
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -44,41 +41,13 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   };
   const [getAllCategories, setGetAllCategories] = useState([]);
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
-
   const toggleCollapse = (index) => {
     setOpenCategoryIndex((prev) => (prev === index ? null : index));
   };
 
-  // const [isProfileView, setIsProfileView] = useState(false);
-  const navigate = useNavigate();
-  // const location = useLocation();
-  // const { loginContext, logoutContext, authToken, setauthToken } =
-  //   useAuth();
-
-  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
-
   const { enqueueSnackbar } = useSnackbar();
-
-  const [wishlistData, setWishlistData] = useState([]);
-
-  const fetchWishlistData = useCallback(async () => {
-    try {
-      const response = await getUserWishlist();
-      const wishlist = response?.data?.data?.wishlist?.items|| [];
-      setWishlistData(wishlist);
-    } catch (err) {
-      console.error(
-        "Error fetching wishlist:",
-        err.response?.data || err.message
-      );
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchWishlistData();
-  }, []);
-
+  // const [wishlistData, setWishlistData] = useState([]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -90,7 +59,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     return `${count} notifications`;
   }
   const [profileData, setProfileData] = useState(null);
-
   // Fetch Profile Data
   const fetchProfileData = async () => {
     try {
@@ -98,27 +66,22 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         console.error("No user profile token found");
         return;
       }
-
       const { _id } = jwtDecode(authToken);
       if (!_id) {
         console.error("Invalid token structure");
         return;
       }
-
       const response = await getProfile(_id);
       const profile = response?.data?.data;
-
       const fetchedData = {
         fullName: profile.fullName,
         profilePicture: profile.profilePicture || "/broken-image.jpg",
       };
-
       setProfileData(fetchedData);
     } catch (error) {
       console.error("Error fetching profile data: ", error.message || error);
     }
   };
-
   useEffect(() => {
     fetchProfileData();
   }, [authToken]);
@@ -135,7 +98,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     };
     handleResize();
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -168,7 +130,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       { name: "BLOGS", path: "/blogs" },
     ],
   };
-
   const menuItems = [
     { name: "My Profile", link: "/profile" },
     { name: "Wishlist", link: "/profile/wishlist" },
@@ -180,34 +141,32 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  const [cartData, setCartData] = useState(null);
-  const fetchCartData = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
+  // const [cartData, setCartData] = useState(null);
+  // const fetchCartData = async () => {
+  //   try {
+  //     if (!authToken) {
+  //       console.error("No user profile token found");
+  //       return;
+  //     }
+  //     const { _id } = jwtDecode(authToken);
+  //     if (!_id) {
+  //       console.error("Invalid token structure");
+  //       return;
+  //     }
+  //     const response = await getCart();
+  //     setCartData(response?.data?.data);
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchCartData();
+  // }, []);
 
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
-      const response = await getCart();
-      setCartData(response?.data?.data);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-  useEffect(() => {
-    fetchCartData();
-  }, []);
   const fetchCategoriesData = async () => {
     try {
       const response = await getCategory();
       const categories = Object.values(response.data.data);
-
       // Ensure data structure matches expectations
       if (categories.length) {
         setGetAllCategories(categories);
@@ -216,10 +175,16 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       console.error("Error fetching categories:", error);
     }
   };
-
   useEffect(() => {
     fetchCategoriesData();
   }, []);
+
+  useEffect(() => {
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+      dispatch(fetchWishlist(authToken));
+    }
+  }, [authToken, dispatch]);
 
   return (
     <nav className="navbar_container">
@@ -336,7 +301,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           );
         })}
       </ul>
-
       <div>
         <div>
           {!navWithoutSearchBar_list && (
@@ -385,10 +349,9 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             </form>
           )}
         </div>
-
         {authToken && (
           <IconButton
-            aria-label={`wishlist with ${wishlistData.length} items`}
+            aria-label={`wishlist with ${wishlist.length} items`}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
@@ -424,7 +387,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             </Badge>
           </IconButton>
         )}
-
         <div>
           <Button
             id="basic-button"
@@ -442,7 +404,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               ) : (
                 <Avatar src="/broken-image.jpg" />
               )}
-
               {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
             </div>
           </Button>
@@ -508,7 +469,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           </Menu>
         </div>
       </div>
-
       <div className="nav-mobile">
         <button
           id="navbar-toggle"

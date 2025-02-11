@@ -5,35 +5,40 @@ import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHe
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, getCart, getReviewById } from "../../../../services/user/userAPI";
+import {
+  addToCart,
+  getCart,
+  getReviewById,
+} from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
+import { addToTheCart, fetchCart } from "../../../../Redux/features/CartSlice";
 function ProductCard({
   title = "Product Title",
   shortDescription = "Short description here...",
   picture = "",
   price = 0,
   offer_inPercent = 0,
-  id = "",
+  id,
   priceAfterDiscount = price,
   isAddedToWishlist,
   refreshWishlist,
 }) {
- 
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const authToken = useSelector((state) => state.auth);
 
   const [reviewData, setReviewData] = useState(null);
 
   const getReview = async () => {
     try {
-      const response = await getReviewById(id); 
+      const response = await getReviewById(id);
       setReviewData(response?.data?.data);
     } catch (error) {
       console.error("Error fetching review data:", error.message);
     }
-  }
-  
+  };
+
   const checkIfInCart = async () => {
     try {
       const response = await getCart();
@@ -49,14 +54,17 @@ function ProductCard({
     getReview();
     if (id) checkIfInCart();
   }, [id]);
-  
-  const handleAddToCart = async (e) => {
+
+  const handleAddToCart = (e) => {
     e.stopPropagation();
+
     if (isInCart) {
       navigate("/view-cart");
     } else {
       try {
-        await addToCart(id, 1);
+        dispatch(addToTheCart({ productId: id, quantity: 1 })).unwrap();
+        dispatch(fetchCart(authToken.token));
+
         setIsInCart(true);
       } catch (err) {
         console.error("Error adding to cart:", err.message);
@@ -65,7 +73,6 @@ function ProductCard({
   };
   return (
     <div
-      
       className="productCard_container"
       onClick={() => navigate(`/product/${id}`)}
     >
@@ -78,15 +85,11 @@ function ProductCard({
       </div>
       {/* Wishlist Icon */}
       <section>
-      <WishListHeartIcon productId={id} isWishlist={isAddedToWishlist} />
+        <WishListHeartIcon productId={id} isWishlist={isAddedToWishlist} />
       </section>
       {/* Product Image */}
       <figure>
-        <img
-          
-          src={picture}
-          alt=""
-        />
+        <img src={picture} alt="" />
       </figure>
       {/* Product Details */}
       <article>
@@ -104,10 +107,7 @@ function ProductCard({
       </article>
       {/* Add to Cart Button */}
       <div className={isAddedToWishlist ? "wistListBtnStyle" : ""}>
-        <button
-          onClick={handleAddToCart}
-          className={isInCart ? "in-cart" : ""}
-        >
+        <button onClick={handleAddToCart} className={isInCart ? "in-cart" : ""}>
           {isInCart ? "Go to Cart" : "Add to Cart"}
         </button>
       </div>
