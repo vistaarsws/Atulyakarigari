@@ -1,31 +1,29 @@
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import userProfileAvatar from "../../../../assets/images/avatar.svg";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
-import { useState, useEffect, useCallback } from "react";
-import { login, logout } from "../../../../Redux/features/AuthSlice";
+import { useState, useEffect } from "react";
+import { logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-// import avatar from "../../../assets/images/avatar.svg";
-// import { useAuth } from "../../../../context/authToken";
+
 import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import {
-  getCart,
-  getProfile,
-  getUserWishlist,
-} from "../../../../services/user/userAPI";
+import { getCart, getProfile } from "../../../../services/user/userAPI";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
-// import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
+import { fetchCart } from "../../../../Redux/features/CartSlice";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
+  const dispatch = useDispatch();
+  const wishlist = useSelector((state) => state.wishlist.items);
+  const cartData = useSelector((state) => state.cart);
+  console.log("GGGG", cartData);
+
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
@@ -47,36 +45,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     setOpenCategoryIndex((prev) => (prev === index ? null : index));
   };
 
-  // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
-  // const location = useLocation();
-  // const { loginContext, logoutContext, authToken, setauthToken } =
-  //   useAuth();
 
-  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
 
   const { enqueueSnackbar } = useSnackbar();
-
-  const [wishlistData, setWishlistData] = useState([]);
-
-  const fetchWishlistData = useCallback(async () => {
-    try {
-      const response = await getUserWishlist();
-      const wishlist = response?.data?.data?.wishlist?.items|| [];
-      setWishlistData(wishlist);
-    } catch (err) {
-      console.error(
-        "Error fetching wishlist:",
-        err.response?.data || err.message
-      );
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchWishlistData();
-  }, []);
-
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -178,57 +151,35 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  const [cartData, setCartData] = useState(null);
-  const fetchCartData = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
+  // const [cartData, setCartData] = useState([]);
 
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
+  // const fetchCartData = async () => {
+  //   try {
+  //     const response = await getCart();
 
-      const response = await getCart();
-      setCartData(response?.data?.data);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-  useEffect(() => {
-    fetchCartData();
-  }, []);
-  const fetchCategoriesData = async () => {
-    try {
-      const response = await getCategory();
-      const categories = Object.values(response.data.data);
-
-      // Ensure data structure matches expectations
-      if (categories.length) {
-        setGetAllCategories(categories);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  //     setCartData(response.data.data);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchCartData();
+  // }, [cartData]);
 
   useEffect(() => {
-    fetchCategoriesData();
-  }, []);
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+    }
+  }, [authToken, dispatch]);
 
   return (
     <nav className="navbar_container">
-      {/* <Button onClick={() => navigate("/admin")}>admin</Button> */}
       <figure>
         <Link to={"/"}>
           <img src={headerLogo} alt="Atulyakarigari Logo" />
         </Link>
       </figure>
       <ul
-        // className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
         className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"} ${
           navWithoutSearchBar_list ? "navWithoutSearchBar_list" : ""
         }`}
@@ -386,11 +337,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
         {authToken && (
           <IconButton
-            aria-label={`wishlist with ${wishlistData.length} items`}
+            aria-label={notificationsLabel(100)}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData?.length}
+              badgeContent={wishlist.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",
@@ -440,8 +391,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               ) : (
                 <Avatar src="/broken-image.jpg" />
               )}
-
-              {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
             </div>
           </Button>
           <Menu
