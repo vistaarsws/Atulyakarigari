@@ -1,11 +1,10 @@
 import PropTypes from "prop-types";
 import "./ProductCard.css";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
-import { useSelector } from "react-redux";
-import { addToCart, getCart } from "../../../../services/user/userAPI";
+import { addToCart, getCart, getReviewById } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
 function ProductCard({
   title = "Product Title",
@@ -18,33 +17,39 @@ function ProductCard({
   isAddedToWishlist,
   refreshWishlist,
 }) {
-  const [isHover, setIsHover] = useState(false);
+ 
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  useEffect(() => {
-    const checkIfInCart = async () => {
-      try {
-        const response = await getCart();
-        const cartItems = response?.data?.data?.items || [];
-        if (Array.isArray(cartItems)) {
-          setIsInCart(cartItems.some((item) => item.productId === id));
-        }
-      } catch (err) {
-        console.error("Error fetching cart items:", err.message);
+
+  const [reviewData, setReviewData] = useState(null);
+
+  const getReview = async () => {
+    try {
+      const response = await getReviewById(id);
+      console.log("response",response?.data?.data);
+      setReviewData(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching review data:", error.message);
+    }
+  }
+  console.log("review",reviewData);
+  
+  const checkIfInCart = async () => {
+    try {
+      const response = await getCart();
+      const cartItems = response?.data?.data?.items || [];
+      if (Array.isArray(cartItems)) {
+        setIsInCart(cartItems.some((item) => item.productId === id));
       }
-    };
+    } catch (err) {
+      console.error("Error fetching cart items:", err.message);
+    }
+  };
+  useEffect(() => {
+    getReview();
     if (id) checkIfInCart();
   }, [id]);
-  // Check if the URL contains "user/wishlist"
-  // useEffect(() => {
-  //   const path = location.pathname;
-  //   if (path.includes("/profile/wishlist")) {
-  //     setIsHover(false);
-  //   } else {
-  //     setIsHover(true);
-  //   }
-  // }, [location.pathname]);
+  
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     if (isInCart) {
@@ -60,17 +65,13 @@ function ProductCard({
   };
   return (
     <div
-      style={{
-        backgroundColor: isHover ? "white" : "",
-        boxShadow: isHover ? "rgba(149, 157, 165, 0.2) 0px 8px 24px" : "none",
-        borderRadius: isHover ? "0.4rem" : "0rem",
-      }}
+      
       className="productCard_container"
       onClick={() => navigate(`/product/${id}`)}
     >
       {/* Rating */}
       <div className="rating_box">
-        <div>4.5</div>
+        <div>{reviewData?.averageRating}</div>
         <figure>
           <img src={rating_star} alt="Rating Star" />
         </figure>
@@ -86,7 +87,7 @@ function ProductCard({
       {/* Product Image */}
       <figure>
         <img
-          style={{ transform: isHover ? "scale(1.5)" : "" }}
+          
           src={picture}
           alt=""
         />
@@ -109,7 +110,6 @@ function ProductCard({
       <div className={isAddedToWishlist ? "wistListBtnStyle" : ""}>
         <button
           onClick={handleAddToCart}
-          style={{ visibility: isHover ? "visible" : "hidden" }}
           className={isInCart ? "in-cart" : ""}
         >
           {isInCart ? "Go to Cart" : "Add to Cart"}

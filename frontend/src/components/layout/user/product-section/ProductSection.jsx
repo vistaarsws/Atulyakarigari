@@ -24,7 +24,7 @@ const formatProductData = (product) => ({
 });
 
 export default function ProductSection({ productCategorySection, bgColor }) {
-  const { title, subtitle, products, categoryId } = productCategorySection;
+  const { title, subtitle, products, subcategory_id } = productCategorySection;
   const userProfileToken = useSelector((state) => state.auth.token);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +122,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
 
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate(`/categories/${categoryId}`);
+    navigate(`/sub-categories/${subcategory_id}`);
   };
 
   return (

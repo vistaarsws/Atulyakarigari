@@ -40,7 +40,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       setAnchorEl(event.currentTarget); // Open the dropdown
     }
   };
-  const [isProfileHovered, setIsProfileHovered] = useState(false);
   const [getAllCategories, setGetAllCategories] = useState([]);
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
 
@@ -61,23 +60,22 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   const [wishlistData, setWishlistData] = useState([]);
 
-  const fetchWishlistData = async () => {
+  const fetchWishlistData = useCallback(async () => {
     try {
-      const { userId } = jwtDecode(authToken);
-      const response = await getUserWishlist(userId);
-      setWishlistData(response.data.data.wishlist.items);
+      const response = await getUserWishlist();
+      const wishlist = response?.data?.data?.wishlist?.items|| [];
+      setWishlistData(wishlist);
     } catch (err) {
       console.error(
         "Error fetching wishlist:",
         err.response?.data || err.message
       );
-      toast.error("Failed to load wishlist. Please try again.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWishlistData();
-  }, []);
+  }, [fetchWishlistData]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -179,20 +177,46 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  const [cartData, setCartData] = useState([]);
-
+  const [cartData, setCartData] = useState(null);
   const fetchCartData = async () => {
     try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
+
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
+
       const response = await getCart();
-      console.log("ttt", response.data.data);
-      setCartData(response.data.data);
+      setCartData(response?.data?.data);
     } catch (err) {
-      console.log(err);
+      console.log(err.message);
     }
   };
   useEffect(() => {
     fetchCartData();
-  }, [cartData]);
+  }, []);
+  const fetchCategoriesData = async () => {
+    try {
+      const response = await getCategory();
+      const categories = Object.values(response.data.data);
+
+      // Ensure data structure matches expectations
+      if (categories.length) {
+        setGetAllCategories(categories);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategoriesData();
+  }, []);
 
   return (
     <nav className="navbar_container">
@@ -362,11 +386,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
         {authToken && (
           <IconButton
-            aria-label={notificationsLabel(100)}
+            aria-label={`wishlist with ${wishlistData.length} items`}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData.length}
+              badgeContent={wishlistData?.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",
