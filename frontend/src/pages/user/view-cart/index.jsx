@@ -12,9 +12,6 @@ const Index = () => {
   const authToken = useSelector((state) => state.auth.token);
   const [cartData, setCartData] = useState(null);
   const fetchCartData = async () => {
-    debugger;
-    console.log("feklfn");
-
     try {
       if (!authToken) {
         console.error("No user profile token found");

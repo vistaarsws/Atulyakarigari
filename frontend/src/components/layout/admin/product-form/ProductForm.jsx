@@ -13,6 +13,7 @@ import {
   Box,
   Typography,
   Paper,
+  useMediaQuery,
 } from "@mui/material";
 import { Add, Remove, Save } from "@mui/icons-material";
 
@@ -57,11 +58,16 @@ export default function ProductForm({
   const [formData, setFormData] = useState(() => ({
     name: productDetails?.name || "",
     productImage: productDetails?.images || [],
-    description: productDetails?.description || "",
+    // description: productDetails?.description || "",
     detailDescription: productDetails?.detailDescription || [],
     price: productDetails?.price || "",
     category: productDetails?.category || null,
     subcategory: productDetails?.subcategory || "",
+    sku: productDetails?.sku || "",
+    weight: productDetails?.weight || "",
+    length: productDetails?.length || "",
+    width: productDetails?.width || "",
+    height: productDetails?.height || "",
     _attributes: productDetails?.attributes || [],
     stock: productDetails?.stock || "",
     status: productDetails?.status || "",
@@ -132,7 +138,7 @@ export default function ProductForm({
 
   // Save Data to State
   const handleSaveDetailDescription = () => {
-    setSavedData(details);
+    setDetails(details);
     console.log("Saved Data:", details);
   };
 
@@ -144,6 +150,11 @@ export default function ProductForm({
     price: "",
     category: null,
     subcategory: "",
+    sku: "",
+    weight: "",
+    length: "",
+    width: "",
+    height: "",
     _attributes: [],
     stock: "",
     status: "",
@@ -402,7 +413,7 @@ export default function ProductForm({
       const formDataInstance = new FormData();
 
       formDataInstance.append("name", formData?.name);
-      formDataInstance.append("description", formData?.description);
+      // formDataInstance.append("description", formData?.description);
       formDataInstance.append("price", Number(formData?.price).toFixed(0));
       formDataInstance.append("category", formData?.category);
       formDataInstance.append("subcategory", formData?.subcategory);
@@ -415,6 +426,12 @@ export default function ProductForm({
       formDataInstance.append("artisanName", formData?.artisanName);
       formDataInstance.append("artisanAbout", formData?.artisanAbout);
 
+      formDataInstance.append("sku", formData?.sku);
+      formDataInstance.append("weight", formData?.weight);
+      formDataInstance.append("lenght", formData?.length);
+      formDataInstance.append("width", formData?.width);
+      formDataInstance.append("height", formData?.height);
+
       // Serialize _attributes
       if (formData._attributes) {
         formDataInstance.append(
@@ -424,9 +441,10 @@ export default function ProductForm({
       }
 
       if (formData.detailDescription) {
+        setDetails(details);
         formDataInstance.append(
           "detailDescription",
-          JSON.stringify([...formData?.detailDescription])
+          JSON.stringify([...details])
         );
       }
 
@@ -861,6 +879,104 @@ export default function ProductForm({
                 />
               </div>
             </Box>
+            {/* -------------------------------------------------------------------------------------------------------------------- */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 2,
+                my: "2rem",
+              }}
+            >
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="sku"
+                  label="SKU ID"
+                  variant="outlined"
+                  value={formData.sku}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      sku: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="weight"
+                  label="weight (gm)"
+                  variant="outlined"
+                  value={formData.weight}
+                  type="number"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      weight: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </Box>
+            {/* -------------------------------------------------------------------------------------------------------------------- */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: 2,
+                my: "2rem",
+              }}
+            >
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="length"
+                  label="Length"
+                  variant="outlined"
+                  value={formData.length}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      length: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="width"
+                  label="width"
+                  variant="outlined"
+                  value={formData.width}
+                  type="number"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      width: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="height"
+                  label="height (cm)"
+                  variant="outlined"
+                  value={formData.height}
+                  type="number"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      height: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </Box>
             {/* ----------------------------------------------ADD Sub Category Dialog Box-------------------------------------------------------------------------- */}
             <AddSubCategoryDialog
               addSubCategoryPopup={addSubCategoryPopup}
@@ -1006,11 +1122,11 @@ export default function ProductForm({
           </article>
 
           <article>
-            
             <Box
               sx={{
                 width: "100%",
-                maxWidth: 600,
+
+                maxWidth: useMediaQuery("(845px)") ? "auto" : 600,
                 margin: "auto",
                 p: 2,
                 my: 2,
@@ -1018,7 +1134,7 @@ export default function ProductForm({
               }}
             >
               <Typography variant="h5" sx={{ mb: 2 }}>
-                Detail Input Form
+                Detail Description
               </Typography>
 
               {details.map((item, index) => (
@@ -1063,13 +1179,13 @@ export default function ProductForm({
                 >
                   Add More
                 </Button>
-                <Button
+                {/* <Button
                   variant="contained"
                   color="primary"
                   onClick={handleSaveDetailDescription}
                 >
                   Save Data
-                </Button>
+                </Button> */}
               </Box>
             </Box>
 

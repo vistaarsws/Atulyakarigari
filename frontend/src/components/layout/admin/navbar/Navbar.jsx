@@ -64,7 +64,6 @@ export default function Navbar() {
         }
 
         const profile = response.data.data;
-        console.log("Profile Data:", profile);
 
         const fetchedData = {
           fullName: profile.fullName || "Unknow Admin",
