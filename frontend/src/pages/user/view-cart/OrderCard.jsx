@@ -14,11 +14,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { removeFromCart } from "../../../services/user/userAPI";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { fetchCart } from "../../../Redux/features/CartSlice";
 
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
@@ -280,16 +278,7 @@ const ProductCard = ({ product }) => {
   );
 };
 
-const OrderCard = () => {
-  const dispatch = useDispatch();
-  const authToken = useSelector((state) => state.auth.token);
-  const cartData = useSelector((state) => state.cart);
-  console.log("MMMMKKK", cartData);
-  useEffect(() => {
-    if (authToken) {
-      dispatch(fetchCart(authToken));
-    }
-  }, [authToken, dispatch]);
+const OrderCard = ({ cartData }) => {
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -305,7 +294,7 @@ const OrderCard = () => {
         }}
       >
         {cartData?.items?.map((item) => (
-          <ProductCard key={item._id} product={item} />
+          <ProductCard key={item._id} product={item}  />
         ))}
       </Box>
     </ThemeProvider>

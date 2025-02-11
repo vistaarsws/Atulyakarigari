@@ -94,9 +94,12 @@ export const getCart = async (req, res) => {
     }
 
         // Fetch the user's cart and populate product details
-        const cart = await Cart.findOne({ userId }).populate("items.productId", "name price description priceAfterDiscount images");
+        let cart = await Cart.findOne({ userId }).populate("items.productId", "name price description priceAfterDiscount images");
+
         if (!cart) {
-            return notFoundRequest(req, res, null, "Cart not found");
+            // Create an empty cart if not found
+            cart = new Cart({ userId, items: [], total: 0, totalMRP: 0, totalDiscount: 0 });
+            await cart.save();
         }
 
         // Calculate totals

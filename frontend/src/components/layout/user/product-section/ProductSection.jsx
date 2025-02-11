@@ -24,7 +24,7 @@ const formatProductData = (product) => ({
 });
 
 export default function ProductSection({ productCategorySection, bgColor }) {
-  const { title, subtitle, products, categoryId } = productCategorySection;
+  const { title, subtitle, products, subcategory_id } = productCategorySection;
   const userProfileToken = useSelector((state) => state.auth.token);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +99,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
           key={product._id}
           {...formatProductData(product)}
           isAddedToWishlist={isAddedToWishlist}
+          refreshWishlist={fetchWishlistData}
           loading={loading}
         />
       );
@@ -108,6 +109,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
     const skeletons = [...Array(Math.max(0, 5 - realProducts.length))].map(
       (_, index) => (
         <div className="skeletonCard" key={`skeleton-${index}`}>
+         
           <div className="skeleton_image"></div>
           <div className="skeleton_text"></div>
           <div className="skeleton_text short"></div>
@@ -120,7 +122,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
 
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate(`/categories/${categoryId}`);
+    navigate(`/sub-categories/${subcategory_id}`);
   };
 
   return (
