@@ -4,37 +4,44 @@ import Stepper from "./Stepper";
 import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
-import { getCart } from "../../../services/user/userAPI";
+import { useSelector, useDispatch } from "react-redux";
+// import { getCart } from "../../../services/user/userAPI";
+import { fetchCart } from "../../../Redux/features/CartSlice";
 
 const Index = () => {
+  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
-  const [cartData, setCartData] = useState(null);
-  const fetchCartData = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
+  const cartData = useSelector((state) => state.cart);
+  console.log("CCCCCCCCCCCCCCCCC", cartData);
 
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
+  // const [cartData, setCartData] = useState(null);
 
-      const response = await getCart(_id);
-      console.log(response);
+  // const fetchCartData = async () => {
+  //   try {
+  //     if (!authToken) {
+  //       console.error("No user profile token found");
+  //       return;
+  //     }
 
-      setCartData(response?.data?.data);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
+  //     const { _id } = jwtDecode(authToken);
+  //     if (!_id) {
+  //       console.error("Invalid token structure");
+  //       return;
+  //     }
+
+  //     const response = await getCart(_id);
+  //     console.log(response);
+
+  //     setCartData(response?.data?.data);
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // };
   useEffect(() => {
-    fetchCartData();
-  }, [authToken]);
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+    }
+  }, [authToken, dispatch]);
   return (
     <Box
       sx={{

@@ -16,10 +16,13 @@ import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
+import { fetchCart } from "../../../../Redux/features/CartSlice";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const dispatch = useDispatch();
   const wishlist = useSelector((state) => state.wishlist.items);
+  const cartData = useSelector((state) => state.cart);
+  console.log("GGGG", cartData);
 
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -148,20 +151,26 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  const [cartData, setCartData] = useState([]);
+  // const [cartData, setCartData] = useState([]);
 
-  const fetchCartData = async () => {
-    try {
-      const response = await getCart();
-      console.log("ttt", response.data.data);
-      setCartData(response.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const fetchCartData = async () => {
+  //   try {
+  //     const response = await getCart();
+
+  //     setCartData(response.data.data);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchCartData();
+  // }, [cartData]);
+
   useEffect(() => {
-    fetchCartData();
-  }, [cartData]);
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+    }
+  }, [authToken, dispatch]);
 
   return (
     <nav className="navbar_container">
