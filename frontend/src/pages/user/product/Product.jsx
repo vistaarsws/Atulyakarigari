@@ -121,7 +121,7 @@ export default function Product() {
     reviews: [],
     averageRating: "0 ",
   });
-  const [formData, setFormData] = useState({ rating: 5, comment: "" });
+  const [formData, setFormData] = useState({ rating: 0, comment: "" });
   const [userReview, setUserReview] = useState(null);
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
