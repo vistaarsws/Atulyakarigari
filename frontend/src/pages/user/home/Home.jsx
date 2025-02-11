@@ -9,7 +9,7 @@ import ProductSection from "../../../components/layout/user/product-section/Prod
 
 import CategoryView from "../../../components/layout/user/category-view/CategoryView";
 import { useMediaQuery } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
 import { useNavigate } from "react-router-dom";
 
@@ -63,7 +63,7 @@ export default function Home() {
         {getAllCategories.length > 0 ? (
           getAllCategories.map((category, index) => {
             return (
-              <>
+              <Fragment key={index}>
                 {index == 1 && (
                   <section className="celebrate_artistry_container">
                     <article>
@@ -129,7 +129,7 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-              </>
+              </Fragment>
             );
           })
         ) : (
