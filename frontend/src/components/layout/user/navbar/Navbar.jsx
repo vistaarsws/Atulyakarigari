@@ -26,6 +26,8 @@ import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
+ 
+  const wishlist = useSelector((state) => state.wishlist.items);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
@@ -390,7 +392,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData?.length}
+              badgeContent={wishlist.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",
