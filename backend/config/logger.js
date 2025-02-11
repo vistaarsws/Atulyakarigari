@@ -2,13 +2,18 @@ import winston from "winston";
 import path from "path";
 import fs from "fs";
 import "winston-daily-rotate-file";
+import { fileURLToPath } from "url"; // Import for ES Module fix
+
+// Fix __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Define log directory
 const logDir = path.join(__dirname, "../../logs");
 
 // Ensure log directory exists
 if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
+  fs.mkdirSync(logDir, { recursive  : true });
 }
 
 // Define custom log format

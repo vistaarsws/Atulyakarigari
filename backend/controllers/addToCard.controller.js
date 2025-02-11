@@ -86,8 +86,12 @@ export const addToCart = async (req, res) => {
 
 // Get the cart for the user
 export const getCart = async (req, res) => {
-    try {
-        const userId = req.user._id; // Assuming user ID is available in the request
+  try {
+    //updated by mohit 
+    const userId = req.user?._id;
+    if (!userId) {
+      return notFoundRequest(req, res, null, "User not authenticated");
+    }
 
         // Fetch the user's cart and populate product details
         let cart = await Cart.findOne({ userId }).populate("items.productId", "name price description priceAfterDiscount images");
