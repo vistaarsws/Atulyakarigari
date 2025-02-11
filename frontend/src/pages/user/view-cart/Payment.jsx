@@ -8,9 +8,20 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import {formatPrice} from "../../../utils/helpers";
+import { formatPrice } from "../../../utils/helpers";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchCart } from "../../../Redux/features/CartSlice";
 
-const Payment = ({ cartData }) => {
+const Payment = () => {
+  const dispatch = useDispatch();
+  const authToken = useSelector((state) => state.auth.token);
+  const cartData = useSelector((state) => state.cart);
+  useEffect(() => {
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+    }
+  }, [authToken, dispatch]);
   const navigate = useNavigate();
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const location = useLocation();
