@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
+import { useSelector, useDispatch } from "react-redux";
 import { addToCart, getCart, getReviewById } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
 function ProductCard({
@@ -20,6 +21,7 @@ function ProductCard({
  
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [reviewData, setReviewData] = useState(null);
 
@@ -78,11 +80,7 @@ function ProductCard({
       </div>
       {/* Wishlist Icon */}
       <section>
-        <WishListHeartIcon
-          productId={id}
-          isWishlist={isAddedToWishlist}
-          refreshWishlist={refreshWishlist}
-        />
+      <WishListHeartIcon productId={id} isWishlist={isAddedToWishlist} />
       </section>
       {/* Product Image */}
       <figure>
