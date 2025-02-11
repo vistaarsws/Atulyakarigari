@@ -84,9 +84,19 @@ export const getReviewsByProduct = async (req, res) => {
         // Fetch reviews for the product
         const reviews = await RatingAndReviews.find({ productId });
 
-        if (reviews.length === 0) {
-            return success(req, res, "No reviews found for the product");
+        const totalReviews = reviews.length;
+
+        if (totalReviews === 0) {
+            return success(req, res, "No reviews found for the product", { 
+                averageRating: 0, 
+                totalReviews: 0,
+                reviews: [] 
+            });
         }
+
+        // Calculate average rating
+        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRating / totalReviews;
 
         // Fetch user profiles for each review
         const reviewsWithUser = await Promise.all(
@@ -107,7 +117,12 @@ export const getReviewsByProduct = async (req, res) => {
             })
         );
 
-        return success(req, res, "Reviews retrieved successfully", { reviews: reviewsWithUser });
+        return success(req, res, "Reviews retrieved successfully", { 
+            averageRating: averageRating.toFixed(1), // Rounded to 1 decimal
+            totalReviews,
+            reviews: reviewsWithUser 
+        });
+
     } catch (error) {
         return internalServerError(req, res, error, "Failed to retrieve reviews");
     }
