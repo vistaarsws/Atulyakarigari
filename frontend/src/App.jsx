@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router";
 import { SnackbarProvider } from "notistack";
 import ScrollToTop from "./hooks/ScrollToTop";
 import ProtectedRoute from "./utils/ProtectedRoute";

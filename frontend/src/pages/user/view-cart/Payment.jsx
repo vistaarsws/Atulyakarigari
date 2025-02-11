@@ -8,13 +8,15 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import {formatPrice} from "../../../utils/helpers";
+import { formatPrice } from "../../../utils/helpers";
+// import { useDispatch, useSelector } from "react-redux";
+// import { useEffect } from "react";
+// import { fetchCart } from "../../../Redux/features/CartSlice";
 
 const Payment = ({ cartData }) => {
   const navigate = useNavigate();
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const location = useLocation();
-
   return (
     <Box
       sx={{
