@@ -21,6 +21,8 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useSnackbar } from "notistack";
+import ConfirmationModal from "../../../components/ui/modal/confirmation-modal/ConfirmationModal";
 
 import { useEffect, useRef } from "react";
 import { logEvent } from "../../../utils/analytics/analytics";
@@ -86,6 +88,14 @@ export default function Product() {
   let { id: productId } = useParams();
   const [productQuantity, setProductQuantity] = useState(1);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
+
+  const handleOpenConfirm = (reviewId) => {
+    setReviewToDelete(reviewId);
+    setOpenConfirm(true);
+  };
 
   const [value, setValue] = useState(0);
 
@@ -200,10 +210,11 @@ export default function Product() {
       }
 
       if (response?.data?.success) {
-        alert(
+        enqueueSnackbar(
           editingReviewId
             ? "Review updated successfully!"
-            : "Review submitted successfully!"
+            : "Review submitted successfully!",
+          { variant: "success" }
         );
         fetchRatingAndReview();
         setFormData({ rating: 5, comment: "" });
@@ -218,33 +229,24 @@ export default function Product() {
     }
   };
 
-  const handleDeleteReview = async (reviewId) => {
+  const handleDeleteConfirmed = async () => {
+    setOpenConfirm(false);
+    if (!reviewToDelete) return;
+
     try {
-      if (!reviewId) {
-        console.error("Error: Review ID is required");
-        alert("Review ID is missing!");
-        return;
-      }
-
-      const confirmation = window.confirm(
-        "Are you sure you want to delete this review?"
-      );
-
-      if (!confirmation) return;
-
-      const response = await deleteReview(reviewId);
-
+      const response = await deleteReview(reviewToDelete);
       if (response?.success) {
-        alert("Review deleted successfully!");
-
+        enqueueSnackbar("Review deleted successfully!", { variant: "success" });
         fetchRatingAndReview();
       } else {
-        console.error("Failed to delete review:", response);
-        alert("Failed to delete review. Please try again later.");
+        enqueueSnackbar("Failed to delete review. Please try again later.", {
+          variant: "error",
+        });
       }
     } catch (error) {
-      console.error("Unexpected error in handleDeleteReview:", error);
-      alert("An error occurred while deleting the review.");
+      enqueueSnackbar("An error occurred while deleting the review.", {
+        variant: "error",
+      });
     }
   };
 
@@ -332,7 +334,9 @@ export default function Product() {
         console.error("Error sharing:", error);
       }
     } else {
-      alert("Sharing not supported in this browser.");
+      enqueueSnackbar("Sharing not supported in this browser.", {
+        variant: "error",
+      });
     }
   };
   // END Share Product
@@ -386,7 +390,9 @@ export default function Product() {
 
   const handleAskQuestion = async () => {
     if (newQuestion.length < 5) {
-      alert("Question must be at least 5 characters long.");
+      enqueueSnackbar("Question must be at least 5 characters long.", {
+        variant: "error",
+      });
       return;
     }
 
@@ -394,15 +400,21 @@ export default function Product() {
     try {
       const response = await askQuestion(productId, newQuestion);
       if (response?.data?.success === true) {
-        alert("Question submitted successfully!");
+        enqueueSnackbar("Question submitted successfully!", {
+          variant: "success",
+        });
         setNewQuestion("");
         fetchQuestionsAndAnswers();
       } else {
-        alert(response?.message || "Failed to submit question.");
+        enqueueSnackbar(response?.message || "Failed to submit question.", {
+          variant: "error",
+        });
       }
     } catch (error) {
       console.error("Error submitting question:", error);
-      alert("An error occurred while submitting your question.");
+      enqueueSnackbar("An error occurred while submitting your question.", {
+        variant: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -431,7 +443,9 @@ export default function Product() {
     }
 
     if (!adminAnswer || !selectedQuestionId) {
-      alert("Please select a question and provide an answer.");
+      enqueueSnackbar("Please select a question and provide an answer.", {
+        variant: "error",
+      });
       setLoading(false);
       return;
     }
@@ -443,16 +457,22 @@ export default function Product() {
       const response = await answerQuestion(answer, questionId, productId);
 
       if (response?.status == 200) {
-        alert("Answer submitted successfully!");
+        enqueueSnackbar("Answer submitted successfully!", {
+          variant: "success",
+        });
         setAdminAnswer("");
         setSelectedQuestionId("");
         fetchQuestionsAndAnswers();
       } else {
-        alert(response?.message || "Failed to submit answer.");
+        enqueueSnackbar(response?.message || "Failed to submit answer.", {
+          variant: "error",
+        });
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
-      alert("An error occurred while submitting your answer.");
+      enqueueSnackbar("An error occurred while submitting your answer.", {
+        variant: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -737,7 +757,7 @@ export default function Product() {
                                       </Button>
                                       <Button
                                         onClick={() =>
-                                          handleDeleteReview(review._id)
+                                          handleOpenConfirm(review._id)
                                         }
                                         sx={{
                                           marginLeft: "10px",
@@ -822,6 +842,13 @@ export default function Product() {
                     </form>
                   </Box>
                 </div>
+                <ConfirmationModal
+                  open={openConfirm}
+                  onClose={() => setOpenConfirm(false)}
+                  onConfirm={handleDeleteConfirmed}
+                  title="Delete Review"
+                  message="Are you sure you want to delete this review?"
+                />
               </CustomTabPanel>
 
               <CustomTabPanel value={value} index={3}>

@@ -39,7 +39,7 @@ const productSlice = createSlice({
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Something went wrong";
+        state.error = action.payload || "Something   went wrong";
       });
   },
 });

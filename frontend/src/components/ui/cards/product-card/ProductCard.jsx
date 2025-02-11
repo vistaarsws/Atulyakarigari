@@ -32,13 +32,11 @@ function ProductCard({
   const getReview = async () => {
     try {
       const response = await getReviewById(id);
-      console.log("response", response?.data?.data);
       setReviewData(response?.data?.data);
     } catch (error) {
       console.error("Error fetching review data:", error.message);
     }
   };
-  console.log("review", reviewData);
 
   const checkIfInCart = async () => {
     try {
