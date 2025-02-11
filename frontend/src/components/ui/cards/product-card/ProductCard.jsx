@@ -11,7 +11,7 @@ import {
   getReviewById,
 } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
-import { addToTheCart } from "../../../../Redux/features/CartSlice";
+import { addToTheCart, fetchCart } from "../../../../Redux/features/CartSlice";
 function ProductCard({
   title = "Product Title",
   shortDescription = "Short description here...",
@@ -26,6 +26,7 @@ function ProductCard({
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const authToken = useSelector((state) => state.auth);
 
   const [reviewData, setReviewData] = useState(null);
 
@@ -61,7 +62,9 @@ function ProductCard({
       navigate("/view-cart");
     } else {
       try {
-        dispatch(addToTheCart({ productId: id, quantity: 1 })).unwrap(); // ✅ Corrected Dispatch
+        dispatch(addToTheCart({ productId: id, quantity: 1 })).unwrap();
+        dispatch(fetchCart(authToken.token));
+
         setIsInCart(true);
       } catch (err) {
         console.error("Error adding to cart:", err.message);

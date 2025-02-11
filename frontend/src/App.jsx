@@ -19,7 +19,7 @@ import SubCategories from "./pages/user/categories/SubCategory";
 import Blogs from "./pages/user/blogs/Blogs";
 import Product from "./pages/user/product/Product";
 import Artisans from "./pages/user/artisans/Artisans";
-import ViewCart from "./pages/user/view-cart/index";
+import ViewCart from "./pages/user/view-cart/Index";
 import PlaceOrder from "./pages/user/place-order";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
