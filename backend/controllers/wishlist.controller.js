@@ -11,17 +11,21 @@ import Wishlist from "../models/wishlist.js";
 export const getWishlist = async (req, res) => {
   const { _id } = req.user;
   try {
-    const wishlist = await Wishlist.findOne({ userId: _id }).populate("items");
+    let wishlist = await Wishlist.findOne({ userId: _id }).populate("items");
 
     if (!wishlist) {
-      return notFoundRequest(req, res, null, "Wishlist not found");
+      // Create an empty wishlist if not found
+      wishlist = new Wishlist({ userId: _id, items: [] });
+      await wishlist.save();
     }
+
     return success(req, res, "Wishlist retrieved successfully", { wishlist });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error in getWishlist:", error);
     return internalServerError(req, res, error, "Failed to retrieve wishlist");
   }
 };
+
 
 // Toggle Item in Wishlist
 export const toggleItemInWishlist = async (req, res) => {

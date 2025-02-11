@@ -4,45 +4,37 @@ import Stepper from "./Stepper";
 import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-// import { getCart } from "../../../services/user/userAPI";
-import { fetchCart } from "../../../Redux/features/CartSlice";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import { getCart } from "../../../services/user/userAPI";
 
 const Index = () => {
-  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
-  const cartData = useSelector((state) => state.cart);
-  console.log("CCCCCCCCCCCCCCCCC", cartData);
+  const [cartData, setCartData] = useState(null);
+  const fetchCartData = async () => {
+    try {
+      if (!authToken) {
+        console.error("No user profile token found");
+        return;
+      }
 
-  // const [cartData, setCartData] = useState(null);
+      const { _id } = jwtDecode(authToken);
+      if (!_id) {
+        console.error("Invalid token structure");
+        return;
+      }
 
-  // const fetchCartData = async () => {
-  //   try {
-  //     if (!authToken) {
-  //       console.error("No user profile token found");
-  //       return;
-  //     }
+      const response = await getCart(_id);
+      console.log(response);
 
-  //     const { _id } = jwtDecode(authToken);
-  //     if (!_id) {
-  //       console.error("Invalid token structure");
-  //       return;
-  //     }
-
-  //     const response = await getCart(_id);
-  //     console.log(response);
-
-  //     setCartData(response?.data?.data);
-  //   } catch (err) {
-  //     console.log(err.message);
-  //   }
-  // };
-
-  useEffect(() => {
-    if (authToken) {
-      dispatch(fetchCart(authToken));
+      setCartData(response?.data?.data);
+    } catch (err) {
+      console.log(err.message);
     }
-  }, [authToken, dispatch]);
+  };
+  useEffect(() => {
+    fetchCartData();
+  }, [authToken]);
   return (
     <Box
       sx={{
@@ -72,7 +64,7 @@ const Index = () => {
           }}
         >
           <AddressComponent />
-          <OrderCard />
+          <OrderCard cartData={cartData} />
         </Box>
         <Box
           sx={{
@@ -80,8 +72,8 @@ const Index = () => {
             width: { xs: "100%", md: "35%", marginBottom: "7rem" },
           }}
         >
-          <Payment />
-        </Box>
+          <Payment cartData={cartData} />
+        </Box>{" "}
       </Box>
     </Box>
   );

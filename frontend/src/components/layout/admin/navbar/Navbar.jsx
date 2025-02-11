@@ -17,7 +17,7 @@ import adminLogoutIcon from "../../../../assets/images/adminLogoutIcon.svg";
 import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { getProfile } from "../../../../services/user/userAPI";
 import { logout } from "../../../../Redux/features/AuthSlice";
@@ -25,14 +25,13 @@ import { logout } from "../../../../Redux/features/AuthSlice";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
   const authToken = useSelector((state) => state.auth.token);
-
   const [fetchedData, setProfileData] = useState(null);
 
   useEffect(() => {
@@ -68,8 +67,7 @@ export default function Navbar() {
 
         const fetchedData = {
           fullName: profile.fullName || "Unknow Admin",
-          profilePicture:
-            profile.profilePicture || "/static/images/avatar/1.jpg",
+          profilePicture: profile.profilePicture || "/static/images/avatar/1.jpg",
         };
         setProfileData(fetchedData);
       } catch (error) {
