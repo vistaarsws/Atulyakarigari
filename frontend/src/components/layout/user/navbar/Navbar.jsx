@@ -1,31 +1,26 @@
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import userProfileAvatar from "../../../../assets/images/avatar.svg";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
-import { useState, useEffect, useCallback } from "react";
-import { login, logout } from "../../../../Redux/features/AuthSlice";
+import { useState, useEffect } from "react";
+import { logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-// import avatar from "../../../assets/images/avatar.svg";
-// import { useAuth } from "../../../../context/authToken";
+
 import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
-import {
-  getCart,
-  getProfile,
-  getUserWishlist,
-} from "../../../../services/user/userAPI";
+import { getCart, getProfile } from "../../../../services/user/userAPI";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
-// import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
+  const dispatch = useDispatch();
+  const wishlist = useSelector((state) => state.wishlist.items);
+
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
@@ -40,7 +35,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       setAnchorEl(event.currentTarget); // Open the dropdown
     }
   };
-  const [isProfileHovered, setIsProfileHovered] = useState(false);
   const [getAllCategories, setGetAllCategories] = useState([]);
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
 
@@ -48,36 +42,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     setOpenCategoryIndex((prev) => (prev === index ? null : index));
   };
 
-  // const [isProfileView, setIsProfileView] = useState(false);
   const navigate = useNavigate();
-  // const location = useLocation();
-  // const { loginContext, logoutContext, authToken, setauthToken } =
-  //   useAuth();
 
-  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
 
   const { enqueueSnackbar } = useSnackbar();
-
-  const [wishlistData, setWishlistData] = useState([]);
-
-  const fetchWishlistData = async () => {
-    try {
-      const { userId } = jwtDecode(authToken);
-      const response = await getUserWishlist(userId);
-      setWishlistData(response.data.data.wishlist.items);
-    } catch (err) {
-      console.error(
-        "Error fetching wishlist:",
-        err.response?.data || err.message
-      );
-      toast.error("Failed to load wishlist. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    fetchWishlistData();
-  }, [wishlistData]);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -196,14 +165,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   return (
     <nav className="navbar_container">
-      {/* <Button onClick={() => navigate("/admin")}>admin</Button> */}
       <figure>
         <Link to={"/"}>
           <img src={headerLogo} alt="Atulyakarigari Logo" />
         </Link>
       </figure>
       <ul
-        // className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
         className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"} ${
           navWithoutSearchBar_list ? "navWithoutSearchBar_list" : ""
         }`}
@@ -365,7 +332,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData.length}
+              badgeContent={wishlist.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",
@@ -415,8 +382,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               ) : (
                 <Avatar src="/broken-image.jpg" />
               )}
-
-              {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
             </div>
           </Button>
           <Menu

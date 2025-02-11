@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { addToCart, getCart } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
 function ProductCard({
@@ -16,12 +16,12 @@ function ProductCard({
   id = "",
   priceAfterDiscount = price,
   isAddedToWishlist,
-  refreshWishlist,
 }) {
   const [isHover, setIsHover] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   useEffect(() => {
     const checkIfInCart = async () => {
       try {
@@ -77,11 +77,7 @@ function ProductCard({
       </div>
       {/* Wishlist Icon */}
       <section>
-        <WishListHeartIcon
-          productId={id}
-          isWishlist={isAddedToWishlist}
-          refreshWishlist={refreshWishlist}
-        />
+        <WishListHeartIcon productId={id} isWishlist={isAddedToWishlist} />
       </section>
       {/* Product Image */}
       <figure>
@@ -127,6 +123,5 @@ ProductCard.propTypes = {
   id: PropTypes.string.isRequired,
   isAddedToWishlist: PropTypes.bool,
   priceAfterDiscount: PropTypes.number.isRequired,
-  refreshWishlist: PropTypes.func,
 };
 export default ProductCard;

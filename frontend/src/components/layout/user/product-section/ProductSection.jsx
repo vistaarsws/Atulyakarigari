@@ -99,7 +99,6 @@ export default function ProductSection({ productCategorySection, bgColor }) {
           key={product._id}
           {...formatProductData(product)}
           isAddedToWishlist={isAddedToWishlist}
-          refreshWishlist={fetchWishlistData}
           loading={loading}
         />
       );
@@ -109,7 +108,6 @@ export default function ProductSection({ productCategorySection, bgColor }) {
     const skeletons = [...Array(Math.max(0, 5 - realProducts.length))].map(
       (_, index) => (
         <div className="skeletonCard" key={`skeleton-${index}`}>
-         
           <div className="skeleton_image"></div>
           <div className="skeleton_text"></div>
           <div className="skeleton_text short"></div>
