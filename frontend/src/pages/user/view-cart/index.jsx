@@ -37,6 +37,7 @@ const Index = () => {
   //     console.log(err.message);
   //   }
   // };
+
   useEffect(() => {
     if (authToken) {
       dispatch(fetchCart(authToken));
@@ -71,7 +72,7 @@ const Index = () => {
           }}
         >
           <AddressComponent />
-          <OrderCard cartData={cartData} />
+          <OrderCard />
         </Box>
         <Box
           sx={{
@@ -79,8 +80,8 @@ const Index = () => {
             width: { xs: "100%", md: "35%", marginBottom: "7rem" },
           }}
         >
-          <Payment cartData={cartData} />
-        </Box>{" "}
+          <Payment />
+        </Box>
       </Box>
     </Box>
   );
