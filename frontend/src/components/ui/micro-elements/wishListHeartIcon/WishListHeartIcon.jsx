@@ -4,11 +4,7 @@ import { toggleWishlistItem } from "../../../../services/user/userAPI";
 import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function WishListHeartIcon({
-  productId,
-  isWishlist,
-  refreshWishlist,
-}) {
+export default function WishListHeartIcon({ productId, isWishlist }) {
   const dispatch = useDispatch();
   const userProfileToken = useSelector((state) => state.auth.token);
   const [wishlist, setWishlist] = useState(isWishlist);
@@ -24,9 +20,6 @@ export default function WishListHeartIcon({
       setWishlist(updatedWishlist);
       await toggleWishlistItem(productId);
       dispatch(fetchWishlist(userProfileToken));
-      // if (refreshWishlist) {
-      //   refreshWishlist();
-      // }
     } catch (error) {
       console.error("Error toggling wishlist item:", error.message || error);
       setWishlist(isWishlist);
