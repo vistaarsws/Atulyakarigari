@@ -117,7 +117,7 @@ export default function Home() {
                               title: subcat.name,
                               subtitle: `Explore products in ${subcat.name}`,
                               products: subcat.products,
-                              categoryId: category._id,
+                              subcategory_id: subcat._id,
                               // Now includes detailed product info.
                             }}
                             bgColor="#fff"
