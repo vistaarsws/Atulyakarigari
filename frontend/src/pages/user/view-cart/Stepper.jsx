@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Progress = () => {
   const theme = useTheme();
@@ -38,9 +38,14 @@ const Progress = () => {
         }}
       >
         <Typography
-          sx={{ fontSize: isSmallScreen ? "11px" : "16px", pb: "10%" }}
+          sx={{
+            fontSize: isSmallScreen ? "11px" : "16px",
+            pb: "10%",
+            width: isSmallScreen ? "50px" : "auto",
+            overflowX: "hidden",
+          }}
         >
-          .......................
+          ...................
         </Typography>
       </Box>
       <Typography
@@ -61,9 +66,14 @@ const Progress = () => {
         }}
       >
         <Typography
-          sx={{ fontSize: isSmallScreen ? "11px" : "16px", pb: "10%" }}
+          sx={{
+            fontSize: isSmallScreen ? "11px" : "16px",
+            pb: "10%",
+            width: isSmallScreen ? "50px" : "auto",
+            overflowX: "hidden",
+          }}
         >
-          ........................
+          ...................
         </Typography>
       </Box>
 
