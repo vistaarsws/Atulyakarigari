@@ -4,6 +4,7 @@ import SubCategory from "../models/subCategory.js";
 import mongoose from "mongoose";
 import { badRequest, internalServerError, notFoundRequest, success } from "../helpers/api-response.js";
 import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../utils/image-uploder/index.js";
+import { addProductToShiprocket, getAllProductsShipRocket } from "../utils/shiprocket-service/shiprocket.js";
 
 const calculateDiscountedPrice = (price, discountPercentage) => { return price * (1 - discountPercentage / 100) };
 
@@ -41,45 +42,64 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const createProduct = async (req, res) => {
-    let session;
-    try {
-        // Destructure and validate input
-        const {
-            name,
-            description,
-            detailDescription,
-            price,
-            category,
-            subcategory,
-            _attributes,
-            stock,
-            status,
-            discountPercentage,
-            artisanName,
-            artisanAbout,
-        } = req.body;
+  let session;
+  try {
+    // Destructure and validate input
+    const {
+      name,
+      detailDescription,
+      price,
+      category,
+      subcategory,
+      _attributes,
+      sku,
+      weight,
+      length,
+      width,
+      height,
+      stock,
+      status,
+      discountPercentage,
+      artisanName,
+      artisanAbout,
+    } = req.body;
 
-        if (!req.files || !req.files.productImage) {
-            return badRequest(req, res, null, "product image is required");
-        }
-        // if (!req.files.artisanImage) {
-        //     return badRequest(req, res, null, "artisan image is required");
-        // }
-        //  input validation
-        if (!name || !price || !category || !stock || !status || !description || !detailDescription || !_attributes || !discountPercentage
-            //  || !artisanName || !artisanAbout
-        ) {
-            return badRequest(req, res, null, "fields are missing");
-        }
-        const attributes = JSON.parse(_attributes);
-        if (!attributes || !Array.isArray(attributes)) {
-            return badRequest(req, res, null, "Invalid Attributes");
-        }
-        // Check if category exists
-        const existingCategory = await Category.findById(category);
-        if (!existingCategory) {
-            return badRequest(req, res, null, "Category not found");
-        }
+    if (!req.files || !req.files.productImage) {
+      return badRequest(req, res, null, "product image is required");
+    }
+    // if (!req.files.artisanImage) {
+    //     return badRequest(req, res, null, "artisan image is required");
+    // }
+    //  input validation
+    if (
+      !name ||
+      !price ||
+      !category ||
+      !sku ||
+      !weight ||
+      !length ||
+      !width ||
+      !height ||
+      !stock ||
+      !status ||
+      !detailDescription ||
+      !_attributes ||
+      !discountPercentage
+      //  || !artisanName || !artisanAbout
+    ) {
+      return badRequest(req, res, null, "fields are missing");
+    }
+    const attributes = JSON.parse(_attributes);
+
+    const _detailDescription = JSON.parse(detailDescription);
+    if (!attributes || !Array.isArray(attributes)) {
+      return badRequest(req, res, null, "Invalid Attributes");
+    }
+    // Check if category exists
+    const existingCategory = await Category.findById(category);
+    if (!existingCategory) {
+      return badRequest(req, res, null, "Category not found");
+    }
 
         // Optional: Validate subcategory if provided
         if (subcategory) {
@@ -123,28 +143,38 @@ export const createProduct = async (req, res) => {
             return internalServerError(req, res, null, "Failed to upload product images");
         }
 
-        productImages.push(...validUrls);
-        // artisan Image upload
-        const artisanPicture = await uploadImageToCloudinary(req.files.artisanImage, "artisan");
-        const priceAfterDiscount = calculateDiscountedPrice(price, discountPercentage);
-        //  product data
-        const productData = {
-            name: name.trim(),
-            description: description ? description.trim() : '',
-            detailDescription: detailDescription ? detailDescription.trim() : '',
-            price,
-            category,
-            subcategory: subcategory || null,
-            attributes,
-            stock,
-            status,
-            discountPercentage,
-            priceAfterDiscount,
-            images: productImages,
-            artisanName,
-            artisanAbout,
-            artisanImage: artisanPicture.url
-        };
+    productImages.push(...validUrls);
+    // artisan Image upload
+    const artisanPicture = await uploadImageToCloudinary(
+      req.files.artisanImage,
+      "artisan"
+    );
+    const priceAfterDiscount = calculateDiscountedPrice(
+      price,
+      discountPercentage
+    );
+    //  product data
+    const productData = {
+      name: name.trim(),
+      _detailDescription,
+      price,
+      category,
+      subcategory: subcategory || null,
+      sku,
+      weight,
+      length,
+      width, 
+      height,
+      attributes,
+      stock,
+      status,
+      discountPercentage,
+      priceAfterDiscount,
+      images: productImages,
+      artisanName,
+      artisanAbout,
+      artisanImage: artisanPicture.url,
+    };
 
         // Create product,
         const product = await Product.create([productData], { session });
@@ -164,36 +194,40 @@ export const createProduct = async (req, res) => {
             { session, new: true }
         );
 
-        // Update subcategory references if exists
-        let updatedSubcategory;
-        if (subcategory) {
-            updatedSubcategory = await SubCategory.findByIdAndUpdate(
-                subcategory,
-                {
-                    $addToSet: { products: product[0]._id },
-                    $set: { updatedAt: new Date() }
-                },
-                { session, new: true }
-            );
-        }
-
-        // Commit transaction
-        await session.commitTransaction();;
-        const response = product[0].toObject();
-        // Respond with created product
-        return success(req, res, "product created successfully", response);
-    } catch (error) {
-        // Abort transaction if it exists
-        console.log(error);
-        if (session) {
-            await session.abortTransaction();
-        }
-        return internalServerError(req, res, error, "unable to create product");
-    } finally {
-        if (session) {
-            session.endSession();
-        }
+    // Update subcategory references if exists
+    let updatedSubcategory;
+    if (subcategory) {
+      updatedSubcategory = await SubCategory.findByIdAndUpdate(
+        subcategory,
+        {
+          $addToSet: { products: product[0]._id },
+          $set: { updatedAt: new Date() },
+        },
+        { session, new: true }
+      );
     }
+
+    // Add product to Shiprocket
+    await addProductToShiprocket(productData);
+
+    // Commit transaction
+    await session.commitTransaction();
+    const response = product[0].toObject();
+
+    // Respond with created product
+    return success(req, res, "product created successfully", response);
+  } catch (error) {
+    // Abort transaction if it exists
+    console.log(error);
+    if (session) {
+      await session.abortTransaction();
+    }
+    return internalServerError(req, res, error, "unable to create product");
+  } finally {
+    if (session) {
+      session.endSession();
+    }
+  }
 };
 
 export const getProductById = async (req, res) => {
@@ -227,7 +261,11 @@ export const updateProduct = async (req, res) => {
     try {
         const {
             name,
-            description,
+            sku,
+            weight,
+            length,
+            width, 
+            height,
             detailDescription,
             price,
             category,
@@ -315,11 +353,15 @@ export const updateProduct = async (req, res) => {
         // Prepare updated data
         const updatedData = {
             name: name?.trim() || existingProduct.name,
-            description: description?.trim() || existingProduct.description,
             detailDescription: detailDescription?.trim() || existingProduct.detailDescription,
             price: price || existingProduct.price,
             category: category || existingProduct.category,
             subcategory: subcategory || existingProduct.subcategory,
+            sku: sku || existingProduct.sku,
+            weight: weight || existingProduct.weight,
+            length: length || existingProduct.length,
+            width: skwidthu || existingProduct.width,
+            height: height || existingProduct.height,
             attributes: attributes || existingProduct.attributes,
             stock: stock || existingProduct.stock,
             status: status || existingProduct.status,
@@ -437,28 +479,6 @@ export const deleteProduct = async (req, res) => {
     }
 };
 
-// cloudinary image delete
-// export const deleteSingleImage = async (req, res) => {
-//     try {
-//         const { imageId } = req.body;
-//         const user = req.user
-
-//         if (!imageId) {
-//             return badRequest(req, res, null, "Image ID is required");
-//         }
-
-//         const result = await deleteImageFromCloudinary(imageId);
-
-//         if (result.status === "success") {
-//             return success(req, res, "Image deleted successfully", result);
-//         } else {
-//             return notFoundRequest(req, res, null, `Failed to delete image: ${result.reason}`);
-//         }
-//     } catch (error) {
-//         console.error("Error in deleteSingleImage controller:", error);
-//         return internalServerError(req, res, error, "Unable to delete image");
-//     }
-// };
 
 // extract the id from image url
 const extractId = (url) => {
@@ -493,9 +513,14 @@ export const deleteSingleImage = async (req, res) => {
 
         const result = await deleteImageFromCloudinary(imageId);
 
-        if (result?.status !== "success") {
-            return notFoundRequest(req, res, null, `Failed to delete image: ${result?.reason || "Unknown error"}`);
-        }
+    if (result?.status !== "success") {
+      return notFoundRequest(
+        req,
+        res,
+        null,
+        `Failed to delete image: ${result?.reason || "Unknown error"}`
+      );
+    }
 
         product.images = product.images.filter(image => image !== imageUrl);
         await product.save();
@@ -527,12 +552,9 @@ export const deleteMultipleImages = async (req, res) => {
             return notFoundRequest(req, res, null, "Product not found");
         }
 
-        // Check if the user has the necessary permissions
-        // if (user.accountType !== "admin" && String(product.createdBy) !== String(user._id)) {
-        //     return unauthorizedRequest(req, res, null, "You are not authorized to perform this action");
-        // }
-
-        const validImageUrls = imageUrls.filter((url) => product.images.includes(url));
+    const validImageUrls = imageUrls.filter((url) =>
+      product.images.includes(url)
+    );
 
         if (validImageUrls.length === 0) {
             return badRequest(req, res, null, "No valid image URLs found in the product");

@@ -428,7 +428,7 @@ export default function ProductForm({
 
       formDataInstance.append("sku", formData?.sku);
       formDataInstance.append("weight", formData?.weight);
-      formDataInstance.append("lenght", formData?.length);
+      formDataInstance.append("length", formData?.length);
       formDataInstance.append("width", formData?.width);
       formDataInstance.append("height", formData?.height);
 
