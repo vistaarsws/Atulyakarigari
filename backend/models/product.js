@@ -14,12 +14,6 @@ const ProductSchema = new mongoose.Schema({
         index: true
 
     },
-    description: {
-        type: String,
-        required: [true, 'Product description is required'],
-        trim: true,
-        maxlength: [100, 'Product description cannot exceed 100 characters']
-    },
     detailDescription: {
         type: [
             {
@@ -54,6 +48,37 @@ const ProductSchema = new mongoose.Schema({
     subcategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subcategory'
+    },
+    sku: {
+        type: String,
+        required: [true, 'SKU ID is required'],
+        maxlength: [20, 'SKU ID cannot exceed 20 characters'],
+        index: true
+
+    },
+    weight: {
+        type: Number,
+        required: [true, 'Weight cannot be negative'],
+        min: [0, 'Weight is required'],
+
+    },
+    length: {
+        type: Number,
+        required: [true, 'Length cannot be negative'],
+        min: [0, 'Length is required'],
+
+    },
+    width: {
+        type: Number,
+        required: [true, 'Width cannot be negative'],
+        min: [0, 'Width is required'],
+
+    },
+    height: {
+        type: Number,
+        required: [true, 'Height cannot be negative'],
+        min: [0, 'Height is required'],
+
     },
     attributes: [
         {
