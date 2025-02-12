@@ -3,7 +3,7 @@ import Payment from "./Payment";
 import Stepper from "./Stepper";
 import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCart } from "../../../Redux/features/CartSlice";
 
@@ -34,6 +34,7 @@ const Index = () => {
           display: "flex",
           justifyContent: "space-around",
           // marginTop: "2rem",
+
           flexDirection: { xs: "column", md: "row" },
           px: { xs: 2, md: 4 },
         }}
