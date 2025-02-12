@@ -96,7 +96,8 @@ const ProductCard = ({ product }) => {
       <Box sx={{ height: "100%" }}>
         <ProductImageWrapper
           sx={{
-            width: "250px",
+            width: { xs: "100px", sm: "250px" },
+
             overflow: "hidden",
           }}
         >
