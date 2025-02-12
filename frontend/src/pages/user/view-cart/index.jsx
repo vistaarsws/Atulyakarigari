@@ -34,6 +34,7 @@ const Index = () => {
           display: "flex",
           justifyContent: "space-around",
           // marginTop: "2rem",
+
           flexDirection: { xs: "column", md: "row" },
           px: { xs: 2, md: 4 },
         }}
