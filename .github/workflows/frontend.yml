@@ -3,10 +3,10 @@ name: Frontend CI/CD Pipeline
 on:
   pull_request:
     branches:
-      - develop
+      - dev
   push:
     branches:
-      - develop
+      - dev
       - main
 
 jobs:
@@ -62,10 +62,10 @@ jobs:
           npm run build
 
   deploy-to-development:
-    name: 🚀 Deploy to Development (develop branch)
+    name: 🚀 Deploy to Development (dev branch)
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/dev'
 
     steps:
       - name: Checkout Code
