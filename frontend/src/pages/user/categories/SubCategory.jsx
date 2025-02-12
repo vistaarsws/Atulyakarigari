@@ -6,6 +6,7 @@ import { Skeleton } from "@mui/material";
 import "./CategoryPage.css";
 import { useDispatch } from "react-redux";
 import { fetchSubCategoryDataById } from "../../../Redux/features/CategorySlice";
+import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
 
 const Index = () => {
   const { id } = useParams();
@@ -59,6 +60,8 @@ const Index = () => {
   if (error) {
     return (
       <div className="error">
+        <SkeletonLoader />
+        <SkeletonLoader />
         <p>Failed to load category data. Please try again.</p>
         <button onClick={fetchSubCategoryHandler}>Retry</button>
       </div>

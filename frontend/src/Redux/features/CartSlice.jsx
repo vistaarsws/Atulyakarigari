@@ -3,7 +3,7 @@ import {
   getCart,
   removeFromCart,
   addToCart,
-} from "../../services/user/userAPI"; // Add remove API
+} from "../../services/user/userAPI";
 import { jwtDecode } from "jwt-decode";
 
 // Fetch Cart Items
@@ -20,26 +20,38 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
-// Remove Item from Cart
+// Remove Item from Cart and Update Redux Immediately
 export const removeFromTheCart = createAsyncThunk(
   "cart/removeFromCart",
-  async ({ productId }, { rejectWithValue }) => {
+  async ({ authToken, productId }, { rejectWithValue, dispatch }) => {
     try {
-      await removeFromCart(productId); // Call API to remove item
-      return productId; // ✅ Return productId so we can remove it from Redux state
+      await removeFromCart(productId);
+
+      // ✅ Update Redux state locally first (to remove the item instantly)
+      dispatch(cartSlice.actions.removeItemFromState(productId));
+
+      // ✅ Re-fetch the updated cart from backend (to refresh totals)
+      const updatedCart = await dispatch(fetchCart(authToken)).unwrap();
+      return updatedCart;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// ADD Item to Cart
+// ADD Item to Cart and Fetch Updated Cart
 export const addToTheCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ productId, quantity = 1 }, { rejectWithValue }) => {
+  async (
+    { authToken, productId, quantity = 1 },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
-      const response = await addToCart(productId, quantity);
-      return response.data;
+      await addToCart(productId, quantity);
+
+      // ✅ Re-fetch the updated cart from the backend after addition
+      const updatedCart = await dispatch(fetchCart(authToken)).unwrap();
+      return updatedCart;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
@@ -50,13 +62,19 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: {
     items: [],
+    totalDiscount: 0,
+    totalMRP: 0,
+    total: 0,
     error: null,
     status: "idle",
   },
   reducers: {
-    // addToCart: (state, action) => {
-    //   state.items.push(action.payload);
-    // },
+    // ✅ Reducer to remove item immediately from Redux state
+    removeItemFromState: (state, action) => {
+      state.items = state.items.filter(
+        (item) => item.productId !== action.payload
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -65,32 +83,29 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items = action.payload.items; // Ensure API response structure is correct
+        state.items = action.payload.items || [];
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalMRP = action.payload.totalMRP || 0;
+        state.total = action.payload.total || 0;
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })
       .addCase(removeFromTheCart.fulfilled, (state, action) => {
-        state.items = state.items.filter(
-          (item) => item.productId !== action.payload
-        );
+        state.items = action.payload.items || [];
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalMRP = action.payload.totalMRP || 0;
+        state.total = action.payload.total || 0;
       })
       .addCase(removeFromTheCart.rejected, (state, action) => {
         state.error = action.payload;
       })
-      // ✅ Handle Adding Item to Redux State
       .addCase(addToTheCart.fulfilled, (state, action) => {
-        const newItem = action.payload;
-        const existingItem = state.items.find(
-          (item) => item.productId === newItem.productId
-        );
-
-        if (existingItem) {
-          existingItem.quantity += newItem.quantity; // ✅ Update quantity if item exists
-        } else {
-          state.items.push(newItem); // ✅ Add new item if not in cart
-        }
+        state.items = action.payload.items || [];
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalMRP = action.payload.totalMRP || 0;
+        state.total = action.payload.total || 0;
       })
       .addCase(addToTheCart.rejected, (state, action) => {
         state.error = action.payload;
@@ -98,5 +113,4 @@ const cartSlice = createSlice({
   },
 });
 
-// export const { addToCart } = cartSlice.actions;
 export default cartSlice.reducer;
