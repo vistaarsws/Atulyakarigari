@@ -233,7 +233,7 @@ const ProductCard = ({ product }) => {
                   fontWeight: 400,
                 }}
               >
-                Delivery Between
+                Delivery Between{" "}
                 <span
                   style={{
                     fontWeight: 900,
