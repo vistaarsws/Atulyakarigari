@@ -1,32 +1,29 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import BanarsiSilkFilter from "./BanarsiSilkFilter";
 import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
-import { Pagination, Skeleton } from "@mui/material";
-import { getSubCategoryById } from "../../../services/admin/adminAPI";
+import { Skeleton } from "@mui/material";
 import "./CategoryPage.css";
+import { useDispatch } from "react-redux";
+import { fetchSubCategoryDataById } from "../../../Redux/features/CategorySlice";
 
 const Index = () => {
   const { id } = useParams();
   const [subCategoryData, setSubCategoryData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
-  const productsPerPage = 20;
-  const hasFetched = useRef(false);
 
-  const fetchSubCategoryData = useCallback(async () => {
-    if (!id || hasFetched.current) return;
-    hasFetched.current = true;
+  const dispatch = useDispatch();
 
+  const fetchSubCategoryHandler = async () => {
     setLoading(true);
     setError(false);
 
     try {
-      const response = await getSubCategoryById(id);
+      const fetchedData = await dispatch(fetchSubCategoryDataById(id)).unwrap();
 
-      console.log("API Response:", response);
-      setSubCategoryData(response?.data?.data || null);
+      console.log("API Response:", fetchedData.products);
+      setSubCategoryData(fetchedData);
     } catch (error) {
       console.error("Error fetching category data:", error);
       setSubCategoryData(null);
@@ -34,11 +31,11 @@ const Index = () => {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  };
 
   useEffect(() => {
-    fetchSubCategoryData();
-  }, [fetchSubCategoryData]);
+    fetchSubCategoryHandler();
+  }, [dispatch, id]);
 
   if (loading) {
     return (
@@ -63,62 +60,42 @@ const Index = () => {
     return (
       <div className="error">
         <p>Failed to load category data. Please try again.</p>
-        <button onClick={fetchSubCategoryData}>Retry</button>
+        <button onClick={fetchSubCategoryHandler}>Retry</button>
       </div>
     );
   }
 
   const products = subCategoryData?.products || [];
 
-  console.log("products", products);
-  const totalPages = Math.max(1, Math.ceil(products.length / productsPerPage));
-  const paginatedProducts = products.slice(
-    (page - 1) * productsPerPage,
-    page * productsPerPage
-  );
-
   return (
     <div className="categoryPage_container">
       <section>
         <BanarsiSilkFilter />
-        <div className="productList">
-          {paginatedProducts.length > 0 ? (
-            products.map(
-              (product) => (
-                console.log("pro", product),
-                (
-                  <ProductCard
-                    key={product?._id}
-                    id={product?._id}
-                    title={product?.name || "No Title"}
-                    picture={
-                      product?.images?.length
-                        ? product.images[0]
-                        : "/placeholder.png"
-                    }
-                    price={product?.price || "N/A"}
-                    shortDescription={product?.description || "No Description"}
-                    offer_inPercent={product?.discountPercentage || null}
-                    priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
-                    loading={loading}
-                  />
-                )
-              )
-            )
+        <div
+          className={`productList  ${products.length > 3 ? "responsiveLayout" : ""}`}
+          style={{
+            justifyContent: products.length > 3 ? "space-between" : "start",
+          }}
+        >
+          {products?.length > 0 ? (
+            products.map((product) => (
+              <ProductCard
+                key={product?._id}
+                id={product?._id}
+                title={product?.name || "No Title"}
+                picture={product?.images?.[0] || "/placeholder.png"}
+                price={product?.price || "N/A"}
+                shortDescription={product?.description || "No Description"}
+                offer_inPercent={product?.discountPercentage || null}
+                priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
+                loading={loading}
+              />
+            ))
           ) : (
             <div className="emptyState">No products found.</div>
           )}
         </div>
       </section>
-      {totalPages > 1 && (
-        <div className="paginationContainer">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(event, value) => setPage(value)}
-          />
-        </div>
-      )}
     </div>
   );
 };

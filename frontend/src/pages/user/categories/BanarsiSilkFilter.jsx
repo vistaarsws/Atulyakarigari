@@ -105,7 +105,6 @@ export default function SidebarFilter() {
     );
   };
 
-
   return (
     <div
       className={`filterSection_container ${isToggled ? "toggleSideBar" : ""}`}
@@ -177,17 +176,13 @@ export default function SidebarFilter() {
             />
           </Box>
           {/* price slider */}
-          <PriceRangeSlider
-            min={2000}
-            max={30000}
-            
-          />
+          <PriceRangeSlider min={2000} max={30000} />
           {/* Color Filter */}
           <Box sx={sidebarStyles.section}>
             <Typography sx={sidebarStyles.sectionTitle}>Color</Typography>
             <Box sx={sidebarStyles.colorList}>
-              {colors.map((color) => (
-                <Box key={color.name} sx={sidebarStyles.colorItem}>
+              {colors.map((color, index) => (
+                <Box key={color.name + index} sx={sidebarStyles.colorItem}>
                   <FormControlLabel
                     control={
                       <Checkbox

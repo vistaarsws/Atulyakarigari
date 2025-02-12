@@ -26,9 +26,9 @@
     display: grid;
     z-index: 66;
 
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, auto));
     width: 100%;
-    justify-content: center;
+
     align-items: start;
     margin: 0 2rem 2%;
     gap: 2rem 1rem;
@@ -42,6 +42,10 @@
     background-color: antiquewhite;
     height: 100%;
   }
+}
+
+.responsiveLayout {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 /* ----------------------------------------------Filter Section Styles ---------------------------------------------------------- */

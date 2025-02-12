@@ -436,7 +436,7 @@ const AddressUI = () => {
           </Box>
           <Box
             sx={{
-              height: "75vh",
+              height: "auto",
               overflowY: "scroll",
               scrollbarWidth: "none",
             }}
