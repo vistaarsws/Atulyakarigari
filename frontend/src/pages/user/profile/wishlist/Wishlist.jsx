@@ -1,53 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
-
-import ProductCard from "../../../../components/ui/cards/product-card/ProductCard";
 import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
-
+import ProductCard from "../../../../components/ui/cards/product-card/ProductCard";
+import { FaHeartBroken } from "react-icons/fa";
+import { Box, Typography, Button } from "@mui/material";
+import { Link } from "react-router-dom";
 import "./Wishlist.css";
 
 const Wishlist = () => {
   const dispatch = useDispatch();
-  // const [wishlistItems, setWishlistItems] = useState([]);
   const wishlist = useSelector((state) => state.wishlist.items);
   const userProfileToken = useSelector((state) => state.auth.token);
-
-  // const getUserIdFromToken = useCallback(() => {
-  //   if (!userProfileToken) {
-  //     toast.error("Please log in to view your wishlist.");
-  //     return null;
-  //   }
-
-  //   try {
-  //     const decodedToken = jwtDecode(userProfileToken);
-  //     return decodedToken?._id || null;
-  //   } catch (error) {
-  //     console.error("Error decoding token:", error.message || error);
-  //     toast.error("Invalid user session.");
-  //     return null;
-  //   }
-  // }, [userProfileToken]);
-
-  // const fetchWishlistData = useCallback(async () => {
-  //   const userId = getUserIdFromToken();
-  //   if (!userId) return;
-
-  //   try {
-  //     const response = await getUserWishlist(userId);
-  //     console.log("wislist page response", response);
-  //     const wishlist = response?.data?.data?.wishlist || null;
-  //     if (response?.data?.success && wishlist) {
-  //       setWishlistItems(wishlist.items || []);
-  //     } else {
-  //       setWishlistItems([]);
-  //       toast.info("Your wishlist is empty.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching wishlist data:", error.message || error);
-  //     toast.error("Failed to fetch wishlist data. Please try again.");
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (userProfileToken) {
@@ -55,29 +18,59 @@ const Wishlist = () => {
     }
   }, [userProfileToken, dispatch]);
 
-  const renderWishlistItems = () =>
-    wishlist.map((product) => (
-      <ProductCard
-        key={product._id}
-        id={product._id}
-        title={product.name || "Unnamed Product"}
-        picture={product.images?.[0] || "fallback_image_url"}
-        price={product.priceAfterDiscount || product.price || "N/A"}
-        isAddedToWishlist={true}
-        priceAfterDiscount={product.priceAfterDiscount}
-      />
-    ));
-
   return (
-    <div
-      className={`wishlist_container ${wishlist.length > 3 ? "responsiveLayout" : ""}`}
-    >
+    <Box sx={{ textAlign: "center", mt: 4 }}>
       {wishlist.length > 0 ? (
-        renderWishlistItems()
+        <div
+          className={`wishlist_container ${
+            wishlist.length > 3 ? "responsiveLayout" : ""
+          }`}
+        >
+          {wishlist.map((product) => (
+            <ProductCard
+              key={product._id}
+              id={product._id}
+              title={product.name || "Unnamed Product"}
+              picture={product.images?.[0] || "fallback_image_url"}
+              price={product.priceAfterDiscount || product.price || "N/A"}
+              isAddedToWishlist={true}
+              priceAfterDiscount={product.priceAfterDiscount}
+            />
+          ))}
+        </div>
       ) : (
-        <p className="empty_message">Your wishlist is empty.</p>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "60vh",
+          }}
+        >
+          <FaHeartBroken size={100} color="#6D001D" />
+          <Typography variant="h5" fontWeight="bold" mt={2}>
+            Your wishlist is empty.
+          </Typography>
+          <Typography sx={{ color: "gray", mt: 1 }}>
+            Start adding your favorite products now!
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#60A487",
+              color: "white",
+              mt: 3,
+              "&:hover": { backgroundColor: "#d8541e" },
+            }}
+            component={Link}
+            to="/"
+          >
+            Browse Products
+          </Button>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

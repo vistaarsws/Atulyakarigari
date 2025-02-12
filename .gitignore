@@ -1,3 +1,9 @@
 #vercel 
 .vscode
 .vercel
+*.log
+*.audit.json
+
+
+# Ignore logs folder
+logs/
