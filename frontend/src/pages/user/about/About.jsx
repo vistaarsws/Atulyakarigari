@@ -4,8 +4,10 @@ import aboutImg_2 from "../../../assets/images/aboutImg_2.png";
 import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
 import { ourTeam_array } from "../../../utils/Constant";
 import CategoryView from "../../../components/layout/user/category-view/CategoryView";
+import { useNavigate } from "react-router-dom";
 
 export default function About() {
+  const navigate = useNavigate();
   return (
     <div className="about_container">
       <div>
@@ -60,10 +62,6 @@ export default function About() {
             crowned with the elegance of Zardozi Lehengas.
           </p>
         </div>
-
-        {/* <figure>
-          <img src={aboutImg_2} alt="" />
-        </figure> */}
         <article>
           <iframe
             width="100%"
@@ -86,57 +84,8 @@ export default function About() {
           </p>
         </div>
       </article>
-      {/* <article className="about_sec-3">
-        <h2>Meet Our Team</h2>
-        <p>
-          Atulya Karigari unites artisans and designers across India to blend
-          traditional artistry with contemporary appeal. Committed to preserving
-          India’s craft heritage, the team collaborates closely with artisans to
-          create designs that highlight their skills and meet modern tastes.
-        </p>
-        <div>
-          <EmblaSlider
-            slides={ourTeam_array}
-            options={{
-              delay: 3000,
-              draggable: false,
-              preventScrollOnTouch: true,
-              // loop: true,
-            }}
-            navigationDots={false}
-            slides_in_view={{ xl: 7, lg: 5, md: 3, sm: 3, xs: 1 }}
-            plugins={["autoplay", "classname"]}
-            centerSlideStyle={{
-              style: "centerStyle",
-            }}
-          />
-        </div>
-      </article> */}
       <article className="about_sec-4">
         <h2>Our Collections</h2>
-        {/* <div className="collection_container">
-          {ourCollections.map((collection, index) => {
-            return (
-              <div key={index}>
-                <img
-                  src={collection.picture}
-                  alt={collection.collection_name}
-                />
-                <div
-                  className="collection_descriptionCard"
-                  style={{ backgroundColor: collection.hoverBgColor }}
-                >
-                  <h3>{collection.collection_name}</h3>
-                  <div></div>
-                  <p>{collection.collection_description}</p>
-                  <div>
-                    <img src={rightArrow} alt="Right Arrow" />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div> */}
         <CategoryView />
       </article>
       <article className="about-sec-5">
@@ -174,7 +123,7 @@ export default function About() {
             beauty of India’s traditional artistry, reimagined for today’s
             world.
           </p>
-          <button>Explore Now</button>
+          <button onClick={() => navigate("/artisans")}>Explore Now</button>
         </div>
       </article>
     </div>
