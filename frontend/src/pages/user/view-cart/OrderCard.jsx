@@ -93,28 +93,25 @@ const ProductCard = ({ product }) => {
   };
   return (
     <StyledCard>
-      <ProductImageWrapper>
-        <ProductImage
-          src={product?.images?.[0]}
-          alt={product?.name}
-          onClick={handleCardClick}
-        />
-        <Checkbox
+      <Box sx={{ height: "100%" }}>
+        <ProductImageWrapper
           sx={{
-            position: "absolute",
-            top: useMediaQuery("(max-width: 458px)") ? "1.6rem" : 28,
-            left: useMediaQuery("(max-width: 458px)") ? "1.6rem" : 28,
-            padding: 0,
-            color: "white",
-            zIndex: 1,
-            "&.Mui-checked": {
-              color: "white",
-              borderRadius: "2px",
-            },
+            width: "250px",
+            overflow: "hidden",
           }}
-          size="large"
-        />
-      </ProductImageWrapper>{" "}
+        >
+          <ProductImage
+            src={product?.images?.[0]}
+            alt={product?.name}
+            onClick={handleCardClick}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </ProductImageWrapper>
+      </Box>
       <CardContent
         sx={{
           ml: useMediaQuery("(max-width: 458px)") ? "" : "1rem",
@@ -152,7 +149,7 @@ const ProductCard = ({ product }) => {
             WebkitLineClamp: 1, // Limits the number of lines (change this number to suit your needs)
           }}
         >
-          {product?.description || "No description available"}
+          {product?.sku || "No sku ID available"}
         </Typography>
         <Box
           sx={{
