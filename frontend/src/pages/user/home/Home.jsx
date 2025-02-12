@@ -9,12 +9,14 @@ import ProductSection from "../../../components/layout/user/product-section/Prod
 
 import CategoryView from "../../../components/layout/user/category-view/CategoryView";
 import { useMediaQuery } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const [getAllCategories, setGetAllCategories] = useState([]);
+  const navigate = useNavigate();
 
   const fetchCategoriesData = async () => {
     try {
@@ -29,6 +31,15 @@ export default function Home() {
   useEffect(() => {
     fetchCategoriesData();
   }, []);
+
+  const handleShopNow = () => {
+    navigate(`/categories/6799c7d3464f0c78506ba778`); // Redirect to category page
+  };
+  const handleExploreNow = () => {
+    navigate(`/categories/6799c7eb464f0c78506ba77c`); // Redirect to category
+  };
+
+
 
   return (
     <>
@@ -52,7 +63,7 @@ export default function Home() {
         {getAllCategories.length > 0 ? (
           getAllCategories.map((category, index) => {
             return (
-              <>
+              <Fragment key={index}>
                 {index == 1 && (
                   <section className="celebrate_artistry_container">
                     <article>
@@ -91,7 +102,7 @@ export default function Home() {
                         your everyday life. Explore our curated collections and
                         embrace the elegance of true artistry.
                       </p>
-                      <button>Explore Now</button>
+                      <button onClick={handleExploreNow}>Explore Now</button>
                     </article>
                   </section>
                 )}
@@ -101,15 +112,13 @@ export default function Home() {
                     {category.subcategory?.length > 0 ? (
                       category.subcategory.map((subcat) => (
                         <div key={subcat._id} className="subcategory-container">
-                          
-
                           <ProductSection
                             productCategorySection={{
                               title: subcat.name,
                               subtitle: `Explore products in ${subcat.name}`,
                               products: subcat.products,
-                              categoryId : category._id,
-                               // Now includes detailed product info.
+                              subcategory_id: subcat._id,
+                              // Now includes detailed product info.
                             }}
                             bgColor="#fff"
                           />
@@ -120,7 +129,7 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-              </>
+              </Fragment>
             );
           })
         ) : (
@@ -210,7 +219,7 @@ export default function Home() {
             </div>
             <div>
               <figure>
-                <svg
+                {/* <svg
                   width="30"
                   height="31"
                   viewBox="0 0 30 31"
@@ -222,6 +231,17 @@ export default function Home() {
                     fill="#6F6F6F"
                     fillOpacity="0.2"
                   />
+                </svg> */}
+
+                <svg
+                  width="34"
+                  height="34"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="6F6F6F"
+                  fillOpacity="0.2"
+                >
+                  <path d="M20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12ZM22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM13.5003 8C13.8278 8.43606 14.0625 8.94584 14.175 9.5H16V11H14.175C13.8275 12.7117 12.3142 14 10.5 14H10.3107L14.0303 17.7197L12.9697 18.7803L8 13.8107V12.5H10.5C11.4797 12.5 12.3131 11.8739 12.622 11H8V9.5H12.622C12.3131 8.62611 11.4797 8 10.5 8H8V6.5H16V8H13.5003Z"></path>
                 </svg>
               </figure>
               <p>
@@ -235,7 +255,7 @@ export default function Home() {
                 long-term satisfaction. It&apos;s time to consider the value and
                 quality elegance.
               </em>
-              <button>Shop Now</button>
+              <button onClick={handleShopNow}>Shop Now</button>
             </div>
           </div>
         </article>

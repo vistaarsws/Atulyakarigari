@@ -19,6 +19,7 @@ import {
 } from "@mui/icons-material";
 import WAVES_IMG from "../../../../assets/images/footer-wave-effect.png";
 import LEAFE_IMG from "../../../../assets/images/FooterLeafe.png";
+import footerLogo from "../../../../assets/images/headerLogo.svg";
 
 // Styled components
 const StyledFooter = styled("footer")(({ theme }) => ({
@@ -95,18 +96,22 @@ export default function Footer() {
     <>
       <StyledFooter>
         <Container>
-          <FlexContainer sx={{ display: "flex" }}>
+          <FlexContainer
+            sx={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             {/* Logo and Description */}
             <LogoSection>
               <Typography
                 sx={{
                   fontSize: "1.6rem",
                   fontWeight: 500,
-                  lineHeight: "1.3rem",
                 }}
                 gutterBottom
               >
-                Logo
+                <img src={footerLogo} alt="Brand Logo" />
               </Typography>
               <Typography
                 variant="body1"
@@ -114,16 +119,15 @@ export default function Footer() {
                   mb: 2,
                   fontWeight: 300,
                   fontSize: "1.6rem",
-                  lineHeight: "3rem",
+                  lineHeight: "2.2rem",
                   fontFamily: "lato",
+                  mr: 2,
                 }}
               >
-                The proper Footer on proper time can preserve you protection. We
-                assist you make sure every body forward. The proper Footer on
-                proper time can preserve you protection. We assist you make sure
-                every body forward. The proper Footer on proper time can
-                preserve you protection. We assist you make sure every body
-                forward.
+                Atulya Karigari is putting its best to provide one stop
+                corporate gifting solution to its client. Our custom made
+                products are a token of personalized service in the most
+                inspiring way possible.
               </Typography>
               <SocialIcons>
                 {[Facebook, Twitter, Instagram, YouTube].map((Icon, index) => (
@@ -155,10 +159,11 @@ export default function Footer() {
                     fontWeight: 500,
                     lineHeight: "1.3rem",
                     marginBottom: 2,
+                    marginLeft: 1,
                   }}
                   gutterBottom
                 >
-                  Quick Link
+                  Quick Links
                 </Typography>
                 <Box component="nav">
                   {["Home", "About Us", "Services", "Product"].map((text) => (

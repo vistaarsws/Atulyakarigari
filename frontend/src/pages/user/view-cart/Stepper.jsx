@@ -12,6 +12,7 @@ const Progress = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+
         backgroundColor: "#f7f7f7",
         // p: 2,
         flexWrap: isMobile ? "wrap" : "nowrap",

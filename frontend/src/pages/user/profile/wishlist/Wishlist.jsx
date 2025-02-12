@@ -1,70 +1,62 @@
-import { useEffect, useState, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { jwtDecode } from "jwt-decode";
 
 import ProductCard from "../../../../components/ui/cards/product-card/ProductCard";
-import { getUserWishlist } from "../../../../services/user/userAPI";
+import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
 
 import "./Wishlist.css";
 
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState([]);
+  const dispatch = useDispatch();
+  // const [wishlistItems, setWishlistItems] = useState([]);
+  const wishlist = useSelector((state) => state.wishlist.items);
   const userProfileToken = useSelector((state) => state.auth.token);
 
-  const getUserIdFromToken = useCallback(() => {
-    try {
-      if (!userProfileToken) {
-        toast.error("Please log in to view your wishlist.");
-        return null;
-      }
+  // const getUserIdFromToken = useCallback(() => {
+  //   if (!userProfileToken) {
+  //     toast.error("Please log in to view your wishlist.");
+  //     return null;
+  //   }
 
-      const decodedToken = jwtDecode(userProfileToken);
-      const userId = decodedToken?._id;
+  //   try {
+  //     const decodedToken = jwtDecode(userProfileToken);
+  //     return decodedToken?._id || null;
+  //   } catch (error) {
+  //     console.error("Error decoding token:", error.message || error);
+  //     toast.error("Invalid user session.");
+  //     return null;
+  //   }
+  // }, [userProfileToken]);
 
-      if (!userId) {
-        toast.error("Invalid user session.");
-        return null;
-      }
+  // const fetchWishlistData = useCallback(async () => {
+  //   const userId = getUserIdFromToken();
+  //   if (!userId) return;
 
-      return userId;
-    } catch (error) {
-      console.error("Error decoding token:", error.message || error);
-      toast.error("Invalid user session.");
-      return null;
-    }
-  }, [userProfileToken]);
-
-  const fetchWishlistData = useCallback(async () => {
-    const userId = getUserIdFromToken();
-    if (!userId) return;
-
-    try {
-      const response = await getUserWishlist(userId);
-      const wishlist = response?.data?.data?.wishlist || [];
-
-      if (response?.data?.success && wishlist.length > 0) {
-        setWishlistItems(wishlist[0]?.items || []);
-      } else {
-        setWishlistItems([]);
-        toast.info("Your wishlist is empty.");
-      }
-    } catch (error) {
-      console.error("Error fetching wishlist data:", error.message || error);
-      toast.error("Failed to fetch wishlist data. Please try again.");
-    }
-  }, [getUserIdFromToken]);
+  //   try {
+  //     const response = await getUserWishlist(userId);
+  //     console.log("wislist page response", response);
+  //     const wishlist = response?.data?.data?.wishlist || null;
+  //     if (response?.data?.success && wishlist) {
+  //       setWishlistItems(wishlist.items || []);
+  //     } else {
+  //       setWishlistItems([]);
+  //       toast.info("Your wishlist is empty.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching wishlist data:", error.message || error);
+  //     toast.error("Failed to fetch wishlist data. Please try again.");
+  //   }
+  // }, []);
 
   useEffect(() => {
-    fetchWishlistData();
-  }, [fetchWishlistData]);
-
-  const renderEmptyMessage = () => (
-    <p className="empty_message">Your wishlist is empty.</p>
-  );
+    if (userProfileToken) {
+      dispatch(fetchWishlist(userProfileToken));
+    }
+  }, [userProfileToken, dispatch]);
 
   const renderWishlistItems = () =>
-    wishlistItems.map((product) => (
+    wishlist.map((product) => (
       <ProductCard
         key={product._id}
         id={product._id}
@@ -77,8 +69,14 @@ const Wishlist = () => {
     ));
 
   return (
-    <div className="wishlist_container">
-      {wishlistItems.length > 0 ? renderWishlistItems() : renderEmptyMessage()}
+    <div
+      className={`wishlist_container ${wishlist.length > 3 ? "responsiveLayout" : ""}`}
+    >
+      {wishlist.length > 0 ? (
+        renderWishlistItems()
+      ) : (
+        <p className="empty_message">Your wishlist is empty.</p>
+      )}
     </div>
   );
 };

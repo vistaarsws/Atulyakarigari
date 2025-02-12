@@ -84,9 +84,13 @@ const addToCart = async (productId, quantity) => {
   return response;
 };
 
-const getCart = async () => {
+const getCart = async (id) => {
   try {
-    const response = await apiConnector("GET", user_endpoints.USER_GET_CART);
+    const response = await apiConnector(
+      "GET",
+      user_endpoints.USER_GET_CART,
+      id
+    );
     return response;
   } catch (err) {
     console.error("Error fetching cart data:", err);
@@ -156,6 +160,71 @@ const updateAddress = async (id, newAddressDetails) => {
   }
 };
 
+const getReviewById = async (productId) => {
+  try {
+    const response = await apiConnector(
+      "GET",
+      `${user_endpoints.GET_RATING_BY_ID}${productId}`
+    );
+    return response;
+  } catch (error) {
+    console.log("Error fetching reviews:", error);
+  }
+};
+
+const createOrUpdateReview = async (productId, rating, comment) => {
+  try {
+    const response = await apiConnector(
+      "POST",
+      user_endpoints.CREATE_OR_UPDATE_RATING,
+      { productId, rating, comment }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteReview = async (reviewId) => {
+  try {
+    if (!reviewId) {
+      throw new Error("Review ID is required");
+    }
+
+    const response = await apiConnector(
+      "DELETE",
+      `${user_endpoints.DELETE_RATING}/${reviewId}`
+    );
+
+    if (!response || response.status !== 200) {
+      throw new Error("Failed to delete review");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteReview:", error);
+    throw error; // Rethrow for higher-level handling
+  }
+};
+
+const getQuestionsByProduct = async (productId) => {
+  try {
+    const response = await apiConnector("GET",`${user_endpoints.GET_QUESTIONS_BY_PRODUCT}${productId}`)
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const askQuestion = async (productId, question) => {
+  try {
+    const response = await apiConnector("POST", `${user_endpoints.GET_QUESTIONS_BY_PRODUCT}${productId}`, { question });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export {
   createProduct,
   getProducts,
@@ -175,4 +244,9 @@ export {
   getAddress,
   deleteAddress,
   updateAddress,
+  getReviewById,
+  createOrUpdateReview,
+  deleteReview,
+  getQuestionsByProduct,
+  askQuestion
 };

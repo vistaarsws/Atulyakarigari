@@ -13,16 +13,14 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { removeFromCart } from "../../../services/user/userAPI";
-import { useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
+import { removeFromTheCart } from "../../../Redux/features/CartSlice";
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
   palette: {
     primary: {
-      main: "#1976d2",
+      main: "#1976D2",
     },
     text: {
       primary: "#333333",
@@ -30,7 +28,6 @@ const theme = createTheme({
     },
   },
 });
-
 const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
   padding: useMediaQuery("(max-width: 458px)") ? "1rem !important" : "2rem",
@@ -38,12 +35,11 @@ const StyledCard = styled(Card)(({ theme }) => ({
   position: "relative",
   boxShadow: "0 2px 4px rgba(0,0,0,0)",
   // borderRadius: 8,
-  backgroundColor: "#f4f4f4",
+  backgroundColor: "#F4F4F4",
   maxWidth: "lg",
   height: useMediaQuery("(max-width: 458px)") ? "13rem" : "23rem",
   alignItems: useMediaQuery("(max-width: 458px)") ? "start" : "center",
 }));
-
 const CloseButton = styled(IconButton)({
   position: "absolute",
   top: 8,
@@ -51,13 +47,11 @@ const CloseButton = styled(IconButton)({
   color: "#666666",
   padding: 4,
 });
-
 const QuantityContainer = styled(Box)({
   display: "flex",
   alignItems: "center",
-  border: "1px solid #e0e0e0",
+  border: "1px solid #E0E0E0",
 });
-
 const QuantityButton = styled(Button)({
   minWidth: 32,
   height: 32,
@@ -66,7 +60,7 @@ const QuantityButton = styled(Button)({
   color: "#333333",
   fontSize: "15px",
   "&:hover": {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F5F5F5",
   },
 });
 const ProductImage = styled("img")(({ theme }) => ({
@@ -74,7 +68,6 @@ const ProductImage = styled("img")(({ theme }) => ({
   objectPosition: "center",
   height: "100%",
   width: useMediaQuery("(max-width: 458px)") ? "100%" : "",
-
   // Added responsive styling for mobile
   [theme.breakpoints.down("sm")]: {},
 }));
@@ -82,59 +75,44 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   flexBasis: useMediaQuery("(max-width: 458px)") ? "30%" : "25%",
 }));
-
 const ProductCard = ({ product }) => {
-  const authToken = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const removeFromCartHandler = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-      await removeFromCart(product?.productId);
-    } catch (err) {
-      console.log(err.message);
+  const removeFromCartHandler = () => {
+    if (!product?.productId) {
+      console.error("No product ID found");
+      return;
     }
+
+    dispatch(removeFromTheCart({ productId: product?.productId }));
   };
 
   const handleCardClick = () => {
     navigate(`/product/${product.productId}`);
   };
-
   return (
     <StyledCard>
-      <ProductImageWrapper>
-        <ProductImage
-          src={product?.images?.[0]}
-          alt={product?.name}
-          onClick={handleCardClick}
-        />
-        <Checkbox
+      <Box sx={{ height: "100%" }}>
+        <ProductImageWrapper
           sx={{
-            position: "absolute",
-            top: useMediaQuery("(max-width: 458px)") ? "1.6rem" : 28,
-            left: useMediaQuery("(max-width: 458px)") ? "1.6rem" : 28,
-            padding: 0,
-            color: "white",
+            width: { xs: "100px", sm: "250px" },
 
-            zIndex: 1,
-            "&.Mui-checked": {
-              color: "white",
-
-              borderRadius: "2px",
-            },
+            overflow: "hidden",
           }}
-          size="large"
-        />
-      </ProductImageWrapper>{" "}
+        >
+          <ProductImage
+            src={product?.images?.[0]}
+            alt={product?.name}
+            onClick={handleCardClick}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </ProductImageWrapper>
+      </Box>
       <CardContent
         sx={{
           ml: useMediaQuery("(max-width: 458px)") ? "" : "1rem",
@@ -159,7 +137,7 @@ const ProductCard = ({ product }) => {
         <Typography
           variant="body2"
           sx={{
-            color: "#6f6f6f",
+            color: "#6F6F6F",
             fontSize: useMediaQuery("(max-width: 458px)") ? "1rem" : "12px",
             my: useMediaQuery("(max-width: 458px)") ? "" : 1,
             fontWeight: 400,
@@ -172,7 +150,7 @@ const ProductCard = ({ product }) => {
             WebkitLineClamp: 1, // Limits the number of lines (change this number to suit your needs)
           }}
         >
-          {product?.description || "No description available"}
+          {product?.sku || "No sku ID available"}
         </Typography>
         <Box
           sx={{
@@ -181,7 +159,6 @@ const ProductCard = ({ product }) => {
             alignItems: "start",
             justifyContent: "space-between",
             gap: useMediaQuery("(max-width: 458px)") ? 0 : 2,
-
             height: "100%",
           }}
         >
@@ -217,7 +194,6 @@ const ProductCard = ({ product }) => {
               <QuantityButton>+</QuantityButton>
             </QuantityContainer>
           </Box>
-
           <Box>
             <Typography
               variant="body2"
@@ -250,7 +226,7 @@ const ProductCard = ({ product }) => {
                 variant="body2"
                 sx={{
                   ml: useMediaQuery("(max-width: 458px)") ? "0.2rem" : 1,
-                  color: "#6f6f6f",
+                  color: "#6F6F6F",
                   fontSize: useMediaQuery("(max-width: 330px)")
                     ? "10px"
                     : "12px",
@@ -266,7 +242,6 @@ const ProductCard = ({ product }) => {
                     fontSize: "12px",
                   }}
                 >
-                  {" "}
                   5 Oct - 7 Oct
                 </span>
               </Typography>
@@ -277,7 +252,6 @@ const ProductCard = ({ product }) => {
     </StyledCard>
   );
 };
-
 const OrderCard = ({ cartData }) => {
   return (
     <ThemeProvider theme={theme}>
@@ -300,5 +274,4 @@ const OrderCard = ({ cartData }) => {
     </ThemeProvider>
   );
 };
-
 export default OrderCard;

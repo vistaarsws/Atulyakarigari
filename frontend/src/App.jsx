@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router";
 import { SnackbarProvider } from "notistack";
 import ScrollToTop from "./hooks/ScrollToTop";
 import ProtectedRoute from "./utils/ProtectedRoute";
@@ -15,10 +15,11 @@ import Footer from "./components/layout/user/footer/Footer";
 import Home from "./pages/user/home/Home";
 import About from "./pages/user/about/About";
 import Categories from "./pages/user/categories/index";
+import SubCategories from "./pages/user/categories/SubCategory";
 import Blogs from "./pages/user/blogs/Blogs";
 import Product from "./pages/user/product/Product";
 import Artisans from "./pages/user/artisans/Artisans";
-import ViewCart from "./pages/user/view-cart/index";
+import ViewCart from "./pages/user/view-cart/Index";
 import PlaceOrder from "./pages/user/place-order";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
@@ -44,6 +45,7 @@ const getRoutesConfig = () => ({
     { path: "/", element: <Home /> },
     { path: "/about", element: <About /> },
     { path: "/categories/:id", element: <Categories /> },
+    { path: "/sub-categories/:id", element: <SubCategories /> },
     { path: "/blogs", element: <Blogs /> },
     { path: "/artisans", element: <Artisans /> },
     { path: "/product/:id", element: <Product /> },

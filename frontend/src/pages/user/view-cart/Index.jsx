@@ -3,36 +3,22 @@ import Payment from "./Payment";
 import Stepper from "./Stepper";
 import AddressComponent from "./AddressComponent";
 import { Box, useMediaQuery } from "@mui/material";
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
-import { getCart } from "../../../services/user/userAPI";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCart } from "../../../Redux/features/CartSlice";
 
 const Index = () => {
+  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
-  const [cartData, setCartData] = useState(null);
-  const fetchCartData = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
+  const cartData = useSelector((state) => state.cart);
 
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
-      const response = await getCart();
-      setCartData(response?.data?.data);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
   useEffect(() => {
-    fetchCartData();
-  }, [authToken]);
+    if (authToken) {
+      console.log("Fetching cart data...");
+      dispatch(fetchCart(authToken));
+    }
+  }, [authToken, dispatch]);
+
   return (
     <Box
       sx={{
@@ -48,6 +34,7 @@ const Index = () => {
           display: "flex",
           justifyContent: "space-around",
           // marginTop: "2rem",
+
           flexDirection: { xs: "column", md: "row" },
           px: { xs: 2, md: 4 },
         }}
@@ -56,7 +43,6 @@ const Index = () => {
           sx={{
             width: { xs: "100%", md: "60%" },
             mb: { xs: 4, md: 0 },
-
             overflow: useMediaQuery("(max-width:768px)") ? "unset" : "scroll",
             scrollbarWidth: "none",
           }}
@@ -71,10 +57,9 @@ const Index = () => {
           }}
         >
           <Payment cartData={cartData} />
-        </Box>{" "}
+        </Box>
       </Box>
     </Box>
   );
 };
-
 export default Index;
