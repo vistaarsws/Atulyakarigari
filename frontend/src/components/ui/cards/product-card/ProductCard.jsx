@@ -4,14 +4,11 @@ import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
-import { useSelector, useDispatch } from "react-redux";
 import {
-  addToCart,
-  getCart,
+
   getReviewById,
 } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
-import { addToTheCart, fetchCart } from "../../../../Redux/features/CartSlice";
 function ProductCard({
   title = "Product Title",
   shortDescription = "Short description here...",
@@ -21,12 +18,10 @@ function ProductCard({
   id,
   priceAfterDiscount = price,
   isAddedToWishlist,
-  refreshWishlist,
 }) {
-  const [isInCart, setIsInCart] = useState(false);
+
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const authToken = useSelector((state) => state.auth);
+ 
 
   const [reviewData, setReviewData] = useState(null);
 
@@ -39,38 +34,13 @@ function ProductCard({
     }
   };
 
-  const checkIfInCart = async () => {
-    try {
-      const response = await getCart();
-      const cartItems = response?.data?.data?.items || [];
-      if (Array.isArray(cartItems)) {
-        setIsInCart(cartItems.some((item) => item.productId === id));
-      }
-    } catch (err) {
-      console.error("Error fetching cart items:", err.message);
-    }
-  };
+  
   useEffect(() => {
     getReview();
-    if (id) checkIfInCart();
+    
   }, [id]);
 
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-
-    if (isInCart) {
-      navigate("/view-cart");
-    } else {
-      try {
-        dispatch(addToTheCart({ productId: id, quantity: 1 })).unwrap();
-        dispatch(fetchCart(authToken.token));
-
-        setIsInCart(true);
-      } catch (err) {
-        console.error("Error adding to cart:", err.message);
-      }
-    }
-  };
+ 
   return (
     <div
       className="productCard_container"
@@ -105,12 +75,7 @@ function ProductCard({
           )}
         </div>
       </article>
-      {/* Add to Cart Button */}
-      <div className={isAddedToWishlist ? "wistListBtnStyle" : ""}>
-        <button onClick={handleAddToCart} className={isInCart ? "in-cart" : ""}>
-          {isInCart ? "Go to Cart" : "Add to Cart"}
-        </button>
-      </div>
+      
     </div>
   );
 }
