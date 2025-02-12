@@ -12,6 +12,7 @@ import { useMediaQuery } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
 import { useNavigate } from "react-router-dom";
+import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width:768px)");
@@ -125,7 +126,9 @@ export default function Home() {
                         </div>
                       ))
                     ) : (
-                      <p>No subcategories available</p>
+                      <>
+                       <SkeletonLoader/>
+                      </>
                     )}
                   </div>
                 </div>
@@ -133,7 +136,10 @@ export default function Home() {
             );
           })
         ) : (
-          <p>No categories or subcategories available at the moment.</p>
+          <>
+            <SkeletonLoader/>
+            <SkeletonLoader/>
+          </>
         )}
       </section>
 

@@ -5,6 +5,7 @@ import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
 // import { Pagination } from "@mui/material";
 import { getcategoryById } from "../../../../src/services/user/userAPI";
 import "./CategoryPage.css";
+import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
 
 const Index = () => {
   const { id } = useParams(); // Get the category ID from the route params
@@ -36,11 +37,11 @@ const Index = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading"><SkeletonLoader/></div>;
   }
 
   if (!categoryData) {
-    return <div className="error">Failed to load category data.</div>;
+    return <div className="error"><SkeletonLoader/><SkeletonLoader/></div>;
   }
 
   const products = categoryData.products || []; // Ensure products is an array

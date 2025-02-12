@@ -5,6 +5,7 @@ import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
 import { Pagination, Skeleton } from "@mui/material";
 import { getSubCategoryById } from "../../../services/admin/adminAPI";
 import "./CategoryPage.css";
+import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
 
 const Index = () => {
   const { id } = useParams();
@@ -62,7 +63,8 @@ const Index = () => {
   if (error) {
     return (
       <div className="error">
-        <p>Failed to load category data. Please try again.</p>
+        <SkeletonLoader/>
+        <SkeletonLoader/>
         <button onClick={fetchSubCategoryData}>Retry</button>
       </div>
     );
