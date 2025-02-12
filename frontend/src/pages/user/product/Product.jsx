@@ -135,6 +135,7 @@ export default function Product() {
   const [userReview, setUserReview] = useState(null);
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [reviewData, setReviewData] = useState(null);  
 
   const fetchRatingAndReview = async () => {
     try {
@@ -150,6 +151,7 @@ export default function Product() {
       }
 
       const response = await getReviewById(productId);
+      setReviewData(response?.data?.data)
 
       const reviews = response?.data?.data?.reviews;
 
@@ -160,21 +162,13 @@ export default function Product() {
         setUserReview(existingReview);
       }
 
-      const totalReviews = reviews?.length;
-      const totalRating =
-        totalReviews > 0
-          ? reviews.reduce((sum, review) => sum + review.rating, 0)
-          : 0;
-      const averageRating =
-        totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : "N/A";
-
       const updatedReviews = reviews.map((review) => ({
         ...review,
         userName: review?.userName || "Anonymous",
         userImage: review?.userImage || review_person,
       }));
 
-      setRatingAndReview({ reviews: updatedReviews, averageRating });
+      setRatingAndReview({ reviews: updatedReviews });
     } catch (error) {
       console.error("Unexpected error in fetchRatingAndReview:", error);
     }
@@ -530,10 +524,10 @@ export default function Product() {
 
                 <div className="ratingBox">
                   <div>
-                    <span>{ratingAndReview?.averageRating}</span>
+                    <span>{reviewData?.averageRating}</span> 
                     <img src={star} alt="Star" />
                   </div>
-                  <div>{ratingAndReview.reviews.length} Ratings</div>
+                  <div>{reviewData?.totalReviews} Ratings</div>
                 </div>
                 <div className="pincodeBox">
                   <div>
