@@ -10,6 +10,7 @@ import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card
 const Index = () => {
   const { id } = useParams();
   const [subCategoryData, setSubCategoryData] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
@@ -25,12 +26,13 @@ const Index = () => {
 
     try {
       const response = await getSubCategoryById(id);
-
-      console.log("API Response:", response);
+      const products = response?.data?.data?.products || [];
       setSubCategoryData(response?.data?.data || null);
+      setFilteredProducts(products);
     } catch (error) {
       console.error("Error fetching category data:", error);
       setSubCategoryData(null);
+      setFilteredProducts([]);
       setError(true);
     } finally {
       setLoading(false);
@@ -41,11 +43,16 @@ const Index = () => {
     fetchSubCategoryData();
   }, [fetchSubCategoryData]);
 
+  const handleFilterChange = (newFilteredProducts) => {
+    setFilteredProducts(newFilteredProducts);
+    setPage(1); // Reset pagination on filter change
+  };
+
   if (loading) {
     return (
       <div className="categoryPage_container">
         <section>
-          <BanarsiSilkFilter />
+          <BanarsiSilkFilter onFilterChange={handleFilterChange} />
           <div className="productList">
             {[...Array(10)].map((_, index) => (
               <div key={index} className="skeletonCard">
@@ -63,18 +70,18 @@ const Index = () => {
   if (error) {
     return (
       <div className="error">
-        <SkeletonLoader/>
-        <SkeletonLoader/>
+        <SkeletonLoader />
+        <SkeletonLoader />
         <button onClick={fetchSubCategoryData}>Retry</button>
       </div>
     );
   }
 
-  const products = subCategoryData?.products || [];
-
-  console.log("products", products);
-  const totalPages = Math.max(1, Math.ceil(products.length / productsPerPage));
-  const paginatedProducts = products.slice(
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / productsPerPage)
+  );
+  const paginatedProducts = filteredProducts.slice(
     (page - 1) * productsPerPage,
     page * productsPerPage
   );
@@ -82,31 +89,29 @@ const Index = () => {
   return (
     <div className="categoryPage_container">
       <section>
-        <BanarsiSilkFilter />
+        <BanarsiSilkFilter
+          categoryData={subCategoryData}
+          onFilterChange={handleFilterChange}
+        />
         <div className="productList">
           {paginatedProducts.length > 0 ? (
-            products.map(
-              (product) => (
-                console.log("pro", product),
-                (
-                  <ProductCard
-                    key={product?._id}
-                    id={product?._id}
-                    title={product?.name || "No Title"}
-                    picture={
-                      product?.images?.length
-                        ? product.images[0]
-                        : "/placeholder.png"
-                    }
-                    price={product?.price || "N/A"}
-                    shortDescription={product?.description || "No Description"}
-                    offer_inPercent={product?.discountPercentage || null}
-                    priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
-                    loading={loading}
-                  />
-                )
-              )
-            )
+            paginatedProducts.map((product) => (
+              <ProductCard
+                key={product?._id}
+                id={product?._id}
+                title={product?.name || "No Title"}
+                picture={
+                  product?.images?.length
+                    ? product.images[0]
+                    : "/placeholder.png"
+                }
+                price={product?.price || "N/A"}
+                shortDescription={product?.description || "No Description"}
+                offer_inPercent={product?.discountPercentage || null}
+                priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
+                loading={loading}
+              />
+            ))
           ) : (
             <div className="emptyState">No products found.</div>
           )}
