@@ -9,7 +9,6 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
   },
   "& .MuiSlider-thumb": {
     height: 20,
-    // width: 20,
     backgroundColor: "#10B981",
     border: "2px solid white",
     "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
@@ -24,14 +23,14 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
   },
 }));
 
-export default function PriceRangeSlider({ min, max, onChange }) {
-  const [value, setValue] = useState(min);
+export default function PriceRangeSlider({ min, max, value, onChange }) {
+  const [priceRange, setPriceRange] = useState(value || [min, max]);
 
   const handleChange = (_event, newValue) => {
-    const numValue = newValue;
-    setValue(numValue);
-    onChange?.(numValue);
+    setPriceRange(newValue);
+    onChange?.(newValue); // Ensure callback is triggered
   };
+
   return (
     <Box>
       <Typography
@@ -42,18 +41,19 @@ export default function PriceRangeSlider({ min, max, onChange }) {
       </Typography>
       <Box sx={{ px: 1 }}>
         <StyledSlider
-          value={value}
+          value={priceRange}
           min={min}
           max={max}
           onChange={handleChange}
-          aria-label="Price range"
+          valueLabelDisplay="auto"
+          aria-labelledby="price-range-slider"
         />
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
           <Typography sx={{ fontSize: "12px" }} color="text.secondary">
             {min.toLocaleString()}
           </Typography>
-          <Typography sx={{ fontSize: "12px" }} fontWeight="500">
-            {value.toLocaleString()}
+          <Typography sx={{ fontSize: "12px", fontWeight: 500 }}>
+            {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()}
           </Typography>
           <Typography sx={{ fontSize: "12px" }} color="text.secondary">
             {max.toLocaleString()}
