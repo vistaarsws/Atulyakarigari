@@ -129,7 +129,7 @@ const sidebarStyles = {
     },
   },
   filterToggle: {
-    display: {  sm:"flex", md: "none"},
+    display: { sm: "flex", md: "none" },
     alignItems: "center",
     justifyContent: "center",
     padding: "8px",
@@ -251,7 +251,12 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
               style={{ width: 24, height: 24, color: "#000000" }}
             />
           </IconButton>
-          <Typography sx={sidebarStyles.title}>{categoryData?.parentCategory?.name}/{categoryData?.name}</Typography>
+          <Typography sx={sidebarStyles.title}>
+            {categoryData?.parentCategory?.name &&
+              `${categoryData.parentCategory.name}/`}
+            {categoryData?.name}
+          </Typography>
+
           <Box sx={sidebarStyles.filterToggle}>
             <img
               src={isToggled ? toggleArrow : toggleFilter}

@@ -245,7 +245,7 @@ export default function OrderDetails() {
                 <TableCell>{product.quantity}</TableCell>
                 <TableCell>Color: {product.attributes.color}, Size: {product.attributes.size}</TableCell>
                 <TableCell>{product.date}</TableCell>
-                <TableCell>{product.price}</TableCell>
+                <TableCell>₹{product.price}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -255,7 +255,7 @@ export default function OrderDetails() {
       {/* Order Summary */}
       <Box sx={{ mt: 3, p: 2, bgcolor: "#f7f7f7", borderRadius: 1 }}>
         <Typography variant="body1"><b>Subtotal:</b> ₹{order.subtotal}</Typography>
-        <Typography variant="body1"><b>Discount:</b> {order.discount}</Typography>
+        <Typography variant="body1"><b>Discount:</b> ₹{order.discount}</Typography>
         <Typography variant="h6"><b>Total:</b> ₹{order.total}</Typography>
       </Box>
     </Box>
