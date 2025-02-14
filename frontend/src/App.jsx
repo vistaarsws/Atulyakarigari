@@ -39,6 +39,7 @@ import Team from "./pages/admin/team/Team";
 import Products from "./pages/admin/products/Products";
 import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
+import CustomerDetails from "./pages/admin/customers/CustomerDetails";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -66,6 +67,7 @@ const getRoutesConfig = () => ({
   adminRoutes: [
     { path: "add-product", element: <AddNewProduct /> },
     { path: "customers", element: <Customers /> },
+    { path: "customers/:id", element: <CustomerDetails /> },
     { path: "orders", element: <Orders /> },
     { path: "orders/:id", element: <OrderDetails /> },
     { path: "team", element: <Team /> },
