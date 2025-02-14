@@ -114,7 +114,7 @@ export default function Orders() {
               <TableRow key={order.id} onClick={() => handleRowClick(order.id)} sx={{ cursor: "pointer" }}>
                 <TableCell>#{order.id}</TableCell>
                 <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.total}</TableCell>
+                <TableCell>₹{order.total}</TableCell>
                 <TableCell>{order.state}</TableCell>
                 {!isSmallScreen && <TableCell>{order.address}</TableCell>}
                 <TableCell>{order.date}</TableCell>

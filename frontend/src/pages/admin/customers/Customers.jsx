@@ -15,7 +15,6 @@ import {
   InputAdornment,
   Grid,
   Avatar,
-  Chip,
   MenuItem,
   Select,
   FormControl,
