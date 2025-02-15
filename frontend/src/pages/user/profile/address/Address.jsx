@@ -61,6 +61,7 @@ const AddressCard = ({
   const deleteAddressHandler = async (id) => {
     try {
       await deleteAddress(id);
+
       getAllAddress();
     } catch (error) {
       console.log(error);
@@ -354,9 +355,17 @@ const AddressUI = () => {
   const getAllAddress = async () => {
     try {
       const response = await getAddress();
-      setAddresses(response.data.data);
+
+      if (response?.data?.success) {
+        // Check if addresses exist; if not, set an empty array
+        setAddresses(response?.data?.data || []);
+      } else {
+        console.warn(response?.data?.message || "No addresses found.");
+        setAddresses([]); // Set to empty array to prevent errors
+      }
     } catch (error) {
-      console.log(error.message);
+      console.error("Error fetching addresses:", error.message);
+      setAddresses([]); // Ensure state is cleared if there's an error
     }
   };
 
