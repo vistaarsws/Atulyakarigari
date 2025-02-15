@@ -34,3 +34,15 @@
 .ag-layout-auto-height {
   min-height: 4rem !important;
 }
+.product-popup-container {
+  padding: 16px;
+}
+
+.product-popup-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.product-popup-container ul li {
+  margin-bottom: 8px;
+}

@@ -133,6 +133,12 @@ const ProductSchema = new mongoose.Schema({
             ref: "RatingAndReviews",
         },
     ],
+    questions:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Question",
+        },
+    ]
 }, {
     timestamps: true
 });
