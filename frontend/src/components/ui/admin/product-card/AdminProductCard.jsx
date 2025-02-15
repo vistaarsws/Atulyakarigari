@@ -85,7 +85,9 @@ export default function AdminProductCard({ products }) {
     },
     category: getCategoryName(product.category)?.name,
     stock: product.stock,
-    attributes: product.attributes.map((obj) => obj.key),
+    productID: product._id,
+    sku: product.sku,
+    // attributes: product.attributes.map((obj) => obj.key),
     price: product.price,
     date: new Date(product.updatedAt).toLocaleDateString(), // Format the date
     name: product.name,
@@ -151,9 +153,10 @@ export default function AdminProductCard({ products }) {
       cellStyle: { fontWeight: "bold" },
     },
 
-    { field: "category", headerName: "CATEGORIES", flex: 0.8 },
-    { field: "stock", headerName: "STOCK STATUS", flex: 0.8 },
-    { field: "attributes", headerName: "ATTRIBUTES", flex: 0.8 },
+    { field: "category", headerName: "CATEGORIES", flex: 0.7 },
+    { field: "stock", headerName: "STOCK STATUS", flex: 0.5},
+    { field: "productID", headerName: "PRODUCT ID", flex: 0.8 },
+    { field: "sku", headerName: "SKU ID", flex: 0.7 },
     {
       field: "price",
       headerName: "PRICE",

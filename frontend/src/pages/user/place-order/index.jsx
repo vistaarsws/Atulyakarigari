@@ -78,7 +78,7 @@ const PlaceOrder = () => {
             // mb: 2,
           }}
         >
-          <DeliveryEstimate />
+          <DeliveryEstimate cartData={cartData}/>
           <Payment cartData={cartData}/>
         </Box>
       </Box>

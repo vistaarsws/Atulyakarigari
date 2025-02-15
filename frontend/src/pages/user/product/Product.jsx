@@ -42,6 +42,7 @@ import {
   getQuestionsByProduct,
   askQuestion,
   getUserWishlist,
+  getServiceability,
 } from "../../../../src/services/user/userAPI";
 import { answerQuestion } from "../../../../src/services/admin/adminAPI";
 import { useSelector } from "react-redux";
@@ -472,6 +473,25 @@ export default function Product() {
     }
   };
 
+  const [deliveryEstimation, setDeliveryEstimation] = useState("");
+  const [deliveryPincode, setDeliveryPincode] = useState("");
+  const handleServiceability = async (product) =>{
+
+    console.log("product", product)
+    if (!deliveryPincode) {
+      console.log("Delivery pincodes is required.");
+      return;
+    }
+    let delivery_postcode =deliveryPincode;
+    let cod=false;
+    let weight =0.5;
+    
+    const response = await getServiceability( delivery_postcode, cod, weight);
+    setDeliveryEstimation(response);
+    console.log("deliveryEstimation", deliveryEstimation);
+    
+  } ;
+
   return (
     <ThemeProvider theme={theme}>
       <div className="product_container">
@@ -533,11 +553,13 @@ export default function Product() {
                   <div>
                     <input
                       type="text" //
-                      name="pincode"
-                      id="pincode"
+                      name="Pincode"
+                      id="Pincode"
                       inputMode="numeric"
                       pattern="[0-6]*"
                       placeholder="Enter Pincode"
+                      value={deliveryPincode}
+                      onChange={(e) => setDeliveryPincode(e.target.value)}
                       style={{
                         appearance: "textfield",
                         MozAppearance: "textfield",
@@ -546,7 +568,7 @@ export default function Product() {
                     />
                   </div>
                   <div>
-                    <button type="button">Check</button>
+                    <button type="button" onClick={() => handleServiceability(productId)}>Check</button>
                   </div>
                 </div>
               </div>
@@ -586,7 +608,7 @@ export default function Product() {
                 </button>
               </div>
               <div>
-                <button onClick={() => handleBuyToggle(productId)}>
+                <button onClick={() => handleBuyToggle()}>
                   Buy Now
                 </button>
               </div>

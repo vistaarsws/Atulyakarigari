@@ -9,6 +9,8 @@ import {
   Checkbox,
 } from "@mui/material";
 import ORDER_IMG from "../../../assets/images/order-img.png";
+import { getServiceability } from "../../../services/user/userAPI";
+import { useState } from "react";
 
 const items = [
   {
@@ -37,7 +39,24 @@ const items = [
   },
 ];
 
-const DeliveryEstimate = () => {
+const DeliveryEstimate = (cartData) => {
+  const [deliveryEstimation, setDeliveryEstimation] = useState("");
+  const [deliveryPincode, setDeliveryPincode] = useState("");
+  const handleServiceability = async (product) => {
+    console.log("product", product);
+    if (!deliveryPincode) {
+      console.log("Delivery pincodes is required.");
+      return;
+    }
+    let delivery_postcode = deliveryPincode;
+    let cod = false;
+
+    const response = await getServiceability(delivery_postcode, cod);
+    setDeliveryEstimation(response);
+    console.log("deliveryEstimation", deliveryEstimation);
+  };
+
+  console.log("cartData at delivery estimation:", cartData);
   return (
     <Box padding={2}>
       <Typography
