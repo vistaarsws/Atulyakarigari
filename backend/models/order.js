@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema(
   {
+    orderId: {
+      type: String,
+      unique: true,
+      required: true,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -36,15 +41,42 @@ const OrderSchema = new mongoose.Schema(
       enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Pending",
     },
+
+    /** Shipping & Billing Details */
     shippingAddress: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
-      required: true,
+      fullName: { type: String, required: true },
+      phone: { type: String, required: true },
+      addressLine1: { type: String, required: true },
+      addressLine2: { type: String },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true, default: "India" },
     },
+    billingAddress: {
+      fullName: { type: String },
+      phone: { type: String },
+      addressLine1: { type: String },
+      addressLine2: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String, default: "India" },
+    },
+    shippingMethod: {
+      type: String,
+      default: "Standard",
+    },
+
+    /** Payment & Transaction Details */
     paymentMethod: {
       type: String,
-      enum: ["Credit Card", "PayPal", "Cash on Delivery"],
+      enum: ["Credit Card", "PayPal", "Cash on Delivery", "UPI", "Bank Transfer"],
       required: true,
+    },
+    transactionId: {
+      type: String,
+      default: null,
     },
     isPaid: {
       type: Boolean,
@@ -52,6 +84,34 @@ const OrderSchema = new mongoose.Schema(
     },
     paidAt: {
       type: Date,
+    },
+
+    /** Shipment Details */
+    trackingId: {
+      type: String,
+      default: null,
+    },
+    courierName: {
+      type: String,
+      default: null,
+    },
+    estimatedDelivery: {
+      type: Date,
+      default: null,
+    },
+    shippedAt: {
+      type: Date,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    cancelledAt: {
+      type: Date,
+    },
+
+    /** Additional Info */
+    notes: {
+      type: String,
     },
   },
   {

@@ -57,4 +57,7 @@ export const user_endpoints = {
 
   GET_QUESTIONS_BY_PRODUCT: BASE_URL + "/api/v1/questions/",
   CREATE_QUESTION: BASE_URL + "/api/v1/questions/",
+
+
+  GET_SERVICEABILITY: BASE_URL + "/api/v1/shiprocket/getServiceability",
 };

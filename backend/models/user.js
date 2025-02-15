@@ -63,26 +63,8 @@ const userSchema = new mongoose.Schema({
     }
 )
 
-// userSchema.pre("save", async function (next) {
-//     if (!this.isModified("password")) return next();
-//     try {
-//         this.password = await bcrypt.hash(this.password, 10);
-//         next();
-//     } catch (error) {
-//         console.error("Error hashing password:", error);
-//         next(new Error("Password hashing failed"));
-//     }
-// });
-
 userSchema.methods = {
-    // comparePassword: async function (password) {
-    //     try {
-    //         return await bcrypt.compare(password, this.password);
-    //     } catch (error) {
-    //         console.error("Error comparing password:", error);
-    //         throw new Error("Password comparison failed");
-    //     }
-    // },
+
     generateAuthToken: async function () {
         try {
             const userWithProfile = await this.populate('additionalDetails')
