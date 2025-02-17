@@ -127,6 +127,7 @@ export default function ProductForm({
   // Add new empty entry
   const addField = () => {
     setDetails([...details, { title: "", description: "" }]);
+    // setFormData({ ...formData, detailDescription: details });
   };
 
   // Remove a specific entry
@@ -136,11 +137,11 @@ export default function ProductForm({
     }
   };
 
-  // Save Data to State
-  const handleSaveDetailDescription = () => {
-    setDetails(details);
-    console.log("Saved Data:", details);
-  };
+  // // Save Data to State
+  // const handleSaveDetailDescription = () => {
+  //   setDetails(details);
+  //   console.log("Saved Data:", details);
+  // };
 
   const initialState = {
     name: "",
@@ -441,10 +442,11 @@ export default function ProductForm({
       }
 
       if (formData.detailDescription) {
+        console.log("Before appending:", formData.detailDescription);
         setDetails(details);
         formDataInstance.append(
           "detailDescription",
-          JSON.stringify([...details])
+          JSON.stringify(formData.detailDescription)
         );
       }
 
@@ -1137,7 +1139,7 @@ export default function ProductForm({
                 Detail Description
               </Typography>
 
-              {details.map((item, index) => (
+              {details?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"

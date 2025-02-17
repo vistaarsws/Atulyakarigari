@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Progress = () => {
   const theme = useTheme();
@@ -21,12 +21,16 @@ const Progress = () => {
     >
       <Typography
         sx={{
-          color: "#60a487",
           mx: 1,
           fontSize: isSmallScreen ? "14px" : "16px",
         }}
       >
-        Bag
+        <Link
+          to={"/view-cart"}
+          style={{ textDecoration: "none", color: "#60a487" }}
+        >
+          Bag
+        </Link>
       </Typography>
       <Box
         sx={{
@@ -38,19 +42,31 @@ const Progress = () => {
         }}
       >
         <Typography
-          sx={{ fontSize: isSmallScreen ? "11px" : "16px", pb: "10%" }}
+          sx={{
+            fontSize: isSmallScreen ? "11px" : "16px",
+            pb: "10%",
+            width: isSmallScreen ? "50px" : "auto",
+            overflowX: "hidden",
+          }}
         >
-          .......................
+          ...................
         </Typography>
       </Box>
       <Typography
         sx={{
-          color: routes == "/place-order" ? "#60a487" : "#888888",
           mx: 1,
           fontSize: isSmallScreen ? "14px" : "16px",
         }}
       >
-        Address
+        <Link
+          to={"/place-order"}
+          style={{
+            textDecoration: "none",
+            color: routes == "/place-order" ? "#60a487" : "#888888",
+          }}
+        >
+          Address
+        </Link>
       </Typography>
       <Box
         sx={{
@@ -61,9 +77,14 @@ const Progress = () => {
         }}
       >
         <Typography
-          sx={{ fontSize: isSmallScreen ? "11px" : "16px", pb: "10%" }}
+          sx={{
+            fontSize: isSmallScreen ? "11px" : "16px",
+            pb: "10%",
+            width: isSmallScreen ? "50px" : "auto",
+            overflowX: "hidden",
+          }}
         >
-          ........................
+          ...................
         </Typography>
       </Box>
 

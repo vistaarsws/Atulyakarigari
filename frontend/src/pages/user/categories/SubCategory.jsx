@@ -6,7 +6,6 @@ import { Pagination, Skeleton } from "@mui/material";
 import { getSubCategoryById } from "../../../services/admin/adminAPI";
 import "./CategoryPage.css";
 import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
-
 const Index = () => {
   const { id } = useParams();
   const [subCategoryData, setSubCategoryData] = useState(null);
@@ -16,14 +15,11 @@ const Index = () => {
   const [error, setError] = useState(false);
   const productsPerPage = 20;
   const hasFetched = useRef(false);
-
   const fetchSubCategoryData = useCallback(async () => {
     if (!id || hasFetched.current) return;
     hasFetched.current = true;
-
     setLoading(true);
     setError(false);
-
     try {
       const response = await getSubCategoryById(id);
       const products = response?.data?.data?.products || [];
@@ -41,13 +37,12 @@ const Index = () => {
 
   useEffect(() => {
     fetchSubCategoryData();
-  }, [fetchSubCategoryData]);
+  }, []);
 
   const handleFilterChange = (newFilteredProducts) => {
     setFilteredProducts(newFilteredProducts);
     setPage(1); // Reset pagination on filter change
   };
-
   if (loading) {
     return (
       <div className="categoryPage_container">
@@ -66,7 +61,6 @@ const Index = () => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="error">
@@ -76,7 +70,6 @@ const Index = () => {
       </div>
     );
   }
-
   const totalPages = Math.max(
     1,
     Math.ceil(filteredProducts.length / productsPerPage)
@@ -85,7 +78,6 @@ const Index = () => {
     (page - 1) * productsPerPage,
     page * productsPerPage
   );
-
   return (
     <div className="categoryPage_container">
       <section>
@@ -129,5 +121,4 @@ const Index = () => {
     </div>
   );
 };
-
 export default Index;

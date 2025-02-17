@@ -1,42 +1,39 @@
 import { useEffect, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import { useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
-import { getProfile, updateProfile } from "../../../../services/user/userAPI";
-import { Avatar, Button, styled, useMediaQuery } from "@mui/material";
-import toast from "react-hot-toast";
-import "./Profile.css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Avatar,
+  Button,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  styled,
+  TextField,
+  useMediaQuery,
+} from "@mui/material";
 
-const ProfileField = ({ label, value, onChange, type, isEditable }) => {
-  return (
-    <div className="profile-field">
-      <div className="profile-field-label">{label}</div>
-      <input
-        type={type || "text"}
-        className="profile-input"
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={!isEditable}
-      />
-    </div>
-  );
-};
+import "./Profile.css";
+import {
+  fetchProfile,
+  updateProfileThunk,
+} from "../../../../Redux/features/ProfileSlice";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { useSnackbar } from "notistack";
 
 const Profile = () => {
-  const userProfileToken = useSelector((state) => state.auth.token);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    dob: "",
-    hintName: "",
-    mobile: "",
-    gender: "",
-    location: "",
-    alternateMobile: "",
-    profilePicture: "/broken-image.jpg",
-    profilePictureFile: null, // Store the file for uploading
-  });
-  const [originalData, setOriginalData] = useState({});
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const profile = useSelector((state) => state.profile.profile);
+  const authToken = useSelector((state) => state.auth.token);
+  const isLoading = useSelector((state) => state.profile.loading);
+  const defaultProfilePicture = "/broken-image.jpg";
+
+  const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
 
   const VisuallyHiddenInput = styled("input")({
@@ -51,178 +48,98 @@ const Profile = () => {
     width: 1,
   });
 
-  // Fetch Profile Data
-  const fetchProfileData = async () => {
-    try {
-      if (!userProfileToken) {
-        console.error("No user profile token found");
-        return;
-      }
-
-      const { _id } = jwtDecode(userProfileToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
-      const response = await getProfile(_id);
-      const profile = response.data.data;
-
-      const fetchedData = {
-        fullName: profile.fullName || "",
-        email: profile.email || "",
-        dob: profile.dateOfBirth || "",
-        hintName: profile.hintName || "",
-        mobile: profile.contactNumber || "",
-        gender: profile.gender || "",
-        location: profile.location || "",
-        alternateMobile: profile.alternativeContactNumber || "",
-        profilePicture: profile.profilePicture || "/broken-image.jpg",
-        profilePictureFile: null, // Reset file on fetch
-      };
-
-      setFormData(fetchedData);
-      setOriginalData(fetchedData);
-    } catch (error) {
-      console.error("Error fetching profile data: ", error.message || error);
-      toast.error("Failed to fetch profile data.");
-    }
-  };
-
-  // Handle Input Change
-  const handleInputChange = (field, value) => {
-    if ((field === "mobile" || field === "alternateMobile") && isNaN(value)) {
-      toast.error("Please enter a valid number.");
-      return;
-    }
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
-  // Handle Profile Picture Change (file upload)
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const allowedFormats = ["image/jpeg", "image/png"];
-      if (allowedFormats.includes(file.type)) {
-        setFormData({
-          profilePicture: URL.createObjectURL(file), // Preview the image
-          profilePictureFile: file, // Store the file for uploading
-        });
-      } else {
-        toast.error("Please upload a valid image (JPEG/PNG).");
-      }
-    }
-  };
-
-  // Save Updated Profile
-  const handleSave = async () => {
-    try {
-      if (!userProfileToken) {
-        toast.error("User token is missing. Please log in again.");
-        return;
-      }
-
-      const { _id } = jwtDecode(userProfileToken);
-      if (!_id) {
-        toast.error("Invalid user ID. Please try again.");
-        return;
-      }
-
-      const updatedData = {
-        fullName: formData.fullName || "",
-        email: formData.email || "",
-        dateOfBirth: formData.dob || "",
-        hintName: formData.hintName || "",
-        contactNumber: formData.mobile || "",
-        gender: formData.gender || "",
-        location: formData.location || "",
-        alternativeContactNumber: formData.alternateMobile || "",
-        profilePicture: formData.profilePicture || "null",
-      };
-
-      const formDataToSend = new FormData();
-      Object.keys(updatedData).forEach((key) => {
-        formDataToSend.append(key, updatedData[key]);
-      });
-
-      // Append the profile picture file if available
-      if (formData.profilePictureFile) {
-        formDataToSend.append("profileImage", formData.profilePictureFile);
-      }
-
-      console.log("Sending updated data to API:", updatedData); // Debug log
-
-      toast.loading("Updating profile...");
-      const response = await updateProfile(_id, formDataToSend);
-
-      // Debugging API response
-      console.log("API Response:", response);
-
-      if (response.data.success) {
-        toast.dismiss();
-        toast.success("Profile updated successfully!");
-        setIsEditing(false);
-        fetchProfileData(); // Refresh profile data
-      } else {
-        toast.dismiss();
-        toast.error(response.data.message || "Failed to update profile.");
-      }
-    } catch (error) {
-      toast.dismiss();
-      console.error("Error updating profile: ", error.message || error);
-      toast.error("An error occurred while updating the profile.");
-    }
-  };
-
-  // Cancel Editing and Restore Original Data
-  const handleCancel = () => {
-    setFormData({ ...originalData }); // Restore the original data
-    setIsEditing(false);
-  };
+  useEffect(() => {
+    dispatch(fetchProfile(authToken));
+  }, [dispatch, authToken]);
 
   useEffect(() => {
-    fetchProfileData();
-  }, [userProfileToken]);
+    if (profile) {
+      setFormData({
+        ...profile,
+        profilePicture: profile.profilePicture || defaultProfilePicture,
+      });
+    }
+  }, [profile]);
+
+  const handleInputChange = (field, value) => {
+    setFormData((prevData) => ({ ...prevData, [field]: value }));
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file && ["image/jpeg", "image/png"].includes(file.type)) {
+      setFormData((prevData) => ({ ...prevData, profilePicture: file }));
+    } else {
+      enqueueSnackbar("Please upload a valid image (JPEG/PNG).", {
+        preventDuplicate: false,
+        variant: "error",
+      });
+    }
+  };
+
+  const cancelEditHandler = () => {
+    setIsEditing(false);
+    dispatch(fetchProfile(authToken));
+  };
+
+  const handleSave = async () => {
+    try {
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach((key) =>
+        formDataToSend.append(key, formData[key])
+      );
+      if (formData.profilePicture instanceof File) {
+        formDataToSend.append("profileImage", formData.profilePicture);
+      }
+      await dispatch(
+        updateProfileThunk({ authToken, updatedData: formDataToSend })
+      ).unwrap();
+      setIsEditing(false);
+      dispatch(fetchProfile(authToken));
+      enqueueSnackbar("Successfully updated", {
+        preventDuplicate: false,
+        variant: "success",
+      });
+    } catch (error) {
+      enqueueSnackbar("Error updating profile", {
+        preventDuplicate: false,
+        variant: "error",
+      });
+    }
+  };
 
   return (
     <div className="profile-container">
       <div className="profile-image-container">
         <div className="profile-image-input-box">
           <Avatar
-            src={formData?.profilePicture}
-            alt={formData?.fullName}
-            sx={{
-              width: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
-
-              height: useMediaQuery("(max-width:768px)") ? "90px" : "110px",
-              fontSize: "4rem",
-            }}
-            className="profile-image"
+            src={
+              formData.profilePicture instanceof File
+                ? URL.createObjectURL(formData.profilePicture)
+                : formData.profilePicture
+            }
+            alt={formData.fullName}
+            sx={{ width: 110, height: 110 }}
           />
-          {/* <img
-            src={formData.profilePicture}
-            alt="Profile"
-            className="profile-image"
-          /> */}
-
           {isEditing && (
-            // <input
-            //   type="file"
-            //   accept="image/jpeg, image/png"
-            //   onChange={handleFileChange}
-            //   className="file-input"
-            // />
             <Button
-              className="file-input"
               component="label"
-              role={undefined}
-              sx={{ width: "100%" }}
-              variant="outlilned"
-              tabIndex={-1}
+              variant="filled"
               startIcon={<EditIcon />}
+              sx={{
+                position: "absolute",
+                right: "-30%",
+                bottom: "-5%",
+                display: "flex",
+                justifyContent: "center",
+                borderRadius: "50%",
+                minWidth: "auto",
+                padding: 1,
+
+                "& .MuiButton-startIcon": {
+                  margin: "0 !important", // Removes unwanted margin from the startIcon
+                },
+              }}
             >
               <VisuallyHiddenInput type="file" onChange={handleFileChange} />
             </Button>
@@ -232,77 +149,119 @@ const Profile = () => {
       <div className="profile-form">
         <div className="profile-fields">
           <div>
-            <ProfileField
+            <TextField
               label="Full Name"
-              value={formData.fullName}
-              onChange={(value) => handleInputChange("fullName", value)}
-              isEditable={isEditing}
+              sx={{ mb: 2 }}
+              value={formData.fullName || ""}
+              onChange={(e) => handleInputChange("fullName", e.target.value)}
+              fullWidth
+              disabled={!isEditing}
             />
-            <ProfileField
-              label="Email ID"
-              value={formData.email}
-              onChange={(value) => handleInputChange("email", value)}
-              isEditable={isEditing}
+            {/* ----------------------------------------------------------------------------------------------------------- */}
+            <TextField
+              sx={{ mb: 2 }}
+              label="Email"
+              value={formData.email || ""}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              fullWidth
+              disabled={!isEditing}
             />
-            <ProfileField
-              label="Date of Birth"
-              value={formData.dob}
-              onChange={(value) => handleInputChange("dob", value)}
-              type="date"
-              isEditable={isEditing}
-            />
+            {/* ----------------------------------------------------------------------------------------------------------- */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <MobileDatePicker
+                sx={{ mb: 2, width: "100%" }}
+                label="Date of Birth"
+                value={
+                  formData.dateOfBirth ? dayjs(formData.dateOfBirth) : null
+                }
+                onChange={(newValue) =>
+                  handleInputChange(
+                    "dateOfBirth",
+                    newValue ? newValue.format("YYYY-MM-DD") : ""
+                  )
+                }
+                disabled={!isEditing}
+              />
+            </LocalizationProvider>
           </div>
+          {/* ----------------------------------------------------------------------------------------------------------- */}
           <div>
-            <ProfileField
-              label="Mobile Number"
-              value={formData.mobile}
-              onChange={(value) => handleInputChange("mobile", value)}
-              isEditable={isEditing}
+            <TextField
+              sx={{ mb: 2 }}
+              label="Contact Number"
+              value={formData.contactNumber || ""}
+              onChange={(e) =>
+                handleInputChange("contactNumber", e.target.value)
+              }
+              fullWidth
+              disabled={!isEditing}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">+91</InputAdornment>
+                ),
+              }}
             />
-            <ProfileField
-              label="Gender"
-              value={formData.gender}
-              onChange={(value) => handleInputChange("gender", value)}
-              isEditable={isEditing}
-            />
-
-            <ProfileField
-              label="Alternate Mobile"
-              value={formData.alternateMobile}
-              onChange={(value) => handleInputChange("alternateMobile", value)}
-              isEditable={isEditing}
+            {/* ----------------------------------------------------------------------------------------------------------- */}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Gender</InputLabel>
+              <Select
+                value={formData.gender || ""}
+                onChange={(e) => handleInputChange("gender", e.target.value)}
+                disabled={!isEditing}
+              >
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
+            {/* ----------------------------------------------------------------------------------------------------------- */}
+            <TextField
+              sx={{ mb: 2 }}
+              label="Alternate Contact Number"
+              value={formData.alternativeContactNumber || ""}
+              onChange={(e) =>
+                handleInputChange("alternativeContactNumber", e.target.value)
+              }
+              fullWidth
+              disabled={!isEditing}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">+91</InputAdornment>
+                ),
+              }}
             />
           </div>
         </div>
-
         <div className="profile-buttons">
-          {!isEditing ? (
-            <Button
-              className="edit-button"
-              variant="outlined"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit
-            </Button>
-          ) : (
+          {isEditing ? (
             <>
               <Button
-                className="save-button"
-                size="large"
                 variant="contained"
                 onClick={handleSave}
+                className="save-button"
+                size="large"
+                disabled={isLoading}
               >
                 Save
               </Button>
               <Button
+                variant="outlined"
                 className="cancel-button"
                 size="large"
-                variant="outlined"
-                onClick={handleCancel}
+                onClick={cancelEditHandler}
               >
                 Cancel
               </Button>
             </>
+          ) : (
+            <Button
+              className="edit-button"
+              variant="outlined"
+              size="large"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit
+            </Button>
           )}
         </div>
       </div>

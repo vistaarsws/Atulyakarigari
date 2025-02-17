@@ -1,15 +1,14 @@
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
-import { login, logout } from "../../../../Redux/features/AuthSlice";
+import { logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { jwtDecode } from "jwt-decode";
-import { getProfile } from "../../../../services/user/userAPI";
+
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
@@ -19,97 +18,24 @@ import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
 import { fetchCart } from "../../../../Redux/features/CartSlice";
 import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
+import { fetchProfile } from "../../../../Redux/features/ProfileSlice";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const wishlist = useSelector((state) => state.wishlist.items);
+  const profile = useSelector((state) => state.profile);
   const cartData = useSelector((state) => state.cart);
 
+  const [getAllCategories, setGetAllCategories] = useState([]);
+  const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
-    if (anchorEl) {
-      setAnchorEl(null); // Close the dropdown if it's already open
-    } else {
-      setAnchorEl(event.currentTarget); // Open the dropdown
-    }
-  };
-  const [getAllCategories, setGetAllCategories] = useState([]);
-  const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
-  const toggleCollapse = (index) => {
-    setOpenCategoryIndex((prev) => (prev === index ? null : index));
-  };
-
-  const authToken = useSelector((state) => state.auth.token);
-  const { enqueueSnackbar } = useSnackbar();
-  // const [wishlistData, setWishlistData] = useState([]);
-
-  function notificationsLabel(count) {
-    if (count === 0) {
-      return "no notifications";
-    }
-    if (count > 99) {
-      return "more than 99 notifications";
-    }
-    return `${count} notifications`;
-  }
-  const [profileData, setProfileData] = useState(null);
-  // Fetch Profile Data
-  const fetchProfileData = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-      const response = await getProfile(_id);
-      const profile = response?.data?.data;
-      const fetchedData = {
-        fullName: profile.fullName,
-        profilePicture: profile.profilePicture || "/broken-image.jpg",
-      };
-      setProfileData(fetchedData);
-    } catch (error) {
-      console.error("Error fetching profile data: ", error.message || error);
-    }
-  };
-  useEffect(() => {
-    fetchProfileData();
-  }, [authToken]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 849) {
-        setIsMobileView(true);
-        setIsNavVisible(false);
-      } else {
-        setIsMobileView(false);
-        setIsNavVisible(true);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  const logoutHandler = (isLogout) => {
-    if (isLogout === "Logout") {
-      enqueueSnackbar("Logout Successfully", { variant: "success" });
-      // logoutContext();
-      dispatch(logout());
-    }
-  };
+  // -----------------------------------------------------------
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
@@ -141,33 +67,61 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       icon: <Logout fontSize="small" />,
     },
   ];
-  // const [cartData, setCartData] = useState(null);
-  // const fetchCartData = async () => {
-  //   try {
-  //     if (!authToken) {
-  //       console.error("No user profile token found");
-  //       return;
-  //     }
-  //     const { _id } = jwtDecode(authToken);
-  //     if (!_id) {
-  //       console.error("Invalid token structure");
-  //       return;
-  //     }
-  //     const response = await getCart();
-  //     setCartData(response?.data?.data);
-  //   } catch (err) {
-  //     console.log(err.message);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchCartData();
-  // }, []);
+  // -----------------------------------------------------------
+
+  const handleClick = (event) => {
+    if (anchorEl) {
+      setAnchorEl(null); // Close the dropdown if it's already open
+    } else {
+      setAnchorEl(event.currentTarget); // Open the dropdown
+    }
+  };
+
+  const toggleCollapse = (index) => {
+    setOpenCategoryIndex((prev) => (prev === index ? null : index));
+  };
+
+  const authToken = useSelector((state) => state.auth.token);
+  const { enqueueSnackbar } = useSnackbar();
+
+  function notificationsLabel(count) {
+    if (count === 0) {
+      return "no notifications";
+    }
+    if (count > 99) {
+      return "more than 99 notifications";
+    }
+    return `${count} notifications`;
+  }
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 849) {
+        setIsMobileView(true);
+        setIsNavVisible(false);
+      } else {
+        setIsMobileView(false);
+        setIsNavVisible(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const logoutHandler = (isLogout) => {
+    if (isLogout === "Logout") {
+      enqueueSnackbar("Logout Successfully", { variant: "success" });
+      dispatch(logout());
+    }
+  };
 
   const fetchCategoriesData = async () => {
     try {
       const response = await getCategory();
       const categories = Object.values(response.data.data);
-      // Ensure data structure matches expectations
       if (categories.length) {
         setGetAllCategories(categories);
       }
@@ -183,6 +137,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     if (authToken) {
       dispatch(fetchCart(authToken));
       dispatch(fetchWishlist(authToken));
+      dispatch(fetchProfile(authToken));
     }
   }, [authToken, dispatch]);
 
@@ -398,8 +353,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             <div className="profileBox">
               {authToken ? (
                 <Avatar
-                  src={profileData?.profilePicture}
-                  alt={profileData?.fullName}
+                  src={profile?.profile?.profilePicture}
+                  alt={profile?.profile?.fullName}
                 />
               ) : (
                 <Avatar src="/broken-image.jpg" />
@@ -418,7 +373,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           >
             {authToken && (
               <MenuItem>
-                <p>Hello, {profileData?.fullName}</p>
+                <p>Hello, {profile?.profile?.fullName}</p>
               </MenuItem>
             )}
             {authToken ? (

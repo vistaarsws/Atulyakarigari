@@ -15,7 +15,6 @@ import toggleArrow from "../../../assets/images/left-arrow-return-svgrepo-com.sv
 import toggleFilter from "../../../assets/images/filter-list-svgrepo-com.svg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 const colors = [
   { name: "Alizarin Crimson", hex: "#E32636" },
   { name: "Coral", hex: "#FF7F50" },
@@ -32,7 +31,6 @@ const colors = [
   { name: "Blue", hex: "#0000FF" },
   { name: "Red", hex: "#FF0000" },
 ];
-
 const sidebarStyles = {
   container: {
     backgroundColor: "#fff",
@@ -45,7 +43,7 @@ const sidebarStyles = {
     display: "flex",
     alignItems: "center",
     padding: "16px",
-    borderBottom: "1px solid #e5e7eb",
+    borderBottom: "1px solid #E5E7EB",
     position: "sticky",
     top: 0,
     backgroundColor: "#fff",
@@ -55,7 +53,7 @@ const sidebarStyles = {
     padding: "8px",
     borderRadius: "50%",
     "&:hover": {
-      backgroundColor: "#f3f4f6",
+      backgroundColor: "#F3F4F6",
     },
   },
   title: {
@@ -96,7 +94,7 @@ const sidebarStyles = {
     width: "16px",
     height: "16px",
     borderRadius: "50%",
-    border: "1px solid #e5e7eb",
+    border: "1px solid #E5E7EB",
     marginRight: "8px",
   },
   buttonContainer: {
@@ -104,7 +102,7 @@ const sidebarStyles = {
     bottom: 0,
     backgroundColor: "#fff",
     padding: "16px",
-    borderTop: "1px solid #e5e7eb",
+    borderTop: "1px solid #E5E7EB",
     display: "flex",
     gap: "12px",
     flexDirection: { xs: "column", sm: "row" },
@@ -135,7 +133,6 @@ const sidebarStyles = {
     padding: "8px",
   },
 };
-
 export default function SidebarFilter({ categoryData, onFilterChange }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -148,9 +145,7 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
     selectedColors: [],
     priceRange: [2000, 30000],
   });
-
   const navigate = useNavigate();
-
   useEffect(() => {
     setTempFilters({
       inStock,
@@ -158,7 +153,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
       priceRange,
     });
   }, [inStock, selectedColors, priceRange]);
-
   const toggleColor = (colorName) => {
     setTempFilters((prev) => ({
       ...prev,
@@ -167,38 +161,32 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
         : [...prev.selectedColors, colorName],
     }));
   };
-
   const handlePriceChange = (newRange) => {
     setTempFilters((prev) => ({
       ...prev,
       priceRange: newRange,
     }));
   };
-
   const handleStockChange = (event) => {
     setTempFilters((prev) => ({
       ...prev,
       inStock: event.target.checked,
     }));
   };
-
   const handleApplyFilters = () => {
     setInStock(tempFilters.inStock);
     setSelectedColors(tempFilters.selectedColors);
     setPriceRange(tempFilters.priceRange);
-
     const filteredProducts = categoryData?.products?.filter((product) => {
       // Stock Availability Check
       const matchesStock =
         !tempFilters.inStock ||
         (product.inStock !== undefined && product.inStock);
-
       // Price Range Check
       const productPrice = product?.price || 0;
       const matchesPrice =
         productPrice >= tempFilters.priceRange[0] &&
         productPrice <= tempFilters.priceRange[1];
-
       // Color Matching Check (Handles case-insensitive matching)
       const productColor = product?.color?.toLowerCase() || "";
       const matchesColor =
@@ -206,36 +194,29 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
         tempFilters.selectedColors.some(
           (color) => color.toLowerCase() === productColor
         );
-
       return matchesStock && matchesPrice && matchesColor;
     });
-
     if (onFilterChange) {
       onFilterChange(filteredProducts);
     }
-
     if (isMobile) {
       setIsToggled(false);
     }
   };
-
   const handleResetFilters = () => {
     const defaultFilters = {
       inStock: false,
       selectedColors: [],
       priceRange: [2000, 30000],
     };
-
     setTempFilters(defaultFilters);
     setInStock(false);
     setSelectedColors([]);
     setPriceRange([2000, 30000]);
-
     if (onFilterChange) {
       onFilterChange(categoryData?.products || []);
     }
   };
-
   return (
     <div
       className={`filterSection_container ${isToggled ? "toggleSideBar" : ""}`}
@@ -256,7 +237,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
               `${categoryData.parentCategory.name}/`}
             {categoryData?.name}
           </Typography>
-
           <Box sx={sidebarStyles.filterToggle}>
             <img
               src={isToggled ? toggleArrow : toggleFilter}
@@ -266,7 +246,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
             />
           </Box>
         </Box>
-
         {/* Content */}
         <Box sx={sidebarStyles.content}>
           {/* Stock Filter */}
@@ -286,7 +265,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
               />
             </Typography>
           </Box>
-
           {/* Price Range Slider */}
           <Box sx={sidebarStyles.section}>
             <PriceRangeSlider
@@ -296,7 +274,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
               onChange={handlePriceChange}
             />
           </Box>
-
           {/* Color Filter */}
           <Box sx={sidebarStyles.section}>
             <Typography sx={sidebarStyles.sectionTitle}>Colors</Typography>
@@ -343,7 +320,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
             </Box>
           </Box>
         </Box>
-
         {/* Fixed Bottom Buttons */}
         <Box sx={sidebarStyles.buttonContainer}>
           <Button

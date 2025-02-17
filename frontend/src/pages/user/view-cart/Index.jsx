@@ -6,7 +6,7 @@ import { Box, Typography, Button, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCart } from "../../../Redux/features/CartSlice";
-import { FaShoppingBag } from "react-icons/fa"; 
+import { FaShoppingBag } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -14,7 +14,7 @@ const Index = () => {
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
   const isMobile = useMediaQuery("(max-width:768px)");
-  
+
   useEffect(() => {
     if (authToken) {
       dispatch(fetchCart(authToken));
@@ -28,6 +28,7 @@ const Index = () => {
       {cartData.items?.length > 0 ? (
         <Box
           sx={{
+            height: "100%",
             display: "flex",
             justifyContent: "space-around",
             flexDirection: { xs: "column", md: "row" },
@@ -45,7 +46,7 @@ const Index = () => {
             <AddressComponent />
             <OrderCard cartData={cartData} />
           </Box>
-          <Box sx={{ width: { xs: "100%", md: "35%", marginBottom: "7rem" } }}>
+          <Box sx={{ width: { xs: "100%", md: "35%" } }}>
             <Payment cartData={cartData} />
           </Box>
         </Box>
