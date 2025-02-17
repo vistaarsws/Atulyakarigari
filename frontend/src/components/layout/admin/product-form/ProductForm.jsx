@@ -114,7 +114,11 @@ export default function ProductForm({
   const [subCategories, setSubCategories] = useState([]);
 
   const [parentCategory, setParentCategory] = useState("");
-  const [details, setDetails] = useState([{ title: "", description: "" }]);
+  const [details, setDetails] = useState(() =>
+    productDetails
+      ? productDetails.detailDescription
+      : [{ title: "", description: "" }]
+  );
   const [savedData, setSavedData] = useState([]);
 
   // Handle input changes
@@ -122,18 +126,31 @@ export default function ProductForm({
     const newDetails = [...details];
     newDetails[index][field] = value;
     setDetails(newDetails);
+    setFormData((prev) => ({
+      ...prev,
+      detailDescription: newDetails, // Ensure formData updates correctly
+    }));
   };
 
   // Add new empty entry
   const addField = () => {
-    setDetails([...details, { title: "", description: "" }]);
-    // setFormData({ ...formData, detailDescription: details });
+    const updatedDetails = [...details, { title: "", description: "" }];
+    setDetails(updatedDetails);
+    setFormData((prev) => ({
+      ...prev,
+      detailDescription: updatedDetails, // Update formData with new details
+    }));
   };
 
   // Remove a specific entry
   const removeField = (index) => {
     if (details.length > 1) {
-      setDetails(details.filter((_, i) => i !== index));
+      const updatedDetails = details.filter((_, i) => i !== index);
+      setDetails(updatedDetails);
+      setFormData((prev) => ({
+        ...prev,
+        detailDescription: updatedDetails,
+      }));
     }
   };
 
@@ -443,7 +460,9 @@ export default function ProductForm({
 
       if (formData.detailDescription) {
         console.log("Before appending:", formData.detailDescription);
-        setDetails(details);
+        console.log("Before dslclkmjnhb:", details);
+
+        setFormData({ ...formData, detailDescription: details });
         formDataInstance.append(
           "detailDescription",
           JSON.stringify(formData.detailDescription)
