@@ -53,7 +53,7 @@ function ProductCard({
       </figure>
       <article>
         <h1>{title}</h1>
-        <p>{shortDescription}</p>
+        {/* <p>{shortDescription}</p> */}
         <div>
           <h2>{formatPrice(priceAfterDiscount)}</h2>
           {offer_inPercent > 0 && (
