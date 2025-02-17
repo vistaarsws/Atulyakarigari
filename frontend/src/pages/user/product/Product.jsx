@@ -462,7 +462,7 @@ export default function Product() {
                 </figure>
               </div>
             </div>
-            <p>{product?.description || "No Description"}</p>
+            {/* <p>{product?.description || "No Description"}</p> */}
             <div className="priceRatingContainer">
               <div>
                 <div className="priceBox">
@@ -642,7 +642,6 @@ export default function Product() {
                             <Box sx={{ ml: 2, flex: 1 }}>
                               <Stack
                                 display="grid"
-                                marginTop="1rem"
                                 gridTemplateColumns="1fr 1fr"
                                 direction="row"
                                 alignItems="center"
@@ -655,15 +654,9 @@ export default function Product() {
                                   readOnly
                                 />
                                 <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ fontSize: "1.2rem" }}
-                                >
-                                  - {review.userName}
-                                </Typography>
-                                <Typography
                                   sx={{
-                                    margin: "0 !important",
+                                    margin: "0 8px 0 0 !important",
+
                                     textAlign: "right",
                                     fontSize: "1.2rem !important",
                                   }}
@@ -672,42 +665,56 @@ export default function Product() {
                                     review.createdAt
                                   ).toLocaleDateString()}
                                 </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ fontSize: "1.2rem" }}
+                                >
+                                  - {review.userName}
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                  }}
+                                >
+                                  {userReview &&
+                                    review.userId === userReview.userId && (
+                                      <>
+                                        <Button
+                                          onClick={() =>
+                                            handleEditReview(review)
+                                          }
+                                          sx={{
+                                            minWidth: "unset",
+                                            "& .MuiButton-startIcon": {
+                                              margin: 0,
+                                            },
+                                          }}
+                                          startIcon={<EditIcon />}
+                                        ></Button>
+                                        <Button
+                                          onClick={() =>
+                                            handleOpenConfirm(review._id)
+                                          }
+                                          sx={{
+                                            minWidth: "unset",
+                                            color: "error.main",
+                                            "& .MuiButton-startIcon": {
+                                              margin: 0,
+                                            },
+                                          }}
+                                          startIcon={<DeleteIcon />}
+                                        ></Button>
+                                      </>
+                                    )}
+                                </Box>
                               </Stack>
                               <Typography
                                 variant="body1"
                                 sx={{ mt: 1, color: "#5d5c5c" }}
                               >
                                 {review.comment}
-                                {userReview &&
-                                  review.userId === userReview.userId && (
-                                    <>
-                                      <Button
-                                        onClick={() => handleEditReview(review)}
-                                        sx={{
-                                          marginLeft: "10px",
-                                          padding: "5px",
-                                          cursor: "pointer",
-                                        }}
-                                        startIcon={<EditIcon />}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        onClick={() =>
-                                          handleOpenConfirm(review._id)
-                                        }
-                                        sx={{
-                                          marginLeft: "10px",
-                                          padding: "5px",
-                                          cursor: "pointer",
-                                          color: "error.main",
-                                        }}
-                                        startIcon={<DeleteIcon />}
-                                      >
-                                        Delete
-                                      </Button>
-                                    </>
-                                  )}
                               </Typography>
                             </Box>
                           </Box>
@@ -769,10 +776,17 @@ export default function Product() {
                           />
 
                           {/* Submit Button */}
+
                           <Button
                             type="submit"
-                            variant="contained"
-                            color="primary"
+                            variant="outlined"
+                            sx={{
+                              color: "#ad3f38",
+                              border: "1px solid #ad3f38",
+                              "&:hover": {
+                                bgcolor: "unset ",
+                              },
+                            }}
                             disabled={loading}
                           >
                             {editingReviewId

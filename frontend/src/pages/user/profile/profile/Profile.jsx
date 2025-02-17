@@ -62,7 +62,10 @@ const Profile = () => {
   }, [profile]);
 
   const handleInputChange = (field, value) => {
-    setFormData((prevData) => ({ ...prevData, [field]: value }));
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value !== "" ? value : "",
+    }));
   };
 
   const handleFileChange = (event) => {
@@ -85,26 +88,24 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach((key) =>
-        formDataToSend.append(key, formData[key])
-      );
+      Object.keys(formData).forEach((key) => {
+        const value = formData[key];
+        formDataToSend.append(key, value !== undefined ? value : "null");
+      });
+
       if (formData.profilePicture instanceof File) {
         formDataToSend.append("profileImage", formData.profilePicture);
       }
+
       await dispatch(
         updateProfileThunk({ authToken, updatedData: formDataToSend })
       ).unwrap();
+
       setIsEditing(false);
-      dispatch(fetchProfile(authToken));
-      enqueueSnackbar("Successfully updated", {
-        preventDuplicate: false,
-        variant: "success",
-      });
+      dispatch(fetchProfile(authToken)); // Refresh profile data after update
+      enqueueSnackbar("Successfully updated", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar("Error updating profile", {
-        preventDuplicate: false,
-        variant: "error",
-      });
+      enqueueSnackbar("Error updating profile", { variant: "error" });
     }
   };
 
@@ -152,7 +153,7 @@ const Profile = () => {
             <TextField
               label="Full Name"
               sx={{ mb: 2 }}
-              value={formData.fullName || ""}
+              value={formData?.fullName || ""}
               onChange={(e) => handleInputChange("fullName", e.target.value)}
               fullWidth
               disabled={!isEditing}
@@ -195,10 +196,12 @@ const Profile = () => {
               }
               fullWidth
               disabled={!isEditing}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">+91</InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">+91</InputAdornment>
+                  ),
+                },
               }}
             />
             {/* ----------------------------------------------------------------------------------------------------------- */}
