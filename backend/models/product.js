@@ -130,7 +130,7 @@ const ProductSchema = new mongoose.Schema({
     ratingAndReviews: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "RatingAndReviews",
+            ref: 'RatingAndReviews',
         },
     ],
     questions:[
