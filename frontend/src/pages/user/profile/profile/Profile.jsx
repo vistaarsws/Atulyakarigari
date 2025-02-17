@@ -13,7 +13,7 @@ import {
   TextField,
   useMediaQuery,
 } from "@mui/material";
-import toast from "react-hot-toast";
+
 import "./Profile.css";
 import {
   fetchProfile,
@@ -23,9 +23,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { useSnackbar } from "notistack";
 
 const Profile = () => {
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const profile = useSelector((state) => state.profile.profile);
   const authToken = useSelector((state) => state.auth.token);
   const isLoading = useSelector((state) => state.profile.loading);
@@ -60,13 +62,6 @@ const Profile = () => {
   }, [profile]);
 
   const handleInputChange = (field, value) => {
-    if (
-      ["contactNumber", "alternativeContactNumber"].includes(field) &&
-      isNaN(value)
-    ) {
-      toast.error("Please enter a valid number.");
-      return;
-    }
     setFormData((prevData) => ({ ...prevData, [field]: value }));
   };
 
@@ -75,8 +70,16 @@ const Profile = () => {
     if (file && ["image/jpeg", "image/png"].includes(file.type)) {
       setFormData((prevData) => ({ ...prevData, profilePicture: file }));
     } else {
-      toast.error("Please upload a valid image (JPEG/PNG). ");
+      enqueueSnackbar("Please upload a valid image (JPEG/PNG).", {
+        preventDuplicate: false,
+        variant: "error",
+      });
     }
+  };
+
+  const cancelEditHandler = () => {
+    setIsEditing(false);
+    dispatch(fetchProfile(authToken));
   };
 
   const handleSave = async () => {
@@ -93,8 +96,15 @@ const Profile = () => {
       ).unwrap();
       setIsEditing(false);
       dispatch(fetchProfile(authToken));
+      enqueueSnackbar("Successfully updated", {
+        preventDuplicate: false,
+        variant: "success",
+      });
     } catch (error) {
-      toast.error("Error updating profile");
+      enqueueSnackbar("Error updating profile", {
+        preventDuplicate: false,
+        variant: "error",
+      });
     }
   };
 
@@ -112,7 +122,25 @@ const Profile = () => {
             sx={{ width: 110, height: 110 }}
           />
           {isEditing && (
-            <Button component="label" variant="filled" startIcon={<EditIcon />}>
+            <Button
+              component="label"
+              variant="filled"
+              startIcon={<EditIcon />}
+              sx={{
+                position: "absolute",
+                right: "-30%",
+                bottom: "-5%",
+                display: "flex",
+                justifyContent: "center",
+                borderRadius: "50%",
+                minWidth: "auto",
+                padding: 1,
+
+                "& .MuiButton-startIcon": {
+                  margin: "0 !important", // Removes unwanted margin from the startIcon
+                },
+              }}
+            >
               <VisuallyHiddenInput type="file" onChange={handleFileChange} />
             </Button>
           )}
@@ -183,7 +211,7 @@ const Profile = () => {
               >
                 <MenuItem value="Male">Male</MenuItem>
                 <MenuItem value="Female">Female</MenuItem>
-                <MenuItem value="Not To Say">Not to Say</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
             {/* ----------------------------------------------------------------------------------------------------------- */}
@@ -220,7 +248,7 @@ const Profile = () => {
                 variant="outlined"
                 className="cancel-button"
                 size="large"
-                onClick={() => setIsEditing(false)}
+                onClick={cancelEditHandler}
               >
                 Cancel
               </Button>
@@ -229,6 +257,7 @@ const Profile = () => {
             <Button
               className="edit-button"
               variant="outlined"
+              size="large"
               onClick={() => setIsEditing(true)}
             >
               Edit

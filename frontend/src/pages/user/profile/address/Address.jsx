@@ -220,6 +220,7 @@ const AddressCard = ({
                       backgroundColor: "#60a487",
                     },
                   }}
+                  onClick={() => deleteAddressHandler(addressId)}
                 >
                   Remove
                 </Button>

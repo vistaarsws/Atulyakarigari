@@ -4,11 +4,7 @@ import ProductCard from "../../../ui/cards/product-card/ProductCard";
 import pattern from "../../../../assets/images/designPattern_1.svg";
 import { EmblaSlider } from "../../../ui/slider/EmblaSlider";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
-import toast from "react-hot-toast";
-import { getUserWishlist } from "../../../../services/user/userAPI";
+import { useEffect, useState, useMemo } from "react";
 
 import "./ProductSection.css";
 
@@ -25,47 +21,7 @@ const formatProductData = (product) => ({
 
 export default function ProductSection({ productCategorySection, bgColor }) {
   const { title, subtitle, products, subcategory_id } = productCategorySection;
-  const userProfileToken = useSelector((state) => state.auth.token);
-  const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const getUserIdFromToken = useCallback(() => {
-    if (!userProfileToken) {
-      toast.error("Please log in to view your wishlist.");
-      return null;
-    }
-
-    try {
-      const decodedToken = jwtDecode(userProfileToken);
-      return decodedToken?._id || null;
-    } catch (error) {
-      console.error("Error decoding token:", error.message || error);
-      toast.error("Invalid user session.");
-      return null;
-    }
-  }, [userProfileToken]);
-
-  const fetchWishlistData = useCallback(async () => {
-    const userId = getUserIdFromToken();
-    if (!userId) return;
-
-    try {
-      const response = await getUserWishlist(userId);
-      const wishlistArray = response?.data?.data?.wishlist?.items || [];
-      setWishlist(wishlistArray);
-    } catch (error) {
-      console.error(
-        "Error fetching wishlist data:",
-        error.response?.data || error.message
-      );
-    }
-  }, [getUserIdFromToken]);
-
-  useEffect(() => {
-    if (userProfileToken) {
-      fetchWishlistData();
-    }
-  }, [userProfileToken, fetchWishlistData]);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -90,16 +46,10 @@ export default function ProductSection({ productCategorySection, bgColor }) {
     }
 
     const realProducts = products.map((product) => {
-      const isAddedToWishlist = wishlist.some(
-        (item) => item._id === product._id
-      );
-
       return (
         <ProductCard
           key={product._id}
           {...formatProductData(product)}
-          isAddedToWishlist={isAddedToWishlist}
-          refreshWishlist={fetchWishlistData}
           loading={loading}
         />
       );
@@ -109,7 +59,6 @@ export default function ProductSection({ productCategorySection, bgColor }) {
     const skeletons = [...Array(Math.max(0, 5 - realProducts.length))].map(
       (_, index) => (
         <div className="skeletonCard" key={`skeleton-${index}`}>
-         
           <div className="skeleton_image"></div>
           <div className="skeleton_text"></div>
           <div className="skeleton_text short"></div>
@@ -118,7 +67,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
     );
 
     return [...realProducts, ...skeletons]; // Merge real products and skeletons
-  }, [products, wishlist, fetchWishlistData, loading]);
+  }, [products, loading]);
 
   const navigate = useNavigate();
   const handleNavigate = () => {

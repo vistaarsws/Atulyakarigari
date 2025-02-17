@@ -270,9 +270,13 @@ const OrderCard = ({ cartData }) => {
           scrollbarWidth: "none",
         }}
       >
-        {cartData?.items?.map((item) => (
-          <ProductCard key={item._id} product={item} />
-        ))}
+        {cartData?.items?.length > 0 ? (
+          cartData.items.map((item) => (
+            <ProductCard key={item._id} product={item} />
+          ))
+        ) : (
+          <ProductCard key={cartData?._id} product={cartData} />
+        )}
       </Box>
     </ThemeProvider>
   );
