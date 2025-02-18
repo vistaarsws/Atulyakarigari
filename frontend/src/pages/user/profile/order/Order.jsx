@@ -1,19 +1,27 @@
 import { useState } from "react";
-import { Box, Button, InputBase, useMediaQuery } from "@mui/material";
 import {
-  FilterList,
+ 
+  Box,
+ 
+  useMediaQuery,
+  
+} from "@mui/material";
+import {
+  
   Search,
-  ChevronLeft,
-  ChevronRight,
+
   StarBorder,
+
 } from "@mui/icons-material";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import { InputBase } from "@mui/material";
+
 import TEST_01 from "../../../../assets/images/order-img.png";
 import TEST_02 from "../../../../assets/images/aboutBanner.png";
 import TEST_03 from "../../../../assets/images/artistry_1.png";
 import TEST_04 from "../../../../assets/images/ourCollections_2.png";
-import EditAddressModal from "./FilterModal";
+import { OrderDetailsDialog } from "./OrderDetailsDialog";
+
+
 
 export default function Component() {
   const orders = [
@@ -38,7 +46,7 @@ export default function Component() {
       image: TEST_02,
     },
     {
-      id: 1,
+      id: 3,
       status: "Delivered",
       date: "On Wed, 3 Apr 2024",
       product: "BANARSI SAARI",
@@ -48,7 +56,7 @@ export default function Component() {
       image: TEST_03,
     },
     {
-      id: 2,
+      id: 4,
       status: "Delivered",
       date: "On Wed, 3 Apr 2024",
       product: "BANARSI SAARI",
@@ -60,10 +68,8 @@ export default function Component() {
   ];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const breakpoints = {
     max768: useMediaQuery("(max-width:768px)"),
@@ -73,6 +79,13 @@ export default function Component() {
   const handleArrowClick = (index) => {
     setCurrentImageIndex(index);
   };
+
+  const handleOrderClick = (order, index) => {
+    setSelectedOrder(order);
+    setIsOrderModalOpen(true);
+    handleArrowClick(index);
+  };
+
   return (
     <>
       <Box
@@ -85,12 +98,9 @@ export default function Component() {
         <div
           style={{
             display: "flex",
-            height: useMediaQuery("(max-width:768px)") ? "auto" : "90vh",
+            height: breakpoints.max768 ? "auto" : "90vh",
             padding: useMediaQuery("(max-width:425px)") ? "2rem" : "2rem 4rem",
-            width:
-              (breakpoints.max768 && "100%") ||
-              (breakpoints.min769Max1024 && "60%") ||
-              "70%",
+
             gap: "56px",
           }}
         >
@@ -103,7 +113,6 @@ export default function Component() {
           >
             <div
               style={{
-                // padding: breakpoints.max768 ? "0px" : "24px",
                 marginBottom: "1.5rem",
                 display: "flex",
                 justifyContent: "space-between",
@@ -130,7 +139,6 @@ export default function Component() {
                   style={{
                     fontSize: "12px",
                     color: "rgba(111, 111, 111, 1)",
-
                     fontWeight: 400,
                   }}
                 >
@@ -142,11 +150,7 @@ export default function Component() {
                 sx={{
                   display: "flex",
                   gap: 2,
-                  alignItems: useMediaQuery(
-                    "((min-width:769px) and (max-width:1024px))"
-                  )
-                    ? "start"
-                    : "center",
+                  alignItems: breakpoints.min769Max1024 ? "start" : "center",
                 }}
               >
                 <Box
@@ -164,54 +168,39 @@ export default function Component() {
                     placeholder="Search in orders"
                   />
                 </Box>
-                <Button
-                  variant="outlined"
-                  startIcon={<FilterList sx={{ fontSize: 24 }} />}
-                  sx={{
-                    color: "#9e9e9e",
-                    borderColor: "#e0e0e0",
-                    textTransform: "none",
-                    padding: "4px 16px",
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    "&:hover": {
-                      borderColor: "#bdbdbd",
-                    },
-                  }}
-                  onClick={handleOpenModal}
-                >
-                  Filter
-                </Button>
               </Box>
             </div>
             <div
               style={{
-                height: useMediaQuery("(max-width:768px)") ? "72vh" : "77vh",
+                height: breakpoints.max768 ? "72vh" : "77vh",
                 overflowY: "scroll",
                 scrollbarWidth: "none",
               }}
             >
               {orders.map((order, index) => (
-                <div
-                  key={order.id}
-                  style={{
-                    paddingTop: "24px",
-                    marginBottom: useMediaQuery("(max-width:768px)")
-                      ? "2rem"
-                      : "24px",
-                    display: "flex",
-                    padding: "2.4rem",
-                    gap: "24px",
-                    border:
-                      currentImageIndex === index
-                        ? "1.5px solid #60a487"
-                        : "1px solid #eee",
-                    transition: "box-shadow 0.3s ease",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleArrowClick(index)}
-                >
+               <div
+               key={order.id}
+               style={{
+                 paddingTop: "24px",
+                 marginBottom: breakpoints.max768 ? "2rem" : "24px",
+                 display: "flex",
+                 padding: "2.4rem",
+                 gap: "24px",
+                 transition: "box-shadow 0.3s ease, transform 0.3s ease",  // Add transform to transition
+                 borderRadius: "8px",
+                 cursor: "pointer",
+               }}
+               onClick={() => handleOrderClick(order, index)}
+               onMouseEnter={(e) => {
+                 e.currentTarget.style.border = "1.5px solid #60a487";  // Border on hover
+                 e.currentTarget.style.transform = "scale(.99)";  // Zoom in
+               }}
+               onMouseLeave={(e) => {
+                 e.currentTarget.style.border = "1px solid #eee";  // Revert border
+                 e.currentTarget.style.transform = "scale(1)";  // Revert zoom
+               }}
+             >
+              
                   <div style={{ flex: 1 }}>
                     <div
                       style={{
@@ -237,8 +226,20 @@ export default function Component() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            overflow: "hidden",
                           }}
-                        ></div>
+                        >
+                          <img
+                            style={{
+                              objectFit: "cover",
+                              width: "100%",
+                              height: "100%",
+                             
+                            }}
+                            src={orders[index].image}
+                            alt={orders[index].product}
+                          />
+                        </div>
                         <div>
                           <h3
                             style={{
@@ -260,30 +261,6 @@ export default function Component() {
                           </p>
                         </div>
                       </div>
-                      {/* <button
-                      style={{
-                        border: "none",
-                        color: "#000000",
-                        cursor: "pointer",
-                        background: "none",
-                        padding: 0,
-                      }}
-                    > */}
-                      {breakpoints.max768 !== true &&
-                        (currentImageIndex === index ? (
-                          <ArrowBackIosNewRoundedIcon
-                            sx={{
-                              fontSize: 23,
-                              color: "#ad3f38",
-                            }}
-                          />
-                        ) : (
-                          <ArrowForwardIosRoundedIcon
-                            sx={{
-                              fontSize: 23,
-                            }}
-                          />
-                        ))}
                     </div>
                     <h4
                       style={{
@@ -348,32 +325,16 @@ export default function Component() {
             </div>
           </div>
         </div>
-        <Box
-          sx={{
-            width:
-              (breakpoints.max768 && "0") ||
-              (breakpoints.min769Max1024 && "40%") ||
-              "30%",
-            display: breakpoints.max768 ? "none" : "block",
-            height: "87vh",
-            mr: 4,
-          }}
-        >
-          <img
-            style={{
-              objectFit: "cover",
-              width: "100%",
-              height: "100%",
-              paddingTop: "20px",
-              paddingBottom: "20px",
-              marginBottom: "20px",
-            }}
-            src={orders[currentImageIndex].image}
-            alt={orders[currentImageIndex].product}
-          />
-        </Box>
       </Box>
-      <EditAddressModal open={isModalOpen} handleClose={handleCloseModal} />
+
+      {/* Order Details Dialog */}
+      <OrderDetailsDialog
+        open={isOrderModalOpen}
+        handleClose={() => setIsOrderModalOpen(false)}
+        order={selectedOrder}
+      />
+
+     
     </>
   );
 }
