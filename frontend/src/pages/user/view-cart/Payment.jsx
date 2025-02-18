@@ -77,11 +77,12 @@ const Payment = ({ orderData }) => {
         height: {
           xs: "auto",
         },
+
         overflow: "hidden",
         scrollbarWidth: "none",
-        my: "10px",
-        borderRadius: 2,
-        paddingBottom: isPlaceOrder ? "4rem" : "",
+        // my: "10px",
+        // borderRadius: 2,
+        paddingBottom: isPlaceOrder ? "" : "",
       }}
     >
       <Box

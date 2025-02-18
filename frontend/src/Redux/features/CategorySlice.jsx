@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCategory } from "../../services/admin/adminAPI";
+import { getCategory, getSubCategoryById } from "../../services/admin/adminAPI";
 
 export const fetchAllCategory = createAsyncThunk(
   "category/fetchCategory",
@@ -19,8 +19,23 @@ export const fetchAllCategory = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching subcategory data
+export const fetchSubCategoryDataById = createAsyncThunk(
+  "subCategory/fetchById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await getSubCategoryById(id);
+
+      return response?.data?.data || null;
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed to fetch data");
+    }
+  }
+);
+
 const initialState = {
   categories: [],
+
   loading: false,
   error: null,
 };
@@ -47,6 +62,22 @@ const categorySlice = createSlice({
       .addCase(fetchAllCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
+      })
+      .addCase(fetchSubCategoryDataById.pending, (state) => {
+        if (!state.hasFetched) {
+          state.loading = true;
+          state.error = null;
+        }
+      })
+      .addCase(fetchSubCategoryDataById.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.loading = false;
+        state.hasFetched = true;
+      })
+      .addCase(fetchSubCategoryDataById.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
+        state.data = null;
       });
   },
 });

@@ -46,5 +46,9 @@ const wishlistSlice = createSlice({
   },
 });
 
+// Selector to check if a product is in the wishlist
+export const isProductInWishlist = (state, productId) =>
+  state.wishlist.items.some((item) => item._id === productId);
+
 export const { addToWishlist, removeFromWishlist } = wishlistSlice.actions;
 export default wishlistSlice.reducer;

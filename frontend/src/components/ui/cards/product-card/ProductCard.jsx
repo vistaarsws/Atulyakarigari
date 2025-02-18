@@ -4,11 +4,9 @@ import { useNavigate } from "react-router-dom";
 import WishListHeartIcon from "../../micro-elements/wishListHeartIcon/WishListHeartIcon";
 import { useEffect, useState } from "react";
 import rating_star from "../../../../assets/images/ratingStar.svg";
-import {
-
-  getReviewById,
-} from "../../../../services/user/userAPI";
+import { getReviewById } from "../../../../services/user/userAPI";
 import { formatPrice } from "../../../../utils/helpers";
+
 function ProductCard({
   title = "Product Title",
   shortDescription = "Short description here...",
@@ -17,11 +15,8 @@ function ProductCard({
   offer_inPercent = 0,
   id,
   priceAfterDiscount = price,
-  isAddedToWishlist,
 }) {
-
   const navigate = useNavigate();
- 
 
   const [reviewData, setReviewData] = useState(null);
 
@@ -34,37 +29,31 @@ function ProductCard({
     }
   };
 
-  
   useEffect(() => {
     getReview();
-    
   }, [id]);
 
- 
   return (
     <div
       className="productCard_container"
       onClick={() => navigate(`/product/${id}`)}
     >
-      {/* Rating */}
       <div className="rating_box">
         <div>{reviewData?.averageRating}</div>
         <figure>
           <img src={rating_star} alt="Rating Star" />
         </figure>
       </div>
-      {/* Wishlist Icon */}
       <section>
-        <WishListHeartIcon productId={id} isWishlist={isAddedToWishlist} />
+        <WishListHeartIcon productId={id} />
       </section>
-      {/* Product Image */}
+
       <figure>
         <img src={picture} alt="" />
       </figure>
-      {/* Product Details */}
       <article>
         <h1>{title}</h1>
-        <p>{shortDescription}</p>
+        {/* <p>{shortDescription}</p> */}
         <div>
           <h2>{formatPrice(priceAfterDiscount)}</h2>
           {offer_inPercent > 0 && (
@@ -75,7 +64,6 @@ function ProductCard({
           )}
         </div>
       </article>
-      
     </div>
   );
 }
@@ -86,8 +74,6 @@ ProductCard.propTypes = {
   price: PropTypes.number.isRequired,
   offer_inPercent: PropTypes.number,
   id: PropTypes.string.isRequired,
-  isAddedToWishlist: PropTypes.bool,
   priceAfterDiscount: PropTypes.number.isRequired,
-  refreshWishlist: PropTypes.func,
 };
 export default ProductCard;

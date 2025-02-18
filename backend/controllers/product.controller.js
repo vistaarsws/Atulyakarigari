@@ -1,6 +1,8 @@
 import Product from "../models/product.js";
 import Category from "../models/category.js";
 import SubCategory from "../models/subCategory.js";
+import Question from "../models/Question.js";
+import RatingAndReviews from "../models/ratingAndReviews.js";
 import mongoose from "mongoose";
 import { badRequest, internalServerError, notFoundRequest, success } from "../helpers/api-response.js";
 import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../utils/image-uploder/index.js";
@@ -233,9 +235,13 @@ export const createProduct = async (req, res) => {
 export const getProductById = async (req, res) => {
     try {
         const { id } = req.params;
-        if (!id) {
-            return badRequest(req, res, null, "fields are missing");
+
+        // Validate ID format
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return badRequest(req, res, null, "Invalid or missing product ID");
         }
+
+        // Fetch product details
         const product = await Product.findById(id)
             .populate('category', "name")
             .populate({
@@ -243,18 +249,37 @@ export const getProductById = async (req, res) => {
                 model: 'SubCategory',
                 options: { strictPopulate: false },
                 select: 'name'
-            });
+            })
+            .lean();
 
         if (!product) {
-            return notFoundRequest(req, res, null, "product not found");
+            return notFoundRequest(req, res, null, "Product not found");
         }
 
-        return success(req, res, "product fetched successfully", product.toObject());
-    } catch (error) {
-        return internalServerError(req, res, error, "unable to get product");
-    }
+        // Fetch related ratingAndReviews and questions
+        const [ratingAndReviews, questions] = await Promise.all([
+            RatingAndReviews.find({ productId: id })
+                .populate('userId', 'name')
+                .select('rating comment userId')
+                .lean(),
+            Question.find({ productId: id })
+                .populate('userId', 'name')
+                .populate('answeredBy', 'name')
+                .select('question answer userId answeredBy')
+                .lean()
+        ]);
 
+        return success(req, res, "Product fetched successfully", {
+            ...product,
+            ratingAndReviews,
+            questions
+        });
+
+    } catch (error) {
+        return internalServerError(req, res, error, "Unable to get product");
+    }
 };
+
 
 export const updateProduct = async (req, res) => {
     let session;
@@ -344,6 +369,7 @@ export const updateProduct = async (req, res) => {
         if (productImages.length === 0 && req.files?.productImage) {
             return internalServerError(req, res, null, "Failed to upload product images");
         }
+        
 
         // Handle artisan image
         const artisanImage = req.files?.artisanImage
@@ -360,7 +386,7 @@ export const updateProduct = async (req, res) => {
             sku: sku || existingProduct.sku,
             weight: weight || existingProduct.weight,
             length: length || existingProduct.length,
-            width: skwidthu || existingProduct.width,
+            width: width || existingProduct.width,
             height: height || existingProduct.height,
             attributes: attributes || existingProduct.attributes,
             stock: stock || existingProduct.stock,

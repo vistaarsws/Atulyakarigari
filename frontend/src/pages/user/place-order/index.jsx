@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
 import { Box, useMediaQuery } from "@mui/material";
 import Progress from "../view-cart/Stepper";
 import DeliveryEstimate from "./DeliveryEstimate";
@@ -20,16 +19,6 @@ const PlaceOrder = () => {
 
   const fetchOrderData = async () => {
     try {
-      if (!authToken) {
-        console.error("No user token found");
-        return;
-      }
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
       if (productId) {
         const response = await getProductById(productId);
         const rate = {
@@ -68,16 +57,23 @@ const PlaceOrder = () => {
           // height: isMobile ? "" : "83vh",
         }}
       >
-        <Box sx={{ width: isMobile ? "100%" : "65%" }}>
+        <Box
+          sx={{
+            width: isMobile ? "100%" : "65%",
+          }}
+        >
           <AddressUI />
         </Box>
         <Box
           sx={{
+            position: "sticky",
+            top: "10vh",
             width: isMobile ? "100%" : "35%",
-            height: isMobile ? "" : "83.5vh",
+            height: isMobile ? "" : "",
             overflow: "scroll",
             scrollbarWidth: "none",
-            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            // boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            borderLeft: "1px solid rgba(99, 99, 99, 0.1)",
             // mb: 2,
           }}
         >

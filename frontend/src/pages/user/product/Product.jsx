@@ -87,18 +87,30 @@ const theme = createTheme({
 
 export default function Product() {
   let { id: productId } = useParams();
+
   const [productQuantity, setProductQuantity] = useState(1);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [openConfirm, setOpenConfirm] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
 
+  const [formData, setFormData] = useState({ rating: 0, comment: "" });
+  const [userReview, setUserReview] = useState(null);
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [reviewData, setReviewData] = useState(null);
+
+  const authToken = useSelector((state) => state.auth.token);
+  const [ratingAndReview, setRatingAndReview] = useState({
+    reviews: [],
+    averageRating: "0 ",
+  });
+  const [value, setValue] = useState(0);
+
   const handleOpenConfirm = (reviewId) => {
     setReviewToDelete(reviewId);
     setOpenConfirm(true);
   };
-
-  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -108,6 +120,7 @@ export default function Product() {
   const [product, setProduct] = useState(null);
   const fetchProduct = async () => {
     const response = await getProductById(productId);
+    console.log("RHANA", response);
     setProduct(response?.data?.data);
   };
 
@@ -125,34 +138,13 @@ export default function Product() {
     };
   }, [productId]); // Track changes to the product ID in case the route changes
 
-  // RATING AND REVIEW START //
-
-  const authToken = useSelector((state) => state.auth.token);
-  const [ratingAndReview, setRatingAndReview] = useState({
-    reviews: [],
-    averageRating: "0 ",
-  });
-  const [formData, setFormData] = useState({ rating: 0, comment: "" });
-  const [userReview, setUserReview] = useState(null);
-  const [editingReviewId, setEditingReviewId] = useState(null);
-  const [showAllReviews, setShowAllReviews] = useState(false);
-  const [reviewData, setReviewData] = useState(null);  
-
   const fetchRatingAndReview = async () => {
     try {
-      if (!authToken) {
-        console.error("Error: No user profile token found");
-        return;
-      }
-
       const decodedToken = jwtDecode(authToken);
-      if (!decodedToken || !decodedToken._id) {
-        console.error("Error: Invalid token structure");
-        return;
-      }
 
       const response = await getReviewById(productId);
-      setReviewData(response?.data?.data)
+
+      setReviewData(response?.data?.data);
 
       const reviews = response?.data?.data?.reviews;
 
@@ -169,7 +161,7 @@ export default function Product() {
         userImage: review?.userImage || review_person,
       }));
 
-      setRatingAndReview({ reviews: updatedReviews });
+      setRatingAndReview((preRev) => ({ ...preRev, reviews: updatedReviews }));
     } catch (error) {
       console.error("Unexpected error in fetchRatingAndReview:", error);
     }
@@ -183,18 +175,6 @@ export default function Product() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (!authToken) {
-        console.error("Error: No user profile token found");
-        return;
-      }
-
-      const decodedToken = jwtDecode(authToken);
-      const userId = decodedToken?._id;
-      if (!userId) {
-        console.error("Error: Invalid token structure");
-        return;
-      }
-
       let { rating, comment } = formData;
       let response;
 
@@ -255,23 +235,9 @@ export default function Product() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!authToken) {
-        console.error("Error: No user profile token found");
-        return;
-      }
-
-      const decodedToken = jwtDecode(authToken);
-      if (!decodedToken || !decodedToken._id) {
-        console.error("Error: Invalid token structure");
-        return;
-      }
-
-      await fetchRatingAndReview();
-    };
-
-    fetchData();
-  }, []);
+    fetchRatingAndReview();
+    // fetchData();
+  }, [authToken]);
 
   const [isInCart, setIsInCart] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -309,7 +275,7 @@ export default function Product() {
   };
 
   // buy now button
-  const handleBuyToggle = (productId) => {
+  const handleBuyToggle = () => {
     navigate("/place-order", { state: { productId, productQuantity } });
   };
 
@@ -334,34 +300,9 @@ export default function Product() {
       });
     }
   };
-  // END Share Product
-
-  const [isWishlisted, setsWishlisted] = useState();
-  const fetchhWishlist = async () => {
-    if (!authToken) {
-      console.error("Error: No user profile token found");
-      return;
-    }
-
-    const decodedToken = jwtDecode(authToken);
-    const userId = decodedToken?._id;
-    if (!userId) {
-      console.error("Error: Invalid token structure");
-      return;
-    }
-
-    const response = await getUserWishlist(userId);
-
-    const wishlistArray = response?.data?.data?.wishlist?.items || [];
-
-    const isAddedToWishlist = wishlistArray.some(
-      (item) => item._id === productId
-    );
-    setsWishlisted(isAddedToWishlist);
-  };
 
   useEffect(() => {
-    fetchhWishlist();
+    fetchRatingAndReview();
   }, []);
 
   const [questionsAndAnswers, setQuestionsAndAnswers] = useState([]);
@@ -475,22 +416,20 @@ export default function Product() {
 
   const [deliveryEstimation, setDeliveryEstimation] = useState("");
   const [deliveryPincode, setDeliveryPincode] = useState("");
-  const handleServiceability = async (product) =>{
-
-    console.log("product", product)
+  const handleServiceability = async (product) => {
+    console.log("product", product);
     if (!deliveryPincode) {
       console.log("Delivery pincodes is required.");
       return;
     }
-    let delivery_postcode =deliveryPincode;
-    let cod=false;
-    let weight =0.5;
-    
-    const response = await getServiceability( delivery_postcode, cod, weight);
+    let delivery_postcode = deliveryPincode;
+    let cod = false;
+    let weight = 0.5;
+
+    const response = await getServiceability(delivery_postcode, cod, weight);
     setDeliveryEstimation(response);
     console.log("deliveryEstimation", deliveryEstimation);
-    
-  } ;
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -514,7 +453,7 @@ export default function Product() {
             <div>
               <h1>{product?.name}</h1>
               <div>
-                <WishListHeartIcon productId={product?._id} />
+                <WishListHeartIcon productId={productId} />
                 <figure
                   onClick={handleNativeShare}
                   style={{ cursor: "pointer" }}
@@ -523,7 +462,7 @@ export default function Product() {
                 </figure>
               </div>
             </div>
-            <p>{product?.description || "No Description"}</p>
+            {/* <p>{product?.description || "No Description"}</p> */}
             <div className="priceRatingContainer">
               <div>
                 <div className="priceBox">
@@ -544,7 +483,7 @@ export default function Product() {
 
                 <div className="ratingBox">
                   <div>
-                    <span>{reviewData?.averageRating}</span> 
+                    <span>{reviewData?.averageRating}</span>
                     <img src={star} alt="Star" />
                   </div>
                   <div>{reviewData?.totalReviews} Ratings</div>
@@ -568,7 +507,12 @@ export default function Product() {
                     />
                   </div>
                   <div>
-                    <button type="button" onClick={() => handleServiceability(productId)}>Check</button>
+                    <button
+                      type="button"
+                      onClick={() => handleServiceability(productId)}
+                    >
+                      Check
+                    </button>
                   </div>
                 </div>
               </div>
@@ -608,9 +552,7 @@ export default function Product() {
                 </button>
               </div>
               <div>
-                <button onClick={() => handleBuyToggle()}>
-                  Buy Now
-                </button>
+                <button onClick={handleBuyToggle}>Buy Now</button>
               </div>
               <div>
                 <button onClick={handleCartToggle} disabled={loading}>
@@ -657,45 +599,24 @@ export default function Product() {
               <CustomTabPanel value={value} index={1}>
                 <div className="detail_description">
                   <ul>
-                    <li>
-                      <h3>Wash Care</h3>
-                      <p>
-                        Cotton Fabric -First wash dry clean and after that
-                        gentle machine wash. Silk Fabric- Dry clean only. Home
-                        decor -clean with a dry/damp cloth. For any other
-                        product - Please find the wash care in the product
-                        description.
-                      </p>
-                    </li>
-                    <li>
-                      <h3>7 Days free return</h3>
-                      <p>
-                        Product(s) can be exchanged within 7 days from the date
-                        of purchase. On SALE and CUSTOMISED product - No Return
-                        /Refund
-                      </p>
-                    </li>
-                    <li>
-                      <h3>Shipping</h3>
-                      <p>
-                        Free shipping within India. Shipping out of India is as
-                        per weight calculation at checkout. Packing: Atulya
-                        Karigari ensures to provide the finest packing with
-                        proper safety of the products intact.
-                      </p>
-                    </li>
+                    {product?.detailDescription?.map((item, index) => (
+                      <li key={index}>
+                        <h3>{item.title}</h3>
+                        <p>{item.description}</p>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </CustomTabPanel>
-
+              {console.log("YYYYYYY", ratingAndReview.reviews)}
               <CustomTabPanel value={value} index={2}>
                 <div className="reviews_section">
-                  {ratingAndReview.reviews.length > 0 ? (
+                  {reviewData?.reviews?.length > 0 ? (
                     <>
-                      {ratingAndReview.reviews
+                      {reviewData?.reviews
                         .slice(
                           0,
-                          showAllReviews ? ratingAndReview.reviews.length : 1
+                          showAllReviews ? reviewData.reviews.length : 1
                         )
                         .map((review, index) => (
                           <Box
@@ -721,7 +642,6 @@ export default function Product() {
                             <Box sx={{ ml: 2, flex: 1 }}>
                               <Stack
                                 display="grid"
-                                marginTop="1rem"
                                 gridTemplateColumns="1fr 1fr"
                                 direction="row"
                                 alignItems="center"
@@ -734,15 +654,9 @@ export default function Product() {
                                   readOnly
                                 />
                                 <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ fontSize: "1.2rem" }}
-                                >
-                                  - {review.userName}
-                                </Typography>
-                                <Typography
                                   sx={{
-                                    margin: "0 !important",
+                                    margin: "0 8px 0 0 !important",
+
                                     textAlign: "right",
                                     fontSize: "1.2rem !important",
                                   }}
@@ -751,42 +665,56 @@ export default function Product() {
                                     review.createdAt
                                   ).toLocaleDateString()}
                                 </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ fontSize: "1.2rem" }}
+                                >
+                                  - {review.userName}
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                  }}
+                                >
+                                  {userReview &&
+                                    review.userId === userReview.userId && (
+                                      <>
+                                        <Button
+                                          onClick={() =>
+                                            handleEditReview(review)
+                                          }
+                                          sx={{
+                                            minWidth: "unset",
+                                            "& .MuiButton-startIcon": {
+                                              margin: 0,
+                                            },
+                                          }}
+                                          startIcon={<EditIcon />}
+                                        ></Button>
+                                        <Button
+                                          onClick={() =>
+                                            handleOpenConfirm(review._id)
+                                          }
+                                          sx={{
+                                            minWidth: "unset",
+                                            color: "error.main",
+                                            "& .MuiButton-startIcon": {
+                                              margin: 0,
+                                            },
+                                          }}
+                                          startIcon={<DeleteIcon />}
+                                        ></Button>
+                                      </>
+                                    )}
+                                </Box>
                               </Stack>
                               <Typography
                                 variant="body1"
                                 sx={{ mt: 1, color: "#5d5c5c" }}
                               >
                                 {review.comment}
-                                {userReview &&
-                                  review.userId === userReview.userId && (
-                                    <>
-                                      <Button
-                                        onClick={() => handleEditReview(review)}
-                                        sx={{
-                                          marginLeft: "10px",
-                                          padding: "5px",
-                                          cursor: "pointer",
-                                        }}
-                                        startIcon={<EditIcon />}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        onClick={() =>
-                                          handleOpenConfirm(review._id)
-                                        }
-                                        sx={{
-                                          marginLeft: "10px",
-                                          padding: "5px",
-                                          cursor: "pointer",
-                                          color: "error.main",
-                                        }}
-                                        startIcon={<DeleteIcon />}
-                                      >
-                                        Delete
-                                      </Button>
-                                    </>
-                                  )}
                               </Typography>
                             </Box>
                           </Box>
@@ -811,52 +739,64 @@ export default function Product() {
                       No reviews yet.
                     </Typography>
                   )}
-
                   {/* Review Form Section */}
-                  <Box sx={{ mt: 4 }}>
-                    <Typography variant="h6" sx={{ mb: 2 }}>
-                      {editingReviewId ? "Edit Your Review" : "Leave a Review"}
-                    </Typography>
-                    <form onSubmit={handleSubmit}>
-                      <Stack spacing={2}>
-                        {/* Rating Input */}
-                        <Rating
-                          name="rating"
-                          value={formData.rating}
-                          onChange={(event, newValue) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              rating: newValue,
-                            }));
-                          }}
-                          sx={{ fontSize: "2rem" }}
-                        />
+                  {authToken && (
+                    <Box sx={{ mt: 4 }}>
+                      <Typography variant="h6" sx={{ mb: 2 }}>
+                        {editingReviewId
+                          ? "Edit Your Review"
+                          : "Leave a Review"}
+                      </Typography>
+                      <form onSubmit={handleSubmit}>
+                        <Stack spacing={2}>
+                          {/* Rating Input */}
+                          <Rating
+                            name="rating"
+                            value={formData.rating}
+                            onChange={(event, newValue) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                rating: newValue,
+                              }));
+                            }}
+                            sx={{ fontSize: "2rem" }}
+                          />
 
-                        <TextField
-                          name="comment"
-                          label="Your Review"
-                          variant="outlined"
-                          value={formData.comment} // This value gets updated when user clicks edit
-                          onChange={handleChangeReview}
-                          multiline
-                          rows={4}
-                          fullWidth
-                          placeholder="Your review here..." // Placeholder text for the input field
-                          sx={{ marginBottom: "1rem" }}
-                        />
+                          <TextField
+                            name="comment"
+                            label="Your Review"
+                            variant="outlined"
+                            value={formData.comment} // This value gets updated when user clicks edit
+                            onChange={handleChangeReview}
+                            multiline
+                            rows={4}
+                            fullWidth
+                            placeholder="Your review here..." // Placeholder text for the input field
+                            sx={{ marginBottom: "1rem" }}
+                          />
 
-                        {/* Submit Button */}
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          color="primary"
-                          disabled={loading}
-                        >
-                          {editingReviewId ? "Update Review" : "Submit Review"}
-                        </Button>
-                      </Stack>
-                    </form>
-                  </Box>
+                          {/* Submit Button */}
+
+                          <Button
+                            type="submit"
+                            variant="outlined"
+                            sx={{
+                              color: "#ad3f38",
+                              border: "1px solid #ad3f38",
+                              "&:hover": {
+                                bgcolor: "unset ",
+                              },
+                            }}
+                            disabled={loading}
+                          >
+                            {editingReviewId
+                              ? "Update Review"
+                              : "Submit Review"}
+                          </Button>
+                        </Stack>
+                      </form>
+                    </Box>
+                  )}
                 </div>
                 <ConfirmationModal
                   open={openConfirm}

@@ -1,21 +1,33 @@
 import { useEffect, useState } from "react";
 import "./WishListHeartIcon.css";
 import { toggleWishlistItem } from "../../../../services/user/userAPI";
-import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
+import {
+  fetchWishlist,
+  isProductInWishlist,
+} from "../../../../Redux/features/WishlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function WishListHeartIcon({
-  productId,
-  isWishlist,
-  refreshWishlist,
-}) {
+export default function WishListHeartIcon({ productId }) {
   const dispatch = useDispatch();
   const userProfileToken = useSelector((state) => state.auth.token);
-  const [wishlist, setWishlist] = useState(isWishlist);
+  const isInWishlist = useSelector((state) =>
+    isProductInWishlist(state, productId)
+  );
+  console.log(isInWishlist);
 
+  const [wishlist, setWishlist] = useState(isInWishlist);
+
+  // Update local state when Redux state changes
   useEffect(() => {
-    setWishlist(isWishlist);
-  }, [isWishlist]);
+    setWishlist(wishlist);
+  }, [wishlist]);
+
+  // Fetch wishlist when component mounts
+  useEffect(() => {
+    if (userProfileToken) {
+      dispatch(fetchWishlist(userProfileToken));
+    }
+  }, [dispatch, userProfileToken]);
 
   const toggleWishlistHandler = async (e) => {
     e.stopPropagation();
@@ -24,12 +36,9 @@ export default function WishListHeartIcon({
       setWishlist(updatedWishlist);
       await toggleWishlistItem(productId);
       dispatch(fetchWishlist(userProfileToken));
-      // if (refreshWishlist) {
-      //   refreshWishlist();
-      // }
     } catch (error) {
       console.error("Error toggling wishlist item:", error.message || error);
-      setWishlist(isWishlist);
+      setWishlist(wishlist);
     }
   };
 
