@@ -125,15 +125,19 @@ const ProductSchema = new mongoose.Schema(
       },
     },
     ratingAndReviews: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "RatingAndReviews",
-      },
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'RatingAndReviews',
+        },
     ],
-  },
-  {
-    timestamps: true,
-  }
-);
+    questions:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Question",
+        },
+    ]
+}, {
+    timestamps: true
+});
 
 export default mongoose.model("Product", ProductSchema);

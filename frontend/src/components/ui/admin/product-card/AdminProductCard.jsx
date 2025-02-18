@@ -4,39 +4,47 @@ import { ModuleRegistry } from "ag-grid-community";
 import { ClientSideRowModelModule } from "ag-grid-community";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import IconButton from "@mui/material/IconButton";
 import "./AdminProductCard.css";
 import { useSelector, useDispatch } from "react-redux";
 
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
 
 import ProductForm from "../../../../components/layout/admin/product-form/ProductForm";
 import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 
-import { deleteProduct } from "../../../../services/user/userAPI";
+import { deleteProduct, getQuestionsByProduct, getReviewById } from "../../../../services/user/userAPI";
 import { fetchAllCategory } from "../../../../Redux/features/CategorySlice";
+import ProductDetailsPopup from "./ProductDetailsPopup.jsx"; // Import the new popup component
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function AdminProductCard({ products }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDetails, setOpenDetails] = useState(false);
   const dispatch = useDispatch();
 
-  const handleClose = () => {
-    setOpen(false);
+  // Close Edit Dialog
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
     setSelectedProduct(null);
     dispatch(fetchAllProducts());
   };
+
+  // Close View Details Dialog
+  const handleCloseDetails = () => {
+    setOpenDetails(false);
+    setSelectedProduct(null);
+  };
+
   const getCategory = useSelector((state) => state.categories.categories);
 
   const getCategoryName = (id) => {
-    return getCategory.find((cat) => cat.id == id);
+    return getCategory.find((cat) => cat.id === id)?.name || "Unknown";
   };
 
   useEffect(() => {
@@ -44,57 +52,43 @@ export default function AdminProductCard({ products }) {
     dispatch(fetchAllCategory());
   }, [dispatch]);
 
+  // Price Renderer Function
   const priceRenderer = (params) => {
     const originalPrice = params.data.price;
     const discount = params.data.fullProduct.discountPercentage;
     const effectivePrice = originalPrice - (originalPrice * discount) / 100;
 
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {/* Display the discounted price (current price) */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
         <span style={{ fontWeight: 700, fontSize: "14px", color: "#000" }}>
-          ₹{effectivePrice.toFixed(0)}
-          {"  "}
-          <span
-            style={{
-              textDecoration: "line-through",
-              fontSize: "14px",
-              color: "#9F9F9F",
-              fontWeight: 400,
-            }}
-          >
+          ₹{effectivePrice.toFixed(0)}{" "}
+          <span style={{ textDecoration: "line-through", fontSize: "14px", color: "#9F9F9F", fontWeight: 400 }}>
             ₹{originalPrice.toFixed(0)}
           </span>
         </span>
-
-        {/* Display the original price as strikethrough */}
       </div>
     );
   };
 
-  const transformData = products.map((product) => ({
-    productImgTitle: {
-      prodImg: product.images?.[0] || "default-image-path.jpg", // Fallback for missing images
-      prodName: product.name,
-    },
-    category: getCategoryName(product.category)?.name,
-    stock: product.stock,
-    productID: product._id,
-    sku: product.sku,
-    // attributes: product.attributes.map((obj) => obj.key),
-    price: product.price,
-    date: new Date(product.updatedAt).toLocaleDateString(), // Format the date
-    name: product.name,
-    fullProduct: product,
-  }));
+  // Ensure products is an array before mapping
+  const transformData = Array.isArray(products)
+    ? products.map((product) => ({
+        productImgTitle: {
+          prodImg: product.images?.[0] || "default-image-path.jpg",
+          prodName: product.name,
+        },
+        category: getCategoryName(product.category),
+        stock: product.stock,
+        productID: product._id,
+        sku: product.sku,
+        price: product.price,
+        date: new Date(product.updatedAt).toLocaleDateString(),
+        name: product.name,
+        fullProduct: product,
+      }))
+    : [];
 
-  // Custom Cell Renderer for Profile Image
+  // Image & Name Renderer
   const profileImageRenderer = (params) => {
     const { prodImg, prodName } = params.value;
 
@@ -103,36 +97,58 @@ export default function AdminProductCard({ products }) {
         <img
           src={prodImg}
           alt={prodName}
-          style={{
-            width: "35px",
-            height: "35px",
-            borderRadius: "5px",
-            objectFit: "cover",
-          }}
+          style={{ width: "35px", height: "35px", borderRadius: "5px", objectFit: "cover" }}
         />
         <span style={{ marginLeft: "1rem" }}>{prodName}</span>
       </div>
     );
   };
 
-  // Custom Cell Renderer for Action Icons
+  // Handle View Details with API Calls
+  const handleViewDetails = async (product) => {
+    setSelectedProduct(product);
+    setOpenDetails(true);
+
+    try {
+      const [reviewsResponse, qnaResponse] = await Promise.all([
+        getReviewById(product._id), // Fetch reviews
+        getQuestionsByProduct(product._id), // Fetch Q&A
+      ]);
+
+      setSelectedProduct((prev) => ({
+        ...prev,
+        reviews: reviewsResponse?.data?.data?.reviews || [],
+        averageRating: reviewsResponse?.data?.data?.averageRating || "0",
+        questions: qnaResponse?.data?.questions || [],
+      }));
+    } catch (error) {
+      console.error("Error fetching details:", error);
+    }
+  };
+
+  // Action Buttons Renderer
   const actionCellRenderer = (params) => {
     const handleEdit = () => {
       setSelectedProduct(params.data.fullProduct);
-      setOpen(true);
+      setOpenEdit(true);
     };
 
     const deleteProductHandler = async () => {
-      try {
-        await deleteProduct(params.data.fullProduct._id);
-        dispatch(fetchAllProducts());
-      } catch (error) {
-        console.log(error);
+      if (window.confirm("Are you sure you want to delete this product?")) {
+        try {
+          await deleteProduct(params.data.fullProduct._id);
+          dispatch(fetchAllProducts());
+        } catch (error) {
+          console.error("Error deleting product:", error);
+        }
       }
     };
 
     return (
       <div>
+        <IconButton onClick={() => handleViewDetails(params.data.fullProduct)} aria-label="view">
+          <VisibilityIcon sx={{ fill: "#3F51B5" }} />
+        </IconButton>
         <IconButton onClick={handleEdit} aria-label="edit">
           <EditIcon sx={{ fill: "#383737" }} />
         </IconButton>
@@ -143,8 +159,8 @@ export default function AdminProductCard({ products }) {
     );
   };
 
-  // Column Definitions: Defines & controls grid columns.
-  const [colDefs, setColDefs] = useState([
+  // Column Definitions
+  const [colDefs] = useState([
     {
       field: "productImgTitle",
       headerName: "PRODUCT IMAGE & TITLE",
@@ -152,78 +168,32 @@ export default function AdminProductCard({ products }) {
       flex: 1,
       cellStyle: { fontWeight: "bold" },
     },
-
     { field: "category", headerName: "CATEGORIES", flex: 0.7 },
-    { field: "stock", headerName: "STOCK STATUS", flex: 0.5},
+    { field: "stock", headerName: "STOCK STATUS", flex: 0.5 },
     { field: "productID", headerName: "PRODUCT ID", flex: 0.8 },
     { field: "sku", headerName: "SKU ID", flex: 0.7 },
-    {
-      field: "price",
-      headerName: "PRICE",
-      cellRenderer: priceRenderer,
-      flex: 0.7,
-    },
+    { field: "price", headerName: "PRICE", cellRenderer: priceRenderer, flex: 0.7 },
     { field: "date", headerName: "DATE", flex: 0.5 },
-    {
-      headerName: "ACTION",
-      cellRenderer: actionCellRenderer,
-      sortable: false,
-      filter: true,
-      flex: 0.5,
-    },
+    { headerName: "ACTION", cellRenderer: actionCellRenderer, sortable: false, filter: true, flex: 0.7 },
   ]);
 
-  const defaultColDef = {
-    flex: 1,
-  };
+  const defaultColDef = { flex: 1 };
 
-  // Container: Defines the grid's theme & dimensions.
   return (
-    <div
-      style={{
-        width: "100%",
+    <div style={{ width: "100%", padding: "1rem" }}>
+      <AgGridReact rowData={transformData} columnDefs={colDefs} defaultColDef={defaultColDef} domLayout="autoHeight" />
 
-        padding: "1rem",
-      }}
-    >
-      <AgGridReact
-        rowData={transformData}
-        columnDefs={colDefs}
-        defaultColDef={defaultColDef}
-        domLayout="autoHeight"
-      />
-      {/* ----------------------------------------------------------DIALOG EDIT PRODUCT--------------------------------------------------------------- */}
+      {/* EDIT PRODUCT DIALOG */}
       <Box>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          PaperProps={{
-            component: "form",
-            onSubmit: (event) => {
-              event.preventDefault();
-              // Form data handling logic
-              handleClose();
-            },
-          }}
-        >
+        <Dialog open={openEdit} onClose={handleCloseEdit}>
           <DialogContent>
-            <ProductForm
-              productDetails={selectedProduct}
-              isProductEditing={true}
-              closeDialog={handleClose}
-            />
+            <ProductForm productDetails={selectedProduct} isProductEditing={true} closeDialog={handleCloseEdit} />
           </DialogContent>
-          <DialogActions sx={{ padding: "0 2.4rem 2rem" }}>
-            {/* <Button onClick={handleClose} variant="contained" color="error">
-              Cancel
-            </Button> */}
-            {/* <Button type="submit" variant="contained">
-              Submit
-            </Button> */}
-          </DialogActions>
         </Dialog>
       </Box>
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------------- */}
+
+      {/* VIEW PRODUCT DETAILS DIALOG */}
+      <ProductDetailsPopup open={openDetails} handleClose={handleCloseDetails} product={selectedProduct} />
     </div>
   );
 }
