@@ -19,6 +19,7 @@ const OrderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
+        name: { type: String, required: true },
         quantity: {
           type: Number,
           required: true,
@@ -29,14 +30,41 @@ const OrderSchema = new mongoose.Schema(
           required: true,
           min: [0, "Price cannot be negative"],
         },
+        totalPrice: {
+          type: Number,
+          required: true,
+        },
       },
     ],
+
+    /** Order Cost Calculation */
+    totalMRP: {
+      type: Number,
+      required: true,
+      min: [0, "Subtotal cannot be negative"],
+    },
+    discountAmount: {
+      type: Number,
+      default: 0,
+      min: [0, "Discount cannot be negative"],
+    },
+    shippingCost: {
+      type: Number,
+      default: 0,
+    },
+    donationAmount: {
+      type: Number,
+      min: [0, "Donation amount cannot be negative"],
+    },
     totalAmount: {
       type: Number,
       required: true,
       min: [0, "Total amount cannot be negative"],
     },
-    status: {
+   
+
+    /** Order Status */
+    orderStatus: {
       type: String,
       enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Pending",
@@ -65,6 +93,7 @@ const OrderSchema = new mongoose.Schema(
     },
     shippingMethod: {
       type: String,
+      enum: ["Standard", "Express", "Overnight"],
       default: "Standard",
     },
 
@@ -84,15 +113,20 @@ const OrderSchema = new mongoose.Schema(
     },
     paidAt: {
       type: Date,
+      default: null,
     },
 
-    /** Shipment Details */
+    /** Shiprocket Order Details */
+    shiprocketOrderId: {
+      type: String, // Order ID returned by Shiprocket
+      default: null,
+    },
     trackingId: {
-      type: String,
+      type: String, // Tracking ID provided by Shiprocket
       default: null,
     },
     courierName: {
-      type: String,
+      type: String, // Courier name assigned by Shiprocket
       default: null,
     },
     estimatedDelivery: {
@@ -101,12 +135,15 @@ const OrderSchema = new mongoose.Schema(
     },
     shippedAt: {
       type: Date,
+      default: null,
     },
     deliveredAt: {
       type: Date,
+      default: null,
     },
     cancelledAt: {
       type: Date,
+      default: null,
     },
 
     /** Additional Info */
@@ -115,7 +152,7 @@ const OrderSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Auto-creates createdAt & updatedAt fields
   }
 );
 

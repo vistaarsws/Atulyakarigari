@@ -21,6 +21,14 @@ const Index = () => {
     }
   }, [authToken, dispatch]);
 
+      const selectedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
+  
+      const orderData = {
+        products: cartData,
+        donationAmount:selectedDonation,
+      };
+      localStorage.setItem("orderData", JSON.stringify(orderData));
+
   return (
     <Box sx={{ pt: { sm: "0" } }}>
       <Stepper />
@@ -46,7 +54,7 @@ const Index = () => {
             <OrderCard cartData={cartData} />
           </Box>
           <Box sx={{ width: { xs: "100%", md: "35%", marginBottom: "7rem" } }}>
-            <Payment cartData={cartData} />
+            <Payment orderData={orderData} />
           </Box>
         </Box>
       ) : (

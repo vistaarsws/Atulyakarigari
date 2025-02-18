@@ -348,7 +348,10 @@ const AddressUI = () => {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleAddressSelection = (addressId) => {
-    setSelectedAddress(addressId === selectedAddress ? null : addressId);
+    const addr = addressId === selectedAddress ? null : addressId
+    setSelectedAddress(addr); 
+    localStorage.setItem("selectedAddressID", JSON.stringify(addr));
+    console.log(addr);
   };
 
   const getAllAddress = async () => {

@@ -33,12 +33,14 @@ const PlaceOrder = () => {
       if (productId) {
         const response = await getProductById(productId);
         const rate = {
-          items : productQuantity,
-          totalMRP :(response?.data?.data?.priceAfterDiscount * productQuantity),
-          totalDiscount :((response?.data?.data?.price - response?.data?.data?.priceAfterDiscount) * productQuantity),
-          total : (response?.data?.data?.priceAfterDiscount * productQuantity),
-
-        }
+          items: productQuantity,
+          totalMRP: response?.data?.data?.priceAfterDiscount * productQuantity,
+          totalDiscount:
+            (response?.data?.data?.price -
+              response?.data?.data?.priceAfterDiscount) *
+            productQuantity,
+          total: response?.data?.data?.priceAfterDiscount * productQuantity,
+        };
         console.log("Rate Data:", rate);
         setCartData(rate);
       } else {
@@ -53,6 +55,7 @@ const PlaceOrder = () => {
   useEffect(() => {
     fetchOrderData();
   }, [authToken, productId]);
+  const orderData = JSON.parse(localStorage.getItem("orderData"));
 
   return (
     <Box>
@@ -78,8 +81,8 @@ const PlaceOrder = () => {
             // mb: 2,
           }}
         >
-          <DeliveryEstimate cartData={cartData}/>
-          <Payment cartData={cartData}/>
+          <DeliveryEstimate orderData={orderData} />
+          <Payment orderData={orderData} />
         </Box>
       </Box>
     </Box>
