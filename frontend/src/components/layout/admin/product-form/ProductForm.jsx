@@ -114,7 +114,11 @@ export default function ProductForm({
   const [subCategories, setSubCategories] = useState([]);
 
   const [parentCategory, setParentCategory] = useState("");
-  const [details, setDetails] = useState([{ title: "", description: "" }]);
+  const [details, setDetails] = useState(() =>
+    productDetails
+      ? productDetails.detailDescription
+      : [{ title: "", description: "" }]
+  );
   const [savedData, setSavedData] = useState([]);
 
   // Handle input changes
@@ -122,25 +126,39 @@ export default function ProductForm({
     const newDetails = [...details];
     newDetails[index][field] = value;
     setDetails(newDetails);
+    setFormData((prev) => ({
+      ...prev,
+      detailDescription: newDetails, // Ensure formData updates correctly
+    }));
   };
 
   // Add new empty entry
   const addField = () => {
-    setDetails([...details, { title: "", description: "" }]);
+    const updatedDetails = [...details, { title: "", description: "" }];
+    setDetails(updatedDetails);
+    setFormData((prev) => ({
+      ...prev,
+      detailDescription: updatedDetails, // Update formData with new details
+    }));
   };
 
   // Remove a specific entry
   const removeField = (index) => {
     if (details.length > 1) {
-      setDetails(details.filter((_, i) => i !== index));
+      const updatedDetails = details.filter((_, i) => i !== index);
+      setDetails(updatedDetails);
+      setFormData((prev) => ({
+        ...prev,
+        detailDescription: updatedDetails,
+      }));
     }
   };
 
-  // Save Data to State
-  const handleSaveDetailDescription = () => {
-    setDetails(details);
-    console.log("Saved Data:", details);
-  };
+  // // Save Data to State
+  // const handleSaveDetailDescription = () => {
+  //   setDetails(details);
+  //   console.log("Saved Data:", details);
+  // };
 
   const initialState = {
     name: "",
@@ -441,10 +459,13 @@ export default function ProductForm({
       }
 
       if (formData.detailDescription) {
-        setDetails(details);
+        console.log("Before appending:", formData.detailDescription);
+        console.log("Before dslclkmjnhb:", details);
+
+        setFormData({ ...formData, detailDescription: details });
         formDataInstance.append(
           "detailDescription",
-          JSON.stringify([...details])
+          JSON.stringify(formData.detailDescription)
         );
       }
 
@@ -1137,7 +1158,7 @@ export default function ProductForm({
                 Detail Description
               </Typography>
 
-              {details.map((item, index) => (
+              {details?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"

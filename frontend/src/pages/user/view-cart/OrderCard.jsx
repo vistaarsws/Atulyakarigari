@@ -37,7 +37,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   // borderRadius: 8,
   backgroundColor: "#F4F4F4",
   maxWidth: "lg",
-  height: useMediaQuery("(max-width: 458px)") ? "13rem" : "23rem",
+  height: useMediaQuery("(max-width: 458px)") ? "15rem" : "23rem",
   alignItems: useMediaQuery("(max-width: 458px)") ? "start" : "center",
 }));
 const CloseButton = styled(IconButton)({
@@ -217,11 +217,14 @@ const ProductCard = ({ product }) => {
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                alignItems: "start",
                 mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
               }}
             >
-              <CheckIcon color="success" sx={{ fontSize: 18 }} />
+              <CheckIcon
+                color="success"
+                sx={{ fontSize: 18, margin: "0.2rem 0" }}
+              />
               <Typography
                 variant="body2"
                 sx={{
@@ -233,7 +236,7 @@ const ProductCard = ({ product }) => {
                   fontWeight: 400,
                 }}
               >
-                Delivery Between
+                Delivery Between{" "}
                 <span
                   style={{
                     fontWeight: 900,
@@ -267,9 +270,13 @@ const OrderCard = ({ cartData }) => {
           scrollbarWidth: "none",
         }}
       >
-        {cartData?.items?.map((item) => (
-          <ProductCard key={item._id} product={item} />
-        ))}
+        {cartData?.items?.length > 0 ? (
+          cartData.items.map((item) => (
+            <ProductCard key={item._id} product={item} />
+          ))
+        ) : (
+          <ProductCard key={cartData?._id} product={cartData} />
+        )}
       </Box>
     </ThemeProvider>
   );
