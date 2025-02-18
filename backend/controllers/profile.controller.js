@@ -9,9 +9,13 @@ import {
 } from "../helpers/api-response.js";
 import { uploadImageToCloudinary } from "../utils/image-uploder/index.js";
 
-
-
-export const createProfileForUser = async (user, fullName, isEmailLogin, loginId, avatar = "") => {
+export const createProfileForUser = async (
+  user,
+  fullName,
+  isEmailLogin,
+  loginId,
+  avatar = ""
+) => {
   try {
     // Determine if the loginId is an email or phone number
     const email = isEmailLogin ? loginId : "";
@@ -45,7 +49,6 @@ export const createProfileForUser = async (user, fullName, isEmailLogin, loginId
   }
 };
 
-
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -59,33 +62,34 @@ export const updateProfile = async (req, res) => {
       alternativeContactNumber,
     } = req.body;
 
-    const profileImage  = req.files?.profileImage; // Safely access profileImage
+    const profileImage = req.files?.profileImage; // Safely access profileImage
 
     // Validate input fields
     const validationErrors = {};
 
     // Email validation (optional, but with basic format check)
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      validationErrors.email = 'Invalid email format';
+      validationErrors.email = "Invalid email format";
     }
 
     // Contact number validation (optional)
     if (contactNumber && isNaN(contactNumber)) {
-      validationErrors.contactNumber = 'Contact number must be a valid number';
+      validationErrors.contactNumber = "Contact number must be a valid number";
     }
 
     if (alternativeContactNumber && isNaN(alternativeContactNumber)) {
-      validationErrors.alternativeContactNumber = 'Alternative contact number must be a valid number';
+      validationErrors.alternativeContactNumber =
+        "Alternative contact number must be a valid number";
     }
 
     // Check if there are any validation errors
     if (Object.keys(validationErrors).length > 0) {
-      return badRequest(req, res, validationErrors, 'Validation Error');
+      return badRequest(req, res, validationErrors, "Validation Error");
     }
     // upload profile image
-    let profilePicture
+    let profilePicture;
     if (profileImage) {
-      profilePicture = await uploadImageToCloudinary(profileImage, "profile")
+      profilePicture = await uploadImageToCloudinary(profileImage, "profile");
     }
     const updateData = {};
 
@@ -96,31 +100,35 @@ export const updateProfile = async (req, res) => {
     if (dateOfBirth) updateData.dateOfBirth = dateOfBirth;
     if (about) updateData.about = about;
     if (contactNumber) updateData.contactNumber = contactNumber;
-    if (alternativeContactNumber) updateData.alternativeContactNumber = alternativeContactNumber;
+    if (alternativeContactNumber)
+      updateData.alternativeContactNumber = alternativeContactNumber;
     // Find and update profile
-    const profile = await Profile.findOneAndUpdate(
-      { userId },
-      updateData,
-      {
-        new: true,  // Return the updated document
-        runValidators: true  // Run mongoose validation
-      }
-    );
-    return success(req, res, 'Profile updated successfully', { profile });
+    const profile = await Profile.findOneAndUpdate({ userId }, updateData, {
+      new: true, // Return the updated document
+      runValidators: true, // Run mongoose validation
+    });
+    return success(req, res, "Profile updated successfully", { profile });
   } catch (error) {
-    console.error('Profile update error:', error);
+    console.error("Profile update error:", error);
 
     // Handle specific mongoose validation errors
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return internalServerError(req, res, validationErrors, 'Validation Error');
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      return internalServerError(
+        req,
+        res,
+        validationErrors,
+        "Validation Error"
+      );
     }
     // Handle duplicate key errors
     if (error.code === 11000) {
-      return internalServerError(req, res, error, 'Duplicate key error');
+      return internalServerError(req, res, error, "Duplicate key error");
     }
 
-    return internalServerError(req, res, error, 'Internal server error');
+    return internalServerError(req, res, error, "Internal server error");
   }
 };
 
@@ -154,7 +162,7 @@ export const deleteProfile = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.user?._id;// Extract user ID from request
+    const userId = req.user?._id; // Extract user ID from request
 
     if (!mongoose.isValidObjectId(userId)) {
       return badRequest(req, res, null, "Invalid user ID format");
@@ -167,7 +175,12 @@ export const getProfile = async (req, res) => {
     }
 
     // Send a clean, user-friendly success response
-    return success(req, res, "Profile fetched successfully", profile.toObject());
+    return success(
+      req,
+      res,
+      "Profile fetched successfully",
+      profile.toObject()
+    );
   } catch (error) {
     console.error("Error fetching profile:", error);
     return internalServerError(req, res, error, "Error fetching profile");
