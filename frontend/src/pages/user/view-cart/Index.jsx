@@ -1,7 +1,6 @@
 import OrderCard from "./OrderCard";
 import Payment from "./Payment";
 import Stepper from "./Stepper";
-import AddressComponent from "./AddressComponent";
 import { Box, Typography, Button, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -20,6 +19,14 @@ const Index = () => {
       dispatch(fetchCart(authToken));
     }
   }, [authToken, dispatch]);
+
+      const selectedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
+  
+      const orderData = {
+        products: cartData,
+        donationAmount:selectedDonation,
+      };
+      localStorage.setItem("orderData", JSON.stringify(orderData));
 
   return (
     <Box sx={{ pt: { sm: "0" } }}>
@@ -43,11 +50,10 @@ const Index = () => {
               scrollbarWidth: "none",
             }}
           >
-            <AddressComponent />
             <OrderCard cartData={cartData} />
           </Box>
-          <Box sx={{ width: { xs: "100%", md: "35%" } }}>
-            <Payment cartData={cartData} />
+          <Box sx={{ width: { xs: "100%", md: "35%", marginBottom: "7rem" } }}>
+            <Payment orderData={orderData} />
           </Box>
         </Box>
       ) : (

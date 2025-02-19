@@ -60,4 +60,11 @@ export const user_endpoints = {
 
 
   GET_SERVICEABILITY: BASE_URL + "/api/v1/shiprocket/getServiceability",
+  CREATE_PAYMENT: BASE_URL + "/api/v1/payment/create-payment",
+  VERIFY_PAYMENT: BASE_URL + "/api/v1/payment/payment-response",
+  
+  CREATE_ORDER: BASE_URL + "/api/v1/orders/create",
+  GET_ORDER_BY_ID: BASE_URL + "/api/v1/orders/getOrder",
+  RETURN_ORDER: BASE_URL + "/api/v1/orders/return",
+  CANCEL_ORDER: BASE_URL + "/api/v1/orders/cancel",
 };

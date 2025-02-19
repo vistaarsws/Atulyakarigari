@@ -251,6 +251,86 @@ const getServiceability = async (delivery_postcode, cod) => {
     throw error;
   }
 };
+const createOrder = async (payload) => {
+  try {
+    const response = await apiConnector(
+      "POST",
+      user_endpoints.CREATE_ORDER,
+      payload
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw error;
+  }
+};
+const getORderById = async (id) => {
+  try {
+    const response = await apiConnector(
+      "GET",
+      `${user_endpoints.GET_ORDER_BY_ID}/${id}`
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error get order:", error);
+    throw error;
+  }
+};
+const returnOrder = async (id) => {
+  try {
+    const response = await apiConnector(
+      "PUT",
+      `${user_endpoints.RETURN_ORDER}/${id}`
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error creating Return order:", error);
+    throw error;
+  }
+};
+const cancelOrder = async (id) => {
+  try {
+    const response = await apiConnector(
+      "PUT",
+      `${user_endpoints.CANCEL_ORDER}/${id}`
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    throw error;
+  }
+};
+const createPayment = async (amount) => {
+  try {
+    const response = await apiConnector(
+      "POST",
+      user_endpoints.CREATE_PAYMENT,
+      amount
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Payment Initiation Error: ", error);
+    throw error;
+  }
+};
+const paymentResponse = async (payload) => {
+  try { 
+    const response = await apiConnector(
+      "POST",
+      user_endpoints.VERIFY_PAYMENT,
+      payload
+    );
+    return response;
+  } catch (error) {
+    console.error("check Status Error: ", error);
+    throw error;
+  }
+};
 
 export {
   createProduct,
@@ -277,4 +357,10 @@ export {
   getQuestionsByProduct,
   askQuestion,
   getServiceability,
+  createOrder,
+  getORderById,
+  cancelOrder,
+  returnOrder,
+  createPayment,
+  paymentResponse,
 };
