@@ -459,9 +459,6 @@ export default function ProductForm({
       }
 
       if (formData.detailDescription) {
-        console.log("Before appending:", formData.detailDescription);
-        console.log("Before dslclkmjnhb:", details);
-
         setFormData({ ...formData, detailDescription: details });
         formDataInstance.append(
           "detailDescription",
@@ -595,67 +592,69 @@ export default function ProductForm({
   return (
     <form id="productForm" onSubmit={productFormHandler}>
       <div className="form-main">
-        <div className="image-upload">
-          <h2>Upload Image </h2>
-          <div
-            {...getRootPropsMultiple()}
-            className={`image-upload-area ${isDragActiveMultiple ? "active" : ""}`}
-            style={{
-              border: "2px dashed #ccc",
-              padding: "20px",
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <input {...getInputPropsMultiple()} required />
-            {isDragActiveMultiple ? (
-              <p>Drop the files here...</p>
-            ) : (
-              <p>Drag & Drop your files or click to browse</p>
-            )}
-          </div>
-          {/* Image Thumbnails */}
-          <div className="image-thumbnails" style={{ marginTop: "20px" }}>
-            {formData.productImage.map((file, index) => (
-              <div
-                key={index}
-                style={{ display: "inline-block", position: "relative" }}
-              >
-                <img
-                  src={
-                    typeof file === "string"
-                      ? file // If file is a string, use it as the URL
-                      : file instanceof File
-                        ? URL.createObjectURL(file) // If it's a File object, create a preview URL
-                        : "" // Fallback in case file is neither
-                  }
-                  alt={`Preview ${index + 1}`}
-                  className="thumbnail"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    margin: "10px",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() =>
-                    document.getElementById(`file-input-${index}`).click()
-                  } // Trigger file input on click
-                />
-                <input
-                  id={`file-input-${index}`}
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={(e) => handleImageChange(e, index)} // Handle image change
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Form */}
         <div className="form-fields">
+          <article>
+            <div className="image-upload">
+              <h2>Upload Image </h2>
+              <div
+                {...getRootPropsMultiple()}
+                className={`image-upload-area ${isDragActiveMultiple ? "active" : ""}`}
+                style={{
+                  border: "2px dashed #ccc",
+                  padding: "20px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                }}
+              >
+                <input {...getInputPropsMultiple()} required />
+                {isDragActiveMultiple ? (
+                  <p>Drop the files here...</p>
+                ) : (
+                  <p>Drag & Drop your files or click to browse</p>
+                )}
+              </div>
+              {/* Image Thumbnails */}
+              <div className="image-thumbnails" style={{ marginTop: "20px" }}>
+                {formData.productImage.map((file, index) => (
+                  <div
+                    key={index}
+                    style={{ display: "inline-block", position: "relative" }}
+                  >
+                    <img
+                      src={
+                        typeof file === "string"
+                          ? file // If file is a string, use it as the URL
+                          : file instanceof File
+                            ? URL.createObjectURL(file) // If it's a File object, create a preview URL
+                            : "" // Fallback in case file is neither
+                      }
+                      alt={`Preview ${index + 1}`}
+                      className="thumbnail"
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                        margin: "10px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        document.getElementById(`file-input-${index}`).click()
+                      } // Trigger file input on click
+                    />
+                    <input
+                      id={`file-input-${index}`}
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleImageChange(e, index)} // Handle image change
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </article>
+
           <h2>{`${isProductEditing ? "Edit" : "New"} Product Details`} </h2>
 
           <article>
@@ -663,6 +662,7 @@ export default function ProductForm({
               <TextField
                 sx={{
                   width: "100%",
+                  marginBottom: "2rem",
                 }}
                 required
                 id="productTitle"
@@ -1146,8 +1146,7 @@ export default function ProductForm({
             <Box
               sx={{
                 width: "100%",
-
-                maxWidth: useMediaQuery("(845px)") ? "auto" : 600,
+                borderRadius: "0.4rem",
                 margin: "auto",
                 p: 2,
                 my: 2,
@@ -1354,7 +1353,6 @@ export default function ProductForm({
                   color="warning"
                   value="Draft"
                   onClick={(e) => {
-                    console.log("MANNN", e);
                     productFormHandler(e);
                   }}
                 >

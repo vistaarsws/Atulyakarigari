@@ -1,5 +1,5 @@
 .image-upload {
-  flex: 40%;
+  width: 100%;
   & > h2 {
     padding: 1rem 0 2rem;
   }
@@ -30,6 +30,7 @@
   margin-top: 1rem;
   /* display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -46,7 +47,7 @@
   background-color: #f3f4f6;
   padding: 2rem;
   margin: 2rem 0;
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
 }
 
 .attributeCards_container {
@@ -116,7 +117,6 @@
     display: flex;
     gap: 1.5rem;
     & > div:first-of-type {
-      flex-basis: 80%;
     }
     & > div:nth-of-type(2) {
       flex-basis: 20%;
