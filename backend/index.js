@@ -21,7 +21,7 @@ import ordersRoutes from "./routes/order.routes.js";
 import addToCartRoutes from "./routes/addToCart.routes.js";
 import questionsRoutes from "./routes/question.routes.js";
 import shiprocketRoute from "./routes/shiprocket.routes.js"
-// import metrics from './routes/metrics.routes.js';
+import paymentRoute from "./routes/payment.routes.js"
 
 // Enhanced console styling with emojis and better formatting
 const log = {
@@ -120,7 +120,7 @@ app.use("/api/v1/orders", ordersRoutes);
 app.use("/api/v1/addToCart", addToCartRoutes);
 app.use("/api/v1/questions", questionsRoutes);
 app.use("/api/v1/shiprocket", shiprocketRoute);
-// app.use('/api/v1/metrics', metrics);
+app.use("/api/v1/payment", paymentRoute);
 
 
 

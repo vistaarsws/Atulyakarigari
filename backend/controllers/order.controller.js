@@ -1,4 +1,7 @@
 import Order from "../models/order.js";
+import Address from "../models/Address.js";
+import Payment from "../models/payment.js";
+import { createShiprocketOrder } from "../utils/shiprocket-service/shiprocket.js";
 
 const handleOrderNotFound = (res) => {
   return res.status(404).json({ message: "Order not found" });
@@ -7,19 +10,37 @@ const handleOrderNotFound = (res) => {
 export const createOrder = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { products, shippingAddress, paymentMethod } = req.body;
+    const { orderData, selectedAddressID, paymentOrderId } = req.body;
 
-    const totalAmount = products.reduce(
-      (sum, { price, quantity }) => sum + price * quantity,
-      0
-    );
+    const addresses = await Address.find({ _id: selectedAddressID, userId });
+    const Payments = await Payment.find({ paymentOrderId, userId });
+
+    const order = await createShiprocketOrder(orderData);
 
     const newOrder = await Order.create({
-      userId,
-      products,
+      userId: userId,
+      products: orderData.products.items,
+      totalMRP: orderData.products.totalMRP,
+      discountAmount: orderData.products.totalDiscount,
+      shippingCost,
+      donationAmount: orderData.products.total,
       totalAmount,
+      orderStatus,
       shippingAddress,
+      billingAddress,
+      shippingMethod,
       paymentMethod,
+      transactionId,
+      isPaid,
+      paidAt,
+      shiprocketOrderId,
+      trackingId,
+      courierName,
+      estimatedDelivery,
+      shippedAt,
+      deliveredAt,
+      cancelledAt,
+      notes,
     });
 
     res.status(201).json(newOrder);
@@ -42,9 +63,7 @@ export const getAllOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
-      .populate("userId", "name email")
-      .populate("products.productId", "name price");
+    const order = await getShiprocketOrderDetails(res.params.id);
 
     if (!order) return handleOrderNotFound(res);
 
@@ -54,7 +73,7 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-export const updateOrderStatus = async (req, res) => {
+export const returnorder = async (req, res) => {
   try {
     const { status } = req.body;
 
@@ -72,7 +91,7 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-export const deleteOrder = async (req, res) => {
+export const cancelOrder = async (req, res) => {
   try {
     const deletedOrder = await Order.findByIdAndDelete(req.params.id);
 

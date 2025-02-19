@@ -9,14 +9,53 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatPrice } from "../../../utils/helpers";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useEffect } from "react";
-// import { fetchCart } from "../../../Redux/features/CartSlice";
+import { useState, useEffect } from "react";
+import { createPayment } from "../../../services/user/userAPI";
 
-const Payment = ({ cartData }) => {
+const Payment = ({ orderData }) => {
   const navigate = useNavigate();
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const location = useLocation();
+
+  const [selectedDonation, setSelectedDonation] = useState(0);
+  const [isDonationEnabled, setIsDonationEnabled] = useState(true);
+
+  const donationAmounts = [0, 10, 20, 50, 100];
+
+  useEffect(() => {
+    const savedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
+    if (savedDonation) {
+      setSelectedDonation(savedDonation);
+    }
+  }, []);
+
+  const handleDonationSelect = (amount) => {
+    setSelectedDonation(amount);
+    localStorage.setItem("selectedDonation", JSON.stringify(amount));
+    console.log("selectedDonation", amount);
+  };
+
+  const totalAmount = isDonationEnabled
+    ? orderData?.products?.total + (selectedDonation || 0) || 0
+    : orderData?.products?.total || 0;
+
+  const handlePayment = async () => {
+    try {
+      const amount = "1";
+      const { data } = await createPayment(amount);
+      console.log("data", data);
+      
+
+      if (data.success) {
+        window.location.href = data.paymentUrl;
+      } else {
+        alert("Payment initiation failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error initiating payment");
+    }
+  };
   return (
     <Box
       sx={{
@@ -66,7 +105,13 @@ const Payment = ({ cartData }) => {
             <FormControlLabel
               control={
                 <Checkbox
-                  defaultChecked
+                  checked={isDonationEnabled}
+                  onChange={() => {
+                    setIsDonationEnabled(!isDonationEnabled);
+                    if (!isDonationEnabled) {
+                      setSelectedDonation(0);
+                    }
+                  }}
                   size="large"
                   sx={{
                     color: "rgb(56, 55, 55)",
@@ -92,56 +137,36 @@ const Payment = ({ cartData }) => {
             />
           </Box>
 
-          <Box sx={{ display: "flex", gap: 2, marginTop: 2, flexWrap: "wrap" }}>
-            <Button
-              variant="outlined"
-              sx={{
-                borderRadius: "50px",
-                fontSize: "14px",
-                fontWeight: 400,
-                color: "#383737",
-                borderColor: "#e2e2e2",
-              }}
+          {isDonationEnabled && (
+            <Box
+              sx={{ display: "flex", gap: 2, marginTop: 2, flexWrap: "wrap" }}
             >
-              10
-            </Button>
-            <Button
-              variant="outlined"
-              sx={{
-                borderRadius: "50px",
-                fontSize: "14px",
-                fontWeight: 400,
-                color: "#383737",
-                borderColor: "#e2e2e2",
-              }}
-            >
-              20
-            </Button>{" "}
-            <Button
-              variant="outlined"
-              sx={{
-                borderRadius: "50px",
-                fontSize: "14px",
-                fontWeight: 400,
-                color: "#383737",
-                borderColor: "#e2e2e2",
-              }}
-            >
-              50
-            </Button>{" "}
-            <Button
-              variant="outlined"
-              sx={{
-                borderRadius: "50px",
-                fontSize: "14px",
-                borderColor: "#e2e2e2",
-                fontWeight: 400,
-                color: "#383737",
-              }}
-            >
-              100
-            </Button>
-          </Box>
+              {donationAmounts.map((amount) => (
+                <Button
+                  key={amount}
+                  variant={
+                    selectedDonation === amount ? "contained" : "outlined"
+                  }
+                  sx={{
+                    borderRadius: "50px",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    color: selectedDonation === amount ? "white" : "#383737",
+                    backgroundColor:
+                      selectedDonation === amount ? "#60a487" : "transparent",
+                    borderColor: "#e2e2e2",
+                    "&:hover": {
+                      backgroundColor: "#60a487",
+                      color: "white",
+                    },
+                  }}
+                  onClick={() => handleDonationSelect(amount)}
+                >
+                  {amount}
+                </Button>
+              ))}
+            </Box>
+          )}
         </Box>
         <Divider sx={{ marginY: 3 }} />
         <Box sx={{ marginBottom: 3 }}>
@@ -154,14 +179,14 @@ const Payment = ({ cartData }) => {
             }}
           >
             Price Details (
-            {cartData?.items > 1
-              ? `${cartData.items} items`
-              : cartData?.items === 1
-                ? `${cartData.items} item`
-                : cartData?.items?.length === 1
-                  ? `${cartData.items.length} item`
-                  : cartData?.items?.length > 1
-                    ? `${cartData.items.length} items`
+            {orderData?.products?.items?.items > 1
+              ? `${orderData?.products?.items} items`
+              : orderData?.products?.items === 1
+                ? `${orderData?.products?.items} item`
+                : orderData?.products?.items?.length === 1
+                  ? `${orderData?.products?.items?.length} item`
+                  : orderData?.products?.items?.length > 1
+                    ? `${orderData?.products?.items?.length} items`
                     : "0 item"}
             )
           </Typography>
@@ -191,7 +216,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(cartData?.totalMRP || 0)}
+                {formatPrice(orderData?.products?.totalMRP || 0)}
               </Typography>
             </Box>
             <Box
@@ -220,7 +245,7 @@ const Payment = ({ cartData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(cartData?.totalDiscount || 0)}
+                {formatPrice(orderData.products?.totalDiscount || 0)}
               </Typography>
             </Box>
             <Box
@@ -281,6 +306,37 @@ const Payment = ({ cartData }) => {
                 Free
               </Typography>
             </Box>
+            {isDonationEnabled && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: 14,
+                  marginTop: 1,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    fontWeight: 400,
+                    color: "rgba(111, 111, 111, 1)",
+                    lineHeight: "25px",
+                  }}
+                >
+                  Donation for Artisans
+                </Typography>
+                <Typography
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: "12px",
+                    color: "rgba(96, 164, 135, 1)",
+                    lineHeight: "25px",
+                  }}
+                >
+                  {formatPrice(selectedDonation)}
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Box>
         <Divider sx={{ marginY: 3 }} />
@@ -311,7 +367,7 @@ const Payment = ({ cartData }) => {
                 lineHeight: "25px",
               }}
             >
-              {formatPrice(cartData?.total || 0)}
+              {formatPrice(totalAmount)}
             </Typography>
           </Box>
         </Box>
@@ -367,7 +423,7 @@ const Payment = ({ cartData }) => {
                 width: "100%",
               }}
               onClick={() => {
-                navigate("/");
+                handlePayment();
               }}
             >
               Continue

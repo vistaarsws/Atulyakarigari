@@ -39,24 +39,31 @@ const items = [
   },
 ];
 
-const DeliveryEstimate = (cartData) => {
+const DeliveryEstimate = () => {
   const [deliveryEstimation, setDeliveryEstimation] = useState("");
   const [deliveryPincode, setDeliveryPincode] = useState("");
   const handleServiceability = async (product) => {
-    console.log("product", product);
     if (!deliveryPincode) {
       console.log("Delivery pincodes is required.");
       return;
     }
-    let delivery_postcode = deliveryPincode;
-    let cod = false;
+    const delivery_postcode = deliveryPincode;
+    const cod = false;
 
-    const response = await getServiceability(delivery_postcode, cod);
+    const response = await getServiceability(product, delivery_postcode, cod);
     setDeliveryEstimation(response);
-    console.log("deliveryEstimation", deliveryEstimation);
+    // console.log("deliveryEstimation", deliveryEstimation);
+    if (response.data.success == 200) {
+      const courier = {
+        totalAvaliableCourier:
+          deliveryEstimation.data.message.all_couriers.length,
+        fastest_delivery: deliveryEstimation.data.message.fastest_delivery,
+        cheapest_delivery: deliveryEstimation.data.message.cheapest_delivery,
+        longest_delivery: deliveryEstimation.data.message.longest_delivery,
+      };
+    }
   };
 
-  console.log("cartData at delivery estimation:", cartData);
   return (
     <Box padding={2}>
       <Typography

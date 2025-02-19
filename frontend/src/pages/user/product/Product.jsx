@@ -120,7 +120,6 @@ export default function Product() {
   const [product, setProduct] = useState(null);
   const fetchProduct = async () => {
     const response = await getProductById(productId);
-    console.log("RHANA", response);
     setProduct(response?.data?.data);
   };
 
@@ -626,7 +625,6 @@ export default function Product() {
                   </ul>
                 </div>
               </CustomTabPanel>
-              {console.log("YYYYYYY", ratingAndReview.reviews)}
               <CustomTabPanel value={value} index={2}>
                 <div className="reviews_section">
                   {reviewData?.reviews?.length > 0 ? (
