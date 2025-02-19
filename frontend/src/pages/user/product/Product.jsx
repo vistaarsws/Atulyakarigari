@@ -427,7 +427,6 @@ export default function Product() {
 
     const response = await getServiceability(delivery_postcode, cod, weight);
     setDeliveryEstimation(response);
-    console.log("deliveryEstimation", deliveryEstimation);
   };
 
   return (
@@ -515,6 +514,25 @@ export default function Product() {
                   </div>
                 </div>
               </div>
+              {deliveryEstimation?.data?.message?.fastest_delivery
+                ?.estimated_delivery && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                    color: "green",
+                    fontSize: "16px",
+                    marginTop: "2vh",
+
+                  }}
+                >
+                  Estimated Delivery :{" "}
+                  {
+                    deliveryEstimation?.data?.message?.fastest_delivery
+                      ?.estimated_delivery
+                  }
+                </Box>
+              )}
             </div>
             <article className="product_details_description">
               <h2>Product Description</h2>

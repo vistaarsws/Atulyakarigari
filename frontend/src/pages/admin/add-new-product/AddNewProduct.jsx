@@ -5,11 +5,11 @@ import DraftSection from "../../../components/layout/admin/draft-section/DraftSe
 export default function AddNewProduct() {
   return (
     <div className="addProduct_container">
-      <div className="form-header">
-        <h1 className="form-title">Add Product</h1>
-      </div>
       <main className="form-container">
         <section>
+          <div className="form-header">
+            <h1 className="form-title">Add Product</h1>
+          </div>
           <ProductForm />
         </section>
         <section>

@@ -64,7 +64,7 @@ const Profile = () => {
   const handleInputChange = (field, value) => {
     setFormData((prevData) => ({
       ...prevData,
-      [field]: value !== "" ? value : "",
+      [field]: value === "" ? null : value,
     }));
   };
 
@@ -190,9 +190,9 @@ const Profile = () => {
             <TextField
               sx={{ mb: 2 }}
               label="Contact Number"
-              value={formData.contactNumber || ""}
+              value={formData?.contactNumber || null}
               onChange={(e) =>
-                handleInputChange("contactNumber", e.target.value)
+                handleInputChange("contactNumber", e.target.value * 1)
               }
               fullWidth
               disabled={!isEditing}
@@ -221,16 +221,21 @@ const Profile = () => {
             <TextField
               sx={{ mb: 2 }}
               label="Alternate Contact Number"
-              value={formData.alternativeContactNumber || ""}
+              value={formData.alternativeContactNumber || null}
               onChange={(e) =>
-                handleInputChange("alternativeContactNumber", e.target.value)
+                handleInputChange(
+                  "alternativeContactNumber",
+                  e.target.value * 1
+                )
               }
               fullWidth
               disabled={!isEditing}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">+91</InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">+91</InputAdornment>
+                  ),
+                },
               }}
             />
           </div>
