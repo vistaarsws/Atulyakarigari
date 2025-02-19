@@ -92,8 +92,8 @@ const ProductCard = ({ product }) => {
     navigate(`/product/${product.productId}`);
   };
   return (
-    <StyledCard>
-      <Box sx={{ height: "100%" }}>
+    <StyledCard sx={{ marginTop:"5vh" }}>
+      <Box sx={{ height: "100%"}}>
         <ProductImageWrapper
           sx={{
             width: { xs: "100px", sm: "250px" },

@@ -21,6 +21,7 @@ import Product from "./pages/user/product/Product";
 import Artisans from "./pages/user/artisans/Artisans";
 import ViewCart from "./pages/user/view-cart/Index";
 import PlaceOrder from "./pages/user/place-order";
+import OrderStatus from "./pages/user/order/OrderStatus";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
 import UserProfile from "./components/layout/user/user-profile/UserProfile";
@@ -40,6 +41,7 @@ import Products from "./pages/admin/products/Products";
 import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
 import CustomerDetails from "./pages/admin/customers/CustomerDetails";
+import OrderCancel from "./pages/user/order/OrderCancel";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -53,6 +55,8 @@ const getRoutesConfig = () => ({
     { path: "/product/:id", element: <Product /> },
     { path: "/view-cart", element: <ViewCart /> },
     { path: "/place-order", element: <PlaceOrder /> },
+    { path: "/order-status", element: <OrderStatus /> },
+    { path: "/order-cancel", element: <OrderCancel /> },
     { path: "/login", element: <AuthTemplate page="login" /> },
     { path: "/signup", element: <AuthTemplate page="signup" /> },
     { path: "/otp", element: <AuthTemplate page="otp" /> },

@@ -13,7 +13,6 @@ export default function WishListHeartIcon({ productId }) {
   const isInWishlist = useSelector((state) =>
     isProductInWishlist(state, productId)
   );
-  console.log(isInWishlist);
 
   const [wishlist, setWishlist] = useState(isInWishlist);
 

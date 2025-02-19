@@ -10,7 +10,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatPrice } from "../../../utils/helpers";
 import { useState, useEffect } from "react";
-import { createOrder, pay } from "../../../services/user/userAPI";
+import { pay } from "../../../services/user/userAPI";
 
 const Payment = ({ orderData }) => {
   const navigate = useNavigate();
@@ -39,31 +39,21 @@ const Payment = ({ orderData }) => {
     ? orderData?.products?.total + (selectedDonation || 0) || 0
     : orderData?.products?.total || 0;
 
-  const placeOrderHandler = async () => {
+  const handlePayment = async () => {
     try {
-      const orderData = JSON.parse(localStorage.getItem("orderData"));
-      const selectedAddressID = JSON.parse(
-        localStorage.getItem("selectedAddressID")
-      );
-
-      const payload = {
-        orderData,
-        selectedAddressID,
-      };
-
-      const paymentResponse = await pay(payload);
-      console.log("paymentResponse", paymentResponse);
-
-      if (paymentResponse.data.paymentUrl) {
-        window.location.href = paymentResponse.data.paymentUrl; // Redirect user to Worldline
-      }
-
+      const amount = "1";
+      const { data } = await pay(amount);
+      console.log("data", data);
       
 
-      // const OrderResponse = await createOrder(payload);
-      // console.log("OrderResponse", OrderResponse);
+      if (data.success) {
+        window.location.href = data.paymentUrl;
+      } else {
+        alert("Payment initiation failed");
+      }
     } catch (error) {
-      console.error("Error creating payment:", error);
+      console.error("Error:", error);
+      alert("Error initiating payment");
     }
   };
   return (
@@ -433,7 +423,7 @@ const Payment = ({ orderData }) => {
                 width: "100%",
               }}
               onClick={() => {
-                placeOrderHandler();
+                handlePayment();
               }}
             >
               Continue

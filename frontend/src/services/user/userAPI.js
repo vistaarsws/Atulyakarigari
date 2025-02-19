@@ -304,12 +304,12 @@ const cancelOrder = async (id) => {
     throw error;
   }
 };
-const pay = async (payload) => {
+const pay = async (amount) => {
   try {
     const response = await apiConnector(
       "POST",
       user_endpoints.CREATE_PAYMENT,
-      payload
+      amount
     );
 
     return response;
@@ -318,11 +318,12 @@ const pay = async (payload) => {
     throw error;
   }
 };
-const checkStatus = async (id) => {
-  try {
+const checkStatus = async (paamountyload) => {
+  try { 
     const response = await apiConnector(
       "POST",
-      `${user_endpoints.VERIFY_PAYMENT}/${id}`
+      user_endpoints.VERIFY_PAYMENT,
+      payload
     );
     return response;
   } catch (error) {
