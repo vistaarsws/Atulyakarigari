@@ -10,7 +10,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatPrice } from "../../../utils/helpers";
 import { useState, useEffect } from "react";
-import { pay } from "../../../services/user/userAPI";
+import { createPayment } from "../../../services/user/userAPI";
 
 const Payment = ({ orderData }) => {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const Payment = ({ orderData }) => {
   const handlePayment = async () => {
     try {
       const amount = "1";
-      const { data } = await pay(amount);
+      const { data } = await createPayment(amount);
       console.log("data", data);
       
 
