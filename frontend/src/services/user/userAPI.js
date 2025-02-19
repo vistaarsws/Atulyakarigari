@@ -304,7 +304,7 @@ const cancelOrder = async (id) => {
     throw error;
   }
 };
-const pay = async (amount) => {
+const createPayment = async (amount) => {
   try {
     const response = await apiConnector(
       "POST",
@@ -318,7 +318,7 @@ const pay = async (amount) => {
     throw error;
   }
 };
-const checkStatus = async (paamountyload) => {
+const paymentResponse = async (payload) => {
   try { 
     const response = await apiConnector(
       "POST",
@@ -361,6 +361,6 @@ export {
   getORderById,
   cancelOrder,
   returnOrder,
-  pay,
-  checkStatus,
+  createPayment,
+  paymentResponse,
 };
