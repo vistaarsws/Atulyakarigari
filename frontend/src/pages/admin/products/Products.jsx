@@ -73,10 +73,16 @@ export default function Products() {
           onChange={handleChange}
           aria-label="basic tabs example"
         >
-          <Tab label={`All (62)`} {...a11yProps(0)} />
-          <Tab label={`Published (80)`} {...a11yProps(1)} />
-          <Tab label={`Draft (110)`} {...a11yProps(2)} />
-          <Tab label={`Out Of Stock (1000)`} {...a11yProps(3)} />
+          <Tab label={`All (${allProducts.length})`} {...a11yProps(0)} />
+          <Tab
+            label={`Published (${publishedProducts.length})`}
+            {...a11yProps(1)}
+          />
+          <Tab label={`Draft (${draftedProducts.length})`} {...a11yProps(2)} />
+          <Tab
+            label={`Out Of Stock (${outOfStock.length})`}
+            {...a11yProps(3)}
+          />
         </Tabs>
       </Box>
       <Box>

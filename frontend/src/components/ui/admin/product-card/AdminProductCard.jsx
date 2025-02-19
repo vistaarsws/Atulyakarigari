@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry } from "ag-grid-community";
@@ -47,10 +46,23 @@ export default function AdminProductCard({ products }) {
     const effectivePrice = originalPrice - (originalPrice * discount) / 100;
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
         <span style={{ fontWeight: 700, fontSize: "14px", color: "#000" }}>
           ₹{effectivePrice.toFixed(0)}{" "}
-          <span style={{ textDecoration: "line-through", fontSize: "14px", color: "#9F9F9F", fontWeight: 400 }}>
+          <span
+            style={{
+              textDecoration: "line-through",
+              fontSize: "14px",
+              color: "#9F9F9F",
+              fontWeight: 400,
+            }}
+          >
             ₹{originalPrice.toFixed(0)}
           </span>
         </span>
@@ -89,7 +101,12 @@ export default function AdminProductCard({ products }) {
         <img
           src={prodImg}
           alt={prodName}
-          style={{ width: "35px", height: "35px", borderRadius: "5px", objectFit: "cover" }}
+          style={{
+            width: "35px",
+            height: "35px",
+            borderRadius: "5px",
+            objectFit: "cover",
+          }}
         />
         <span style={{ marginLeft: "1rem" }}>{prodName}</span>
       </div>
@@ -120,10 +137,17 @@ export default function AdminProductCard({ products }) {
 
     return (
       <div>
-        <IconButton onClick={() => handleViewDetails(params.data.fullProduct)} aria-label="edit">
+        <IconButton
+          onClick={() => handleViewDetails(params.data.fullProduct)}
+          aria-label="edit"
+        >
           <EditIcon sx={{ fill: "#3F51B5" }} />
         </IconButton>
-        <IconButton onClick={deleteProductHandler} aria-label="delete" disabled={loading}>
+        <IconButton
+          onClick={deleteProductHandler}
+          aria-label="delete"
+          disabled={loading}
+        >
           <DeleteIcon sx={{ fill: "#AD3F38" }} />
         </IconButton>
       </div>
@@ -139,19 +163,38 @@ export default function AdminProductCard({ products }) {
       flex: 1,
       cellStyle: { fontWeight: "bold" },
     },
-    { field: "category", headerName: "CATEGORIES", flex: 0.7 },
-    { field: "stock", headerName: "STOCK STATUS", flex: 0.5 },
+    { field: "category", headerName: "CATEGORIES", flex: 0.6 },
     { field: "productID", headerName: "PRODUCT ID", flex: 0.8 },
     { field: "sku", headerName: "SKU ID", flex: 0.7 },
-    { field: "price", headerName: "PRICE", cellRenderer: priceRenderer, flex: 0.7 },
-    { field: "date", headerName: "DATE", flex: 0.5 },
-    { headerName: "ACTION", cellRenderer: actionCellRenderer, sortable: false, filter: true, flex: 0.7 },
+    {
+      field: "price",
+      headerName: "PRICE",
+      cellRenderer: priceRenderer,
+      flex: 0.7,
+    },
+    { field: "date", headerName: "DATE", flex: 0.4 },
+    { field: "stock", headerName: "STOCK", flex: 0.3 },
+    {
+      headerName: "ACTION",
+      cellRenderer: actionCellRenderer,
+      sortable: false,
+      filter: true,
+      flex: 0.3,
+    },
   ]);
 
   return (
     <div style={{ width: "100%", padding: "1rem" }}>
-      <AgGridReact rowData={transformData} columnDefs={colDefs} domLayout="autoHeight" />
-      <ProductDetailsPopup open={openDetails} handleClose={handleCloseDetails} product={selectedProduct} />
+      <AgGridReact
+        rowData={transformData}
+        columnDefs={colDefs}
+        domLayout="autoHeight"
+      />
+      <ProductDetailsPopup
+        open={openDetails}
+        handleClose={handleCloseDetails}
+        product={selectedProduct}
+      />
     </div>
   );
 }

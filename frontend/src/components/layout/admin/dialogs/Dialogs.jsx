@@ -562,6 +562,10 @@ const AddEditVariantDialog = ({
               key={index}
               label={value}
               onDelete={() => handleDeleteValue(value)}
+              sx={{
+                userSelect: "text", // Allows text selection
+                cursor: "text", // Changes cursor to text selection mode
+              }}
             />
           ))}
         </Box>

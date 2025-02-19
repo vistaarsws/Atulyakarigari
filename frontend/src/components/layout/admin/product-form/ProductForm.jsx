@@ -662,6 +662,7 @@ export default function ProductForm({
               <TextField
                 sx={{
                   width: "100%",
+                  marginBottom: "2rem",
                 }}
                 required
                 id="productTitle"
@@ -1145,7 +1146,7 @@ export default function ProductForm({
             <Box
               sx={{
                 width: "100%",
-
+                borderRadius: "0.4rem",
                 margin: "auto",
                 p: 2,
                 my: 2,
