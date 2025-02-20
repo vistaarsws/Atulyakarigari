@@ -129,8 +129,9 @@ const Dashboard = () => {
             <CardContent>
               <Typography variant="h6">Sales Report</Typography>
               <Select defaultValue="Monthly" sx={{ mb: 2 }}>
-                <MenuItem value="Monthly">Monthly</MenuItem>
                 <MenuItem value="Weekly">Weekly</MenuItem>
+                <MenuItem value="Monthly">Monthly</MenuItem>
+                <MenuItem value="Yearly">Yearly</MenuItem>
               </Select>
               <Line data={salesData} />
             </CardContent>

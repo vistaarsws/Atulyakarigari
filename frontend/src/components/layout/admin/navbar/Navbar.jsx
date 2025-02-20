@@ -106,7 +106,7 @@ export default function Navbar() {
           { label: "Add New Product", path: "/admin/add-product" },
           { label: "Customers", path: "/admin/customers" },
           { label: "Orders", path: "/admin/orders" },
-          { label: "Team", path: "/admin/team" },
+          { label: "Settings", path: "/admin/settings" },
         ].map((obj) => (
           <ListItem key={obj.label} disablePadding>
             <Link href={obj.path} underline="none">
