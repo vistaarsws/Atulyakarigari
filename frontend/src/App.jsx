@@ -36,7 +36,7 @@ import AddNewProduct from "./pages/admin/add-new-product/AddNewProduct";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Customers from "./pages/admin/customers/Customers";
 import Orders from "./pages/admin/orders/Orders";
-import Team from "./pages/admin/team/Team";
+import Settings  from "./pages/admin/settings/Settings";
 import Products from "./pages/admin/products/Products";
 import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
@@ -74,7 +74,7 @@ const getRoutesConfig = () => ({
     { path: "customers/:id", element: <CustomerDetails /> },
     { path: "orders", element: <Orders /> },
     { path: "orders/:id", element: <OrderDetails /> },
-    { path: "team", element: <Team /> },
+    { path: "settings", element: <Settings /> },
     { path: "products", element: <Products /> },
   ],
 });

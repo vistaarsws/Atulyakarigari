@@ -28,32 +28,42 @@ export const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+
     const filter = {};
     if (req.query.category) filter.category = req.query.category;
     if (req.query.subcategory) filter.subcategory = req.query.subcategory;
-    if (req.query.minPrice)
-      filter.price = { $gte: parseFloat(req.query.minPrice) };
-    if (req.query.maxPrice)
-      filter.price = {
-        ...filter.price,
-        $lte: parseFloat(req.query.maxPrice),
-      };
+    if (req.query.minPrice) filter.price = { $gte: parseFloat(req.query.minPrice) };
+    if (req.query.maxPrice) filter.price = { ...filter.price, $lte: parseFloat(req.query.maxPrice) };
 
-    const products = await Product.find(filter);
-    // .populate('category')
-    // .populate('subcategory')
-    // .skip(skip)
-    // .limit(limit);
+    // Fetch products
+    const products = await Product.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .lean(); // Converts MongoDB documents into plain JavaScript objects
+
+    // Fetch reviews for each product
+    const productIds = products.map((product) => product._id);
+    const reviews = await RatingAndReviews.find({ productId: { $in: productIds } })
+      .populate("userId", "name")
+      .select("rating comment userId productId")
+      .lean();
+
+    // Attach reviews to corresponding products
+    const productsWithReviews = products.map((product) => ({
+      ...product,
+      ratingAndReviews: reviews.filter((review) => review.productId.toString() === product._id.toString()),
+    }));
 
     const total = await Product.countDocuments(filter);
-    return success(req, res, "products fetched successfully", {
-      count: products.length,
+
+    return success(req, res, "Products fetched successfully", {
+      count: productsWithReviews.length,
       page,
       totalPages: Math.ceil(total / limit),
-      products,
+      products: productsWithReviews,
     });
   } catch (error) {
-    return internalServerError(req, res, error, "unable to get products");
+    return internalServerError(req, res, error, "Unable to fetch products");
   }
 };
 

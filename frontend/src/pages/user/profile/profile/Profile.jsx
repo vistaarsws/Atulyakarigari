@@ -11,7 +11,6 @@ import {
   Select,
   styled,
   TextField,
-  useMediaQuery,
 } from "@mui/material";
 
 import "./Profile.css";
@@ -105,7 +104,7 @@ const Profile = () => {
       dispatch(fetchProfile(authToken)); // Refresh profile data after update
       enqueueSnackbar("Successfully updated", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar("Error updating profile", { variant: "error" });
+      enqueueSnackbar("Error updating profile", error, { variant: "error" });
     }
   };
 
