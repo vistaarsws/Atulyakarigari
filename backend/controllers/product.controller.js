@@ -25,9 +25,8 @@ const calculateDiscountedPrice = (price, discountPercentage) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+   
+    
 
     const filter = {};
     if (req.query.category) filter.category = req.query.category;
@@ -37,8 +36,6 @@ export const getAllProducts = async (req, res) => {
 
     // Fetch products
     const products = await Product.find(filter)
-      .skip(skip)
-      .limit(limit)
       .lean(); // Converts MongoDB documents into plain JavaScript objects
 
     // Fetch reviews for each product
@@ -58,8 +55,7 @@ export const getAllProducts = async (req, res) => {
 
     return success(req, res, "Products fetched successfully", {
       count: productsWithReviews.length,
-      page,
-      totalPages: Math.ceil(total / limit),
+     
       products: productsWithReviews,
     });
   } catch (error) {

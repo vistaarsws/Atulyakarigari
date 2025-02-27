@@ -10,22 +10,23 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { Label, Menu as MenuIcon } from "@mui/icons-material";
+import {  Menu as MenuIcon } from "@mui/icons-material";
 
 import notificationIcon from "../../../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../../../assets/images/adminLogoutIcon.svg";
 import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { getProfile } from "../../../../services/user/userAPI";
 import { logout } from "../../../../Redux/features/AuthSlice";
+import NotificationComponent from "./Notification/Notification";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -67,7 +68,7 @@ export default function Navbar() {
 
         const fetchedData = {
           fullName: profile.fullName || "Unknow Admin",
-          profilePicture: profile.profilePicture || "/static/images/avatar/1.jpg",
+          profilePicture:profile.profilePicture || "/static/images/avatar/1.jpg",
         };
         setProfileData(fetchedData);
       } catch (error) {
@@ -85,6 +86,63 @@ export default function Navbar() {
 
     window.location.reload();
   };
+  const notifications = [
+    {
+      title: "New Message",
+      message: "John Doe sent you a message",
+      timestamp: new Date(),
+      avatar: "https://example.com/avatar.jpg",
+      category: "Message",
+      priority: "high",
+      type: "message",
+      isPinned: false,
+      isRead: false
+    },
+    {
+      title: "System Update",
+      message: "New version 2.0 is available for download",
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      avatar: "https://example.com/system.jpg",
+      category: "System",
+      priority: "medium",
+      type: "system",
+      isPinned: true,
+      isRead: false
+    },
+    {
+      title: "Task Completed",
+      message: "Project X deployment was successful",
+      timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000), // 2 days ago
+      avatar: "https://example.com/task.jpg",
+      category: "Task",
+      priority: "low",
+      type: "task",
+      isPinned: false,
+      isRead: true
+    },
+    {
+      title: "Meeting Reminder",
+      message: "Team standup in 15 minutes",
+      timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+      avatar: "https://example.com/meeting.jpg",
+      category: "Calendar",
+      priority: "high",
+      type: "calendar",
+      isPinned: true,
+      isRead: false
+    },
+    {
+      title: "Security Alert",
+      message: "Unusual login attempt detected",
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      avatar: "https://example.com/security.jpg",
+      category: "Security",
+      priority: "high",
+      type: "security",
+      isPinned: false,
+      isRead: false
+    }
+  ];
 
   const DrawerList = (
     <Box
@@ -206,19 +264,14 @@ export default function Navbar() {
           }}
         />
 
-        {/* Notification Icon */}
-        <Box sx={{ backgroundColor: "white", border: "1px solid white" }}>
-          <img
-            src={notificationIcon}
-            alt="Notification Icon"
-            style={{
-              cursor: "pointer",
-              width: "2.4rem",
-              height: "2.4rem",
-              visibility: notificationIcon ? "visible" : "hidden",
-            }}
-          />
-        </Box>
+         {/* Notification Component */}
+         <NotificationComponent
+          notifications={notifications}
+          notificationIcon={notificationIcon}
+          onMarkAllRead={() => console.log("Marked all as read")}
+          onNotificationClick={(n) => console.log("Clicked notification:", n)}
+          onClearAll={() => console.log("Cleared all notifications")}
+        />
 
         {/* Logout Icon */}
         <Box sx={{ border: "1px solid white", padding: "1rem" }}>

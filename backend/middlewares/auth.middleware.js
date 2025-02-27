@@ -47,7 +47,7 @@ export const isUser = async (req, res, next) => {
 export const isAdmin = (req, res, next) => {
     try {
         const user = req.user
-        if (user.role === "admin") {
+        if (user.role === "admin" || user.role === "super-admin") {
             next()
         } else {
             return badRequest(req, res, null, "you are not an admin")
