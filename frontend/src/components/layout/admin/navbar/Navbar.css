@@ -15,12 +15,6 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-
-    & > div:first-of-type {
-      background-color: #5f3dc326;
-      padding: 1rem;
-      border-radius: 0.4rem;
-    }
   }
 }
 

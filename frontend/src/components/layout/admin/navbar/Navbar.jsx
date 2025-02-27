@@ -240,8 +240,8 @@ export default function Navbar() {
             {fetchedData?.fullName}
           </Typography>
 
-          <h2 style={{ margin: 0, fontSize: "1rem", color: "#6F6F6F" }}>
-            ADMIN
+          <h2 style={{ margin: 0, fontSize: "1.3rem", color: "#6F6F6F" }}>
+          {jwtDecode(authToken)?.role}
           </h2>
         </Box>
       </article>
