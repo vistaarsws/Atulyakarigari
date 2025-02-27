@@ -24,6 +24,7 @@ import {
   Delete as DeleteIcon,
 } from "@mui/icons-material";
 import ProductForm from "../../../layout/admin/product-form/ProductForm";
+import { deleteReviewAndRating } from "../../../../services/admin/adminAPI";
 
 // TabPanel Component for managing Tab content
 function TabPanel({ value, index, children }) {
@@ -41,6 +42,14 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
+  };
+
+  const deleteRatingAndReviewHandler = async (id) => {
+    try {
+      await deleteReviewAndRating(id);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -102,7 +111,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
 
         {/* Q&A */}
         <TabPanel value={tabIndex} index={1}>
-          {product?.question?.length > 0 ? (
+          {product?.questions?.length > 0 ? (
             <List sx={{ p: 0 }}>
               {product?.questions?.map((qa, index) => (
                 <ListItem
@@ -155,7 +164,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
         {/* Reviews */}
         <TabPanel value={tabIndex} index={2}>
           <List sx={{ p: 0 }}>
-            {product?.reviews?.map((review, index) => (
+            {product?.ratingAndReviews?.map((review, index) => (
               <Box
                 key={index}
                 sx={{
@@ -186,7 +195,11 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                     <MuiIconButton size="small" sx={{ mr: 1 }}>
                       <EditIcon />
                     </MuiIconButton>
-                    <MuiIconButton size="small" color="error">
+                    <MuiIconButton
+                      size="small"
+                      color="error"
+                      onClick={() => deleteRatingAndReviewHandler(review._id)}
+                    >
                       <DeleteIcon />
                     </MuiIconButton>
                   </Box>

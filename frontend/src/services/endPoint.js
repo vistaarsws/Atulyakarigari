@@ -21,9 +21,11 @@ export const admin_endpoints = {
   UPDATE_SUBCATEGORY: BASE_URL + "/api/v1/sub-category/update",
   GET_SUBCATEGORY_BY_ID: BASE_URL + "/api/v1/sub-category/get/",
   GET_SUBCATEGORY_BY_CATEGORY_ID:
-    BASE_URL + "/api/v1/sub-category/get-by-category",
-
+  BASE_URL + "/api/v1/sub-category/get-by-category",
+  
   ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer/",
+  DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
+
 };
 
 export const user_endpoints = {

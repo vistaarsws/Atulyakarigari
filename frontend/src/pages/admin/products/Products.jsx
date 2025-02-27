@@ -45,7 +45,7 @@ export default function Products() {
   const allProducts = useSelector((state) => state.products.products);
 
   useEffect(() => {
-    if (allProducts.length === 0) {
+    if (allProducts?.length === 0) {
       dispatch(fetchAllProducts());
     }
   }, [allProducts]);
@@ -73,14 +73,14 @@ export default function Products() {
           onChange={handleChange}
           aria-label="basic tabs example"
         >
-          <Tab label={`All (${allProducts.length})`} {...a11yProps(0)} />
+          <Tab label={`All (${allProducts?.length})`} {...a11yProps(0)} />
           <Tab
-            label={`Published (${publishedProducts.length})`}
+            label={`Published (${publishedProducts?.length})`}
             {...a11yProps(1)}
           />
-          <Tab label={`Draft (${draftedProducts.length})`} {...a11yProps(2)} />
+          <Tab label={`Draft (${draftedProducts?.length})`} {...a11yProps(2)} />
           <Tab
-            label={`Out Of Stock (${outOfStock.length})`}
+            label={`Out Of Stock (${outOfStock?.length})`}
             {...a11yProps(3)}
           />
         </Tabs>

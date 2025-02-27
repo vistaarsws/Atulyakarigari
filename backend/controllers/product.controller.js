@@ -25,38 +25,49 @@ const calculateDiscountedPrice = (price, discountPercentage) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-   
-    
-
     const filter = {};
     if (req.query.category) filter.category = req.query.category;
     if (req.query.subcategory) filter.subcategory = req.query.subcategory;
-    if (req.query.minPrice) filter.price = { $gte: parseFloat(req.query.minPrice) };
-    if (req.query.maxPrice) filter.price = { ...filter.price, $lte: parseFloat(req.query.maxPrice) };
+    if (req.query.minPrice)
+      filter.price = { $gte: parseFloat(req.query.minPrice) };
+    if (req.query.maxPrice)
+      filter.price = { ...filter.price, $lte: parseFloat(req.query.maxPrice) };
 
     // Fetch products
-    const products = await Product.find(filter)
-      .lean(); // Converts MongoDB documents into plain JavaScript objects
+    const products = await Product.find(filter).lean(); // Converts MongoDB documents into plain JavaScript objects
 
     // Fetch reviews for each product
     const productIds = products.map((product) => product._id);
-    const reviews = await RatingAndReviews.find({ productId: { $in: productIds } })
+    const reviews = await RatingAndReviews.find({
+      productId: { $in: productIds },
+    })
       .populate("userId", "name")
       .select("rating comment userId productId")
       .lean();
 
+    // Fetch questions for each product
+    const questions = await Question.find({ productId: { $in: productIds } })
+      .populate("userId", "name") // Populate user who asked the question
+      // .populate("userId", "name") // Populate user who answered (if applicable)
+      .lean();
+
     // Attach reviews to corresponding products
-    const productsWithReviews = products.map((product) => ({
+    // Attach reviews and questions to corresponding products
+    const productsWithDetails = products.map((product) => ({
       ...product,
-      ratingAndReviews: reviews.filter((review) => review.productId.toString() === product._id.toString()),
+      ratingAndReviews: reviews.filter(
+        (review) => review.productId.toString() === product._id.toString()
+      ),
+      questions: questions.filter(
+        (question) => question.productId.toString() === product._id.toString()
+      ),
     }));
 
     const total = await Product.countDocuments(filter);
 
     return success(req, res, "Products fetched successfully", {
-      count: productsWithReviews.length,
-     
-      products: productsWithReviews,
+      count: productsWithDetails.length,
+      products: productsWithDetails,
     });
   } catch (error) {
     return internalServerError(req, res, error, "Unable to fetch products");
