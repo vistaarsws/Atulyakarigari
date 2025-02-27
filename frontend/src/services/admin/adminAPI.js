@@ -84,8 +84,7 @@ const updateSubCategory = async (name, id) => {
 const getSubCategoryById = async (id) => {
   const response = await apiConnector(
     "GET",
-    `${admin_endpoints.GET_SUBCATEGORY_BY_ID}${id}`,
-    
+    `${admin_endpoints.GET_SUBCATEGORY_BY_ID}${id}`
   );
 
   return response;
@@ -119,12 +118,29 @@ const answerQuestion = async (answer, questionId, productId) => {
     const response = await apiConnector(
       "PUT",
       `${admin_endpoints.ANSWER_QUESTION}${productId}`,
-      {questionId,answer}
+      { questionId, answer }
     );
     return response;
   } catch (error) {
     console.error(error);
   }
+};
+
+const deleteReviewAndRating = async (id) => {
+  const response = await apiConnector(
+    "DELETE",
+    `${admin_endpoints.DELETE_REVIEW_AND_RATING}/${id}`
+  );
+
+  return response;
+};
+const deleteQuestion = async (id) => {
+  const response = await apiConnector(
+    "DELETE",
+    `${admin_endpoints.DELETE_QUESTION}/${id}`
+  );
+
+  return response;
 };
 
 export {
@@ -140,4 +156,6 @@ export {
   getSubCategoryByCategoryId,
   getCategoryById,
   answerQuestion,
+  deleteReviewAndRating,
+  deleteQuestion
 };

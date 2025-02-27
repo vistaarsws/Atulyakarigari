@@ -24,6 +24,9 @@ export const admin_endpoints = {
     BASE_URL + "/api/v1/sub-category/get-by-category",
 
   ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer/",
+  DELETE_QUESTION: BASE_URL + "/api/v1/questions",
+
+  DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
 };
 
 export const user_endpoints = {
@@ -38,7 +41,7 @@ export const user_endpoints = {
 
   USER_WISHLIST: BASE_URL + "/api/v1/wishlist/get",
   TOGGLE_WISHLIST: BASE_URL + "/api/v1/wishlist/toggle",
-  
+
   USER_ADD_TO_CART: BASE_URL + "/api/v1/addToCart/add",
   USER_GET_CART: BASE_URL + "/api/v1/addToCart/get",
   REMOVE_FROM_CART: BASE_URL + "/api/v1/addToCart/remove",
@@ -58,11 +61,10 @@ export const user_endpoints = {
   GET_QUESTIONS_BY_PRODUCT: BASE_URL + "/api/v1/questions/",
   CREATE_QUESTION: BASE_URL + "/api/v1/questions/",
 
-
   GET_SERVICEABILITY: BASE_URL + "/api/v1/shiprocket/getServiceability",
   CREATE_PAYMENT: BASE_URL + "/api/v1/payment/create-payment",
   VERIFY_PAYMENT: BASE_URL + "/api/v1/payment/payment-response",
-  
+
   CREATE_ORDER: BASE_URL + "/api/v1/orders/create",
   GET_ORDER_BY_ID: BASE_URL + "/api/v1/orders/getOrder",
   RETURN_ORDER: BASE_URL + "/api/v1/orders/return",
