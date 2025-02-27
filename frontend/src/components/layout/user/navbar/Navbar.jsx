@@ -382,9 +382,9 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <MenuItem
                     key={index}
                     onClick={() => {
+                      navigate('/');
                       logoutHandler(item.name);
                       setAnchorEl(null);
-                      navigate(item.link);
                     }}
                   >
                     {item.icon && (
