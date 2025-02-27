@@ -134,6 +134,14 @@ const deleteReviewAndRating = async (id) => {
 
   return response;
 };
+const deleteQuestion = async (id) => {
+  const response = await apiConnector(
+    "DELETE",
+    `${admin_endpoints.DELETE_QUESTION}/${id}`
+  );
+
+  return response;
+};
 
 export {
   getCategory,
@@ -149,4 +157,5 @@ export {
   getCategoryById,
   answerQuestion,
   deleteReviewAndRating,
+  deleteQuestion
 };
