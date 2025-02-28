@@ -523,7 +523,6 @@ export default function Product() {
                     color: "green",
                     fontSize: "16px",
                     marginTop: "2vh",
-
                   }}
                 >
                   Estimated Delivery :{" "}
@@ -554,7 +553,7 @@ export default function Product() {
               </ul>
             </article>
             <article className="product_details_userInputs">
-              <div className="productQuantityCounter_container">
+              {/* <div className="productQuantityCounter_container">
                 <button
                   onClick={() =>
                     productQuantity > 1 &&
@@ -567,7 +566,7 @@ export default function Product() {
                 <button onClick={() => setProductQuantity(productQuantity + 1)}>
                   +
                 </button>
-              </div>
+              </div> */}
               <div>
                 <button onClick={handleBuyToggle}>Buy Now</button>
               </div>
