@@ -23,8 +23,8 @@ export const admin_endpoints = {
   GET_SUBCATEGORY_BY_CATEGORY_ID:
     BASE_URL + "/api/v1/sub-category/get-by-category",
 
-  ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer/",
-  DELETE_QUESTION: BASE_URL + "/api/v1/questions",
+  ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer",
+  DELETE_QUESTION: BASE_URL + "/api/v1/questions/delete",
   UPDATE_QUESTION: BASE_URL + "/api/questions/edit",
 
   DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
