@@ -144,6 +144,14 @@ const deleteQuestion = async (id) => {
   return response;
 };
 
+const getAllQuestions = async (productId) => {
+  const response = await apiConnector(
+    "GET",
+    `${admin_endpoints.GET_ALL_QUESTION}/${productId}`
+  );
+
+  return response;
+};
 
 export {
   getCategory,
@@ -160,4 +168,5 @@ export {
   answerQuestion,
   deleteReviewAndRating,
   deleteQuestion,
+  getAllQuestions,
 };

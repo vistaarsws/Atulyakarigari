@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -30,8 +30,11 @@ import ProductForm from "../../../layout/admin/product-form/ProductForm";
 import {
   deleteReviewAndRating,
   deleteQuestion,
-  answerQuestion
+  answerQuestion,
 } from "../../../../services/admin/adminAPI";
+import { useDispatch } from "react-redux";
+import { fetchAllQuestions } from "../../../../Redux/features/ReviewAndQuestionSlice";
+import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 
 // TabPanel Component for managing Tab content
 function TabPanel({ value, index, children }) {
@@ -41,6 +44,7 @@ function TabPanel({ value, index, children }) {
 // Main Product Details Popup
 export default function ProductDetailsPopup({ open, handleClose, product }) {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -56,11 +60,6 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
     setQuestionOpen(true);
   };
 
-  const handleSave = () => {
-    updateQuestion(selectedQA._id, editedQuestion, editedAnswer);
-    setQuestionOpen(false);
-  };
-
   if (!product) return null;
   console.log("product", product);
 
@@ -71,6 +70,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
   const deleteRatingAndReviewHandler = async (id) => {
     try {
       await deleteReviewAndRating(id);
+      dispatch(fetchAllProducts());
     } catch (error) {
       console.log(error);
     }
@@ -78,6 +78,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
   const deleteQuestionHandler = async (id) => {
     try {
       await deleteQuestion({ questionId: id });
+      dispatch(fetchAllQuestions(product?._id));
     } catch (error) {
       console.error("Error deleting question:", error);
     }
@@ -85,13 +86,12 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
 
   const handleAnswerSave = async () => {
     try {
-      console.log("selec", selectedQA);
-      await answerQuestion( 
-        editedAnswer,
-        selectedQA._id,
-      );
+      await answerQuestion(editedAnswer, selectedQA._id);
+      setQuestionOpen(false);
+      dispatch(fetchAllProducts());
     } catch (error) {
       console.log(error);
+      setQuestionOpen(false);
     }
   };
 
@@ -162,11 +162,13 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                   sx={{
                     bgcolor: "background.paper",
                     mb: 2,
-                    borderRadius: theme.shape.borderRadius,
-                    boxShadow: theme.shadows[1],
+                    borderRadius: "4px",
+                    border: "1px solid #cccccc",
                     transition: "all 0.2s ease",
+                    cursor: "pointer",
                     "&:hover": {
-                      boxShadow: theme.shadows[3],
+                      boxShadow:
+                        "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px",
                     },
                   }}
                 >
@@ -175,49 +177,53 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                       <Typography
                         variant="subtitle1"
                         fontWeight="bold"
-                        color="primary"
+                        sx={{
+                          color: "#ad3f38",
+                          fontSize: "14px",
+                          fontWeight: "400",
+                        }}
                       >
                         Q: {qa.question}
                       </Typography>
                     }
                     secondary={
-                      <Typography color="text.secondary" sx={{ mt: 1, ml: 2 }}>
-                        A: {qa.answer}
+                      <Typography
+                        color="text.secondary"
+                        sx={{ mt: 1, ml: 2, fontSize: "14px" }}
+                      >
+                        {qa.answer}
                       </Typography>
                     }
                   />
-                  <ListItemSecondaryAction>
-                    <MuiIconButton
-                      size="small"
-                      color="primary"
-                      sx={{ mr: 1 }}
-                      onClick={() => editQuestionHandler(qa)}
-                    >
-                      <EditIcon />
-                    </MuiIconButton>
-                    <MuiIconButton
-                      size="small"
-                      color="error"
-                      onClick={() => deleteQuestionHandler(qa._id)}
-                    >
-                      <DeleteIcon />
-                    </MuiIconButton>
-                  </ListItemSecondaryAction>
+                  <MuiIconButton
+                    size="small"
+                    color="primary"
+                    sx={{ mr: 1 }}
+                    onClick={() => editQuestionHandler(qa)}
+                  >
+                    <EditIcon />
+                  </MuiIconButton>
+                  <MuiIconButton
+                    size="small"
+                    color="error"
+                    onClick={() => deleteQuestionHandler(qa._id)}
+                  >
+                    <DeleteIcon />
+                  </MuiIconButton>
                 </ListItem>
               ))}
               <Dialog
                 open={questionOpen}
                 onClose={() => setQuestionOpen(false)}
               >
-                <DialogTitle>Edit Q&A</DialogTitle>
+                <DialogTitle sx={{ fontSize: "16px", color: "#5f3dc3" }}>
+                  Answer/Edit Questions
+                </DialogTitle>
                 <DialogContent>
-                  <TextField
-                    fullWidth
-                    label="Question"
-                    margin="dense"
-                    value={editedQuestion}
-                    onChange={(e) => setEditedQuestion(e.target.value)}
-                  />{editedQuestion}
+                  <Typography sx={{ fontSize: "14px", mb: 2 }}>
+                    {selectedQA?.question}
+                  </Typography>
+
                   <TextField
                     fullWidth
                     label="Answer"
@@ -229,11 +235,16 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                 <DialogActions>
                   <Button
                     onClick={() => setQuestionOpen(false)}
-                    color="secondary"
+                    variant="contained"
+                    color="error"
                   >
                     Cancel
                   </Button>
-                  <Button onClick={handleAnswerSave} color="primary">
+                  <Button
+                    onClick={handleAnswerSave}
+                    variant="contained"
+                    color="primary"
+                  >
                     Save
                   </Button>
                 </DialogActions>
@@ -248,57 +259,70 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
 
         {/* Reviews */}
         <TabPanel value={tabIndex} index={2}>
-          <List sx={{ p: 0 }}>
-            {product?.ratingAndReviews?.map((review, index) => (
-              <Box
-                key={index}
-                sx={{
-                  bgcolor: "background.paper",
-                  borderRadius: 1,
-                  boxShadow: 1,
-                  p: 2,
-                  mb: 2,
-                  "&:hover": { boxShadow: 3 },
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Avatar sx={{ mr: 2, bgcolor: theme.palette.primary.main }}>
-                    {review.userName?.[0]}
-                  </Avatar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      {review.userName}
-                    </Typography>
-                    <Rating
-                      value={review.rating}
-                      readOnly
-                      size="small"
-                      sx={{ color: theme.palette.primary.main }}
-                    />
-                  </Box>
-                  <Box>
-                    <MuiIconButton size="small" sx={{ mr: 1 }}>
-                      <EditIcon />
-                    </MuiIconButton>
-                    <MuiIconButton
-                      size="small"
-                      color="error"
-                      onClick={() => deleteRatingAndReviewHandler(review._id)}
-                    >
-                      <DeleteIcon />
-                    </MuiIconButton>
-                  </Box>
-                </Box>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ ml: 7 }}
+          {product?.ratingAndReviews?.length > 0 ? (
+            <List sx={{ p: 0 }}>
+              {product?.ratingAndReviews?.map((review, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    borderRadius: "4px",
+                    border: "1px solid #cccccc",
+                    transition: "all 0.2s ease",
+                    cursor: "pointer",
+                    "&:hover": {
+                      boxShadow:
+                        "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px",
+                    },
+
+                    bgcolor: "background.paper",
+                    borderRadius: 1,
+                    boxShadow: 1,
+                    p: 2,
+                    mb: 2,
+                    "&:hover": { boxShadow: 3 },
+                  }}
                 >
-                  {review.comment}
-                </Typography>
-              </Box>
-            ))}
-          </List>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <Avatar sx={{ mr: 2, bgcolor: theme.palette.primary.main }}>
+                      {review.userName?.[0]}
+                    </Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {review.userName}
+                      </Typography>
+                      <Rating
+                        value={review.rating}
+                        readOnly
+                        size="small"
+                        sx={{ color: theme.palette.primary.main }}
+                      />
+                    </Box>
+                    <Box>
+                      {/* <MuiIconButton size="small" sx={{ mr: 1 }}>
+                      <EditIcon />
+                    </MuiIconButton> */}
+                      <MuiIconButton
+                        size="small"
+                        color="error"
+                        onClick={() => deleteRatingAndReviewHandler(review._id)}
+                      >
+                        <DeleteIcon />
+                      </MuiIconButton>
+                    </Box>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ ml: 7 }}
+                  >
+                    {review.comment}
+                  </Typography>
+                </Box>
+              ))}
+            </List>
+          ) : (
+            <Typography color="text.secondary">No Reviews available</Typography>
+          )}
         </TabPanel>
       </DialogContent>
     </Dialog>
