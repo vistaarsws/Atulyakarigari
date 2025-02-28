@@ -25,6 +25,7 @@ export const admin_endpoints = {
 
   ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer/",
   DELETE_QUESTION: BASE_URL + "/api/v1/questions",
+  UPDATE_QUESTION: BASE_URL + "/api/questions/edit",
 
   DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
 };

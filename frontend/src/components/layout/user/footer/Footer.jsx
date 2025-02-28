@@ -188,7 +188,7 @@ export default function Footer() {
                     { text: "Home", link: "/" },
                     { text: "About Us", link: "/about" },
                     { text: "Artisans", link: "/artisans" },
-                    { text: "Categories", link: "/categories" },
+                    // { text: "Categories", link: "/categories" },
                   ].map(({ text, link }) => (
                     <QuickLink key={text} href={link}>
                       <StyledIcon component={ChevronRight} />
