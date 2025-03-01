@@ -53,10 +53,10 @@ export const getQuestionsByProduct = async (req, res) => {
   }
 };
 
-// ?? Admin: Answer a question
+// Admin: Answer a question
 export const answerQuestion = async (req, res) => {
   try {
-    const { answer, questionId } = req.body; // Expect `questionId` and `answer` in the body
+    const { answer, questionId } = req.body;
     const adminId = req.user?._id; // Ensure admin is authenticated
 
     if (!answer || !questionId) {
@@ -66,7 +66,6 @@ export const answerQuestion = async (req, res) => {
       });
     }
 
-    // Find the question by ID
     const question = await Question.findById(questionId);
     if (!question) {
       return res.status(404).json({
@@ -77,17 +76,17 @@ export const answerQuestion = async (req, res) => {
 
     // Update the question with the provided answer
     question.answer = answer;
-    question.answeredBy = adminId; // Store the admin's ID
+    question.answeredBy = adminId;
     await question.save();
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Answer submitted successfully.",
       question,
     });
   } catch (error) {
     console.error("Error answering question:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Server error. Please try again later.",
       error: error.message,
@@ -95,50 +94,32 @@ export const answerQuestion = async (req, res) => {
   }
 };
 
-// ?? Admin: Edit a question or answer
-export const editQuestionOrAnswer = async (req, res) => {
-  try {
-    const { question, answer } = req.body;
-    const questionId = req.params.id;
-
-    const updatedQuestion = await Question.findByIdAndUpdate(
-      questionId,
-      { question, answer },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedQuestion)
-      return res
-        .status(404)
-        .json({ success: false, message: "Question not found." });
-
-    res.json({
-      success: true,
-      message: "Updated successfully",
-      updatedQuestion,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
-  }
-};
-
-// ?? Admin: Delete a question
+// Admin: Delete a question
 export const deleteQuestion = async (req, res) => {
   try {
-    const questionId = req.params.id;
+    const { questionId } = req.body;
+
+    if (!questionId) {
+      return res.status(400).json({
+        success: false,
+        message: "Question ID is required.",
+      });
+    }
 
     const question = await Question.findByIdAndDelete(questionId);
-    if (!question)
-      return res
-        .status(404)
-        .json({ success: false, message: "Question not found." });
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: "Question not found.",
+      });
+    }
 
     res.json({ success: true, message: "Deleted successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };

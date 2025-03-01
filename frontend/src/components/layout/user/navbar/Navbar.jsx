@@ -19,6 +19,10 @@ import Logout from "@mui/icons-material/Logout";
 import { fetchCart } from "../../../../Redux/features/CartSlice";
 import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
 import { fetchProfile } from "../../../../Redux/features/ProfileSlice";
+import { fetchAllProducts } from "../../../../Redux/features/productSlice";
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
+import useDebounce from "../../../../hooks/useDebounce";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const dispatch = useDispatch();
@@ -34,6 +38,63 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1); // Keyboard navigation
+
+  // Get products from Redux
+  const { products, loading } = useSelector((state) => state.products);
+
+  // Fetch products only once
+  useEffect(() => {
+    if (products.length === 0) {
+      dispatch(fetchAllProducts());
+    }
+  }, [dispatch, products.length]);
+
+  // MUI Debounce (Runs only when searchQuery changes)
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Filter products when debounced value updates
+  useEffect(() => {
+    if (debouncedSearch.length < 2) {
+      setFilteredProducts([]);
+      return;
+    }
+
+    if (products.length > 0) {
+      const filtered = products.filter((product) =>
+        `${product.name} ${product.description} ${product.category} ${product.subcategory}`
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase())
+      );
+
+      setFilteredProducts(filtered);
+      setSelectedIndex(-1); // Reset selection
+    }
+  }, [debouncedSearch, products]);
+
+  const handleSelectProduct = (product) => {
+    navigate(`/product/${product._id}`);
+    setSearchQuery("");
+    setFilteredProducts([]); // Clear results after selection
+  };
+
+  // Keyboard navigation (Arrow keys & Enter)
+  const handleKeyDown = (e) => {
+    if (filteredProducts.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      setSelectedIndex((prev) =>
+        prev < filteredProducts.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === "ArrowUp") {
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      handleSelectProduct(filteredProducts[selectedIndex]);
+    }
+  };
 
   // -----------------------------------------------------------
   const navigation = {
@@ -52,7 +113,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         })),
       },
       { name: "ARTISANS", path: "/artisans" },
-      { name: "ABOUT US", path: "/about" },
+      { name: "ABOUT", path: "/about" },
       { name: "BLOGS", path: "/blogs" },
     ],
   };
@@ -259,7 +320,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       <div>
         <div>
           {!navWithoutSearchBar_list && (
-            <form className="form">
+            <form className="form" onKeyDown={handleKeyDown}>
               <button>
                 <svg
                   width="17"
@@ -280,27 +341,46 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               </button>
               <input
                 className="input"
-                placeholder="What are you looking for ?"
-                required=""
+                placeholder="Search here..."
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-              {/* )} */}
-              <button className="reset" type="reset">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
+              {searchQuery && (
+                <CloseIcon
+                  className="clear-icon"
+                  fontSize="large"
+                  onClick={() => setSearchQuery("")}
+                />
+              )}
+
+              {/* Search Results Dropdown */}
+              {searchQuery && filteredProducts.length > 0 && (
+                <ul className="search-dropdown">
+                  {filteredProducts.map((product, index) => (
+                    <li
+                      key={product._id}
+                      className={index === selectedIndex ? "selected" : ""}
+                      onMouseEnter={() => setSelectedIndex(index)}
+                      onClick={() => handleSelectProduct(product)}
+                    >
+                      {highlightMatch(product.name, searchQuery)}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {searchQuery && filteredProducts.length === 0 && !loading && (
+                <ul className="search-dropdown">
+                  <li>No results found</li>
+                </ul>
+              )}
+
+              {loading && searchQuery && (
+                <ul className="search-dropdown">
+                  <li>Loading...</li>
+                </ul>
+              )}
             </form>
           )}
         </div>
@@ -382,12 +462,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <MenuItem
                     key={index}
                     onClick={() => {
-                      logoutHandler(item.name);
-                      setAnchorEl(null);
-                      if(item.name == "Logout") {
+                      if (item.name == "Logout") {
                         navigate("/");
                       }
                       navigate(item.link);
+                      logoutHandler(item.name);
+                      setAnchorEl(null);
                     }}
                   >
                     {item.icon && (
@@ -439,5 +519,18 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         </button>
       </div>
     </nav>
+  );
+}
+// Function to highlight matching search text
+function highlightMatch(text, query) {
+  const regex = new RegExp(`(${query})`, "gi");
+  return text.split(regex).map((part, index) =>
+    part.toLowerCase() === query.toLowerCase() ? (
+      <span key={index} className="highlight">
+        {part}
+      </span>
+    ) : (
+      part
+    )
   );
 }

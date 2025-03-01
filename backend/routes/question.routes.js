@@ -2,7 +2,6 @@ import express from "express";
 import {
   askQuestion,
   answerQuestion,
-  editQuestionOrAnswer,
   deleteQuestion,
   getQuestionsByProduct,
 } from "../controllers/question.controller.js";
@@ -16,8 +15,7 @@ router.get("/:id", getQuestionsByProduct);
 router.use(auth);
 router.use(isAdmin);
 
-router.put("/answer/:id", answerQuestion);
-router.put("/edit", editQuestionOrAnswer);
-router.delete("/", deleteQuestion);
+router.put("/answer", answerQuestion);
+router.delete("/delete",isAdmin, deleteQuestion);
 
 export default router;
