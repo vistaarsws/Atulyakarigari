@@ -31,7 +31,6 @@ const signUp = async (fullName, loginId, otp, accountType = "customer") => {
 };
 
 const login = async (loginId) => {
-  // debugger;
   const response = await apiConnector("POST", endpoints.LOGIN_API, {
     loginId,
   });
