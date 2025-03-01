@@ -98,165 +98,6 @@ export const logoutShiprocket = async () => {
   }
 };
 
-// GET SHIPROCKET PRODUCT BY ID
-export const getShiprocketProductDetails = async (productId) => {
-  const authToken = await getShiprocketToken();
-
-  try {
-    const response = await axios.get(
-      `${shiprocketConfig.API_BASE}/products/show/${productId}`, // ✅ Corrected URL
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-      }
-    );
-
-    logMessage(
-      "info",
-      `Shiprocket product details fetched successfully: ${JSON.stringify(response.data)}`,
-      "shiprocket-info"
-    );
-
-    return response.data;
-  } catch (error) {
-    logMessage(
-      "error",
-      `Error fetching Shiprocket product details: ${
-        error?.response?.data || error.message
-      }`,
-      "shiprocket-errors"
-    );
-
-    throw error;
-  }
-};
-
-
-
-// CREATE PRODUCT IN SHIPROCKET
-export const addProductToShiprocket = async (product) => {
-  const authToken = await getShiprocketToken();
-
-  const payload = {
-    name: product.name,
-    category_code: product.category_code || "default",
-    type: product.type || "Single",
-    sku: product.sku,
-    qty: product.stock.toString(),
-    price: product.price,
-    hsn_code: product.hsn_code || "",
-    weight: product.weight || 0.5,
-    length: product.length || 10,
-    breadth: product.breadth || 10,
-    height: product.height || 10,
-    // qc_details: {
-    //   product_image: product.product_image || "",
-    //   brand: product.brand || "",
-    //   color: product.color || "",
-    //   size: product.size || "",
-    //   ean_barcode: product.ean_barcode || "",
-    //   check_damaged_product: product.check_damaged_product ?? false, // Default to false
-    // },
-  };
-
-  try {
-    const response = await axios.post(
-      `${shiprocketConfig.API_BASE}/products`,
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-      }
-    );
-
-    logMessage(
-      "info",
-      `Product added successfully: ${JSON.stringify(response.data)}`,
-      "shiprocket-info"
-    );
-    return response.data;
-  } catch (error) {
-    logMessage(
-      "error",
-      `Error adding product: ${error?.response?.data || error.message}`,
-      "shiprocket-errors"
-    );
-    throw error;
-  }
-};
-
-// DELETE PRODUCT IN SHIPROCKET
-export const deleteProductFromShiprocket = async (sku) => {
-  const authToken = await getShiprocketToken();
-
-  try {
-    const response = await axios.delete(
-      `${shiprocketConfig.API_BASE}/products/delete/${sku}`,
-      {
-        headers: { Authorization: `Bearer ${authToken}` },
-      }
-    );
-
-    logMessage(
-      "info",
-      `Product deleted: ${JSON.stringify(response.data)}`,
-      "shiprocket-info"
-    );
-    return response.data;
-  } catch (error) {
-    logMessage(
-      "error",
-      `Error deleting product: ${error?.response?.data || error.message}`,
-      "shiprocket-errors"
-    );
-    throw error;
-  }
-};
-
-// UPDATE PRODUCT IN SHIPROCKET
-export const updateProductInShiprocket = async (product) => {
-  const authToken = await getShiprocketToken();
-
-  const payload = {
-    name: product.name,
-    sku: product.sku,
-    price: product.price,
-    stock: product.stock,
-    weight: product.weight,
-    length: product.length,
-    breadth: product.breadth,
-    height: product.height,
-  };
-
-  try {
-    const response = await axios.put(
-      `${shiprocketConfig.API_BASE}/products/update`,
-      payload,
-      {
-        headers: { Authorization: `Bearer ${authToken}` },
-      }
-    );
-
-    logMessage(
-      "info",
-      `Product updated: ${JSON.stringify(response.data)}`,
-      "shiprocket-info"
-    );
-    return response.data;
-  } catch (error) {
-    logMessage(
-      "error",
-      `Error updating product: ${error?.response?.data || error.message}`,
-      "shiprocket-errors"
-    );
-    throw error;
-  }
-};
-
 // GET SHIPROCKET WALLET BALANCE
 export const getShiprocketWalletBalance = async () => {
   const authToken = await getShiprocketToken();
@@ -523,7 +364,6 @@ export const addShiprocketPickupLocation = async (pickupData) => {
   }
 };
 
-
 // GET PICKUP LOCATION
 export const getShiprocketPickupLocations = async () => {
   const authToken = await getShiprocketToken();
@@ -571,7 +411,9 @@ export const getShiprocketDeliveryEstimate = async (
   }
 
   try {
-    const url = `${shiprocketConfig.API_BASE}/courier/serviceability/?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&cod=${
+    const url = `${
+      shiprocketConfig.API_BASE
+    }/courier/serviceability/?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&cod=${
       cod ? 1 : 0
     }&weight=${weight || 0.5}`;
 

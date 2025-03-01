@@ -1,119 +1,77 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Checkbox,
-} from "@mui/material";
-import ORDER_IMG from "../../../assets/images/order-img.png";
-import { getServiceability } from "../../../services/user/userAPI";
-import { useState } from "react";
+import { Box, Typography, CardContent, CardMedia, Stack, Divider } from "@mui/material";
+import ORDER_IMG from "../../../assets/images/order-img.png"; // Default fallback image
 
-const items = [
-  {
-    id: 1,
-    imageUrl: ORDER_IMG,
-    title: "BANARSI SAARI",
-    quantity: 1,
-    price: 27000,
-    deliveryDate: "5 Oct - 7 Oct",
-  },
-  {
-    id: 2,
-    imageUrl: ORDER_IMG,
-    title: "BANARSI SAARI",
-    quantity: 1,
-    price: 27000,
-    deliveryDate: "5 Oct - 7 Oct",
-  },
-  {
-    id: 3,
-    imageUrl: ORDER_IMG,
-    title: "BANARSI SAARI",
-    quantity: 1,
-    price: 27000,
-    deliveryDate: "5 Oct - 7 Oct",
-  },
-];
-
-const DeliveryEstimate = () => {
-  const [deliveryEstimation, setDeliveryEstimation] = useState("");
-  const [deliveryPincode, setDeliveryPincode] = useState("");
-  const handleServiceability = async (product) => {
-    if (!deliveryPincode) {
-      console.log("Delivery pincodes is required.");
-      return;
-    }
-    const delivery_postcode = deliveryPincode;
-    const cod = false;
-
-    const response = await getServiceability(product, delivery_postcode, cod);
-    setDeliveryEstimation(response);
-    // console.log("deliveryEstimation", deliveryEstimation);
-    if (response.data.success == 200) {
-      const courier = {
-        totalAvaliableCourier:
-          deliveryEstimation.data.message.all_couriers.length,
-        fastest_delivery: deliveryEstimation.data.message.fastest_delivery,
-        cheapest_delivery: deliveryEstimation.data.message.cheapest_delivery,
-        longest_delivery: deliveryEstimation.data.message.longest_delivery,
-      };
-    }
-  };
+const DeliveryEstimate = ({ orderData }) => {
+  // Extract items safely
+  const items = orderData?.products?.items || [];
 
   return (
-    <Box padding={2}>
-      <Typography
-        sx={{
-          color: "#6F6F6F",
-          fontSize: "14px",
-          fontWeight: 400,
-          mb: 2,
-        }}
-      >
-        Delivery Estimate
+    <Box padding={3} sx={{ backgroundColor: "#FAFAFA", borderRadius: 2 }}>
+      <Typography sx={{ color: "#333", fontSize: "16px", fontWeight: 600, mb: 2 }}>
+        📦 Delivery Estimate
       </Typography>
-      {items.map((item) => (
-        <Box
-          key={item.id}
-          sx={{
-            display: "flex",
-            mb: 2,
-            alignItems: "center",
-            boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 1px",
-            // border: "2px solid red",
-          }}
-        >
-          <CardMedia
-            component="img"
-            sx={{
-              width: "42px",
-              height: "52px",
-            }}
-            image={item.imageUrl}
-            alt={item.title}
-          />
 
-          <Box sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}>
-            <CardContent>
-              <Typography
-                sx={{ fontWeight: 400, fontSize: "12px", color: "#383737" }}
-              >{`${item.title}, QTY ${item.quantity}, ${item.price}`}</Typography>
-            </CardContent>
-            <Box sx={{ padding: 1, textAlign: "right", flexGrow: 1 }}>
-              <Typography
-                sx={{ fontWeight: 400, fontSize: "12px", color: "#383737" }}
-              >
-                Delivery by{" "}
-                <strong style={{ fontWeight: 800 }}>{item.deliveryDate}</strong>
-              </Typography>
+      {items.length > 0 ? (
+        items.map((item, index) => {
+          // Get first image from images array, fallback to ORDER_IMG if unavailable
+          const productImage = item?.images?.length > 0 ? item.images[0] : ORDER_IMG;
+
+          // Truncate name if it's too long
+          const truncatedTitle =
+            item?.name?.length > 20 ? item.name.slice(0, 20) + "..." : item?.name || "Product";
+
+          return (
+            <Box
+              key={item._id || index}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                padding: 2,
+                backgroundColor: "#FFFFFF",
+                borderRadius: 2,
+                boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.08)",
+                mb: 2,
+              }}
+            >
+              {/* Product Image */}
+              <CardMedia
+                component="img"
+                sx={{ width: 55, height: 65, borderRadius: 1, objectFit: "cover" }}
+                image={productImage}
+                alt={truncatedTitle}
+              />
+
+              {/* Product Details */}
+              <Stack spacing={0.5} sx={{ flexGrow: 1, ml: 2 }}>
+                <Typography sx={{ fontWeight: 500, fontSize: "13px", color: "#333" }}>
+                  {truncatedTitle}
+                </Typography>
+
+                {/* Quantity & Price */}
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography sx={{ fontSize: "12px", color: "#666" }}>
+                    QTY {item?.quantity || 1}
+                  </Typography>
+                  <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#000" }}>
+                    ₹{item?.priceAfterDiscount || item?.price || 0}
+                  </Typography>
+                </Stack>
+
+                {/* Delivery Date */}
+                <Divider sx={{ my: 1 }} />
+                <Typography sx={{ fontSize: "12px", color: "#388E3C", fontWeight: 500 }}>
+                  🚚 Delivery by <strong>5 Oct - 7 Oct</strong>
+                </Typography>
+              </Stack>
             </Box>
-          </Box>
-        </Box>
-      ))}
+          );
+        })
+      ) : (
+        <Typography sx={{ fontSize: "14px", color: "#666", textAlign: "center", mt: 2 }}>
+          No items found.
+        </Typography>
+      )}
     </Box>
   );
 };

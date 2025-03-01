@@ -1,85 +1,62 @@
-import crypto from "crypto";
-import dotenv from "dotenv";
 import Payment from "../models/payment.js";
+import { encrypt, decrypt } from "../utils/encryption/cryptoUtils.js";
+import keys from "../config/ccAvenue.js";
+import { v4 as uuidv4 } from "uuid";
 
-dotenv.config();
+// Generate Unique Order ID
+const generatePaymentOrderId = () => `ORD-${uuidv4()}`;
 
-const {
-  CCAVENUE_MERCHANT_ID,
-  CCAVENUE_ACCESS_CODE,
-  CCAVENUE_WORKING_KEY,
-  CCAVENUE_REDIRECT_URL,
-  CCAVENUE_CANCEL_URL,
-  CCAVENUE_URL,
-} = process.env;
-
-const getFormattedKey = (key) => Buffer.from(key.substring(0, 16), "utf8");
-
-const encrypt = (text, key) => {
-  const formattedKey = getFormattedKey(key);
-  const iv = Buffer.alloc(16, 0);
-  const cipher = crypto.createCipheriv("aes-128-cbc", formattedKey, iv);
-  let encrypted = cipher.update(text, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return encrypted;
-};
-
-const decrypt = (text, key) => {
-  const formattedKey = getFormattedKey(key);
-  const iv = Buffer.alloc(16, 0);
-  const decipher = crypto.createDecipheriv("aes-128-cbc", formattedKey, iv);
-  let decrypted = decipher.update(text, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
-};
-
+// ✅ Create Payment Request
 export const createPayment = async (req, res) => {
   try {
-    const { amount = 1 } = req.body;
-    const userId = req.user?._id || "679a055764e6079f5a9b3334";
+    const { amount } = req.body;
+    const userId = req.user?._id;
 
-    if (!userId || !amount) {
-      return res.status(400).json({ error: "Missing required parameters" });
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: "Invalid amount" });
     }
 
-    const orderId = `ORDER_${Date.now()}`;
-    const payment = new Payment({ userId, paymentOrderId: orderId, amount, status: "PENDING" });
-    await payment.save();
+    const paymentOrderId = generatePaymentOrderId();
 
-    const postData = `merchant_id=${CCAVENUE_MERCHANT_ID}&order_id=${orderId}&currency=INR&amount=${amount}&redirect_url=${CCAVENUE_REDIRECT_URL}&cancel_url=${CCAVENUE_CANCEL_URL}&language=EN`;
-    
-    const encRequest = encrypt(postData, CCAVENUE_WORKING_KEY);
-    const paymentUrl = `${CCAVENUE_URL}?command=initiateTransaction&encRequest=${encRequest}&access_code=${CCAVENUE_ACCESS_CODE}`;
+    const newPayment = new Payment({ paymentOrderId, userId, amount, status: "PENDING" });
+    await newPayment.save();
+
+    const postData = `merchant_id=${keys.merchantId}&order_id=${paymentOrderId}&currency=INR&amount=${amount}&redirect_url=${keys.redirectUrl}&cancel_url=${keys.cancelUrl}&billing_name=John Doe&billing_email=john@example.com&billing_tel=9876543210&billing_address=123 Test Street&billing_city=Mumbai&billing_state=Maharashtra&billing_zip=400001&billing_country=India&integration_type=iframe_normal&language=EN&merchant_param1=${userId}`;
+
+    const encRequest = encrypt(postData);
+    const paymentUrl = `https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=${encRequest}&access_code=${keys.accessCode}`;
 
     res.json({ success: true, paymentUrl });
   } catch (error) {
-    console.error("Payment Error:", error);
     res.status(500).json({ error: "Payment initiation failed" });
   }
 };
 
+// ✅ Handle Payment Response
 export const handlePaymentResponse = async (req, res) => {
   try {
     const { encResp } = req.body;
-    if (!encResp) return res.status(400).json({ error: "Missing encrypted response" });
+    if (!encResp) return res.status(400).json({ error: "Missing response from CCAvenue" });
 
-    const decryptedResponse = decrypt(encResp, CCAVENUE_WORKING_KEY);
+    const decryptedResponse = decrypt(encResp);
     const responseParams = new URLSearchParams(decryptedResponse);
-
-    const orderId = responseParams.get("order_id");
+    const paymentOrderId = responseParams.get("order_id");
     const trackingId = responseParams.get("tracking_id");
     const orderStatus = responseParams.get("order_status");
 
-    const payment = await Payment.findOne({ paymentOrderId: orderId });
+    const payment = await Payment.findOne({ paymentOrderId });
     if (!payment) return res.status(404).json({ error: "Payment not found" });
 
     payment.transactionId = trackingId;
     payment.status = orderStatus === "Success" ? "COMPLETED" : "FAILED";
     await payment.save();
 
-    res.json({ success: true, status: payment.status });
+    const frontendRedirectUrl = orderStatus === "Success"
+      ? `${keys.frontendUrl}/payment-success`
+      : `${keys.frontendUrl}/payment-failed`;
+
+    res.redirect(frontendRedirectUrl);
   } catch (error) {
-    console.error("Payment Response Error:", error);
-    res.status(500).json({ error: "Failed to process payment response" });
+    res.status(500).json({ error: "Payment response handling failed" });
   }
 };

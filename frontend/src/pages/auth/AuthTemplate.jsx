@@ -72,7 +72,6 @@ export default function AuthTemplate({ page }) {
   // -----------------------------------------------------Login---------------------------------------------------------------------
 
   const loginHandler = async (e) => {
-    // debugger;
     e.preventDefault();
     setLoading(true);
     try {
