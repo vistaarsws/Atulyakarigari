@@ -15,15 +15,26 @@ import ConfirmationModal from "../../modal/confirmation-modal/ConfirmationModal"
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-export default function AdminProductCard({ products }) {
+export default function AdminProductCard({ productStatus }) {
+  const dispatch = useDispatch();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openDetails, setOpenDetails] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const dispatch = useDispatch();
   const getCategory = useSelector((state) => state.categories.categories);
+  const products = useSelector((state) => state?.products?.products)?.filter(
+    (prod) => {
+      if (productStatus === "all") {
+        return true;
+      }
+      if (productStatus === "outofstock") {
+        return prod.stock === 0;
+      }
+      return prod.status.toLowerCase() === productStatus;
+    }
+  );
 
   useEffect(() => {
     dispatch(fetchAllProducts());
@@ -36,21 +47,21 @@ export default function AdminProductCard({ products }) {
   };
 
   const getCategoryName = useMemo(
-    () => (id) => getCategory.find((cat) => cat.id === id)?.name || "Unknown",
+    () => (id) => getCategory?.find((cat) => cat.id === id)?.name || "Unknown",
     [getCategory]
   );
 
   const transformData = useMemo(
     () =>
       Array.isArray(products)
-        ? products.map((product) => ({
+        ? products?.map((product) => ({
             productImgTitle: {
               prodImg: product.images?.[0] || "default-image-path.jpg",
               prodName: product.name,
             },
-            category: getCategoryName(product.category),
+            category: getCategoryName(product?.category),
             stock: product.stock,
-            productID: product._id,
+            productID: product?._id,
             sku: product.sku,
             price: product.price,
             date: new Date(product.updatedAt).toLocaleDateString(),
@@ -65,7 +76,16 @@ export default function AdminProductCard({ products }) {
     const { prodImg, prodName } = params.value;
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <img src={prodImg} alt={prodName} style={{ width: "35px", height: "35px", borderRadius: "5px", objectFit: "cover" }} />
+        <img
+          src={prodImg}
+          alt={prodName}
+          style={{
+            width: "35px",
+            height: "35px",
+            borderRadius: "5px",
+            objectFit: "cover",
+          }}
+        />
         <span style={{ marginLeft: "1rem" }}>{prodName}</span>
       </div>
     );
@@ -77,10 +97,23 @@ export default function AdminProductCard({ products }) {
     const effectivePrice = originalPrice - (originalPrice * discount) / 100;
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
         <span style={{ fontWeight: 700, fontSize: "14px", color: "#000" }}>
           ₹{effectivePrice.toFixed(0)}{" "}
-          <span style={{ textDecoration: "line-through", fontSize: "14px", color: "#9F9F9F", fontWeight: 400 }}>
+          <span
+            style={{
+              textDecoration: "line-through",
+              fontSize: "14px",
+              color: "#9F9F9F",
+              fontWeight: 400,
+            }}
+          >
             ₹{originalPrice.toFixed(0)}
           </span>
         </span>
@@ -89,7 +122,7 @@ export default function AdminProductCard({ products }) {
   };
 
   const handleViewDetails = (product) => {
-    setSelectedProduct(product);
+    setSelectedProduct(product?._id);
     setOpenDetails(true);
   };
 
@@ -103,7 +136,7 @@ export default function AdminProductCard({ products }) {
 
     setLoading(true);
     try {
-      await deleteProduct(productToDelete._id);
+      await deleteProduct(productToDelete?._id);
       dispatch(fetchAllProducts());
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -116,31 +149,63 @@ export default function AdminProductCard({ products }) {
 
   const actionCellRenderer = (params) => (
     <div>
-      <IconButton onClick={() => handleViewDetails(params.data.fullProduct)} aria-label="edit">
+      <IconButton
+        onClick={() => handleViewDetails(params.data.fullProduct)}
+        aria-label="edit"
+      >
         <EditIcon sx={{ fill: "#3F51B5" }} />
       </IconButton>
-      <IconButton onClick={() => deleteProductHandler(params)} aria-label="delete" disabled={loading}>
+      <IconButton
+        onClick={() => deleteProductHandler(params)}
+        aria-label="delete"
+        disabled={loading}
+      >
         <DeleteIcon sx={{ fill: "#AD3F38" }} />
       </IconButton>
     </div>
   );
 
   const [colDefs] = useState([
-    { field: "productImgTitle", headerName: "PRODUCT IMAGE & TITLE", cellRenderer: profileImageRenderer, flex: 1, cellStyle: { fontWeight: "bold" } },
+    {
+      field: "productImgTitle",
+      headerName: "PRODUCT IMAGE & TITLE",
+      cellRenderer: profileImageRenderer,
+      flex: 1,
+      cellStyle: { fontWeight: "bold" },
+    },
     { field: "category", headerName: "CATEGORIES", flex: 0.6 },
     { field: "productID", headerName: "PRODUCT ID", flex: 0.8 },
     { field: "sku", headerName: "SKU ID", flex: 0.7 },
-    { field: "price", headerName: "PRICE", cellRenderer: priceRenderer, flex: 0.7 },
+    {
+      field: "price",
+      headerName: "PRICE",
+      cellRenderer: priceRenderer,
+      flex: 0.7,
+    },
     { field: "date", headerName: "DATE", flex: 0.4 },
     { field: "stock", headerName: "STOCK", flex: 0.3 },
-    { headerName: "ACTION", cellRenderer: actionCellRenderer, sortable: false, filter: true, flex: 0.3 },
+    {
+      headerName: "ACTION",
+      cellRenderer: actionCellRenderer,
+      sortable: false,
+      filter: true,
+      flex: 0.3,
+    },
   ]);
 
   return (
     <div style={{ width: "100%", padding: "1rem" }}>
-      <AgGridReact rowData={transformData} columnDefs={colDefs} domLayout="autoHeight" />
-      
-      <ProductDetailsPopup open={openDetails} handleClose={handleCloseDetails} product={selectedProduct} />
+      <AgGridReact
+        rowData={transformData}
+        columnDefs={colDefs}
+        domLayout="autoHeight"
+      />
+
+      <ProductDetailsPopup
+        open={openDetails}
+        handleClose={handleCloseDetails}
+        productId={selectedProduct}
+      />
 
       {/* Confirmation Modal for Deleting a Product */}
       <ConfirmationModal

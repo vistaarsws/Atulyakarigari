@@ -518,12 +518,15 @@ export default function ProductForm({
       }
 
       setSavedVariants([]);
+      setDetails([]);
       setFormData(initialState);
       setLoadingStates({
         ...loadingStates,
         addProduct: false,
         draftProduct: false,
       });
+
+      dispatch(fetchAllProducts());
       closeDialog();
     } catch (error) {
       setLoadingStates({
@@ -680,13 +683,12 @@ export default function ProductForm({
                 id="productQuantity"
                 label="Quantity"
                 type="number"
-                slotProps={{ min: 0 }}
                 variant="outlined"
                 value={formData.stock}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    stock: Math.max(1, parseInt(e.target.value) || 1),
+                    stock: Math.max(0, parseInt(e.target.value)),
                   })
                 }
               />

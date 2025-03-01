@@ -15,11 +15,11 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton as MuiIconButton,
   TextField,
   DialogActions,
   Button,
+  useControlled,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -32,9 +32,11 @@ import {
   deleteQuestion,
   answerQuestion,
 } from "../../../../services/admin/adminAPI";
+import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { fetchAllQuestions } from "../../../../Redux/features/ReviewAndQuestionSlice";
 import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
+// import { fetchAllQuestions } from "../../../../Redux/features/ReviewAndQuestionSlice";
+// import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 
 // TabPanel Component for managing Tab content
 function TabPanel({ value, index, children }) {
@@ -42,9 +44,9 @@ function TabPanel({ value, index, children }) {
 }
 
 // Main Product Details Popup
-export default function ProductDetailsPopup({ open, handleClose, product }) {
-  const theme = useTheme();
+export default function ProductDetailsPopup({ open, handleClose, productId }) {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -53,6 +55,10 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
   const [editedQuestion, setEditedQuestion] = useState("");
   const [editedAnswer, setEditedAnswer] = useState("");
 
+  const product = useSelector((state) => state.products.products).find(
+    (prod) => prod?._id == productId
+  );
+
   const editQuestionHandler = (qa) => {
     setSelectedQA(qa);
     setEditedQuestion(qa.question);
@@ -60,25 +66,26 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
     setQuestionOpen(true);
   };
 
-  if (!product) return null;
-  console.log("product", product);
-
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
   };
 
   const deleteRatingAndReviewHandler = async (id) => {
     try {
-      await deleteReviewAndRating(id);
-      dispatch(fetchAllProducts());
+      const res = await deleteReviewAndRating(id);
+      if (res.status === 200) {
+        dispatch(fetchAllProducts());
+      }
     } catch (error) {
       console.log(error);
     }
   };
   const deleteQuestionHandler = async (id) => {
     try {
-      await deleteQuestion({ questionId: id });
-      dispatch(fetchAllQuestions(product?._id));
+      const res = await deleteQuestion({ questionId: id });
+      if (res.status === 200) {
+        dispatch(fetchAllProducts());
+      }
     } catch (error) {
       console.error("Error deleting question:", error);
     }
@@ -86,9 +93,11 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
 
   const handleAnswerSave = async () => {
     try {
-      await answerQuestion(editedAnswer, selectedQA._id);
+      const res = await answerQuestion(editedAnswer, selectedQA?._id);
+      if (res.status === 200) {
+        dispatch(fetchAllProducts());
+      }
       setQuestionOpen(false);
-      dispatch(fetchAllProducts());
     } catch (error) {
       console.log(error);
       setQuestionOpen(false);
@@ -107,7 +116,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: 600, color: "#6f6f6f" }}>
-          {product.name}
+          {product?.name}
         </Typography>
         <Box>
           <IconButton onClick={handleClose} sx={{ color: "#6f6f6f" }}>
