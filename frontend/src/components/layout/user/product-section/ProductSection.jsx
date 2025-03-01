@@ -56,7 +56,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
     });
 
     // Fill with skeletons if fewer than 5 real products exist
-    const skeletons = [...Array(Math.max(0, 5 - realProducts.length))].map(
+    const skeletons = [...Array(Math.max(0, 6 - realProducts.length))].map(
       (_, index) => (
         <div className="skeletonCard" key={`skeleton-${index}`}>
           <div className="skeleton_image"></div>

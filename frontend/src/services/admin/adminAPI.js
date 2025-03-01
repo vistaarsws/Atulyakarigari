@@ -143,6 +143,16 @@ const deleteQuestion = async (id) => {
   return response;
 };
 
+const updateQuestionAndAnswer = async (id,questionAndAnswer) => {
+  const response = await apiConnector(
+    "PUT",
+    `${admin_endpoints.UPDATE_QUESTION}/${id}`,
+    questionAndAnswer
+  );
+
+  return response;
+};
+
 export {
   getCategory,
   createCategory,
@@ -157,5 +167,6 @@ export {
   getCategoryById,
   answerQuestion,
   deleteReviewAndRating,
-  deleteQuestion
+  deleteQuestion,
+  updateQuestionAndAnswer
 };

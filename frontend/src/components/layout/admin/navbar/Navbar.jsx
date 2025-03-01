@@ -221,7 +221,7 @@ export default function Navbar() {
 
         {/* Avatar and Admin Details */}
         <Avatar
-          alt="User Profile"
+          alt={fetchedData?.fullName}
           src={fetchedData?.profilePicture}
           sx={{ width: 56, height: 56, border: "2px solid #fff" }}
         />
@@ -238,6 +238,7 @@ export default function Navbar() {
             sx={{ fontSize: "1.6rem", fontWeight: "700", color: "#383737" }}
           >
             {fetchedData?.fullName}
+
           </Typography>
 
           <h2 style={{ margin: 0, fontSize: "1.3rem", color: "#6F6F6F" }}>

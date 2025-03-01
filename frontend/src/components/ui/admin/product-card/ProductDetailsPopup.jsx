@@ -17,6 +17,9 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton as MuiIconButton,
+  TextField,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -27,6 +30,7 @@ import ProductForm from "../../../layout/admin/product-form/ProductForm";
 import {
   deleteReviewAndRating,
   deleteQuestion,
+  updateQuestionAndAnswer,
 } from "../../../../services/admin/adminAPI";
 
 // TabPanel Component for managing Tab content
@@ -39,6 +43,23 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tabIndex, setTabIndex] = useState(0);
+
+  const [questionOpen, setQuestionOpen] = useState(false);
+  const [selectedQA, setSelectedQA] = useState(null);
+  const [editedQuestion, setEditedQuestion] = useState("");
+  const [editedAnswer, setEditedAnswer] = useState("");
+
+  const editQuestionHandler = (qa) => {
+    setSelectedQA(qa);
+    setEditedQuestion(qa.question);
+    setEditedAnswer(qa.answer);
+    setQuestionOpen(true);
+  };
+
+  const handleSave = () => {
+    updateQuestion(selectedQA._id, editedQuestion, editedAnswer);
+    setQuestionOpen(false);
+  };
 
   if (!product) return null;
   console.log("product", product);
@@ -57,6 +78,18 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
   const deleteQuestionHandler = async (id) => {
     try {
       await deleteQuestion(id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleQuestionSave = async () => {
+    try {
+      console.log("selec", selectedQA);
+      await updateQuestionAndAnswer(selectedQA._id, {
+        question: editedQuestion,
+        answer: editedAnswer,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -154,7 +187,12 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                     }
                   />
                   <ListItemSecondaryAction>
-                    <MuiIconButton size="small" color="primary" sx={{ mr: 1 }}>
+                    <MuiIconButton
+                      size="small"
+                      color="primary"
+                      sx={{ mr: 1 }}
+                      onClick={() => editQuestionHandler(qa)}
+                    >
                       <EditIcon />
                     </MuiIconButton>
                     <MuiIconButton
@@ -167,6 +205,39 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}
+              <Dialog
+                open={questionOpen}
+                onClose={() => setQuestionOpen(false)}
+              >
+                <DialogTitle>Edit Q&A</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    fullWidth
+                    label="Question"
+                    margin="dense"
+                    value={editedQuestion}
+                    onChange={(e) => setEditedQuestion(e.target.value)}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Answer"
+                    margin="dense"
+                    value={editedAnswer}
+                    onChange={(e) => setEditedAnswer(e.target.value)}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setQuestionOpen(false)}
+                    color="secondary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleQuestionSave} color="primary">
+                    Save
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </List>
           ) : (
             <Typography color="text.secondary">
