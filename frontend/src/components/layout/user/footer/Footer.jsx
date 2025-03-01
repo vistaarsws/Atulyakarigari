@@ -144,7 +144,10 @@ export default function Footer() {
                     icon: Instagram,
                     link: "https://www.instagram.com/atulyakarigariindia/",
                   },
-                  { icon: YouTube, link: "https://www.youtube.com" },
+                  {
+                    icon: YouTube,
+                    link: "https://www.youtube.com/@atulyakarigariindia4005",
+                  },
                 ].map(({ icon: Icon, link }, index) => (
                   <IconButton
                     key={index}
