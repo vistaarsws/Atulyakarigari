@@ -30,7 +30,7 @@ import ProductForm from "../../../layout/admin/product-form/ProductForm";
 import {
   deleteReviewAndRating,
   deleteQuestion,
-  updateQuestionAndAnswer,
+  answerQuestion
 } from "../../../../services/admin/adminAPI";
 
 // TabPanel Component for managing Tab content
@@ -77,19 +77,19 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
   };
   const deleteQuestionHandler = async (id) => {
     try {
-      await deleteQuestion(id);
+      await deleteQuestion({ questionId: id });
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting question:", error);
     }
   };
 
-  const handleQuestionSave = async () => {
+  const handleAnswerSave = async () => {
     try {
       console.log("selec", selectedQA);
-      await updateQuestionAndAnswer(selectedQA._id, {
-        question: editedQuestion,
-        answer: editedAnswer,
-      });
+      await answerQuestion( 
+        editedAnswer,
+        selectedQA._id,
+      );
     } catch (error) {
       console.log(error);
     }
@@ -217,7 +217,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                     margin="dense"
                     value={editedQuestion}
                     onChange={(e) => setEditedQuestion(e.target.value)}
-                  />
+                  />{editedQuestion}
                   <TextField
                     fullWidth
                     label="Answer"
@@ -233,7 +233,7 @@ export default function ProductDetailsPopup({ open, handleClose, product }) {
                   >
                     Cancel
                   </Button>
-                  <Button onClick={handleQuestionSave} color="primary">
+                  <Button onClick={handleAnswerSave} color="primary">
                     Save
                   </Button>
                 </DialogActions>

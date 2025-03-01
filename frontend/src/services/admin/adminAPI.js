@@ -113,11 +113,11 @@ const getCategoryById = async (id) => {
   return response;
 };
 
-const answerQuestion = async (answer, questionId, productId) => {
+const answerQuestion = async (answer, questionId) => {
   try {
     const response = await apiConnector(
       "PUT",
-      `${admin_endpoints.ANSWER_QUESTION}${productId}`,
+      admin_endpoints.ANSWER_QUESTION,
       { questionId, answer }
     );
     return response;
@@ -137,21 +137,13 @@ const deleteReviewAndRating = async (id) => {
 const deleteQuestion = async (id) => {
   const response = await apiConnector(
     "DELETE",
-    `${admin_endpoints.DELETE_QUESTION}/${id}`
+    admin_endpoints.DELETE_QUESTION,
+    id
   );
 
   return response;
 };
 
-const updateQuestionAndAnswer = async (id,questionAndAnswer) => {
-  const response = await apiConnector(
-    "PUT",
-    `${admin_endpoints.UPDATE_QUESTION}/${id}`,
-    questionAndAnswer
-  );
-
-  return response;
-};
 
 export {
   getCategory,
@@ -168,5 +160,4 @@ export {
   answerQuestion,
   deleteReviewAndRating,
   deleteQuestion,
-  updateQuestionAndAnswer
 };
