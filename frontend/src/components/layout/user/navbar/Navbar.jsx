@@ -19,8 +19,7 @@ import Logout from "@mui/icons-material/Logout";
 import { fetchCart } from "../../../../Redux/features/CartSlice";
 import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
 import { fetchProfile } from "../../../../Redux/features/ProfileSlice";
-import { fetchAllProducts } from "../../../../Redux/features/productSlice";
-import SearchIcon from "@mui/icons-material/Search";
+import { fetchAllProducts } from "../../../../Redux/features/ProductSlice.jsx";
 import CloseIcon from "@mui/icons-material/Close";
 import useDebounce from "../../../../hooks/useDebounce";
 
