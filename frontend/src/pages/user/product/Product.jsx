@@ -415,17 +415,16 @@ export default function Product() {
 
   const [deliveryEstimation, setDeliveryEstimation] = useState("");
   const [deliveryPincode, setDeliveryPincode] = useState("");
-  const handleServiceability = async (product) => {
-    console.log("product", product);
+  const handleServiceability = async () => {
     if (!deliveryPincode) {
       console.log("Delivery pincodes is required.");
       return;
     }
+    let productId = product._id;
     let delivery_postcode = deliveryPincode;
     let cod = false;
-    let weight = 0.5;
 
-    const response = await getServiceability(delivery_postcode, cod, weight);
+    const response = await getServiceability(productId, delivery_postcode, cod);
     setDeliveryEstimation(response);
   };
 
@@ -507,7 +506,7 @@ export default function Product() {
                   <div>
                     <button
                       type="button"
-                      onClick={() => handleServiceability(productId)}
+                      onClick={() => handleServiceability()}
                     >
                       Check
                     </button>

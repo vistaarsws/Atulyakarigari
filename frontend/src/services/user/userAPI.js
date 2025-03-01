@@ -232,9 +232,10 @@ const askQuestion = async (productId, question) => {
   }
 };
 
-const getServiceability = async (delivery_postcode, cod) => {
+const getServiceability = async (productId, delivery_postcode, cod) => {
   try {
     const payload = {
+      productId,
       delivery_postcode,
       cod,
     };
@@ -304,12 +305,12 @@ const cancelOrder = async (id) => {
     throw error;
   }
 };
-const createPayment = async (amount) => {
+const createPayment = async (payload) => {
   try {
     const response = await apiConnector(
       "POST",
       user_endpoints.CREATE_PAYMENT,
-      amount
+      payload
     );
 
     return response;
