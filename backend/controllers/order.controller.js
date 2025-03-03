@@ -13,60 +13,53 @@ export const createOrder = async (req, res) => {
     const { orderData, selectedAddressID, paymentOrderId } = req.body;
 
     const address = await Address.findOne({ _id: selectedAddressID, userId });
+    if (!address) {
+      return res.status(400).json({ error: "Invalid shipping address" });
+    }
+
     const payment = await Payment.findOne({ paymentOrderId, userId });
+    if (!payment || payment.status !== "COMPLETED") {
+      return res.status(400).json({ error: "Invalid or incomplete payment" });
+    }
 
-    if (!address) return res.status(400).json({ message: "Invalid address" });
-    if (!payment) return res.status(400).json({ message: "Invalid payment" });
+    const shippingCost = orderData.products.shippingCost || 0;
+    const totalAmount = orderData.products.total; 
+    const discountAmount = orderData.products.totalDiscount || 0;
 
-    const {
-      products,
-      totalMRP,
-      totalDiscount,
-      shippingCost = 0,
-      totalAmount,
-      shippingAddress,
-      billingAddress,
-      shippingMethod,
-      paymentMethod,
-      transactionId,
-      isPaid,
-      paidAt,
-      shiprocketOrderId,
-      trackingId,
-      courierName,
-      estimatedDelivery,
-      shippedAt,
-      deliveredAt,
-      cancelledAt,
-      notes,
-    } = orderData;
+    const shiprocketResponse = await createShiprocketOrder(orderData);
+    if (!shiprocketResponse || !shiprocketResponse.order_id) {
+      return res.status(500).json({ error: "Shiprocket order creation failed" });
+    }
 
     const newOrder = await Order.create({
       userId,
-      products: products.items,
-      totalMRP,
-      discountAmount: totalDiscount,
+      products: orderData.products.items,
+      totalMRP: orderData.products.totalMRP,
+      discountAmount,
       shippingCost,
+      donationAmount: orderData.products.donationAmount || 0,
       totalAmount,
-      shippingAddress,
-      billingAddress,
-      shippingMethod,
-      paymentMethod,
-      transactionId,
-      isPaid,
-      paidAt,
-      shiprocketOrderId,
-      trackingId,
-      courierName,
-      estimatedDelivery,
-      shippedAt,
-      deliveredAt,
-      cancelledAt,
-      notes,
+      orderStatus: "Processing",
+      shippingAddress: address, 
+      billingAddress: orderData.billingAddress || address,
+      shippingMethod: orderData.shippingMethod || "Standard",
+      paymentMethod: payment.paymentMethod,
+      transactionId: payment.transactionId,
+      isPaid: true,
+      paidAt: new Date(),
+      shiprocketOrderId: shiprocketResponse.order_id,
+      trackingId: shiprocketResponse.tracking_id || null,
+      courierName: shiprocketResponse.courier_name || null,
+      estimatedDelivery: shiprocketResponse.estimated_delivery_date || null,
+      shippedAt: null,
+      deliveredAt: null,
+      cancelledAt: null,
+      notes: orderData.notes || "",
     });
 
-    res.status(201).json(newOrder);
+    res.status(201).json({ success: true, order: newOrder });
   } catch (error) {
+    console.error("❌ Order Creation Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
