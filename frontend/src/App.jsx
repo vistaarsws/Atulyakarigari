@@ -42,6 +42,7 @@ import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
 import CustomerDetails from "./pages/admin/customers/CustomerDetails";
 import OrderCancel from "./pages/user/order/OrderCancel";
+import PaymentResponse from "./pages/user/place-order/PaymentResponse";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -56,6 +57,7 @@ const getRoutesConfig = () => ({
     { path: "/view-cart", element: <ViewCart /> },
     { path: "/place-order", element: <PlaceOrder /> },
     { path: "/order-status", element: <OrderStatus /> },
+    { path: "/payment-response", element: <PaymentResponse /> },
     { path: "/order-cancel", element: <OrderCancel /> },
     { path: "/login", element: <AuthTemplate page="login" /> },
     { path: "/signup", element: <AuthTemplate page="signup" /> },

@@ -14,11 +14,6 @@ import {
   deleteImageFromCloudinary,
   uploadImageToCloudinary,
 } from "../utils/image-uploder/index.js";
-import {
-  addProductToShiprocket,
-  getAllProductsShipRocket,
-} from "../utils/shiprocket-service/shiprocket.js";
-
 const calculateDiscountedPrice = (price, discountPercentage) => {
   return price * (1 - discountPercentage / 100);
 };
@@ -249,9 +244,6 @@ export const createProduct = async (req, res) => {
         { session, new: true }
       );
     }
-
-    // Add product to Shiprocket
-    await addProductToShiprocket(productData);
 
     // Commit transaction
     await session.commitTransaction();

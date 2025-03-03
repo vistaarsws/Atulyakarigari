@@ -39,23 +39,61 @@ const Payment = ({ orderData }) => {
     ? orderData?.products?.total + (selectedDonation || 0) || 0
     : orderData?.products?.total || 0;
 
+  const generatePaymentOrderId = () => {
+    const datePart = new Date()
+      .toISOString()
+      .replace(/[-T:.Z]/g, "")
+      .slice(0, 14); // YYYYMMDDHHMMSS
+    const randomPart = Math.floor(100000 + Math.random() * 900000); // Ensures a 6-digit random number
+    return `ORD-${datePart}-${randomPart}`;
+  };
+
   const handlePayment = async () => {
     try {
-      const amount = "1";
-      const { data } = await createPayment(amount);
-      console.log("data", data);
-      
-
-      if (data.success) {
-        window.location.href = data.paymentUrl;
-      } else {
-        alert("Payment initiation failed");
+      if (!orderData || !orderData.products || !orderData.products.total) {
+        alert("Cart data is missing or invalid!");
+        return;
       }
+
+      const paymentOrderId = generatePaymentOrderId();
+      const amount = parseFloat(orderData.products.total); // Ensure amount is a number
+
+      if (isNaN(amount) || amount <= 0) {
+        alert("Invalid payment amount!");
+        return;
+      }
+
+      const payload = {
+        paymentOrderId: paymentOrderId,
+        amount: amount, // Ensure amount is valid
+      };
+      // Make API request
+      const {response} = await createPayment(payload);
+      console.log("Initiating payment with:", response.data);
+
+
+      // if (response.data) {
+      //   window.location.href = response.data.paymentUrl;
+      //   // The response contains the payment form
+      //   document.body.innerHTML = response.data.data; // Load the form & auto-submit
+      // }
+
+      // if (!response || !response.data) {
+      //   alert("Error: No response from payment server");
+      //   return;
+      // }
+
+      // if (response.data.success && response.data.paymentUrl) {
+      //   window.location.href = response.data.paymentUrl; // Redirect to CCAvenue
+      // } else {
+      //   alert("Payment initiation failed. Please try again.");
+      // }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error initiating payment");
+      console.error("Payment Error:", error);
+      alert("Error initiating payment. Please try again.");
     }
   };
+
   return (
     <Box
       sx={{

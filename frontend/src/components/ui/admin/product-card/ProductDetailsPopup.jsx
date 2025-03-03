@@ -284,11 +284,9 @@ export default function ProductDetailsPopup({ open, handleClose, productId }) {
                     },
 
                     bgcolor: "background.paper",
-                    borderRadius: 1,
-                    boxShadow: 1,
+
                     p: 2,
                     mb: 2,
-                    "&:hover": { boxShadow: 3 },
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>

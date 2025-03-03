@@ -16,6 +16,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { removeFromTheCart } from "../../../Redux/features/CartSlice";
+import { useState } from "react";
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
   palette: {
@@ -91,9 +92,11 @@ const ProductCard = ({ product }) => {
   const handleCardClick = () => {
     navigate(`/product/${product.productId}`);
   };
+
+  const [productQuantity, setProductQuantity] = useState(1);
   return (
-    <StyledCard sx={{ marginTop:"5vh" }}>
-      <Box sx={{ height: "100%"}}>
+    <StyledCard sx={{ marginTop: "5vh" }}>
+      <Box sx={{ height: "100%" }}>
         <ProductImageWrapper
           sx={{
             width: { xs: "100px", sm: "250px" },
@@ -184,15 +187,31 @@ const ProductCard = ({ product }) => {
             >
               ₹{product?.price?.toLocaleString()}
             </Typography>
-            <QuantityContainer
-              sx={{
-                borderRadius: "0.5rem",
-              }}
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap={1}
+              sx={{ borderRadius: "0.5rem" }}
             >
-              <QuantityButton>-</QuantityButton>
-              <Typography>{product?.quantity}</Typography>
-              <QuantityButton>+</QuantityButton>
-            </QuantityContainer>
+              <Button
+                variant="contained"
+                onClick={() =>
+                  productQuantity > 1 && setProductQuantity(productQuantity - 1)
+                }
+              >
+                -
+              </Button>
+
+              <Typography>{productQuantity}</Typography>
+
+              <Button
+                variant="contained"
+                onClick={() => setProductQuantity(productQuantity + 1)}
+              >
+                +
+              </Button>
+            </Box>
           </Box>
           <Box>
             <Typography
@@ -221,33 +240,6 @@ const ProductCard = ({ product }) => {
                 mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
               }}
             >
-              <CheckIcon
-                color="success"
-                sx={{ fontSize: 18, margin: "0.2rem 0" }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  ml: useMediaQuery("(max-width: 458px)") ? "0.2rem" : 1,
-                  color: "#6F6F6F",
-                  fontSize: useMediaQuery("(max-width: 330px)")
-                    ? "10px"
-                    : "12px",
-                  fontWeight: 400,
-                }}
-              >
-                Delivery Between{" "}
-                <span
-                  style={{
-                    fontWeight: 900,
-                    color: "rgb(56, 55, 55)",
-                    lineHeight: "21px",
-                    fontSize: "12px",
-                  }}
-                >
-                  5 Oct - 7 Oct
-                </span>
-              </Typography>
             </Box>
           </Box>
         </Box>
