@@ -81,6 +81,7 @@ export const createProduct = async (req, res) => {
       subcategory,
       _attributes,
       sku,
+      expectedReturnDate,
       weight,
       length,
       width,
@@ -104,6 +105,7 @@ export const createProduct = async (req, res) => {
       !price ||
       !category ||
       !sku ||
+      !expectedReturnDate ||
       !weight ||
       !length ||
       !width ||
@@ -204,6 +206,7 @@ export const createProduct = async (req, res) => {
       category,
       subcategory: subcategory || null,
       sku,
+      expectedReturnDate,
       weight,
       length,
       width,
@@ -323,6 +326,7 @@ export const updateProduct = async (req, res) => {
     const {
       name,
       sku,
+      expectedReturnDate,
       weight,
       length,
       width,
@@ -443,6 +447,8 @@ export const updateProduct = async (req, res) => {
       category: category || existingProduct.category,
       subcategory: subcategory || existingProduct.subcategory,
       sku: sku || existingProduct.sku,
+      expectedReturnDate:
+        expectedReturnDate || existingProduct.expectedReturnDate,
       weight: weight || existingProduct.weight,
       length: length || existingProduct.length,
       width: width || existingProduct.width,
