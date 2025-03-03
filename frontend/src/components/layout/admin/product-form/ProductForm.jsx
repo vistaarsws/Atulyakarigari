@@ -59,7 +59,7 @@ export default function ProductForm({
     name: productDetails?.name || "",
     productImage: productDetails?.images || [],
     // description: productDetails?.description || "",
-    detailDescription: productDetails?.detailDescription || [],
+    _detailDescription: productDetails?.detailDescription || [],
     price: productDetails?.price || "",
     category: productDetails?.category || null,
     subcategory: productDetails?.subcategory || "",
@@ -118,7 +118,7 @@ export default function ProductForm({
     setDetails(newDetails);
     setFormData((prev) => ({
       ...prev,
-      detailDescription: newDetails, // Ensure formData updates correctly
+      _detailDescription: newDetails, // Ensure formData updates correctly
     }));
   };
 
@@ -128,7 +128,7 @@ export default function ProductForm({
     setDetails(updatedDetails);
     setFormData((prev) => ({
       ...prev,
-      detailDescription: updatedDetails, // Update formData with new details
+      _detailDescription: updatedDetails, // Update formData with new details
     }));
   };
 
@@ -139,7 +139,7 @@ export default function ProductForm({
       setDetails(updatedDetails);
       setFormData((prev) => ({
         ...prev,
-        detailDescription: updatedDetails,
+        _detailDescription: updatedDetails,
       }));
     }
   };
@@ -148,7 +148,7 @@ export default function ProductForm({
     name: "",
     productImage: [],
     description: "",
-    detailDescription: [],
+    _detailDescription: [],
     price: "",
     category: null,
     subcategory: "",
@@ -435,11 +435,11 @@ export default function ProductForm({
         );
       }
 
-      if (formData.detailDescription) {
-        // setFormData({ ...formData, detailDescription: details });
+      if (formData._detailDescription) {
+        // setFormData({ ...formData, _detailDescription: details });
         formDataInstance.append(
-          "detailDescription",
-          JSON.stringify([...formData?.detailDescription])
+          "_detailDescription",
+          JSON.stringify([...formData?._detailDescription])
         );
       }
 
@@ -1136,7 +1136,7 @@ export default function ProductForm({
                 Detail Description
               </Typography>
 
-              {formData.detailDescription?.map((item, index) => (
+              {formData._detailDescription?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"
@@ -1181,7 +1181,7 @@ export default function ProductForm({
                 {/* <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSaveDetailDescription}
+                  onClick={handleSave_detailDescription}
                 >
                   Save Data
                 </Button> */}
