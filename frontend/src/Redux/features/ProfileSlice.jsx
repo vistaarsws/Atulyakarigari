@@ -1,7 +1,22 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getProfile, updateProfile } from "../../services/user/userAPI";
+import { getAllProfiles } from "../../services/admin/adminAPI";
 import { jwtDecode } from "jwt-decode";
 
+// **Fetch All Profiles Thunk**
+export const fetchAllProfiles = createAsyncThunk(
+  "profile/fetchAllProfiles",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAllProfiles();
+      return Object.values(response?.data?.data); // Ensure response structure is correct
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// **Fetch User Profile Thunk**
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (authToken, { rejectWithValue }) => {
@@ -39,6 +54,7 @@ export const updateProfileThunk = createAsyncThunk(
 
 const initialState = {
   profile: {},
+  profiles: [],
   loading: false,
   error: null,
 };
@@ -73,6 +89,20 @@ const profileSlice = createSlice({
       .addCase(updateProfileThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to update profile";
+      })
+
+      // **Fetch All Profiles Cases (Admin)**
+      .addCase(fetchAllProfiles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllProfiles.fulfilled, (state, action) => {
+        state.profiles = action.payload; // Store fetched profiles
+        state.loading = false;
+      })
+      .addCase(fetchAllProfiles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch profiles";
       });
   },
 });

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllProfiles } from "../../../Redux/features/ProfileSlice.jsx";
 import {
   Box,
   Tabs,
@@ -13,93 +15,55 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  Grid,
   Avatar,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Pagination,
+  IconButton,
+  CircularProgress,
+  Stack,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomerDetails from "./CustomerDetails";
 
-// State and city data for India
-const stateCityData = {
-  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati"],
-  Bihar: ["Patna", "Gaya", "Muzaffarpur"],
-  "Madhya Pradesh": ["Bhopal", "Indore", "Jabalpur", "Gwalior"],
-  Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik"],
-  "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi", "Agra"],
-  "West Bengal": ["Kolkata", "Durgapur", "Siliguri"],
-};
-
-// Sample Customers Data
-const customers = [
-  {
-    id: "ORD12345",
-    name: "Aditi Kumari Singh",
-    phone: "+91 8175961513",
-    email: "aditisingh@gmail.com",
-    state: "Madhya Pradesh",
-    city: "Bhopal",
-    stock: "Active",
-    lastOrder: "02 Oct 2024",
-    invoice: "12,000",
-    buys: "06",
-    category: "Handloom",
-    payment: "₹72,000", // New field
-    orders: [ // New field
-      { id: "O-23456", payment: "₹10,000", status: "Shipped", ratings: 4.5 },
-      { id: "O-23457", payment: "₹2,000", status: "Pending", ratings: 4.0 },
-    ],
-  },
-  {
-    id: "ORD12346",
-    name: "Rohan Mehra",
-    phone: "+91 9876543210",
-    email: "rohanmehra@gmail.com",
-    state: "Maharashtra",
-    city: "Mumbai",
-    stock: "Inactive",
-    lastOrder: "05 Nov 2024",
-    invoice: "15,000",
-    buys: "10",
-    category: "Jewellery",
-    payment: "₹95,000",
-    orders: [
-      { id: "O-76543", payment: "₹15,000", status: "Cancelled", ratings: 3.5 },
-      { id: "O-76544", payment: "₹8,000", status: "Returned", ratings: 4.2 },
-    ],
-  },
-];
-
-
 export default function Customers() {
-  const [value, setValue] = useState(0);
-  const [category, setCategory] = useState("");
-  const [search, setSearch] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const dispatch = useDispatch();
 
-  // Filter function: Matches any field with search input
+  // Redux state
+  const loading = useSelector((state) => state.profile.loading);
+  const customers = useSelector((state) => state.profile.profiles) || []; // Ensure it's always an array
+
+  // Local state
+  const [search, setSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [tabValue, setTabValue] = useState(0); // 0 = All Customers, 1 = New Customers
+
+  // Fetch profiles when component mounts
+  useEffect(() => {
+    dispatch(fetchAllProfiles());
+  }, [dispatch]);
+
+  // Get the date 7 days ago
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  // Filter customers based on the selected tab
   const filteredCustomers = customers.filter((customer) => {
-   
-    const searchText = search.toLowerCase();
-    return (
-      (!category || customer.category === category) &&
-      (!state || customer.state === state) &&
-      (!city || customer.city === city) &&
-      (!search ||
-        customer.name.toLowerCase().includes(searchText) ||
-        customer.email.toLowerCase().includes(searchText) ||
-        customer.phone.includes(searchText) ||
-        customer.state.toLowerCase().includes(searchText) ||
-        customer.city.toLowerCase().includes(searchText) ||
-        customer.invoice.includes(searchText) ||
-        customer.lastOrder.includes(searchText))
-    );
+    const name = customer?.fullName?.toLowerCase() || "";
+    const email = customer?.email?.toLowerCase() || "";
+    const phone = customer?.contactNumber?.toString() || ""; // Convert phone number to string
+    const matchesSearch =
+      name.includes(search.toLowerCase()) ||
+      email.includes(search.toLowerCase()) ||
+      phone.includes(search);
+
+    if (tabValue === 1) {
+      // New Customers - created within the last 7 days
+      const createdAt = customer?.createdAt
+        ? new Date(customer.createdAt)
+        : null;
+      return createdAt && createdAt >= sevenDaysAgo && matchesSearch;
+    }
+
+    return matchesSearch;
   });
 
   return selectedCustomer ? (
@@ -109,139 +73,111 @@ export default function Customers() {
     />
   ) : (
     <Box sx={{ p: 3, bgcolor: "#FAF9FF", minHeight: "100vh" }}>
-      <Typography variant="h6" fontWeight="bold">
-        Customers
-      </Typography>
+      {/* Header with Total Customers Count */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Box
+          sx={{
+            bgcolor: "#F0F4FF",
+            color: "#1E40AF",
+            fontWeight: "bold",
+            px: 2,
+            py: 1,
+            borderRadius: "8px",
+            fontSize: "14px",
+          }}
+        >
+          Total Customers: {filteredCustomers.length}
+        </Box>
+      </Stack>
 
+      {/* Tabs */}
       <Tabs
-        value={value}
-        onChange={(e, newValue) => setValue(newValue)}
+        value={tabValue}
+        onChange={(e, newValue) => setTabValue(newValue)}
         sx={{ mt: 2 }}
       >
-        <Tab label="All (4621)" />
-        <Tab label="New (421)" />
+        <Tab label="All Customers" />
+        <Tab label="New Customers" />
       </Tabs>
 
-      {/* Filters */}
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {/* Category Dropdown */}
-        <Grid item>
-          <FormControl sx={{ width: 200, bgcolor: "white" }}>
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <MenuItem value="">Select Category</MenuItem>
-              <MenuItem value="Handloom">Handloom</MenuItem>
-              <MenuItem value="Handicraft">Handicraft</MenuItem>
-              <MenuItem value="Jewellery">Jewellery</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-
-        {/* State Dropdown */}
-        <Grid item>
-          <FormControl sx={{ width: 200, bgcolor: "white" }}>
-            <InputLabel>State</InputLabel>
-            <Select
-              value={state}
-              onChange={(e) => {
-                setState(e.target.value);
-                setCity(""); // Reset city when state changes
-              }}
-            >
-              <MenuItem value="">Select State</MenuItem>
-              {Object.keys(stateCityData).map((stateName) => (
-                <MenuItem key={stateName} value={stateName}>
-                  {stateName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        {/* City Dropdown */}
-        <Grid item>
-          <FormControl sx={{ width: 200, bgcolor: "white" }} disabled={!state}>
-            <InputLabel>City</InputLabel>
-            <Select value={city} onChange={(e) => setCity(e.target.value)}>
-              <MenuItem value="">Select City</MenuItem>
-              {state &&
-                stateCityData[state].map((cityName) => (
-                  <MenuItem key={cityName} value={cityName}>
-                    {cityName}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        {/* Search Input */}
-        <Grid item xs={12} md={4}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search by any field..."
-            size="small"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Grid>
-      </Grid>
+      {/* Search Input */}
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search by name, email, or phone..."
+        size="small"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+        sx={{ mt: 2 }}
+      />
 
       {/* Table */}
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Table>
-          <TableHead sx={{ bgcolor: "#F7F5FF" }}>
-            <TableRow>
-              <TableCell>CUSTOMER</TableCell>
-              <TableCell>PHONE</TableCell>
-              <TableCell>EMAIL</TableCell>
-              <TableCell>STATE</TableCell>
-              <TableCell>CITY</TableCell>
-              <TableCell>CATEGORY</TableCell>
-              <TableCell>LAST ORDER</TableCell>
-              <TableCell>INVOICE</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredCustomers.map((customer) => (
-              <TableRow
-                key={customer.id}
-                sx={{ cursor: "pointer" }}
-                onClick={() => setSelectedCustomer(customer)} // Moved onClick here
-              >
-                <TableCell>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Avatar src="https://i.pravatar.cc/40" />
-                    {customer.name}
-                  </Box>
-                </TableCell>
-                <TableCell>{customer.phone}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.state}</TableCell>
-                <TableCell>{customer.city}</TableCell>
-                <TableCell>{customer.category}</TableCell>
-                <TableCell>{customer.lastOrder}</TableCell>
-                <TableCell>{customer.invoice}</TableCell>
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <TableContainer component={Paper} sx={{ mt: 2 }}>
+          <Table>
+            <TableHead sx={{ bgcolor: "#F7F5FF" }}>
+              <TableRow>
+                <TableCell>CUSTOMER</TableCell>
+                <TableCell>PHONE</TableCell>
+                <TableCell>EMAIL</TableCell>
+                <TableCell>CREATED AT</TableCell>
+                <TableCell>VIEW</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Pagination */}
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-        <Pagination count={3} color="primary" />
-      </Box>
+            </TableHead>
+            <TableBody>
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer, index) => (
+                  <TableRow key={customer?.id || customer?.email || index}>
+                    <TableCell>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Avatar
+                          src={
+                            customer?.profilePicture ||
+                            "https://i.pravatar.cc/40"
+                          }
+                        />
+                        {customer?.fullName || "Unknown"}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{customer?.contactNumber || "N/A"}</TableCell>
+                    <TableCell>{customer?.email || "N/A"}</TableCell>
+                    <TableCell>
+                      {customer?.createdAt
+                        ? new Date(customer.createdAt).toLocaleDateString()
+                        : "Unknown"}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        onClick={() => setSelectedCustomer(customer)}
+                        color="primary"
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    No customers found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </Box>
   );
 }

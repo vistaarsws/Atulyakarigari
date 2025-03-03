@@ -29,6 +29,8 @@ export const admin_endpoints = {
   GET_ALL_QUESTION: BASE_URL + "/api/v1/questions",
 
   DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
+
+  GET_ALL_PROFILE: BASE_URL + "/api/v1/profile/getAll",
 };
 
 export const user_endpoints = {
