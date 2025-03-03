@@ -12,20 +12,42 @@ export const createOrder = async (req, res) => {
     const userId = req.user._id;
     const { orderData, selectedAddressID, paymentOrderId } = req.body;
 
-    const addresses = await Address.find({ _id: selectedAddressID, userId });
-    const Payments = await Payment.find({ paymentOrderId, userId });
+    const address = await Address.findOne({ _id: selectedAddressID, userId });
+    const payment = await Payment.findOne({ paymentOrderId, userId });
 
-    const order = await createShiprocketOrder(orderData);
+    if (!address) return res.status(400).json({ message: "Invalid address" });
+    if (!payment) return res.status(400).json({ message: "Invalid payment" });
+
+    const {
+      products,
+      totalMRP,
+      totalDiscount,
+      shippingCost = 0,
+      totalAmount,
+      shippingAddress,
+      billingAddress,
+      shippingMethod,
+      paymentMethod,
+      transactionId,
+      isPaid,
+      paidAt,
+      shiprocketOrderId,
+      trackingId,
+      courierName,
+      estimatedDelivery,
+      shippedAt,
+      deliveredAt,
+      cancelledAt,
+      notes,
+    } = orderData;
 
     const newOrder = await Order.create({
-      userId: userId,
-      products: orderData.products.items,
-      totalMRP: orderData.products.totalMRP,
-      discountAmount: orderData.products.totalDiscount,
+      userId,
+      products: products.items,
+      totalMRP,
+      discountAmount: totalDiscount,
       shippingCost,
-      donationAmount: orderData.products.total,
       totalAmount,
-      orderStatus,
       shippingAddress,
       billingAddress,
       shippingMethod,
@@ -63,7 +85,10 @@ export const getAllOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
   try {
-    const order = await getShiprocketOrderDetails(res.params.id);
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
+
+    const order = await Order.findById(id);
 
     if (!order) return handleOrderNotFound(res);
 
@@ -73,13 +98,14 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-export const returnorder = async (req, res) => {
+export const returnOrder = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { id, status } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
 
     const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
+      id,
+      { orderStatus: status },
       { new: true }
     );
 
@@ -93,7 +119,10 @@ export const returnorder = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
-    const deletedOrder = await Order.findByIdAndDelete(req.params.id);
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
+
+    const deletedOrder = await Order.findByIdAndDelete(id);
 
     if (!deletedOrder) return handleOrderNotFound(res);
 
