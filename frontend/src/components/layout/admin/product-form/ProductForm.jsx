@@ -113,7 +113,7 @@ export default function ProductForm({
   const handleChange = (index, field, value) => {
     setFormData((prev) => ({
       ...prev,
-      _detailDescription: prev.detailDescription.map((item, i) =>
+      _detailDescription: prev._detailDescription.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       ),
     }));
@@ -124,7 +124,7 @@ export default function ProductForm({
     setFormData((prev) => ({
       ...prev,
       _detailDescription: [
-        ...prev.detailDescription,
+        ...prev._detailDescription,
         { title: "", description: "" },
       ],
     }));
@@ -132,10 +132,12 @@ export default function ProductForm({
 
   // Remove a specific entry
   const removeField = (index) => {
-    if (formData.detailDescription.length > 0) {
+    if (formData._detailDescription.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        _detailDescription: prev.detailDescription.filter((_, i) => i !== index),
+        _detailDescription: prev._detailDescription.filter(
+          (_, i) => i !== index
+        ),
       }));
     }
   };
@@ -433,12 +435,8 @@ export default function ProductForm({
       }
 
       if (formData._detailDescription?.length) {
-        console.log(
-          "Detail Description before sending:",
-          formData._detailDescription
-        );
         formDataInstance.append(
-          "detailDescription",
+          "_detailDescription",
           JSON.stringify(formData._detailDescription) // No unnecessary spread operator
         );
       }
@@ -532,7 +530,7 @@ export default function ProductForm({
     if (productDetails?.detailDescription?.length) {
       setFormData((prev) => ({
         ...prev,
-        detailDescription: [...productDetails.detailDescription], // Ensuring a new reference
+        _detailDescription: [...productDetails.detailDescription], // Ensuring a new reference
       }));
     }
   }, [productDetails]);
