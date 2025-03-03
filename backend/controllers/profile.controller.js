@@ -186,3 +186,19 @@ export const getProfile = async (req, res) => {
     return internalServerError(req, res, error, "Error fetching profile");
   }
 };
+
+export const getAllProfiles = async (req, res) => {
+  try {
+    // Fetch all profiles from the database
+    const profiles = await Profile.find();
+
+    if (!profiles || profiles.length === 0) {
+      return notFoundRequest(req, res, null, "No profiles found");
+    }
+
+    return success(req, res, "Profiles fetched successfully", profiles);
+  } catch (error) {
+    console.error("Error fetching profiles:", error);
+    return internalServerError(req, res, error, "Error fetching profiles");
+  }
+};

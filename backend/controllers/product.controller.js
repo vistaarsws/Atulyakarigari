@@ -75,7 +75,7 @@ export const createProduct = async (req, res) => {
     // Destructure and validate input
     const {
       name,
-      detailDescription,
+      _detailDescription,
       price,
       category,
       subcategory,
@@ -110,7 +110,7 @@ export const createProduct = async (req, res) => {
       !height ||
       !stock ||
       !status ||
-      !detailDescription ||
+      !_detailDescription ||
       !_attributes ||
       !discountPercentage
       //  || !artisanName || !artisanAbout
@@ -119,7 +119,12 @@ export const createProduct = async (req, res) => {
     }
     const attributes = JSON.parse(_attributes);
 
-    const _detailDescription = JSON.parse(detailDescription);
+    if (!_detailDescription || _detailDescription.trim() === "") {
+      return badRequest(req, res, null, "Detail description is required");
+  }
+  
+  const detailDescription = JSON.parse(_detailDescription);
+  
     if (!attributes || !Array.isArray(attributes)) {
       return badRequest(req, res, null, "Invalid Attributes");
     }
@@ -194,7 +199,7 @@ export const createProduct = async (req, res) => {
     //  product data
     const productData = {
       name: name.trim(),
-      _detailDescription,
+      detailDescription,
       price,
       category,
       subcategory: subcategory || null,
