@@ -17,6 +17,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { useEffect, useState } from "react";
 
 // ViewCategoriesDialog Component
 const ViewCategoriesDialog = ({
@@ -472,31 +473,33 @@ const ViewSubCategoryDialog = ({
 
 /* Dialog for Add/Edit Variant */
 const AddEditVariantDialog = ({
-  isVariantDialogOpen,
-  handleCloseDialog,
-  handleSave,
-  isEditing,
-  variantOption,
-  setVariantOption,
-  currentVariantValue,
-  setCurrentVariantValue,
+  isOpen,
+  onClose,
+  onSave,
+  variant,
+  setVariant,
   variantValues,
-  setVariantValues,
-  handleAddValue,
-  handleDeleteValue,
+  onAddValue,
+  onDeleteValue,
 }) => {
+  // Local state for variant key
+  const [localVariantKey, setLocalVariantKey] = useState(variant?.key || "");
+  // Local state for variant value input
+  const [inputValue, setInputValue] = useState("");
+  console.log("variant", variant);
+
+  // Sync local key when dialog opens
+  useEffect(() => {
+    setLocalVariantKey(variant?.key || "");
+  }, [variant]);
+
   return (
-    <Dialog
-      open={isVariantDialogOpen}
-      onClose={handleCloseDialog}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {isEditing ? "Edit Product Variant" : "Add Product Variant"}
+        {variant ? "Edit Product Variant" : "Add Product Variant"}
         <IconButton
           aria-label="close"
-          onClick={handleCloseDialog}
+          onClick={onClose}
           sx={{
             position: "absolute",
             right: "1.6rem",
@@ -509,16 +512,22 @@ const AddEditVariantDialog = ({
       </DialogTitle>
 
       <DialogContent>
+        {/* Variant Option Input */}
         <TextField
           autoFocus
           margin="dense"
           label="Variant Option (e.g., Size)"
           fullWidth
-          value={variantOption}
-          onChange={(e) => setVariantOption(e.target.value)}
+          value={localVariantKey}
+          onChange={(e) => {
+            const updatedKey = e.target.value;
+            setLocalVariantKey(updatedKey);
+            setVariant((prev) => ({ ...prev, key: updatedKey })); // ✅ Update parent state immediately
+          }}
           sx={{ marginBottom: 2 }}
         />
 
+        {/* Variant Value Input */}
         <Box
           sx={{
             display: "grid",
@@ -527,45 +536,39 @@ const AddEditVariantDialog = ({
             marginBottom: 2,
           }}
         >
-          <div>
-            <TextField
-              label="Variant Value"
-              value={currentVariantValue}
-              onChange={(e) => setCurrentVariantValue(e.target.value)}
-              sx={{ width: "100%" }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleAddValue();
-                }
-              }}
-            />
-          </div>
-          <div>
-            <Button
-              sx={{
-                width: "100%",
-                height: "100%",
-              }}
-              variant="outlined"
-              onClick={handleAddValue}
-              disabled={!currentVariantValue.trim()}
-            >
-              Add Value
-            </Button>
-          </div>
+          <TextField
+            label="Variant Value"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            sx={{ width: "100%" }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && inputValue.trim()) {
+                onAddValue(inputValue);
+                setInputValue("");
+              }
+            }}
+          />
+          <Button
+            sx={{ width: "100%", height: "100%" }}
+            variant="outlined"
+            onClick={() => {
+              onAddValue(inputValue);
+              setInputValue("");
+            }}
+            disabled={!inputValue.trim()}
+          >
+            Add Value
+          </Button>
         </Box>
 
-        {/* Display added values as chips */}
+        {/* Display Added Values as Chips */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-          {variantValues?.map((value, index) => (
+          {variantValues.map((value, index) => (
             <Chip
               key={index}
               label={value}
-              onDelete={() => handleDeleteValue(value)}
-              sx={{
-                userSelect: "text", // Allows text selection
-                cursor: "text", // Changes cursor to text selection mode
-              }}
+              onDelete={() => onDeleteValue(value)}
+              sx={{ userSelect: "text", cursor: "text" }}
             />
           ))}
         </Box>
@@ -573,27 +576,27 @@ const AddEditVariantDialog = ({
 
       <DialogActions>
         <Button
-          onClick={handleCloseDialog}
-          sx={{
-            lineHeight: "normal",
-            padding: "1rem 2rem",
-          }}
+          onClick={onClose}
           color="error"
           variant="outlined"
+          sx={{ lineHeight: "normal", padding: "1rem 2rem" }}
         >
           Cancel
         </Button>
         <Button
-          onClick={handleSave}
+          onClick={() => {
+            setVariant((prev) => ({ ...prev, key: localVariantKey })); // Ensure key updates before saving
+            onSave();
+          }}
           variant="contained"
           sx={{
             backgroundColor: "#5f3dc3",
             lineHeight: "normal",
             padding: "1rem 2rem",
           }}
-          disabled={!variantOption || variantValues?.length === 0}
+          disabled={!localVariantKey.trim() || variantValues.length === 0}
         >
-          {isEditing ? "Update Variant" : "Save Variant"}
+          {variant ? "Update Variant" : "Save Variant"}
         </Button>
       </DialogActions>
     </Dialog>

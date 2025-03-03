@@ -26,6 +26,7 @@ export const admin_endpoints = {
   ANSWER_QUESTION: BASE_URL + "/api/v1/questions/answer",
   DELETE_QUESTION: BASE_URL + "/api/v1/questions/delete",
   UPDATE_QUESTION: BASE_URL + "/api/questions/edit",
+  GET_ALL_QUESTION: BASE_URL + "/api/v1/questions",
 
   DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
 };
@@ -70,4 +71,5 @@ export const user_endpoints = {
   GET_ORDER_BY_ID: BASE_URL + "/api/v1/orders/getOrder",
   RETURN_ORDER: BASE_URL + "/api/v1/orders/return",
   CANCEL_ORDER: BASE_URL + "/api/v1/orders/cancel",
+  
 };

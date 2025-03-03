@@ -86,16 +86,9 @@ export default function ProductForm({
     draftProduct: false,
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  // const [dialogState, setDialogState] = useState({});
   const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
-  const [variantOption, setVariantOption] = useState("");
   const [variantValues, setVariantValues] = useState([]);
-  const [currentVariantValue, setCurrentVariantValue] = useState("");
-  const [savedVariants, setSavedVariants] = useState(() =>
-    productDetails ? productDetails.attributes : []
-  );
-  const [variantToEdit, setVariantToEdit] = useState(null);
+  const [variantToEdit, setVariantToEdit] = useState("");
 
   const [categoryName, setCategoryName] = useState("");
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
@@ -115,11 +108,8 @@ export default function ProductForm({
 
   const [parentCategory, setParentCategory] = useState("");
   const [details, setDetails] = useState(() =>
-    productDetails
-      ? productDetails.detailDescription
-      : [{ title: "", description: "" }]
+    productDetails ? productDetails.detailDescription : []
   );
-  const [savedData, setSavedData] = useState([]);
 
   // Handle input changes
   const handleChange = (index, field, value) => {
@@ -154,12 +144,6 @@ export default function ProductForm({
     }
   };
 
-  // // Save Data to State
-  // const handleSaveDetailDescription = () => {
-  //   setDetails(details);
-  //   console.log("Saved Data:", details);
-  // };
-
   const initialState = {
     name: "",
     productImage: [],
@@ -184,83 +168,76 @@ export default function ProductForm({
 
   const handleOpenDialog = (variant = null) => {
     if (variant) {
-      // Editing mode: Populate fields with variant data
-      setVariantOption(variant.key);
+      // 🔥 Editing an existing variant
+      setVariantToEdit({
+        originalKey: variant.key, // ✅ Store original key for updates
+        key: variant.key, // Editable key
+      });
       setVariantValues(variant.value);
-      setIsEditing(true);
-      setVariantToEdit(variant.key);
     } else {
-      // Adding mode: Reset fields
-      setVariantOption("");
+      // 🔥 Adding a new variant
+      setVariantToEdit({ originalKey: null, key: "" }); // ✅ Ensure originalKey is null for new variants
       setVariantValues([]);
-      setIsEditing(false);
-      setVariantToEdit(null);
     }
+
     setIsVariantDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
-    // Reset all states and close dialog
-    setVariantOption("");
-    setVariantValues([]);
-    setCurrentVariantValue("");
-    setIsEditing(false);
-    setVariantToEdit(null);
-    setIsVariantDialogOpen(false);
+    setVariantToEdit(null); // Resets variant key and values
+    setVariantValues([]); // Clears variant values
+    setIsVariantDialogOpen(false); // Closes the dialog
   };
 
   // Add a new value to the variants
-  const handleAddValue = () => {
-    const trimmedValue = currentVariantValue.trim();
+  const handleAddValue = (value) => {
+    const trimmedValue = value.trim();
 
-    if (trimmedValue && !variantValues?.includes(trimmedValue)) {
-      setVariantValues((prevVariantValues) => {
-        if (Array.isArray(prevVariantValues)) {
-          return [...prevVariantValues, trimmedValue]; // Spread the previous array if it's valid
-        }
-        return [trimmedValue]; // Fallback to an array containing the new value if prevVariantValues is not iterable
-      });
-      setCurrentVariantValue("");
+    if (trimmedValue && !variantValues.includes(trimmedValue)) {
+      setVariantValues((prev) => [...prev, trimmedValue]);
     }
   };
 
   // Remove a value from the variants
   const handleDeleteValue = (valueToDelete) => {
-    setVariantValues(variantValues?.filter((value) => value !== valueToDelete));
+    setVariantValues((prev) => prev.filter((value) => value !== valueToDelete));
   };
 
   // Handle saving the variant
   const handleSave = () => {
-    // Normalize variantValues to always be an array
+    if (!variantToEdit?.key.trim()) return; // Prevent empty saves
+
     const normalizedValues = Array.isArray(variantValues)
       ? variantValues
-      : [variantValues]; // If it's not an array, convert it to an array
+      : [variantValues];
 
-    if (isEditing && variantToEdit) {
-      // Update an existing variant
-      setSavedVariants((prev) =>
-        prev.map((variant) =>
-          variant.key === variantToEdit
-            ? { ...variant, key: variantOption, value: normalizedValues }
-            : variant
-        )
-      );
-    } else {
-      // Add a new variant
-      setSavedVariants((prev) => [
-        ...prev,
-        { key: variantOption, value: normalizedValues },
-      ]);
-    }
+    setFormData((prev) => ({
+      ...prev,
+      _attributes: variantToEdit.originalKey // 🔥 If originalKey exists → Update existing
+        ? prev._attributes.map((variant) =>
+            variant.key === variantToEdit.originalKey
+              ? {
+                  ...variant,
+                  key: variantToEdit.key.trim(),
+                  value: normalizedValues,
+                }
+              : variant
+          )
+        : [
+            ...prev._attributes,
+            { key: variantToEdit.key.trim(), value: normalizedValues },
+          ], // 🔥 If no originalKey → Add new
+    }));
 
     handleCloseDialog();
   };
 
   // Handle deleting a saved variant
   const handleDeleteSavedVariant = (optionToDelete) => {
-    setSavedVariants(
-      savedVariants.filter((variant) => variant.key !== optionToDelete)
-    );
+    setFormData((prev) => ({
+      ...prev,
+      _attributes: prev._attributes.filter(({ key }) => key !== optionToDelete),
+    }));
   };
 
   // --------------------------------------------------------------------------------------------------------
@@ -459,10 +436,10 @@ export default function ProductForm({
       }
 
       if (formData.detailDescription) {
-        setFormData({ ...formData, detailDescription: details });
+        // setFormData({ ...formData, detailDescription: details });
         formDataInstance.append(
           "detailDescription",
-          JSON.stringify(formData.detailDescription)
+          JSON.stringify([...formData?.detailDescription])
         );
       }
 
@@ -517,13 +494,20 @@ export default function ProductForm({
         await createProduct(formDataInstance);
       }
 
-      setSavedVariants([]);
+      // setSavedVariants([]);
+      setFormData((prev) => ({
+        ...prev,
+        _attributes: [],
+      }));
+      setDetails([]);
       setFormData(initialState);
       setLoadingStates({
         ...loadingStates,
         addProduct: false,
         draftProduct: false,
       });
+
+      dispatch(fetchAllProducts());
       closeDialog();
     } catch (error) {
       setLoadingStates({
@@ -538,9 +522,9 @@ export default function ProductForm({
 
   // -------------------------------------------------------------------------------------------------------------
 
-  useEffect(() => {
-    setFormData({ ...formData, _attributes: savedVariants });
-  }, [savedVariants]);
+  // useEffect(() => {
+  //   setFormData({ ...formData, _attributes: savedVariants });
+  // }, [savedVariants]);
 
   // Dropzone for multiple images
   const {
@@ -680,13 +664,12 @@ export default function ProductForm({
                 id="productQuantity"
                 label="Quantity"
                 type="number"
-                slotProps={{ min: 0 }}
                 variant="outlined"
                 value={formData.stock}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    stock: Math.max(1, parseInt(e.target.value) || 1),
+                    stock: Math.max(0, parseInt(e.target.value)),
                   })
                 }
               />
@@ -1059,7 +1042,7 @@ export default function ProductForm({
 
               {/* Saved Variants Display */}
               <div className="attributeCards_container">
-                {savedVariants?.map((variant) => (
+                {formData._attributes?.map((variant) => (
                   <Paper
                     key={variant.key}
                     elevation={3}
@@ -1126,18 +1109,14 @@ export default function ProductForm({
 
               {/* Dialog for Add/Edit Variant */}
               <AddEditVariantDialog
-                isVariantDialogOpen={isVariantDialogOpen}
-                handleCloseDialog={handleCloseDialog}
-                handleSave={handleSave}
-                isEditing={isEditing}
-                variantOption={variantOption}
-                setVariantOption={setVariantOption}
-                currentVariantValue={currentVariantValue}
-                setCurrentVariantValue={setCurrentVariantValue}
-                variantValues={variantValues}
-                setVariantValues={setVariantValues}
-                handleAddValue={handleAddValue}
-                handleDeleteValue={handleDeleteValue}
+                isOpen={isVariantDialogOpen}
+                onClose={handleCloseDialog}
+                onSave={handleSave}
+                variant={variantToEdit}
+                setVariant={setVariantToEdit} // Updates { key, value }
+                variantValues={variantValues} // List of values
+                onAddValue={handleAddValue} // Handles value addition
+                onDeleteValue={handleDeleteValue} // Handles value deletion
               />
             </Box>
           </article>
@@ -1157,7 +1136,7 @@ export default function ProductForm({
                 Detail Description
               </Typography>
 
-              {details?.map((item, index) => (
+              {formData.detailDescription?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"

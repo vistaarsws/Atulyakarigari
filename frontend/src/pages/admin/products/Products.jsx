@@ -87,20 +87,18 @@ export default function Products() {
       </Box>
       <Box>
         <CustomTabPanel value={value} index={0}>
-          <AdminProductCard products={allProducts} />
+          <AdminProductCard productStatus={"all"} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <AdminProductCard products={publishedProducts} />
+          <AdminProductCard productStatus={"published"} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <AdminProductCard products={draftedProducts} />
+          <AdminProductCard productStatus={"draft"} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
-          <AdminProductCard products={outOfStock} />
+          <AdminProductCard productStatus={"outofstock"} />
         </CustomTabPanel>
       </Box>
     </Box>
   );
 }
-
-// const Items = () => {};
