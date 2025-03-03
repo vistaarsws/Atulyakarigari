@@ -1,53 +1,81 @@
 import Payment from "../models/payment.js";
-import { encrypt, decrypt } from "../utils/encryption/cryptoUtils.js";
-import keys from "../config/ccAvenue.js";
+import { encrypt } from "../utils/encryption/cryptoUtils.js";
 import { v4 as uuidv4 } from "uuid";
+import config from "../config/ccAvenue.js";
 
 const generatePaymentOrderId = () => `ORD-${uuidv4()}`;
 
-// ✅ Create Payment Request
 export const createPayment = async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, productId } = req.body;
     const userId = req.user?._id;
 
-    if (!userId) {
+    if (!userId)
       return res.status(400).json({ error: "User authentication required" });
-    }
-
-    if (!amount || amount <= 0) {
+    if (!amount || amount <= 0)
       return res.status(400).json({ error: "Invalid amount" });
+    if (!productId)
+      return res.status(400).json({ error: "Product ID is required" });
+
+    let payment = await Payment.findOne({
+      userId,
+      productId,
+      status: { $in: ["PENDING", "FAILED"] },
+    });
+
+    let paymentOrderId;
+
+    if (payment) {
+      paymentOrderId = payment.paymentOrderId;
+      console.log(`🔄 Reusing Existing Order ID: ${paymentOrderId}`);
+
+      if (payment.amount !== amount) {
+        payment.amount = amount;
+        await payment.save();
+      }
+    } else {
+      paymentOrderId = generatePaymentOrderId();
+      console.log(`🆕 Created New Order ID: ${paymentOrderId}`);
+
+      payment = new Payment({
+        paymentOrderId,
+        userId,
+        productId,
+        amount,
+        status: "PENDING",
+      });
+
+      await payment.save();
     }
 
-    const paymentOrderId = generatePaymentOrderId();
-
-    const newPayment = new Payment({ paymentOrderId, userId, amount, status: "PENDING" });
-    await newPayment.save();
-
-    const postData = `merchant_id=${keys.merchantId}&order_id=${paymentOrderId}&currency=INR&amount=${amount}&redirect_url=${keys.redirectUrl}&cancel_url=${keys.cancelUrl}&billing_name=John Doe&billing_email=john@example.com&billing_tel=9876543210&billing_address=123 Test Street&billing_city=Mumbai&billing_state=Maharashtra&billing_zip=400001&billing_country=India&integration_type=iframe_normal&language=EN&merchant_param1=${userId}`;
+    const postData = new URLSearchParams({
+      merchant_id: config.merchantId,
+      order_id: paymentOrderId,
+      currency: "INR",
+      amount,
+      redirect_url: config.redirectUrl,
+      cancel_url: config.cancelUrl,
+      integration_type: "iframe_normal",
+      language: "EN",
+      merchant_param1: userId,
+    }).toString();
 
     const encRequest = encrypt(postData);
-
-    console.log("Encrypted Request:", encRequest);
-    console.log("Decrypted Check:", decrypt(encRequest));
-
-    const paymentUrl = `https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=${encRequest}&access_code=${keys.accessCode}`;
+    const paymentUrl = `https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=${encRequest}&access_code=${config.accessCode}`;
 
     res.json({ success: true, paymentUrl });
   } catch (error) {
     console.error("Payment Creation Error:", error);
-    res.status(500).json({ error: "Payment initiation failed" });
+    res.status(500).json({ errorMessage: "Payment initiation failed", error });
   }
 };
 
-// ✅ Handle Payment Response
 export const handlePaymentResponse = async (req, res) => {
   try {
     const { encResp } = req.body;
-    
-    if (!encResp || typeof encResp !== "string" || encResp.length < 32) {
-      return res.status(400).json({ error: "Invalid or missing CCAvenue response" });
-    }
+
+    if (!encResp)
+      return res.status(400).json({ error: "Invalid CCAvenue response" });
 
     const decryptedResponse = decrypt(encResp);
     console.log("Decrypted Response:", decryptedResponse);
@@ -57,31 +85,23 @@ export const handlePaymentResponse = async (req, res) => {
     const trackingId = responseParams.get("tracking_id");
     const orderStatus = responseParams.get("order_status");
 
-    if (!paymentOrderId) {
-      return res.status(400).json({ error: "Invalid response: Missing order_id" });
-    }
-
     const payment = await Payment.findOne({ paymentOrderId });
-    if (!payment) {
-      return res.status(404).json({ error: "Payment not found" });
-    }
+    if (!payment) return res.status(404).json({ error: "Payment not found" });
 
+    // Update payment status
     payment.transactionId = trackingId;
-    
-    if (orderStatus === "Success") {
-      payment.status = "COMPLETED";
-    } else if (orderStatus === "Aborted") {
-      payment.status = "CANCELED";
-    } else {
-      payment.status = "FAILED";
-    }
-
+    payment.status =
+      orderStatus === "Success"
+        ? "COMPLETED"
+        : orderStatus === "Aborted"
+        ? "CANCELED"
+        : "FAILED";
     await payment.save();
 
-    const frontendRedirectUrl = orderStatus === "Success"
-      ? `${keys.frontendUrl}/payment-success`
-      : `${keys.frontendUrl}/payment-failed`;
-
+    const frontendRedirectUrl =
+      orderStatus === "Success"
+        ? config.frontendSuccessUrl
+        : config.frontendFailureUrl;
     res.redirect(frontendRedirectUrl);
   } catch (error) {
     console.error("Payment Response Error:", error);

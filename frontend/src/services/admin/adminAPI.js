@@ -153,6 +153,11 @@ const getAllQuestions = async (productId) => {
   return response;
 };
 
+const getAllProfiles = async () => {
+  const response = await apiConnector("GET", admin_endpoints.GET_ALL_PROFILE);
+  return response;
+};
+
 export {
   getCategory,
   createCategory,
@@ -169,4 +174,5 @@ export {
   deleteReviewAndRating,
   deleteQuestion,
   getAllQuestions,
+  getAllProfiles,
 };

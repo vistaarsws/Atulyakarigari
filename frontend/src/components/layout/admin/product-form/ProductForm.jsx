@@ -59,7 +59,7 @@ export default function ProductForm({
     name: productDetails?.name || "",
     productImage: productDetails?.images || [],
     // description: productDetails?.description || "",
-    detailDescription: productDetails?.detailDescription || [],
+    _detailDescription: productDetails?.detailDescription || [],
     price: productDetails?.price || "",
     category: productDetails?.category || null,
     subcategory: productDetails?.subcategory || "",
@@ -113,7 +113,7 @@ export default function ProductForm({
   const handleChange = (index, field, value) => {
     setFormData((prev) => ({
       ...prev,
-      detailDescription: prev.detailDescription.map((item, i) =>
+      _detailDescription: prev.detailDescription.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       ),
     }));
@@ -123,7 +123,7 @@ export default function ProductForm({
   const addField = () => {
     setFormData((prev) => ({
       ...prev,
-      detailDescription: [
+      _detailDescription: [
         ...prev.detailDescription,
         { title: "", description: "" },
       ],
@@ -135,7 +135,7 @@ export default function ProductForm({
     if (formData.detailDescription.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        detailDescription: prev.detailDescription.filter((_, i) => i !== index),
+        _detailDescription: prev.detailDescription.filter((_, i) => i !== index),
       }));
     }
   };
@@ -144,7 +144,7 @@ export default function ProductForm({
     name: "",
     productImage: [],
     description: "",
-    detailDescription: [],
+    _detailDescription: [],
     price: "",
     category: null,
     subcategory: "",
@@ -432,14 +432,14 @@ export default function ProductForm({
         );
       }
 
-      if (formData.detailDescription?.length) {
+      if (formData._detailDescription?.length) {
         console.log(
           "Detail Description before sending:",
-          formData.detailDescription
+          formData._detailDescription
         );
         formDataInstance.append(
           "detailDescription",
-          JSON.stringify(formData.detailDescription) // No unnecessary spread operator
+          JSON.stringify(formData._detailDescription) // No unnecessary spread operator
         );
       }
 
@@ -1164,7 +1164,7 @@ export default function ProductForm({
                 Detail Description
               </Typography>
 
-              {formData.detailDescription?.map((item, index) => (
+              {formData._detailDescription?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"
@@ -1205,7 +1205,7 @@ export default function ProductForm({
                 {/* <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSaveDetailDescription}
+                  onClick={handleSave_detailDescription}
                 >
                   Save Data
                 </Button> */}
