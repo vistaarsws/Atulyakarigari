@@ -13,8 +13,15 @@ const ConfirmationModal = ({ open, onClose, onConfirm, title, message }) => {
       <DialogTitle>{title || "Confirm Action"}</DialogTitle>
       <DialogContent>{message || "Are you sure?"}</DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Cancel</Button>
-        <Button onClick={onConfirm} color="error" autoFocus>
+        <Button onClick={onClose} variant="contained" color="error">
+          Cancel
+        </Button>
+        <Button
+          onClick={onConfirm}
+          variant="contained"
+          color="primary"
+          autoFocus
+        >
           Confirm
         </Button>
       </DialogActions>

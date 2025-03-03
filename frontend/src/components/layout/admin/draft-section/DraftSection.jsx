@@ -5,12 +5,14 @@ import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 // -------------------------------------------------------------------------------------------------
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import "./DraftSection.css";
+import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
 
 export default function DraftSection() {
   const allProducts = useSelector((state) => state.products.products);
+  const dispatch = useDispatch();
 
   const [range, setRange] = useState([
     {
