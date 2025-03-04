@@ -195,7 +195,20 @@ const ProductCard = ({ product }) => {
               sx={{ borderRadius: "0.5rem" }}
             >
               <Button
-                variant="contained"
+                variant="outlined"
+                sx={{
+                  padding: "9px 15px",
+                  borderColor: "#60a487",
+                  color: "#60a487",
+                  minWidth: "unset",
+                  fontSize: "1.5rem",
+                  lineHeight: 1,
+
+                  "&:hover": {
+                    color: "white",
+                    backgroundColor: "#60a487",
+                  },
+                }}
                 onClick={() =>
                   productQuantity > 1 && setProductQuantity(productQuantity - 1)
                 }
@@ -203,10 +216,25 @@ const ProductCard = ({ product }) => {
                 -
               </Button>
 
-              <Typography>{productQuantity}</Typography>
+              <Typography sx={{ minWidth: "1.2rem", textAlign: "center" }}>
+                {productQuantity}
+              </Typography>
 
               <Button
-                variant="contained"
+                variant="outlined"
+                sx={{
+                  padding: "9px 15px",
+                  borderColor: "#60a487",
+                  color: "#60a487",
+                  minWidth: "unset",
+                  fontSize: "1.5rem",
+                  lineHeight: 1,
+
+                  "&:hover": {
+                    color: "white",
+                    backgroundColor: "#60a487",
+                  },
+                }}
                 onClick={() => setProductQuantity(productQuantity + 1)}
               >
                 +
@@ -229,7 +257,7 @@ const ProductCard = ({ product }) => {
                   fontSize: "12px",
                 }}
               >
-                10 Days
+                {product.expectedReturn} Days
               </span>{" "}
               return available
             </Typography>
@@ -239,8 +267,7 @@ const ProductCard = ({ product }) => {
                 alignItems: "start",
                 mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
               }}
-            >
-            </Box>
+            ></Box>
           </Box>
         </Box>
       </CardContent>

@@ -36,7 +36,7 @@ import AddNewProduct from "./pages/admin/add-new-product/AddNewProduct";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Customers from "./pages/admin/customers/Customers";
 import Orders from "./pages/admin/orders/Orders";
-import Settings  from "./pages/admin/settings/Settings";
+import Settings from "./pages/admin/settings/Settings";
 import Products from "./pages/admin/products/Products";
 import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
