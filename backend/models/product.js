@@ -75,12 +75,18 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Height cannot be negative"],
       min: [0, "Height is required"],
     },
+
     attributes: [
       {
         key: { type: mongoose.Schema.Types.Mixed, required: true },
         value: { type: mongoose.Schema.Types.Mixed, required: true },
       },
     ],
+    expectedReturnDate: {
+      type: Number, // Storing days as a number
+      required: [true, "Expected return days are required"],
+      min: [0, "Return days cannot be negative"], // Ensures non-negative values
+    },
     images: [
       {
         type: String,
@@ -125,19 +131,21 @@ const ProductSchema = new mongoose.Schema(
       },
     },
     ratingAndReviews: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'RatingAndReviews',
-        },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "RatingAndReviews",
+      },
     ],
-    questions:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Question",
-        },
-    ]
-}, {
-    timestamps: true
-});
+    questions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Question",
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export default mongoose.model("Product", ProductSchema);

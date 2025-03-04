@@ -75,12 +75,13 @@ export const createProduct = async (req, res) => {
     // Destructure and validate input
     const {
       name,
-      detailDescription,
+      _detailDescription,
       price,
       category,
       subcategory,
       _attributes,
       sku,
+      expectedReturnDate,
       weight,
       length,
       width,
@@ -104,13 +105,14 @@ export const createProduct = async (req, res) => {
       !price ||
       !category ||
       !sku ||
+      !expectedReturnDate ||
       !weight ||
       !length ||
       !width ||
       !height ||
       !stock ||
       !status ||
-      !detailDescription ||
+      !_detailDescription ||
       !_attributes ||
       !discountPercentage
       //  || !artisanName || !artisanAbout
@@ -119,7 +121,12 @@ export const createProduct = async (req, res) => {
     }
     const attributes = JSON.parse(_attributes);
 
-    const _detailDescription = JSON.parse(detailDescription);
+    if (!_detailDescription || _detailDescription.trim() === "") {
+      return badRequest(req, res, null, "Detail description is required");
+  }
+  
+  const detailDescription = JSON.parse(_detailDescription);
+  
     if (!attributes || !Array.isArray(attributes)) {
       return badRequest(req, res, null, "Invalid Attributes");
     }
@@ -194,11 +201,12 @@ export const createProduct = async (req, res) => {
     //  product data
     const productData = {
       name: name.trim(),
-      _detailDescription,
+      detailDescription,
       price,
       category,
       subcategory: subcategory || null,
       sku,
+      expectedReturnDate,
       weight,
       length,
       width,
@@ -318,6 +326,7 @@ export const updateProduct = async (req, res) => {
     const {
       name,
       sku,
+      expectedReturnDate,
       weight,
       length,
       width,
@@ -438,6 +447,8 @@ export const updateProduct = async (req, res) => {
       category: category || existingProduct.category,
       subcategory: subcategory || existingProduct.subcategory,
       sku: sku || existingProduct.sku,
+      expectedReturnDate:
+        expectedReturnDate || existingProduct.expectedReturnDate,
       weight: weight || existingProduct.weight,
       length: length || existingProduct.length,
       width: width || existingProduct.width,

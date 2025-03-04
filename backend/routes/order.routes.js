@@ -4,7 +4,7 @@ import {
   getAllOrders,
   getOrderById,
   cancelOrder,
-  returnorder,
+  returnOrder,
 } from "../controllers/order.controller.js";
 import { auth, isAdmin } from "../middlewares/auth.middleware.js";
 
@@ -12,10 +12,11 @@ const router = express.Router();
 router.use(auth);
 
 router.post("/create", createOrder);
-router.get("getOrder/:id", getOrderById);
-router.put("cancel/:id", cancelOrder);
-router.put("return/:id", returnorder);
+router.post("/getOrder", getOrderById);
+router.post("/cancel", cancelOrder);
+router.post("/return", returnOrder);
 
 router.use(isAdmin);
-router.get("/getOrder", getAllOrders);
+router.get("/getOrders", getAllOrders);
+
 export default router;

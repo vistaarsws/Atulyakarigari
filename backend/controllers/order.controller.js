@@ -78,7 +78,10 @@ export const getAllOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
   try {
-    const order = await getShiprocketOrderDetails(res.params.id);
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
+
+    const order = await Order.findById(id);
 
     if (!order) return handleOrderNotFound(res);
 
@@ -88,13 +91,14 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-export const returnorder = async (req, res) => {
+export const returnOrder = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { id, status } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
 
     const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
+      id,
+      { orderStatus: status },
       { new: true }
     );
 
@@ -108,7 +112,10 @@ export const returnorder = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
-    const deletedOrder = await Order.findByIdAndDelete(req.params.id);
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
+
+    const deletedOrder = await Order.findByIdAndDelete(id);
 
     if (!deletedOrder) return handleOrderNotFound(res);
 

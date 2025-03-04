@@ -59,7 +59,7 @@ export default function ProductForm({
     name: productDetails?.name || "",
     productImage: productDetails?.images || [],
     // description: productDetails?.description || "",
-    detailDescription: productDetails?.detailDescription || [],
+    _detailDescription: productDetails?.detailDescription || [],
     price: productDetails?.price || "",
     category: productDetails?.category || null,
     subcategory: productDetails?.subcategory || "",
@@ -75,6 +75,7 @@ export default function ProductForm({
     artisanName: productDetails?.artisanName || "",
     artisanAbout: productDetails?.artisanAbout || "",
     artisanImage: productDetails?.artisanImage || null,
+    returnPolicy: productDetails?.returnPolicy,
   }));
 
   const [loadingStates, setLoadingStates] = useState({
@@ -107,39 +108,36 @@ export default function ProductForm({
   const [subCategories, setSubCategories] = useState([]);
 
   const [parentCategory, setParentCategory] = useState("");
-  const [details, setDetails] = useState(() =>
-    productDetails ? productDetails.detailDescription : []
-  );
 
   // Handle input changes
   const handleChange = (index, field, value) => {
-    const newDetails = [...details];
-    newDetails[index][field] = value;
-    setDetails(newDetails);
     setFormData((prev) => ({
       ...prev,
-      detailDescription: newDetails, // Ensure formData updates correctly
+      _detailDescription: prev._detailDescription.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
     }));
   };
 
   // Add new empty entry
   const addField = () => {
-    const updatedDetails = [...details, { title: "", description: "" }];
-    setDetails(updatedDetails);
     setFormData((prev) => ({
       ...prev,
-      detailDescription: updatedDetails, // Update formData with new details
+      _detailDescription: [
+        ...prev._detailDescription,
+        { title: "", description: "" },
+      ],
     }));
   };
 
   // Remove a specific entry
   const removeField = (index) => {
-    if (details.length > 1) {
-      const updatedDetails = details.filter((_, i) => i !== index);
-      setDetails(updatedDetails);
+    if (formData._detailDescription.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        detailDescription: updatedDetails,
+        _detailDescription: prev._detailDescription.filter(
+          (_, i) => i !== index
+        ),
       }));
     }
   };
@@ -148,7 +146,7 @@ export default function ProductForm({
     name: "",
     productImage: [],
     description: "",
-    detailDescription: [],
+    _detailDescription: [],
     price: "",
     category: null,
     subcategory: "",
@@ -426,6 +424,7 @@ export default function ProductForm({
       formDataInstance.append("length", formData?.length);
       formDataInstance.append("width", formData?.width);
       formDataInstance.append("height", formData?.height);
+      formDataInstance.append("expectedReturnDate", formData?.returnPolicy);
 
       // Serialize _attributes
       if (formData._attributes) {
@@ -435,11 +434,10 @@ export default function ProductForm({
         );
       }
 
-      if (formData.detailDescription) {
-        // setFormData({ ...formData, detailDescription: details });
+      if (formData._detailDescription?.length) {
         formDataInstance.append(
-          "detailDescription",
-          JSON.stringify([...formData?.detailDescription])
+          "_detailDescription",
+          JSON.stringify(formData._detailDescription) // No unnecessary spread operator
         );
       }
 
@@ -499,7 +497,7 @@ export default function ProductForm({
         ...prev,
         _attributes: [],
       }));
-      setDetails([]);
+
       setFormData(initialState);
       setLoadingStates({
         ...loadingStates,
@@ -508,7 +506,9 @@ export default function ProductForm({
       });
 
       dispatch(fetchAllProducts());
-      closeDialog();
+      if (closeDialog) {
+        closeDialog();
+      }
     } catch (error) {
       setLoadingStates({
         ...loadingStates,
@@ -525,6 +525,15 @@ export default function ProductForm({
   // useEffect(() => {
   //   setFormData({ ...formData, _attributes: savedVariants });
   // }, [savedVariants]);
+
+  useEffect(() => {
+    if (productDetails?.detailDescription?.length) {
+      setFormData((prev) => ({
+        ...prev,
+        _detailDescription: [...productDetails.detailDescription], // Ensuring a new reference
+      }));
+    }
+  }, [productDetails]);
 
   // Dropzone for multiple images
   const {
@@ -642,38 +651,19 @@ export default function ProductForm({
           <h2>{`${isProductEditing ? "Edit" : "New"} Product Details`} </h2>
 
           <article>
-            <div>
-              <TextField
-                sx={{
-                  width: "100%",
-                  marginBottom: "2rem",
-                }}
-                required
-                id="productTitle"
-                label="Product & Title"
-                variant="outlined"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <TextField
-                sx={{ width: "100%" }}
-                id="productQuantity"
-                label="Quantity"
-                type="number"
-                variant="outlined"
-                value={formData.stock}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    stock: Math.max(0, parseInt(e.target.value)),
-                  })
-                }
-              />
-            </div>
+            <TextField
+              sx={{
+                width: "100%",
+              }}
+              required
+              id="productTitle"
+              label="Product & Title"
+              variant="outlined"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+            />
           </article>
 
           <div>
@@ -843,11 +833,27 @@ export default function ProductForm({
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 2,
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: useMediaQuery("(max-width:768px)") ? 1 : 2,
                 my: "2rem",
               }}
             >
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="productQuantity"
+                  label="Quantity"
+                  type="number"
+                  variant="outlined"
+                  value={formData.stock}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      stock: Math.max(0, parseInt(e.target.value)),
+                    })
+                  }
+                />
+              </div>
               <div>
                 <TextField
                   sx={{ width: "100%" }}
@@ -887,8 +893,8 @@ export default function ProductForm({
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 2,
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: useMediaQuery("(max-width:768px)") ? 1 : 2,
                 my: "2rem",
               }}
             >
@@ -903,6 +909,26 @@ export default function ProductForm({
                     setFormData({
                       ...formData,
                       sku: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="returnPolicy"
+                  label="Expected Return/Cancel Days"
+                  value={formData.returnPolicy}
+                  variant="outlined"
+                  slotProps={{
+                    input: {
+                      min: 0,
+                    },
+                  }}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      returnPolicy: Number(e.target.value),
                     })
                   }
                 />
@@ -929,7 +955,7 @@ export default function ProductForm({
               sx={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr",
-                gap: 2,
+                gap: useMediaQuery("(max-width:768px)") ? 1 : 2,
                 my: "2rem",
               }}
             >
@@ -1136,7 +1162,7 @@ export default function ProductForm({
                 Detail Description
               </Typography>
 
-              {formData.detailDescription?.map((item, index) => (
+              {formData._detailDescription?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"
@@ -1156,11 +1182,7 @@ export default function ProductForm({
                       handleChange(index, "description", e.target.value)
                     }
                   />
-                  <IconButton
-                    onClick={() => removeField(index)}
-                    color="error"
-                    disabled={details.length === 1}
-                  >
+                  <IconButton onClick={() => removeField(index)} color="error">
                     <Remove />
                   </IconButton>
                 </Box>
@@ -1181,7 +1203,7 @@ export default function ProductForm({
                 {/* <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSaveDetailDescription}
+                  onClick={handleSave_detailDescription}
                 >
                   Save Data
                 </Button> */}
@@ -1208,6 +1230,7 @@ export default function ProductForm({
                 className={`image-upload-area ${isDragActiveSingle ? "active" : ""}`}
                 style={{
                   border: "2px dashed #ccc",
+
                   padding: "20px",
                   textAlign: "center",
                   cursor: "pointer",
