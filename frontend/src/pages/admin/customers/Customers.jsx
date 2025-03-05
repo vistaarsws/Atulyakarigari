@@ -12,7 +12,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography,
   TextField,
   InputAdornment,
   Avatar,
@@ -105,7 +104,7 @@ export default function Customers() {
         fullWidth
         variant="outlined"
         placeholder="Search by name, email, or phone..."
-        size="small"
+        size="medium"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         InputProps={{
@@ -132,6 +131,7 @@ export default function Customers() {
                 <TableCell>PHONE</TableCell>
                 <TableCell>EMAIL</TableCell>
                 <TableCell>CREATED AT</TableCell>
+                <TableCell>TOTAL ORDER</TableCell>
                 <TableCell>VIEW</TableCell>
               </TableRow>
             </TableHead>
@@ -157,6 +157,7 @@ export default function Customers() {
                         ? new Date(customer.createdAt).toLocaleDateString()
                         : "Unknown"}
                     </TableCell>
+                    <TableCell>{customer?.totalOrder || 0}</TableCell>
                     <TableCell>
                       <IconButton
                         onClick={() => setSelectedCustomer(customer)}
