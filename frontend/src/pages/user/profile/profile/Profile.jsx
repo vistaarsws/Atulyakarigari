@@ -60,7 +60,19 @@ const Profile = () => {
     }
   }, [profile]);
 
+  // const handleInputChange = (field, value) => {
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [field]: value === "" ? null : value,
+  //   }));
+  // };
+
   const handleInputChange = (field, value) => {
+    if (["contactNumber", "alternativeContactNumber"].includes(field)) {
+      // Allow only numbers
+      if (!/^\d*$/.test(value)) return;
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [field]: value === "" ? null : value,
@@ -87,8 +99,15 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       const formDataToSend = new FormData();
+
       Object.keys(formData).forEach((key) => {
-        const value = formData[key];
+        let value = formData[key];
+
+        // Convert contact numbers to valid numbers or empty string
+        if (["contactNumber", "alternativeContactNumber"].includes(key)) {
+          value = value ? value.toString().trim() : "";
+        }
+
         formDataToSend.append(key, value !== undefined ? value : "null");
       });
 
@@ -104,7 +123,9 @@ const Profile = () => {
       dispatch(fetchProfile(authToken)); // Refresh profile data after update
       enqueueSnackbar("Successfully updated", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar("Error updating profile", error, { variant: "error" });
+      enqueueSnackbar(error?.message || "Error updating profile", {
+        variant: "error",
+      });
     }
   };
 
@@ -189,18 +210,17 @@ const Profile = () => {
             <TextField
               sx={{ mb: 2 }}
               label="Contact Number"
-              value={formData?.contactNumber || null}
+              value={formData?.contactNumber || ""}
               onChange={(e) =>
-                handleInputChange("contactNumber", e.target.value * 1)
+                handleInputChange("contactNumber", e.target.value)
               }
               fullWidth
               disabled={!isEditing}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">+91</InputAdornment>
-                  ),
-                },
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">+91</InputAdornment>
+                ),
               }}
             />
             {/* ----------------------------------------------------------------------------------------------------------- */}
@@ -220,21 +240,17 @@ const Profile = () => {
             <TextField
               sx={{ mb: 2 }}
               label="Alternate Contact Number"
-              value={formData.alternativeContactNumber || null}
+              value={formData.alternativeContactNumber || ""}
               onChange={(e) =>
-                handleInputChange(
-                  "alternativeContactNumber",
-                  e.target.value * 1
-                )
+                handleInputChange("alternativeContactNumber", e.target.value)
               }
               fullWidth
               disabled={!isEditing}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">+91</InputAdornment>
-                  ),
-                },
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">+91</InputAdornment>
+                ),
               }}
             />
           </div>

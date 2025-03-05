@@ -36,7 +36,7 @@ import AddNewProduct from "./pages/admin/add-new-product/AddNewProduct";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Customers from "./pages/admin/customers/Customers";
 import Orders from "./pages/admin/orders/Orders";
-import Settings  from "./pages/admin/settings/Settings";
+import Settings from "./pages/admin/settings/Settings";
 import Products from "./pages/admin/products/Products";
 import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
@@ -162,51 +162,55 @@ export default function App() {
     <SnackbarProvider maxSnack={3}>
       <ScrollToTop />
       <TrackPageView /> {/* Track page views on route changes */}
-      {showNavBar && <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />}
-      <main className={`${!showNavBar ? "" : "marginTop"} `}>
-        <Routes>
-          {/* Public Routes */}
-          {routesConfig.publicRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-
-          {/* Protected Routes */}
-          <Route
-            path="/profile/*"
-            element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Profile />} />
-            {routesConfig.protectedRoutes.map(({ path, element }) => (
+      <div>
+        {showNavBar && (
+          <Navbar navWithoutSearchBar_list={navWithoutSearchBar} />
+        )}
+        <main className={`${!showNavBar ? "" : "marginTop"} `}>
+          <Routes>
+            {/* Public Routes */}
+            {routesConfig.publicRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
             ))}
-            <Route path="*" element={<PageNotFound />} />
-          </Route>
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin/*"
-            element={
-              <AdminRoute>
-                <Admin />
-              </AdminRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            {routesConfig.adminRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-            ))}
-            <Route path="*" element={<PageNotFound />} />
-          </Route>
+            {/* Protected Routes */}
+            <Route
+              path="/profile/*"
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Profile />} />
+              {routesConfig.protectedRoutes.map(({ path, element }) => (
+                <Route key={path} path={path} element={element} />
+              ))}
+              <Route path="*" element={<PageNotFound />} />
+            </Route>
 
-          {/* Catch-All Route */}
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
-      </main>
-      {showFooter && <Footer />}
+            {/* Admin Routes */}
+            <Route
+              path="/admin/*"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              {routesConfig.adminRoutes.map(({ path, element }) => (
+                <Route key={path} path={path} element={element} />
+              ))}
+              <Route path="*" element={<PageNotFound />} />
+            </Route>
+
+            {/* Catch-All Route */}
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </main>
+        {showFooter && <Footer />}
+      </div>
     </SnackbarProvider>
   );
 }
