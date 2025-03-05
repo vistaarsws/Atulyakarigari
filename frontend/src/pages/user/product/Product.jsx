@@ -578,6 +578,21 @@ export default function Product() {
                   );
                 })}
               </ul>
+              <ul
+                style={{
+                  listStyleType: "disc",
+                  paddingLeft: "10px",
+                  margin: 0,
+                }}
+              >
+                <li>
+                  <em style={{ fontSize: "14px" }}>
+                    {product?.expectedReturnDate > 0
+                      ? `Easy ${product.expectedReturnDate} days returns and exchanges`
+                      : "No Return"}
+                  </em>
+                </li>
+              </ul>
             </article>
             <article className="product_details_userInputs">
               <div>

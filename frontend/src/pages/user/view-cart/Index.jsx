@@ -36,6 +36,7 @@ const Index = () => {
       {cartData.items?.length > 0 ? (
         <Box
           sx={{
+            marginTop: "2rem",
             height: "100%",
             display: "flex",
             justifyContent: "space-around",

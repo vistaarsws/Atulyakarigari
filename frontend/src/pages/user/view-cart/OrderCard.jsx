@@ -95,7 +95,7 @@ const ProductCard = ({ product }) => {
 
   const [productQuantity, setProductQuantity] = useState(1);
   return (
-    <StyledCard sx={{ marginTop: "5vh" }}>
+    <StyledCard>
       <Box sx={{ height: "100%" }}>
         <ProductImageWrapper
           sx={{
@@ -242,32 +242,36 @@ const ProductCard = ({ product }) => {
             </Box>
           </Box>
           <Box>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-                fontSize: "12px",
-                fontWeight: 400,
-              }}
-            >
-              <span
-                style={{
-                  fontWeight: 900,
-                  color: "rgb(56, 55, 55)",
+            {product.expectedReturnDate >= 0 ? (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
                   fontSize: "12px",
+                  fontWeight: 400,
                 }}
               >
-                {product.expectedReturn} Days
-              </span>{" "}
-              return available
-            </Typography>
-            <Box
+                <span
+                  style={{
+                    fontWeight: 900,
+                    color: "rgb(56, 55, 55)",
+                    fontSize: "12px",
+                  }}
+                >
+                  {`Easy ${product?.expectedReturnDate} days returns and exchanges`}
+                </span>
+              </Typography>
+            ) : (
+              "No Return"
+            )}
+
+            {/* <Box
               sx={{
                 display: "flex",
                 alignItems: "start",
                 mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
               }}
-            ></Box>
+            ></Box> */}
           </Box>
         </Box>
       </CardContent>
@@ -275,7 +279,7 @@ const ProductCard = ({ product }) => {
   );
 };
 const OrderCard = ({ cartData }) => {
-  console.log("CART",cartData)
+  console.log("CART", cartData);
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -285,7 +289,7 @@ const OrderCard = ({ cartData }) => {
           padding: "2 2 2 0",
           bgcolor: "#fff",
           // height: "65vh"
-          height: { xs: "auto", sm: "65vh" },
+          height: { xs: "auto", sm: "75vh" },
           overflow: "scroll",
           scrollbarWidth: "none",
         }}
