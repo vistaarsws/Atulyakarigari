@@ -1,37 +1,133 @@
 import "./Navbar.css";
 import headerLogo from "../../../../assets/images/headerLogo.svg";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import userProfileAvatar from "../../../../assets/images/avatar.svg";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
-import { login, logout } from "../../../../Redux/features/AuthSlice";
+import { logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-// import avatar from "../../../assets/images/avatar.svg";
-// import { useAuth } from "../../../../context/authToken";
+
 import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { jwtDecode } from "jwt-decode";
-import {
-  getCart,
-  getProfile,
-  getUserWishlist,
-} from "../../../../services/user/userAPI";
+
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
-// import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { MenuItem } from "@mui/material";
 import Logout from "@mui/icons-material/Logout";
+import { fetchCart } from "../../../../Redux/features/CartSlice";
+import { fetchWishlist } from "../../../../Redux/features/WishlistSlice";
+import { fetchProfile } from "../../../../Redux/features/ProfileSlice";
+import { fetchAllProducts } from "../../../../Redux/features/ProductSlice.jsx";
+import CloseIcon from "@mui/icons-material/Close";
+import useDebounce from "../../../../hooks/useDebounce";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const wishlist = useSelector((state) => state.wishlist.items);
+  const profile = useSelector((state) => state.profile);
+  const cartData = useSelector((state) => state.cart);
+
+  const [getAllCategories, setGetAllCategories] = useState([]);
+  const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
   const [isCategoryHovered, setIsCategoryHovered] = useState(false);
-  const [wishlistData, setWishlistData] = useState([]);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1); // Keyboard navigation
+
+  // Get products from Redux
+  const { products, loading } = useSelector((state) => state.products);
+
+  // Fetch products only once
+  useEffect(() => {
+    if (products.length === 0) {
+      dispatch(fetchAllProducts());
+    }
+  }, [dispatch, products.length]);
+
+  // MUI Debounce (Runs only when searchQuery changes)
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Filter products when debounced value updates
+  useEffect(() => {
+    if (debouncedSearch.length < 2) {
+      setFilteredProducts([]);
+      return;
+    }
+
+    if (products.length > 0) {
+      const filtered = products.filter((product) =>
+        `${product.name} ${product.description} ${product.category} ${product.subcategory}`
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase())
+      );
+
+      setFilteredProducts(filtered);
+      setSelectedIndex(-1); // Reset selection
+    }
+  }, [debouncedSearch, products]);
+
+  const handleSelectProduct = (product) => {
+    navigate(`/product/${product._id}`);
+    setSearchQuery("");
+    setFilteredProducts([]); // Clear results after selection
+  };
+
+  // Keyboard navigation (Arrow keys & Enter)
+  const handleKeyDown = (e) => {
+    if (filteredProducts.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      setSelectedIndex((prev) =>
+        prev < filteredProducts.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === "ArrowUp") {
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      handleSelectProduct(filteredProducts[selectedIndex]);
+    }
+  };
+
+  // -----------------------------------------------------------
+  const navigation = {
+    links: [
+      { name: "HOME", path: "/" },
+      {
+        name: "CATEGORIES",
+        path: "#",
+        dropdown: getAllCategories.map((category) => ({
+          category: category.name,
+          category_Details: category,
+          subcategories: category.subcategory.map((sub) => ({
+            name: sub.name,
+            subCategory_Details: sub,
+          })),
+        })),
+      },
+      { name: "ARTISANS", path: "/artisans" },
+      { name: "ABOUT", path: "/about" },
+      { name: "BLOGS", path: "/blogs" },
+    ],
+  };
+  const menuItems = [
+    { name: "My Profile", link: "/profile" },
+    { name: "Wishlist", link: "/profile/wishlist" },
+    { name: "Orders", link: "/profile/orders" },
+    { name: "Address", link: "/profile/address" },
+    {
+      name: "Logout",
+      link: "/",
+      icon: <Logout fontSize="small" />,
+    },
+  ];
+  // -----------------------------------------------------------
 
   const handleClick = (event) => {
     if (anchorEl) {
@@ -41,49 +137,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     }
   };
 
-  const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
-
   const toggleCollapse = (index) => {
     setOpenCategoryIndex((prev) => (prev === index ? null : index));
   };
 
-  // const [isProfileView, setIsProfileView] = useState(false);
-  const navigate = useNavigate();
-  // const location = useLocation();
-  // const { loginContext, logoutContext, authToken, setauthToken } =
-  //   useAuth();
-
-  const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
-
   const { enqueueSnackbar } = useSnackbar();
-  // const cookies = Cookies.get("authToken");
-
-  // const StyledBadge = styled(Badge)(({ theme }) => ({
-  //   "& .MuiBadge-badge": {
-  //     right: -3,
-  //     top: 13,
-  //     border: `1px solid ${theme.palette.background.paper}`,
-  //     padding: "0 2px",
-  //     backgroundColor: "#b56f82",
-  //     fontSize: "1.2rem",
-  //     width: "1.5rem",
-  //     height: "1.5rem",
-  //   },
-  // }));
-
-  const fetchWishlistData = async () => {
-    try {
-      const response = await getUserWishlist();
-      setWishlistData(response?.data?.data?.wishlist);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchWishlistData();
-  }, []);
 
   function notificationsLabel(count) {
     if (count === 0) {
@@ -94,39 +153,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     }
     return `${count} notifications`;
   }
-  const [profileData, setProfileData] = useState(null);
-
-  // Fetch Profile Data
-  const fetchProfileData = async () => {
-    try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
-      }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
-      const response = await getProfile(_id);
-      const profile = response?.data?.data;
-
-      const fetchedData = {
-        fullName: profile.fullName,
-        profilePicture: profile.profilePicture || "/broken-image.jpg",
-      };
-
-      setProfileData(fetchedData);
-    } catch (error) {
-      console.error("Error fetching profile data: ", error.message || error);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfileData();
-  }, [authToken]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -140,7 +166,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     };
     handleResize();
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -149,167 +174,32 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const logoutHandler = (isLogout) => {
     if (isLogout === "Logout") {
       enqueueSnackbar("Logout Successfully", { variant: "success" });
-      // logoutContext();
       dispatch(logout());
     }
   };
 
-  // useEffect(() => {
-  //   // Check if the URL contains "user/wishlist"
-  //   const path = window.location.pathname;
-  //   if (path.includes("user/") || path.includes("/blogs")) {
-  //     setIsProfileView(true);
-  //   } else {
-  //     setIsProfileView(false);
-  //   }
-  //   return () => {
-  //     setIsProfileView(false);
-  //   };
-  // }, [window.location.pathname]);
-  const navigation = {
-    links: [
-      { name: "HOME", path: "/" },
-
-      {
-        name: "CATEGORIES",
-        path: "#",
-        dropdown: [
-          {
-            category: "HANDLOOM",
-            subcategories: [
-              {
-                name: "Lehenga",
-                items: [
-                  "Zardozi",
-                  "Zari with Kundan Touch",
-                  "Zari",
-                  "Resham",
-                  "Banarsi",
-                ],
-              },
-              {
-                name: "Saree",
-                items: [
-                  "Sambalpuri Cotton",
-                  "Pure Raw Cotton",
-                  "Organza",
-                  "Kota Doria",
-                  "Khandua Silk",
-                  "Georgette",
-                  "Banarsi Silk",
-                ],
-              },
-              {
-                name: "Suit Set",
-                items: ["Woolen Suit"],
-              },
-              {
-                name: "Ready To Wear",
-                items: [
-                  "Bhagalpuri Silk",
-                  "Chanderi Silk",
-                  "Cotton Silk",
-                  "Khadi Silk",
-                ],
-              },
-              {
-                name: "Tie",
-                items: [
-                  "Bhagalpuri Silk",
-                  "Chanderi Silk",
-                  "Cotton Silk",
-                  "Khadi Silk",
-                ],
-              },
-              {
-                name: "Facemask",
-                items: ["Embroidered", "Printed Cotton"],
-              },
-              {
-                name: "Home Decor",
-                items: ["Table Runner"],
-              },
-            ],
-          },
-          {
-            category: "HANDICRAFT",
-            subcategories: [
-              {
-                name: "",
-                items: [
-                  "Golden Grass",
-                  "Dhokra",
-                  "Diary",
-                  "Sabai Grass",
-                  "Palm Leaves Etching",
-                  "Pattachitra",
-                ],
-              },
-            ],
-          },
-          {
-            category: "JEWELLERY",
-            subcategories: [
-              {
-                name: "",
-                items: [
-                  "Jhumka",
-                  "Rings",
-                  "Bracelet",
-                  "Kamarbandh",
-                  "Baju Bnadh",
-                  "Payal/Anklet",
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      { name: "ARTISANS", path: "/artisans" },
-      { name: "ABOUT US", path: "/about" },
-      { name: "BLOGS", path: "/blogs" },
-    ],
-  };
-
-  const menuItems = [
-    { name: "My Profile", link: "/profile" },
-    { name: "Wishlist", link: "/profile/wishlist" },
-    { name: "Orders", link: "/profile/orders" },
-    { name: "Address", link: "/profile/address" },
-    {
-      name: "Logout",
-      link: "/",
-      icon: <Logout fontSize="small" />,
-    },
-
-    // { name: "Contact Us", link: "/user/contact" },
-    // { name: "Terms of use", link: "/user/terms" },
-    // { name: "Privacy Policy", link: "/user/privacy" },
-    // { name: "Log Out", link: "/user/logout" },
-  ];
-  const [cartData, setCartData] = useState(null);
-  const fetchCartData = async () => {
+  const fetchCategoriesData = async () => {
     try {
-      if (!authToken) {
-        console.error("No user profile token found");
-        return;
+      const response = await getCategory();
+      const categories = Object.values(response.data.data);
+      if (categories.length) {
+        setGetAllCategories(categories);
       }
-
-      const { _id } = jwtDecode(authToken);
-      if (!_id) {
-        console.error("Invalid token structure");
-        return;
-      }
-
-      const response = await getCart();
-      setCartData(response?.data?.data);
-    } catch (err) {
-      console.log(err.message);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
   useEffect(() => {
-    fetchCartData();
+    fetchCategoriesData();
   }, []);
+
+  useEffect(() => {
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+      dispatch(fetchWishlist(authToken));
+      dispatch(fetchProfile(authToken));
+    }
+  }, [authToken, dispatch]);
 
   return (
     <nav className="navbar_container">
@@ -354,23 +244,26 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   }`}
                 >
                   <div className="categories-container">
-                    {link.dropdown.map((categoryObj, index) => (
+                    {link.dropdown.map((categoryObj, catIndex) => (
                       <div
                         id="category"
-                        className={` ${
-                          index !== 0 ? "smallNavMenuSection" : ""
-                        }`}
-                        key={index}
+                        className={`${catIndex !== 0 ? "smallNavMenuSection" : ""}`}
+                        key={catIndex}
                       >
                         <div
                           className="category-header"
-                          onClick={() => toggleCollapse(index)}
-                          aria-expanded={openCategoryIndex === index}
+                          onClick={() => toggleCollapse(catIndex)}
+                          aria-expanded={openCategoryIndex === catIndex}
                         >
-                          <h1>{categoryObj.category}</h1>
+                          <Link
+                            className="underline"
+                            to={`/categories/${categoryObj.category_Details._id}`}
+                          >
+                            <h1>{categoryObj.category}</h1>
+                          </Link>
                           <svg
                             className={`collapse-icon ${
-                              openCategoryIndex === index ? "open" : ""
+                              openCategoryIndex === catIndex ? "open" : ""
                             }`}
                             width="12"
                             height="12"
@@ -383,39 +276,34 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                         </div>
                         <section
                           className={`collapse-content ${
-                            openCategoryIndex === index ? "show" : ""
+                            openCategoryIndex === catIndex ? "show" : ""
                           }`}
                         >
                           {categoryObj.subcategories.map(
                             (subcategory, subIndex) => (
-                              <div key={subIndex}>
-                                {subcategory.name && (
-                                  <h2>{subcategory.name}</h2>
-                                )}
-                                <ul>
-                                  {subcategory.items.map((item, itemIndex) => (
-                                    <li key={itemIndex} id="subcategoryLinks">
-                                      {item}
-                                      <svg
-                                        width="8"
-                                        height="8"
-                                        viewBox="0 0 8 8"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="onHoverRightArrow"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          clipRule="evenodd"
-                                          d="M0 4C0 4.13308 0.0526814 4.26071 0.146455 4.35482C0.240228 4.44892 0.367412 4.50179 0.500027 4.50179H6.29368L4.14689 6.65613C4.05857 6.75125 4.01048 6.87707 4.01277 7.00706C4.01506 7.13706 4.06753 7.26109 4.15915 7.35303C4.25076 7.44497 4.37436 7.49763 4.5039 7.49992C4.63344 7.50222 4.75881 7.45396 4.8536 7.36533L7.85377 4.3546C7.9474 4.26051 8 4.13297 8 4C8 3.86703 7.9474 3.73949 7.85377 3.6454L4.8536 0.634675C4.75881 0.546039 4.63344 0.497785 4.5039 0.500079C4.37436 0.502372 4.25076 0.555035 4.15915 0.646971C4.06753 0.738907 4.01506 0.86294 4.01277 0.992937C4.01048 1.12293 4.05857 1.24875 4.14689 1.34387L6.29368 3.49821L0.500027 3.49821C0.367412 3.49821 0.240228 3.55108 0.146455 3.64518C0.0526814 3.73929 0 3.86692 0 4Z"
-                                          fill="#60A487"
-                                        />
-                                      </svg>
-                                    </li>
-                                  ))}
-                                </ul>
-                                <div className="dividerLine"></div>
-                              </div>
+                              <li key={subIndex} id="subcategoryLinks">
+                                <Link
+                                  className="underline"
+                                  to={`/sub-categories/${subcategory?.subCategory_Details?._id}`}
+                                >
+                                  {subcategory.name}
+                                </Link>
+                                <svg
+                                  width="8"
+                                  height="8"
+                                  viewBox="0 0 8 8"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="onHoverRightArrow"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    clipRule="evenodd"
+                                    d="M0 4C0 4.13308 0.0526814 4.26071 0.146455 4.35482C0.240228 4.44892 0.367412 4.50179 0.500027 4.50179H6.29368L4.14689 6.65613C4.05857 6.75125 4.01048 6.87707 4.01277 7.00706C4.01506 7.13706 4.06753 7.26109 4.15915 7.35303C4.25076 7.44497 4.37436 7.49763 4.5039 7.49992C4.63344 7.50222 4.75881 7.45396 4.8536 7.36533L7.85377 4.3546C7.9474 4.26051 8 4.13297 8 4C8 3.86703 7.9474 3.73949 7.85377 3.6454L4.8536 0.634675C4.75881 0.546039 4.63344 0.497785 4.5039 0.500079C4.37436 0.502372 4.25076 0.555035 4.15915 0.646971C4.06753 0.738907 4.01506 0.86294 4.01277 0.992937C4.01048 1.12293 4.05857 1.24875 4.14689 1.34387L6.29368 3.49821L0.500027 3.49821C0.367412 3.49821 0.240228 3.55108 0.146455 3.64518C0.0526814 3.73929 0 3.86692 0 4Z"
+                                    fill="#60A487"
+                                  />
+                                </svg>
+                              </li>
                             )
                           )}
                         </section>
@@ -428,11 +316,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           );
         })}
       </ul>
-
       <div>
         <div>
           {!navWithoutSearchBar_list && (
-            <form className="form">
+            <form className="form" onKeyDown={handleKeyDown}>
               <button>
                 <svg
                   width="17"
@@ -453,38 +340,56 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               </button>
               <input
                 className="input"
-                placeholder="What are you looking for ?"
-                required=""
+                placeholder="Search here..."
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-              {/* )} */}
-              <button className="reset" type="reset">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
+              {searchQuery && (
+                <CloseIcon
+                  className="clear-icon"
+                  fontSize="large"
+                  onClick={() => setSearchQuery("")}
+                />
+              )}
+
+              {/* Search Results Dropdown */}
+              {searchQuery && filteredProducts.length > 0 && (
+                <ul className="search-dropdown">
+                  {filteredProducts.map((product, index) => (
+                    <li
+                      key={product._id}
+                      className={index === selectedIndex ? "selected" : ""}
+                      onMouseEnter={() => setSelectedIndex(index)}
+                      onClick={() => handleSelectProduct(product)}
+                    >
+                      {highlightMatch(product.name, searchQuery)}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {searchQuery && filteredProducts.length === 0 && !loading && (
+                <ul className="search-dropdown">
+                  <li>No results found</li>
+                </ul>
+              )}
+
+              {loading && searchQuery && (
+                <ul className="search-dropdown">
+                  <li>Loading...</li>
+                </ul>
+              )}
             </form>
           )}
         </div>
-
         {authToken && (
           <IconButton
-            aria-label={notificationsLabel(100)}
+            aria-label={`wishlist with ${wishlist.length} items`}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlistData?.length}
+              badgeContent={wishlist.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",
@@ -516,7 +421,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             </Badge>
           </IconButton>
         )}
-
         <div>
           <Button
             id="basic-button"
@@ -528,13 +432,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             <div className="profileBox">
               {authToken ? (
                 <Avatar
-                  src={profileData?.profilePicture}
-                  alt={profileData?.fullName}
+                  src={profile?.profile?.profilePicture}
+                  alt={profile?.profile?.fullName}
                 />
               ) : (
                 <Avatar src="/broken-image.jpg" />
               )}
-
               {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
             </div>
           </Button>
@@ -549,7 +452,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           >
             {authToken && (
               <MenuItem>
-                <p>Hello, {profileData?.fullName}</p>
+                <p>Hello, {profile?.profile?.fullName}</p>
               </MenuItem>
             )}
             {authToken ? (
@@ -558,9 +461,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <MenuItem
                     key={index}
                     onClick={() => {
+                      if (item.name == "Logout") {
+                        navigate("/");
+                      }
+                      navigate(item.link);
                       logoutHandler(item.name);
                       setAnchorEl(null);
-                      navigate(item.link);
                     }}
                   >
                     {item.icon && (
@@ -600,7 +506,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           </Menu>
         </div>
       </div>
-
       <div className="nav-mobile">
         <button
           id="navbar-toggle"
@@ -613,5 +518,18 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         </button>
       </div>
     </nav>
+  );
+}
+// Function to highlight matching search text
+function highlightMatch(text, query) {
+  const regex = new RegExp(`(${query})`, "gi");
+  return text.split(regex).map((part, index) =>
+    part.toLowerCase() === query.toLowerCase() ? (
+      <span key={index} className="highlight">
+        {part}
+      </span>
+    ) : (
+      part
+    )
   );
 }

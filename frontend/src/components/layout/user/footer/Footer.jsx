@@ -19,6 +19,7 @@ import {
 } from "@mui/icons-material";
 import WAVES_IMG from "../../../../assets/images/footer-wave-effect.png";
 import LEAFE_IMG from "../../../../assets/images/FooterLeafe.png";
+import footerLogo from "../../../../assets/images/headerLogo.svg";
 
 // Styled components
 const StyledFooter = styled("footer")(({ theme }) => ({
@@ -95,7 +96,12 @@ export default function Footer() {
     <>
       <StyledFooter>
         <Container>
-          <FlexContainer sx={{ display: "flex" }}>
+          <FlexContainer
+            sx={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             {/* Logo and Description */}
             <LogoSection>
               <Typography
@@ -106,7 +112,7 @@ export default function Footer() {
                 }}
                 gutterBottom
               >
-                Logo
+                <img src={footerLogo} alt="Brand Logo" />
               </Typography>
               <Typography
                 variant="body1"
@@ -114,21 +120,41 @@ export default function Footer() {
                   mb: 2,
                   fontWeight: 300,
                   fontSize: "1.6rem",
-                  lineHeight: "3rem",
+                  lineHeight: "2.2rem",
                   fontFamily: "lato",
+                  mr: 2,
                 }}
               >
-                The proper Footer on proper time can preserve you protection. We
-                assist you make sure every body forward. The proper Footer on
-                proper time can preserve you protection. We assist you make sure
-                every body forward. The proper Footer on proper time can
-                preserve you protection. We assist you make sure every body
-                forward.
+                Atulya Karigari is putting its best to provide one stop
+                corporate gifting solution to its client. Our custom made
+                products are a token of personalized service in the most
+                inspiring way possible.
               </Typography>
               <SocialIcons>
-                {[Facebook, Twitter, Instagram, YouTube].map((Icon, index) => (
+                {[
+                  {
+                    icon: Facebook,
+                    link: "https://www.facebook.com/atulyakarigariindia",
+                  },
+                  {
+                    icon: Twitter,
+                    link: "https://twitter.com/atulyakarigari",
+                  },
+                  {
+                    icon: Instagram,
+                    link: "https://www.instagram.com/atulyakarigariindia/",
+                  },
+                  {
+                    icon: YouTube,
+                    link: "https://www.youtube.com/@atulyakarigariindia4005",
+                  },
+                ].map(({ icon: Icon, link }, index) => (
                   <IconButton
                     key={index}
+                    component="a"
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     sx={{
                       backgroundColor: "white",
                       color: "#6D001D",
@@ -158,11 +184,16 @@ export default function Footer() {
                   }}
                   gutterBottom
                 >
-                  Quick Link
+                  Quick Links
                 </Typography>
                 <Box component="nav">
-                  {["Home", "About Us", "Services", "Product"].map((text) => (
-                    <QuickLink key={text} href="#">
+                  {[
+                    { text: "Home", link: "/" },
+                    { text: "About Us", link: "/about" },
+                    { text: "Artisans", link: "/artisans" },
+                    // { text: "Categories", link: "/categories" },
+                  ].map(({ text, link }) => (
+                    <QuickLink key={text} href={link}>
                       <StyledIcon component={ChevronRight} />
                       <Typography
                         sx={{
@@ -197,7 +228,7 @@ export default function Footer() {
                     <StyledIcon component={CalendarToday} />
                     <Box>
                       <Link
-                        href="#"
+                        href="/blogs"
                         color="inherit"
                         underline="hover"
                         sx={{ display: "block", mb: 0.5 }}
@@ -244,19 +275,35 @@ export default function Footer() {
                 {[
                   {
                     Icon: LocationOn,
-                    text: "44 Danwers, NY City, USA, 70-102",
+                    text: "Plot No 1215/1511; Khandagiri Bari, Ghatikiya, Khordha, Bhubaneswar-751030 Odisha (India)",
+                    link: "https://maps.google.com/?q=Plot+No+1215/1511,+Khandagiri+Bari,+Bhubaneswar-751030",
                   },
-                  { Icon: Mail, text: "Lamaro@Lamaroyc.Us" },
-                  { Icon: Phone, text: "91+585-656-658" },
+                  {
+                    Icon: Mail,
+                    text: "atulyakarigariindia@gmail.com",
+                    link: "mailto:atulyakarigariindia@gmail.com",
+                  },
+                  {
+                    Icon: Phone,
+                    text: "+91 9078077078",
+                    link: "tel:+919078077078",
+                  },
                 ].map((item, index) => (
                   <ContactItem key={index}>
                     <StyledIcon component={item.Icon} />
                     <Typography
+                      component="a"
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       sx={{
                         fontSize: "1.6rem",
                         fontWeight: 400,
                         fontFamily: "lato",
                         mb: 1,
+                        textDecoration: "none", // Removes underline
+                        color: "inherit", // Keeps text color same as before
+                        "&:hover": { textDecoration: "underline" }, // Adds underline on hover
                       }}
                     >
                       {item.text}

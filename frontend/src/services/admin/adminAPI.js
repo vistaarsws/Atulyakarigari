@@ -81,6 +81,14 @@ const updateSubCategory = async (name, id) => {
   return response;
 };
 
+const getSubCategoryById = async (id) => {
+  const response = await apiConnector(
+    "GET",
+    `${admin_endpoints.GET_SUBCATEGORY_BY_ID}${id}`
+  );
+
+  return response;
+};
 const getSubCategoryByCategoryId = async (id) => {
   const response = await apiConnector(
     "GET",
@@ -105,6 +113,51 @@ const getCategoryById = async (id) => {
   return response;
 };
 
+const answerQuestion = async (answer, questionId) => {
+  try {
+    const response = await apiConnector(
+      "PUT",
+      admin_endpoints.ANSWER_QUESTION,
+      { questionId, answer }
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const deleteReviewAndRating = async (id) => {
+  const response = await apiConnector(
+    "DELETE",
+    `${admin_endpoints.DELETE_REVIEW_AND_RATING}/${id}`
+  );
+
+  return response;
+};
+const deleteQuestion = async (id) => {
+  const response = await apiConnector(
+    "DELETE",
+    admin_endpoints.DELETE_QUESTION,
+    id
+  );
+
+  return response;
+};
+
+const getAllQuestions = async (productId) => {
+  const response = await apiConnector(
+    "GET",
+    `${admin_endpoints.GET_ALL_QUESTION}/${productId}`
+  );
+
+  return response;
+};
+
+const getAllProfiles = async () => {
+  const response = await apiConnector("GET", admin_endpoints.GET_ALL_PROFILE);
+  return response;
+};
+
 export {
   getCategory,
   createCategory,
@@ -114,6 +167,12 @@ export {
   createSubCategory,
   deleteSubCategory,
   updateSubCategory,
+  getSubCategoryById,
   getSubCategoryByCategoryId,
   getCategoryById,
+  answerQuestion,
+  deleteReviewAndRating,
+  deleteQuestion,
+  getAllQuestions,
+  getAllProfiles,
 };

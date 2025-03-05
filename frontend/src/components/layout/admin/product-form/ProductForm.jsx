@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import LoadingButton from "@mui/lab/LoadingButton";
+
 import "./ProductForm.css";
 
 import {
@@ -12,6 +13,7 @@ import {
   Box,
   Typography,
   Paper,
+  useMediaQuery,
 } from "@mui/material";
 import { Add, Remove, Save } from "@mui/icons-material";
 
@@ -56,11 +58,16 @@ export default function ProductForm({
   const [formData, setFormData] = useState(() => ({
     name: productDetails?.name || "",
     productImage: productDetails?.images || [],
-    description: productDetails?.description || "",
-    detailDescription: productDetails?.detailDescription || [],
+    // description: productDetails?.description || "",
+    _detailDescription: productDetails?.detailDescription || [],
     price: productDetails?.price || "",
     category: productDetails?.category || null,
     subcategory: productDetails?.subcategory || "",
+    sku: productDetails?.sku || "",
+    weight: productDetails?.weight || "",
+    length: productDetails?.length || "",
+    width: productDetails?.width || "",
+    height: productDetails?.height || "",
     _attributes: productDetails?.attributes || [],
     stock: productDetails?.stock || "",
     status: productDetails?.status || "",
@@ -68,6 +75,7 @@ export default function ProductForm({
     artisanName: productDetails?.artisanName || "",
     artisanAbout: productDetails?.artisanAbout || "",
     artisanImage: productDetails?.artisanImage || null,
+    returnPolicy: productDetails?.returnPolicy,
   }));
 
   const [loadingStates, setLoadingStates] = useState({
@@ -79,16 +87,9 @@ export default function ProductForm({
     draftProduct: false,
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  // const [dialogState, setDialogState] = useState({});
   const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
-  const [variantOption, setVariantOption] = useState("");
   const [variantValues, setVariantValues] = useState([]);
-  const [currentVariantValue, setCurrentVariantValue] = useState("");
-  const [savedVariants, setSavedVariants] = useState(() =>
-    productDetails ? productDetails.attributes : []
-  );
-  const [variantToEdit, setVariantToEdit] = useState(null);
+  const [variantToEdit, setVariantToEdit] = useState("");
 
   const [categoryName, setCategoryName] = useState("");
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
@@ -107,42 +108,53 @@ export default function ProductForm({
   const [subCategories, setSubCategories] = useState([]);
 
   const [parentCategory, setParentCategory] = useState("");
-  const [details, setDetails] = useState([{ title: "", description: "" }]);
-  const [savedData, setSavedData] = useState([]);
 
   // Handle input changes
   const handleChange = (index, field, value) => {
-    const newDetails = [...details];
-    newDetails[index][field] = value;
-    setDetails(newDetails);
+    setFormData((prev) => ({
+      ...prev,
+      _detailDescription: prev._detailDescription.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
   };
 
   // Add new empty entry
   const addField = () => {
-    setDetails([...details, { title: "", description: "" }]);
+    setFormData((prev) => ({
+      ...prev,
+      _detailDescription: [
+        ...prev._detailDescription,
+        { title: "", description: "" },
+      ],
+    }));
   };
 
   // Remove a specific entry
   const removeField = (index) => {
-    if (details.length > 1) {
-      setDetails(details.filter((_, i) => i !== index));
+    if (formData._detailDescription.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        _detailDescription: prev._detailDescription.filter(
+          (_, i) => i !== index
+        ),
+      }));
     }
-  };
-
-  // Save Data to State
-  const handleSaveDetailDescription = () => {
-    setSavedData(details);
-    console.log("Saved Data:", details);
   };
 
   const initialState = {
     name: "",
     productImage: [],
     description: "",
-    detailDescription: [],
+    _detailDescription: [],
     price: "",
     category: null,
     subcategory: "",
+    sku: "",
+    weight: "",
+    length: "",
+    width: "",
+    height: "",
     _attributes: [],
     stock: "",
     status: "",
@@ -154,83 +166,76 @@ export default function ProductForm({
 
   const handleOpenDialog = (variant = null) => {
     if (variant) {
-      // Editing mode: Populate fields with variant data
-      setVariantOption(variant.key);
+      // 🔥 Editing an existing variant
+      setVariantToEdit({
+        originalKey: variant.key, // ✅ Store original key for updates
+        key: variant.key, // Editable key
+      });
       setVariantValues(variant.value);
-      setIsEditing(true);
-      setVariantToEdit(variant.key);
     } else {
-      // Adding mode: Reset fields
-      setVariantOption("");
+      // 🔥 Adding a new variant
+      setVariantToEdit({ originalKey: null, key: "" }); // ✅ Ensure originalKey is null for new variants
       setVariantValues([]);
-      setIsEditing(false);
-      setVariantToEdit(null);
     }
+
     setIsVariantDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
-    // Reset all states and close dialog
-    setVariantOption("");
-    setVariantValues([]);
-    setCurrentVariantValue("");
-    setIsEditing(false);
-    setVariantToEdit(null);
-    setIsVariantDialogOpen(false);
+    setVariantToEdit(null); // Resets variant key and values
+    setVariantValues([]); // Clears variant values
+    setIsVariantDialogOpen(false); // Closes the dialog
   };
 
   // Add a new value to the variants
-  const handleAddValue = () => {
-    const trimmedValue = currentVariantValue.trim();
+  const handleAddValue = (value) => {
+    const trimmedValue = value.trim();
 
-    if (trimmedValue && !variantValues?.includes(trimmedValue)) {
-      setVariantValues((prevVariantValues) => {
-        if (Array.isArray(prevVariantValues)) {
-          return [...prevVariantValues, trimmedValue]; // Spread the previous array if it's valid
-        }
-        return [trimmedValue]; // Fallback to an array containing the new value if prevVariantValues is not iterable
-      });
-      setCurrentVariantValue("");
+    if (trimmedValue && !variantValues.includes(trimmedValue)) {
+      setVariantValues((prev) => [...prev, trimmedValue]);
     }
   };
 
   // Remove a value from the variants
   const handleDeleteValue = (valueToDelete) => {
-    setVariantValues(variantValues?.filter((value) => value !== valueToDelete));
+    setVariantValues((prev) => prev.filter((value) => value !== valueToDelete));
   };
 
   // Handle saving the variant
   const handleSave = () => {
-    // Normalize variantValues to always be an array
+    if (!variantToEdit?.key.trim()) return; // Prevent empty saves
+
     const normalizedValues = Array.isArray(variantValues)
       ? variantValues
-      : [variantValues]; // If it's not an array, convert it to an array
+      : [variantValues];
 
-    if (isEditing && variantToEdit) {
-      // Update an existing variant
-      setSavedVariants((prev) =>
-        prev.map((variant) =>
-          variant.key === variantToEdit
-            ? { ...variant, key: variantOption, value: normalizedValues }
-            : variant
-        )
-      );
-    } else {
-      // Add a new variant
-      setSavedVariants((prev) => [
-        ...prev,
-        { key: variantOption, value: normalizedValues },
-      ]);
-    }
+    setFormData((prev) => ({
+      ...prev,
+      _attributes: variantToEdit.originalKey // 🔥 If originalKey exists → Update existing
+        ? prev._attributes.map((variant) =>
+            variant.key === variantToEdit.originalKey
+              ? {
+                  ...variant,
+                  key: variantToEdit.key.trim(),
+                  value: normalizedValues,
+                }
+              : variant
+          )
+        : [
+            ...prev._attributes,
+            { key: variantToEdit.key.trim(), value: normalizedValues },
+          ], // 🔥 If no originalKey → Add new
+    }));
 
     handleCloseDialog();
   };
 
   // Handle deleting a saved variant
   const handleDeleteSavedVariant = (optionToDelete) => {
-    setSavedVariants(
-      savedVariants.filter((variant) => variant.key !== optionToDelete)
-    );
+    setFormData((prev) => ({
+      ...prev,
+      _attributes: prev._attributes.filter(({ key }) => key !== optionToDelete),
+    }));
   };
 
   // --------------------------------------------------------------------------------------------------------
@@ -401,7 +406,7 @@ export default function ProductForm({
       const formDataInstance = new FormData();
 
       formDataInstance.append("name", formData?.name);
-      formDataInstance.append("description", formData?.description);
+      // formDataInstance.append("description", formData?.description);
       formDataInstance.append("price", Number(formData?.price).toFixed(0));
       formDataInstance.append("category", formData?.category);
       formDataInstance.append("subcategory", formData?.subcategory);
@@ -414,13 +419,13 @@ export default function ProductForm({
       formDataInstance.append("artisanName", formData?.artisanName);
       formDataInstance.append("artisanAbout", formData?.artisanAbout);
 
-      // Serialize _attributes
-      if (formData._attributes) {
-        formDataInstance.append(
-          "_attributes",
-          JSON.stringify([...formData?._attributes])
-        );
-      }
+      formDataInstance.append("sku", formData?.sku);
+      formDataInstance.append("weight", formData?.weight);
+      formDataInstance.append("length", formData?.length);
+      formDataInstance.append("width", formData?.width);
+      formDataInstance.append("height", formData?.height);
+      formDataInstance.append("expectedReturnDate", formData?.returnPolicy);
+
       // Serialize _attributes
       if (formData._attributes) {
         formDataInstance.append(
@@ -429,10 +434,10 @@ export default function ProductForm({
         );
       }
 
-      if (formData.detailDescription) {
+      if (formData._detailDescription?.length) {
         formDataInstance.append(
-          "detailDescription",
-          JSON.stringify([...savedData])
+          "_detailDescription",
+          JSON.stringify(formData._detailDescription) // No unnecessary spread operator
         );
       }
 
@@ -487,14 +492,23 @@ export default function ProductForm({
         await createProduct(formDataInstance);
       }
 
-      setSavedVariants([]);
+      // setSavedVariants([]);
+      setFormData((prev) => ({
+        ...prev,
+        _attributes: [],
+      }));
+
       setFormData(initialState);
       setLoadingStates({
         ...loadingStates,
         addProduct: false,
         draftProduct: false,
       });
-      closeDialog();
+
+      dispatch(fetchAllProducts());
+      if (closeDialog) {
+        closeDialog();
+      }
     } catch (error) {
       setLoadingStates({
         ...loadingStates,
@@ -508,9 +522,18 @@ export default function ProductForm({
 
   // -------------------------------------------------------------------------------------------------------------
 
+  // useEffect(() => {
+  //   setFormData({ ...formData, _attributes: savedVariants });
+  // }, [savedVariants]);
+
   useEffect(() => {
-    setFormData({ ...formData, _attributes: savedVariants });
-  }, [savedVariants]);
+    if (productDetails?.detailDescription?.length) {
+      setFormData((prev) => ({
+        ...prev,
+        _detailDescription: [...productDetails.detailDescription], // Ensuring a new reference
+      }));
+    }
+  }, [productDetails]);
 
   // Dropzone for multiple images
   const {
@@ -562,102 +585,85 @@ export default function ProductForm({
   return (
     <form id="productForm" onSubmit={productFormHandler}>
       <div className="form-main">
-        <div className="image-upload">
-          <h2>Upload Image </h2>
-          <div
-            {...getRootPropsMultiple()}
-            className={`image-upload-area ${isDragActiveMultiple ? "active" : ""}`}
-            style={{
-              border: "2px dashed #ccc",
-              padding: "20px",
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <input {...getInputPropsMultiple()} required />
-            {isDragActiveMultiple ? (
-              <p>Drop the files here...</p>
-            ) : (
-              <p>Drag & Drop your files or click to browse</p>
-            )}
-          </div>
-          {/* Image Thumbnails */}
-          <div className="image-thumbnails" style={{ marginTop: "20px" }}>
-            {formData.productImage.map((file, index) => (
-              <div
-                key={index}
-                style={{ display: "inline-block", position: "relative" }}
-              >
-                <img
-                  src={
-                    typeof file === "string"
-                      ? file // If file is a string, use it as the URL
-                      : file instanceof File
-                        ? URL.createObjectURL(file) // If it's a File object, create a preview URL
-                        : "" // Fallback in case file is neither
-                  }
-                  alt={`Preview ${index + 1}`}
-                  className="thumbnail"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    margin: "10px",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() =>
-                    document.getElementById(`file-input-${index}`).click()
-                  } // Trigger file input on click
-                />
-                <input
-                  id={`file-input-${index}`}
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={(e) => handleImageChange(e, index)} // Handle image change
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Form */}
         <div className="form-fields">
+          <article>
+            <div className="image-upload">
+              <h2>Upload Image </h2>
+              <div
+                {...getRootPropsMultiple()}
+                className={`image-upload-area ${isDragActiveMultiple ? "active" : ""}`}
+                style={{
+                  border: "2px dashed #ccc",
+                  padding: "20px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                }}
+              >
+                <input {...getInputPropsMultiple()} required />
+                {isDragActiveMultiple ? (
+                  <p>Drop the files here...</p>
+                ) : (
+                  <p>Drag & Drop your files or click to browse</p>
+                )}
+              </div>
+              {/* Image Thumbnails */}
+              <div className="image-thumbnails" style={{ marginTop: "20px" }}>
+                {formData.productImage.map((file, index) => (
+                  <div
+                    key={index}
+                    style={{ display: "inline-block", position: "relative" }}
+                  >
+                    <img
+                      src={
+                        typeof file === "string"
+                          ? file // If file is a string, use it as the URL
+                          : file instanceof File
+                            ? URL.createObjectURL(file) // If it's a File object, create a preview URL
+                            : "" // Fallback in case file is neither
+                      }
+                      alt={`Preview ${index + 1}`}
+                      className="thumbnail"
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                        margin: "10px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        document.getElementById(`file-input-${index}`).click()
+                      } // Trigger file input on click
+                    />
+                    <input
+                      id={`file-input-${index}`}
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleImageChange(e, index)} // Handle image change
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </article>
+
           <h2>{`${isProductEditing ? "Edit" : "New"} Product Details`} </h2>
 
           <article>
-            <div>
-              <TextField
-                sx={{
-                  width: "100%",
-                }}
-                required
-                id="productTitle"
-                label="Product & Title"
-                variant="outlined"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <TextField
-                sx={{ width: "100%" }}
-                id="productQuantity"
-                label="Quantity"
-                type="number"
-                slotProps={{ min: 0 }}
-                variant="outlined"
-                value={formData.stock}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    stock: Math.max(1, parseInt(e.target.value) || 1),
-                  })
-                }
-              />
-            </div>
+            <TextField
+              sx={{
+                width: "100%",
+              }}
+              required
+              id="productTitle"
+              label="Product & Title"
+              variant="outlined"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+            />
           </article>
 
           <div>
@@ -827,11 +833,27 @@ export default function ProductForm({
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 2,
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: useMediaQuery("(max-width:768px)") ? 1 : 2,
                 my: "2rem",
               }}
             >
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="productQuantity"
+                  label="Quantity"
+                  type="number"
+                  variant="outlined"
+                  value={formData.stock}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      stock: Math.max(0, parseInt(e.target.value)),
+                    })
+                  }
+                />
+              </div>
               <div>
                 <TextField
                   sx={{ width: "100%" }}
@@ -867,6 +889,124 @@ export default function ProductForm({
                 />
               </div>
             </Box>
+            {/* -------------------------------------------------------------------------------------------------------------------- */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: useMediaQuery("(max-width:768px)") ? 1 : 2,
+                my: "2rem",
+              }}
+            >
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="sku"
+                  label="SKU ID"
+                  variant="outlined"
+                  value={formData.sku}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      sku: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="returnPolicy"
+                  label="Expected Return/Cancel Days"
+                  value={formData.returnPolicy}
+                  variant="outlined"
+                  slotProps={{
+                    input: {
+                      min: 0,
+                    },
+                  }}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      returnPolicy: Number(e.target.value),
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="weight"
+                  label="weight (gm)"
+                  variant="outlined"
+                  value={formData.weight}
+                  type="number"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      weight: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </Box>
+            {/* -------------------------------------------------------------------------------------------------------------------- */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: useMediaQuery("(max-width:768px)") ? 1 : 2,
+                my: "2rem",
+              }}
+            >
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="length"
+                  label="Length"
+                  variant="outlined"
+                  value={formData.length}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      length: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="width"
+                  label="width"
+                  variant="outlined"
+                  value={formData.width}
+                  type="number"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      width: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{ width: "100%" }}
+                  id="height"
+                  label="height (cm)"
+                  variant="outlined"
+                  value={formData.height}
+                  type="number"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      height: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </Box>
             {/* ----------------------------------------------ADD Sub Category Dialog Box-------------------------------------------------------------------------- */}
             <AddSubCategoryDialog
               addSubCategoryPopup={addSubCategoryPopup}
@@ -896,7 +1036,7 @@ export default function ProductForm({
           </article>
           {/* -----------------------------------------------Product Description----------------------------------------------------------------------------------------- */}
           <article>
-            <TextField
+            {/* <TextField
               sx={{ width: "100%" }}
               id="productCategory "
               label="Description"
@@ -910,7 +1050,7 @@ export default function ProductForm({
                   description: e.target.value,
                 })
               }
-            />
+            /> */}
           </article>
           <article className="addVariant_container">
             <Box sx={{ margin: "auto" }}>
@@ -928,7 +1068,7 @@ export default function ProductForm({
 
               {/* Saved Variants Display */}
               <div className="attributeCards_container">
-                {savedVariants?.map((variant) => (
+                {formData._attributes?.map((variant) => (
                   <Paper
                     key={variant.key}
                     elevation={3}
@@ -995,40 +1135,23 @@ export default function ProductForm({
 
               {/* Dialog for Add/Edit Variant */}
               <AddEditVariantDialog
-                isVariantDialogOpen={isVariantDialogOpen}
-                handleCloseDialog={handleCloseDialog}
-                handleSave={handleSave}
-                isEditing={isEditing}
-                variantOption={variantOption}
-                setVariantOption={setVariantOption}
-                currentVariantValue={currentVariantValue}
-                setCurrentVariantValue={setCurrentVariantValue}
-                variantValues={variantValues}
-                setVariantValues={setVariantValues}
-                handleAddValue={handleAddValue}
-                handleDeleteValue={handleDeleteValue}
+                isOpen={isVariantDialogOpen}
+                onClose={handleCloseDialog}
+                onSave={handleSave}
+                variant={variantToEdit}
+                setVariant={setVariantToEdit} // Updates { key, value }
+                variantValues={variantValues} // List of values
+                onAddValue={handleAddValue} // Handles value addition
+                onDeleteValue={handleDeleteValue} // Handles value deletion
               />
             </Box>
           </article>
 
           <article>
-            <TextField
-              sx={{ width: "100%" }}
-              id="productTitle"
-              label="Artisans Name"
-              variant="outlined"
-              value={formData.artisanName}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  artisanName: e.target.value,
-                })
-              }
-            />
             <Box
               sx={{
                 width: "100%",
-                maxWidth: 600,
+                borderRadius: "0.4rem",
                 margin: "auto",
                 p: 2,
                 my: 2,
@@ -1036,10 +1159,10 @@ export default function ProductForm({
               }}
             >
               <Typography variant="h5" sx={{ mb: 2 }}>
-                Detail Input Form
+                Detail Description
               </Typography>
 
-              {details.map((item, index) => (
+              {formData._detailDescription?.map((item, index) => (
                 <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <TextField
                     label="Title"
@@ -1059,11 +1182,7 @@ export default function ProductForm({
                       handleChange(index, "description", e.target.value)
                     }
                   />
-                  <IconButton
-                    onClick={() => removeField(index)}
-                    color="error"
-                    disabled={details.length === 1}
-                  >
+                  <IconButton onClick={() => removeField(index)} color="error">
                     <Remove />
                   </IconButton>
                 </Box>
@@ -1081,15 +1200,29 @@ export default function ProductForm({
                 >
                   Add More
                 </Button>
-                <Button
+                {/* <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSaveDetailDescription}
+                  onClick={handleSave_detailDescription}
                 >
                   Save Data
-                </Button>
+                </Button> */}
               </Box>
             </Box>
+
+            <TextField
+              sx={{ width: "100%" }}
+              id="productTitle"
+              label="Artisans Name"
+              variant="outlined"
+              value={formData.artisanName}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  artisanName: e.target.value,
+                })
+              }
+            />
 
             <div className="artisan_image-desc_container">
               <div
@@ -1097,6 +1230,7 @@ export default function ProductForm({
                 className={`image-upload-area ${isDragActiveSingle ? "active" : ""}`}
                 style={{
                   border: "2px dashed #ccc",
+
                   padding: "20px",
                   textAlign: "center",
                   cursor: "pointer",
@@ -1221,7 +1355,6 @@ export default function ProductForm({
                   color="warning"
                   value="Draft"
                   onClick={(e) => {
-                    console.log("MANNN", e);
                     productFormHandler(e);
                   }}
                 >

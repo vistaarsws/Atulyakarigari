@@ -1,5 +1,4 @@
 .productCategorySection_container {
-
   padding: 5%;
 }
 
@@ -21,6 +20,7 @@
 .productCategorySection_container > div:first-of-type {
   display: flex;
   justify-content: end;
+  margin-bottom: 1rem;
 
   button {
     border: none;
@@ -46,6 +46,54 @@
   justify-content: center;
   align-items: center;
   margin: 1rem 0 0;
+}
+.skeletonCard {
+  width: 220px;
+  height: 36rem;
+  background-color: #f5f5f5;
+  border-radius: 0.6rem;
+  display: flex;
+  flex-direction: column;
+
+  /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; */
+  box-shadow:
+    rgba(17, 17, 26, 0.05) 0px 1px 0px,
+    rgba(17, 17, 26, 0.1) 0px 0px 8px;
+  padding: 1rem;
+}
+
+.skeleton_image,
+.skeleton_text,
+.skeleton_price {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: loadingAnimation 1.5s infinite;
+  border-radius: 5px;
+}
+
+.skeleton_image {
+  width: 100%;
+  height: 80%;
+  margin-bottom: 12px;
+}
+
+.skeleton_text {
+  width: 80%;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.skeleton_text.short {
+  width: 40%;
+}
+
+@keyframes loadingAnimation {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @media screen and (max-width: 425px) {

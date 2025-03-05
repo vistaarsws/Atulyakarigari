@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router";
 import { SnackbarProvider } from "notistack";
 import ScrollToTop from "./hooks/ScrollToTop";
 import ProtectedRoute from "./utils/ProtectedRoute";
@@ -15,11 +15,13 @@ import Footer from "./components/layout/user/footer/Footer";
 import Home from "./pages/user/home/Home";
 import About from "./pages/user/about/About";
 import Categories from "./pages/user/categories/index";
+import SubCategories from "./pages/user/categories/SubCategory";
 import Blogs from "./pages/user/blogs/Blogs";
 import Product from "./pages/user/product/Product";
 import Artisans from "./pages/user/artisans/Artisans";
-import ViewCart from "./pages/user/view-cart/index";
+import ViewCart from "./pages/user/view-cart/Index";
 import PlaceOrder from "./pages/user/place-order";
+import OrderStatus from "./pages/user/order/OrderStatus";
 import AuthTemplate from "./pages/auth/AuthTemplate";
 
 import UserProfile from "./components/layout/user/user-profile/UserProfile";
@@ -34,9 +36,13 @@ import AddNewProduct from "./pages/admin/add-new-product/AddNewProduct";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Customers from "./pages/admin/customers/Customers";
 import Orders from "./pages/admin/orders/Orders";
-import Team from "./pages/admin/team/Team";
+import Settings  from "./pages/admin/settings/Settings";
 import Products from "./pages/admin/products/Products";
 import Admin from "./pages/admin/Admin";
+import OrderDetails from "./pages/admin/orders/OrderDetails";
+import CustomerDetails from "./pages/admin/customers/CustomerDetails";
+import OrderCancel from "./pages/user/order/OrderCancel";
+import PaymentResponse from "./pages/user/place-order/PaymentResponse";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -44,11 +50,15 @@ const getRoutesConfig = () => ({
     { path: "/", element: <Home /> },
     { path: "/about", element: <About /> },
     { path: "/categories/:id", element: <Categories /> },
+    { path: "/sub-categories/:id", element: <SubCategories /> },
     { path: "/blogs", element: <Blogs /> },
     { path: "/artisans", element: <Artisans /> },
     { path: "/product/:id", element: <Product /> },
     { path: "/view-cart", element: <ViewCart /> },
     { path: "/place-order", element: <PlaceOrder /> },
+    { path: "/order-status", element: <OrderStatus /> },
+    { path: "/payment-response", element: <PaymentResponse /> },
+    { path: "/order-cancel", element: <OrderCancel /> },
     { path: "/login", element: <AuthTemplate page="login" /> },
     { path: "/signup", element: <AuthTemplate page="signup" /> },
     { path: "/otp", element: <AuthTemplate page="otp" /> },
@@ -63,8 +73,10 @@ const getRoutesConfig = () => ({
   adminRoutes: [
     { path: "add-product", element: <AddNewProduct /> },
     { path: "customers", element: <Customers /> },
+    { path: "customers/:id", element: <CustomerDetails /> },
     { path: "orders", element: <Orders /> },
-    { path: "team", element: <Team /> },
+    { path: "orders/:id", element: <OrderDetails /> },
+    { path: "settings", element: <Settings /> },
     { path: "products", element: <Products /> },
   ],
 });

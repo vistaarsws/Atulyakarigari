@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry } from "ag-grid-community";
 import { ClientSideRowModelModule } from "ag-grid-community";
@@ -7,95 +7,73 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import "./AdminProductCard.css";
 import { useSelector, useDispatch } from "react-redux";
-
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-
-import ProductForm from "../../../../components/layout/admin/product-form/ProductForm";
 import { fetchAllProducts } from "../../../../Redux/features/ProductSlice";
-
 import { deleteProduct } from "../../../../services/user/userAPI";
 import { fetchAllCategory } from "../../../../Redux/features/CategorySlice";
+import ProductDetailsPopup from "./ProductDetailsPopup";
+import ConfirmationModal from "../../modal/confirmation-modal/ConfirmationModal";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-export default function AdminProductCard({ products }) {
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [open, setOpen] = useState(false);
+export default function AdminProductCard({ productStatus }) {
   const dispatch = useDispatch();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [openDetails, setOpenDetails] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedProduct(null);
-    dispatch(fetchAllProducts());
-  };
   const getCategory = useSelector((state) => state.categories.categories);
-
-  const getCategoryName = (id) => {
-    return getCategory.find((cat) => cat.id == id);
-  };
+  const products = useSelector((state) => state?.products?.products)?.filter(
+    (prod) => {
+      if (productStatus === "all") {
+        return true;
+      }
+      if (productStatus === "outofstock") {
+        return prod.stock === 0;
+      }
+      return prod.status.toLowerCase() === productStatus;
+    }
+  );
 
   useEffect(() => {
     dispatch(fetchAllProducts());
     dispatch(fetchAllCategory());
   }, [dispatch]);
 
-  const priceRenderer = (params) => {
-    const originalPrice = params.data.price;
-    const discount = params.data.fullProduct.discountPercentage;
-    const effectivePrice = originalPrice - (originalPrice * discount) / 100;
-
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {/* Display the discounted price (current price) */}
-        <span style={{ fontWeight: 700, fontSize: "14px", color: "#000" }}>
-          ₹{effectivePrice.toFixed(0)}
-          {"  "}
-          <span
-            style={{
-              textDecoration: "line-through",
-              fontSize: "14px",
-              color: "#9F9F9F",
-              fontWeight: 400,
-            }}
-          >
-            ₹{originalPrice.toFixed(0)}
-          </span>
-        </span>
-
-        {/* Display the original price as strikethrough */}
-      </div>
-    );
+  const handleCloseDetails = () => {
+    setOpenDetails(false);
+    setSelectedProduct(null);
   };
 
-  const transformData = products.map((product) => ({
-    productImgTitle: {
-      prodImg: product.images?.[0] || "default-image-path.jpg", // Fallback for missing images
-      prodName: product.name,
-    },
-    category: getCategoryName(product.category)?.name,
-    stock: product.stock,
-    attributes: product.attributes.map((obj) => obj.key),
-    price: product.price,
-    date: new Date(product.updatedAt).toLocaleDateString(), // Format the date
-    name: product.name,
-    fullProduct: product,
-  }));
+  const getCategoryName = useMemo(
+    () => (id) => getCategory?.find((cat) => cat.id === id)?.name || "Unknown",
+    [getCategory]
+  );
 
-  // Custom Cell Renderer for Profile Image
+  const transformData = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products?.map((product) => ({
+            productImgTitle: {
+              prodImg: product.images?.[0] || "default-image-path.jpg",
+              prodName: product.name,
+            },
+            category: getCategoryName(product?.category),
+            stock: product.stock,
+            productID: product?._id,
+            sku: product.sku,
+            price: product.price,
+            date: new Date(product.updatedAt).toLocaleDateString(),
+            name: product.name,
+            fullProduct: product,
+          }))
+        : [],
+    [products, getCategoryName]
+  );
+
   const profileImageRenderer = (params) => {
     const { prodImg, prodName } = params.value;
-
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <img
@@ -113,36 +91,81 @@ export default function AdminProductCard({ products }) {
     );
   };
 
-  // Custom Cell Renderer for Action Icons
-  const actionCellRenderer = (params) => {
-    const handleEdit = () => {
-      setSelectedProduct(params.data.fullProduct);
-      setOpen(true);
-    };
-
-    const deleteProductHandler = async () => {
-      try {
-        await deleteProduct(params.data.fullProduct._id);
-        dispatch(fetchAllProducts());
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const priceRenderer = (params) => {
+    const originalPrice = params.data.price;
+    const discount = params.data.fullProduct.discountPercentage;
+    const effectivePrice = originalPrice - (originalPrice * discount) / 100;
 
     return (
-      <div>
-        <IconButton onClick={handleEdit} aria-label="edit">
-          <EditIcon sx={{ fill: "#383737" }} />
-        </IconButton>
-        <IconButton onClick={deleteProductHandler} aria-label="delete">
-          <DeleteIcon sx={{ fill: "#AD3F38" }} />
-        </IconButton>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        <span style={{ fontWeight: 700, fontSize: "14px", color: "#000" }}>
+          ₹{effectivePrice.toFixed(0)}{" "}
+          <span
+            style={{
+              textDecoration: "line-through",
+              fontSize: "14px",
+              color: "#9F9F9F",
+              fontWeight: 400,
+            }}
+          >
+            ₹{originalPrice.toFixed(0)}
+          </span>
+        </span>
       </div>
     );
   };
 
-  // Column Definitions: Defines & controls grid columns.
-  const [colDefs, setColDefs] = useState([
+  const handleViewDetails = (product) => {
+    setSelectedProduct(product?._id);
+    setOpenDetails(true);
+  };
+
+  const deleteProductHandler = (params) => {
+    setProductToDelete(params.data.fullProduct);
+    setOpenConfirm(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!productToDelete) return;
+
+    setLoading(true);
+    try {
+      await deleteProduct(productToDelete?._id);
+      dispatch(fetchAllProducts());
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    } finally {
+      setLoading(false);
+      setOpenConfirm(false);
+      setProductToDelete(null);
+    }
+  };
+
+  const actionCellRenderer = (params) => (
+    <div>
+      <IconButton
+        onClick={() => handleViewDetails(params.data.fullProduct)}
+        aria-label="edit"
+      >
+        <EditIcon sx={{ fill: "#3F51B5" }} />
+      </IconButton>
+      <IconButton
+        onClick={() => deleteProductHandler(params)}
+        aria-label="delete"
+        disabled={loading}
+      >
+        <DeleteIcon sx={{ fill: "#AD3F38" }} />
+      </IconButton>
+    </div>
+  );
+
+  const [colDefs] = useState([
     {
       field: "productImgTitle",
       headerName: "PRODUCT IMAGE & TITLE",
@@ -150,77 +173,48 @@ export default function AdminProductCard({ products }) {
       flex: 1,
       cellStyle: { fontWeight: "bold" },
     },
-
-    { field: "category", headerName: "CATEGORIES", flex: 0.8 },
-    { field: "stock", headerName: "STOCK STATUS", flex: 0.8 },
-    { field: "attributes", headerName: "ATTRIBUTES", flex: 0.8 },
+    { field: "category", headerName: "CATEGORIES", flex: 0.6 },
+    { field: "productID", headerName: "PRODUCT ID", flex: 0.8 },
+    { field: "sku", headerName: "SKU ID", flex: 0.7 },
     {
       field: "price",
       headerName: "PRICE",
       cellRenderer: priceRenderer,
       flex: 0.7,
     },
-    { field: "date", headerName: "DATE", flex: 0.5 },
+    { field: "date", headerName: "DATE", flex: 0.4 },
+    { field: "stock", headerName: "STOCK", flex: 0.3 },
     {
       headerName: "ACTION",
       cellRenderer: actionCellRenderer,
       sortable: false,
       filter: true,
-      flex: 0.5,
+      flex: 0.3,
     },
   ]);
 
-  const defaultColDef = {
-    flex: 1,
-  };
-
-  // Container: Defines the grid's theme & dimensions.
   return (
-    <div
-      style={{
-        width: "100%",
-
-        padding: "1rem",
-      }}
-    >
+    <div style={{ width: "100%", padding: "1rem" }}>
       <AgGridReact
         rowData={transformData}
         columnDefs={colDefs}
-        defaultColDef={defaultColDef}
         domLayout="autoHeight"
       />
-      {/* ----------------------------------------------------------DIALOG EDIT PRODUCT--------------------------------------------------------------- */}
-      <Box>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          PaperProps={{
-            component: "form",
-            onSubmit: (event) => {
-              event.preventDefault();
-              // Form data handling logic
-              handleClose();
-            },
-          }}
-        >
-          <DialogContent>
-            <ProductForm
-              productDetails={selectedProduct}
-              isProductEditing={true}
-              closeDialog={handleClose}
-            />
-          </DialogContent>
-          <DialogActions sx={{ padding: "0 2.4rem 2rem" }}>
-            {/* <Button onClick={handleClose} variant="contained" color="error">
-              Cancel
-            </Button> */}
-            {/* <Button type="submit" variant="contained">
-              Submit
-            </Button> */}
-          </DialogActions>
-        </Dialog>
-      </Box>
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------------- */}
+
+      <ProductDetailsPopup
+        open={openDetails}
+        handleClose={handleCloseDetails}
+        productId={selectedProduct}
+      />
+
+      {/* Confirmation Modal for Deleting a Product */}
+      <ConfirmationModal
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        onConfirm={handleDeleteConfirmed}
+        title="Delete Product"
+        message="Are you sure you want to delete this product?"
+      />
     </div>
   );
 }

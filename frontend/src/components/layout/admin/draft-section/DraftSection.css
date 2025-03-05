@@ -1,9 +1,9 @@
 .draft-sidebar {
   flex: 0.25;
-  padding: 0 2rem 2rem;
-  /* background-color: #f3f4f6; */
+  padding: 2rem;
+  background-color: #f3f4f6;
   height: 100%;
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
 }
 
 .draft-list {
@@ -40,10 +40,4 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-}
-
-@media screen and (max-width: 768px) {
-  .draft-sidebar {
-    padding: 0;
-  }
 }

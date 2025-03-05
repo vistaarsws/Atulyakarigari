@@ -10,19 +10,139 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { Label, Menu as MenuIcon } from "@mui/icons-material";
+import {  Menu as MenuIcon } from "@mui/icons-material";
 
 import notificationIcon from "../../../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../../../assets/images/adminLogoutIcon.svg";
 import "./Navbar.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { getProfile } from "../../../../services/user/userAPI";
+import { logout } from "../../../../Redux/features/AuthSlice";
+import NotificationComponent from "./Notification/Notification";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+
+  const authToken = useSelector((state) => state.auth.token);
+  const [fetchedData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        if (!authToken) {
+          console.error("No user profile token found");
+          return;
+        }
+
+        let decodedToken;
+        try {
+          decodedToken = jwtDecode(authToken);
+        } catch (decodeError) {
+          console.error("Invalid token:", decodeError);
+          return;
+        }
+
+        const { _id } = decodedToken;
+        if (!_id) {
+          console.error("Invalid token structure");
+          return;
+        }
+
+        const response = await getProfile(_id);
+
+        if (!response || !response.data) {
+          console.error("Invalid API response:", response);
+          return;
+        }
+
+        const profile = response.data.data;
+
+        const fetchedData = {
+          fullName: profile.fullName || "Unknow Admin",
+          profilePicture:profile.profilePicture || "/static/images/avatar/1.jpg",
+        };
+        setProfileData(fetchedData);
+      } catch (error) {
+        console.error("Error fetching profile data:", error.message || error);
+      }
+    };
+
+    fetchProfileData();
+  }, [authToken]);
+
+  // Logout Handler
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+
+    window.location.reload();
+  };
+  const notifications = [
+    {
+      title: "New Message",
+      message: "John Doe sent you a message",
+      timestamp: new Date(),
+      avatar: "https://example.com/avatar.jpg",
+      category: "Message",
+      priority: "high",
+      type: "message",
+      isPinned: false,
+      isRead: false
+    },
+    {
+      title: "System Update",
+      message: "New version 2.0 is available for download",
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      avatar: "https://example.com/system.jpg",
+      category: "System",
+      priority: "medium",
+      type: "system",
+      isPinned: true,
+      isRead: false
+    },
+    {
+      title: "Task Completed",
+      message: "Project X deployment was successful",
+      timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000), // 2 days ago
+      avatar: "https://example.com/task.jpg",
+      category: "Task",
+      priority: "low",
+      type: "task",
+      isPinned: false,
+      isRead: true
+    },
+    {
+      title: "Meeting Reminder",
+      message: "Team standup in 15 minutes",
+      timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+      avatar: "https://example.com/meeting.jpg",
+      category: "Calendar",
+      priority: "high",
+      type: "calendar",
+      isPinned: true,
+      isRead: false
+    },
+    {
+      title: "Security Alert",
+      message: "Unusual login attempt detected",
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      avatar: "https://example.com/security.jpg",
+      category: "Security",
+      priority: "high",
+      type: "security",
+      isPinned: false,
+      isRead: false
+    }
+  ];
 
   const DrawerList = (
     <Box
@@ -44,7 +164,7 @@ export default function Navbar() {
           { label: "Add New Product", path: "/admin/add-product" },
           { label: "Customers", path: "/admin/customers" },
           { label: "Orders", path: "/admin/orders" },
-          { label: "Team", path: "/admin/team" },
+          { label: "Settings", path: "/admin/settings" },
         ].map((obj) => (
           <ListItem key={obj.label} disablePadding>
             <Link href={obj.path} underline="none">
@@ -101,8 +221,8 @@ export default function Navbar() {
 
         {/* Avatar and Admin Details */}
         <Avatar
-          alt="Rishit"
-          src="/static/images/avatar/1.jpg"
+          alt={fetchedData?.fullName}
+          src={fetchedData?.profilePicture}
           sx={{ width: 56, height: 56, border: "2px solid #fff" }}
         />
         <Box
@@ -117,11 +237,12 @@ export default function Navbar() {
             component="h1"
             sx={{ fontSize: "1.6rem", fontWeight: "700", color: "#383737" }}
           >
-            Rishit
+            {fetchedData?.fullName}
+
           </Typography>
 
-          <h2 style={{ margin: 0, fontSize: "1rem", color: "#6F6F6F" }}>
-            Admin
+          <h2 style={{ margin: 0, fontSize: "1.3rem", color: "#6F6F6F" }}>
+          {jwtDecode(authToken)?.role}
           </h2>
         </Box>
       </article>
@@ -144,19 +265,14 @@ export default function Navbar() {
           }}
         />
 
-        {/* Notification Icon */}
-        <Box sx={{ backgroundColor: "white", border: "1px solid white" }}>
-          <img
-            src={notificationIcon}
-            alt="Notification Icon"
-            style={{
-              cursor: "pointer",
-              width: "2.4rem",
-              height: "2.4rem",
-              visibility: notificationIcon ? "visible" : "hidden",
-            }}
-          />
-        </Box>
+         {/* Notification Component */}
+         <NotificationComponent
+          notifications={notifications}
+          notificationIcon={notificationIcon}
+          onMarkAllRead={() => console.log("Marked all as read")}
+          onNotificationClick={(n) => console.log("Clicked notification:", n)}
+          onClearAll={() => console.log("Cleared all notifications")}
+        />
 
         {/* Logout Icon */}
         <Box sx={{ border: "1px solid white", padding: "1rem" }}>
@@ -168,6 +284,7 @@ export default function Navbar() {
               width: "2rem",
               height: "2.4rem",
             }}
+            onClick={handleLogout}
           />
         </Box>
       </article>

@@ -15,6 +15,7 @@ export const authSlice = createSlice({
     logout: (state) => {
       Cookies.remove("authToken");
       state.token = null;
+      window.location.reload();
     },
   },
 });

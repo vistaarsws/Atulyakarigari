@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getProducts } from "../../services/user/userAPI";
+import { getProducts, getProductById } from "../../services/user/userAPI";
 
 export const fetchAllProducts = createAsyncThunk(
   "products/fetchProducts",
@@ -7,6 +7,18 @@ export const fetchAllProducts = createAsyncThunk(
     try {
       const response = await getProducts();
       return response.data.data.products;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+export const fetchProductById = createAsyncThunk(
+  "products/fetchProductById",
+  async (id) => {
+    try {
+      const response = await getProductById(id);
+      return response.data.data;
     } catch (error) {
       console.log(error);
     }
@@ -38,6 +50,18 @@ const productSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
+      })
+      .addCase(fetchProductById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductById.fulfilled, (state, action) => {
+        state.products = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchProductById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       });

@@ -154,7 +154,7 @@ export const getSubcategoryById = async (req, res) => {
         }
 
         // Find subcategory with populated parent category
-        const subcategory = await SubCategory.findById(id).populate('parentCategory');
+        const subcategory = await SubCategory.findById(id).populate('parentCategory').populate('products')
 
         // Check if subcategory exists
         if (!subcategory) {

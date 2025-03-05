@@ -3,18 +3,20 @@ import {
   createOrder,
   getAllOrders,
   getOrderById,
-  updateOrderStatus,
-  deleteOrder,
+  cancelOrder,
+  returnOrder,
 } from "../controllers/order.controller.js";
-import { auth } from "../middlewares/auth.middleware.js";
+import { auth, isAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
-router.use(auth); // Apply authentication middleware to all routes
+router.use(auth);
 
-router.post("/create", createOrder); // Create a new order
-router.get("/all", getAllOrders); // Get all orders
-router.get("/:id", getOrderById); // Get order by ID
-router.put("/:id", updateOrderStatus); // Update order status by ID
-router.delete("/:id", deleteOrder); // Delete order by ID
+router.post("/create", createOrder);
+router.post("/getOrder", getOrderById);
+router.post("/cancel", cancelOrder);
+router.post("/return", returnOrder);
+
+router.use(isAdmin);
+router.get("/getOrders", getAllOrders);
 
 export default router;

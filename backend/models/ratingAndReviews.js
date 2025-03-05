@@ -6,6 +6,7 @@ const ratingAndReviewsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
         required: true,
+        index: true,
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +21,7 @@ const ratingAndReviewsSchema = new mongoose.Schema({
     },
     comment: {
         type: String,
-        required: true,
+        default: "",
         trim: true,
     },
 }, {

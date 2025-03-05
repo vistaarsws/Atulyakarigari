@@ -1,4 +1,7 @@
 import Order from "../models/order.js";
+import Address from "../models/Address.js";
+import Payment from "../models/payment.js";
+import { createShiprocketOrder } from "../utils/shiprocket-service/shiprocket.js";
 
 const handleOrderNotFound = (res) => {
   return res.status(404).json({ message: "Order not found" });
@@ -7,23 +10,56 @@ const handleOrderNotFound = (res) => {
 export const createOrder = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { products, shippingAddress, paymentMethod } = req.body;
+    const { orderData, selectedAddressID, paymentOrderId } = req.body;
 
-    const totalAmount = products.reduce(
-      (sum, { price, quantity }) => sum + price * quantity,
-      0
-    );
+    const address = await Address.findOne({ _id: selectedAddressID, userId });
+    if (!address) {
+      return res.status(400).json({ error: "Invalid shipping address" });
+    }
+
+    const payment = await Payment.findOne({ paymentOrderId, userId });
+    if (!payment || payment.status !== "COMPLETED") {
+      return res.status(400).json({ error: "Invalid or incomplete payment" });
+    }
+
+    const shippingCost = orderData.products.shippingCost || 0;
+    const totalAmount = orderData.products.total; 
+    const discountAmount = orderData.products.totalDiscount || 0;
+
+    const shiprocketResponse = await createShiprocketOrder(orderData);
+    if (!shiprocketResponse || !shiprocketResponse.order_id) {
+      return res.status(500).json({ error: "Shiprocket order creation failed" });
+    }
 
     const newOrder = await Order.create({
       userId,
-      products,
+      products: orderData.products.items,
+      totalMRP: orderData.products.totalMRP,
+      discountAmount,
+      shippingCost,
+      donationAmount: orderData.products.donationAmount || 0,
       totalAmount,
-      shippingAddress,
-      paymentMethod,
+      orderStatus: "Processing",
+      shippingAddress: address, 
+      billingAddress: orderData.billingAddress || address,
+      shippingMethod: orderData.shippingMethod || "Standard",
+      paymentMethod: payment.paymentMethod,
+      transactionId: payment.transactionId,
+      isPaid: true,
+      paidAt: new Date(),
+      shiprocketOrderId: shiprocketResponse.order_id,
+      trackingId: shiprocketResponse.tracking_id || null,
+      courierName: shiprocketResponse.courier_name || null,
+      estimatedDelivery: shiprocketResponse.estimated_delivery_date || null,
+      shippedAt: null,
+      deliveredAt: null,
+      cancelledAt: null,
+      notes: orderData.notes || "",
     });
 
-    res.status(201).json(newOrder);
+    res.status(201).json({ success: true, order: newOrder });
   } catch (error) {
+    console.error("❌ Order Creation Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -42,9 +78,10 @@ export const getAllOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
-      .populate("userId", "name email")
-      .populate("products.productId", "name price");
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
+
+    const order = await Order.findById(id);
 
     if (!order) return handleOrderNotFound(res);
 
@@ -54,13 +91,14 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-export const updateOrderStatus = async (req, res) => {
+export const returnOrder = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { id, status } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
 
     const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
+      id,
+      { orderStatus: status },
       { new: true }
     );
 
@@ -72,9 +110,12 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-export const deleteOrder = async (req, res) => {
+export const cancelOrder = async (req, res) => {
   try {
-    const deletedOrder = await Order.findByIdAndDelete(req.params.id);
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ message: "Order ID is required" });
+
+    const deletedOrder = await Order.findByIdAndDelete(id);
 
     if (!deletedOrder) return handleOrderNotFound(res);
 
