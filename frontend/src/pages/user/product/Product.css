@@ -227,32 +227,6 @@
       color: white;
     }
   }
-
-  .productQuantityCounter_container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 0.4rem;
-    padding: 1rem 1.5rem;
-    background-color: #f4f4f4;
-    font-size: 1.4rem;
-    height: fit-content;
-
-    button {
-      border: none;
-      background-color: transparent;
-      color: #6f6f6f;
-      font-size: 1.4rem;
-      padding: 0.5rem;
-      width: auto;
-    }
-
-    & div {
-      display: inline-block;
-      text-align: center;
-      min-width: 2rem;
-    }
-  }
 }
 
 /* Tab view container */

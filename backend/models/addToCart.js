@@ -18,6 +18,11 @@ const CartSchema = new mongoose.Schema({
                 required: true,
                 min: [1, "Quantity cannot be less than 1"],
             },
+            expectedReturnDate: {
+              type: Number,
+              required: true,
+              min: [0, "Quantity cannot be less than 0"],
+            },
         },
     ],
     total: {
