@@ -37,7 +37,6 @@ export default function CategoryView() {
                   backgroundColor: collection.hoverBgColor,
                 }}
               >
-                
                 <h3>{ourCollection[index]?.name}</h3>
 
                 <div></div>

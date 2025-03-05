@@ -394,14 +394,16 @@ export default function ProductForm({
 
   // --------------------------------------------------------------------------------------------------------
 
-  const productFormHandler = async (e) => {
+  const productFormHandler = async (e, status) => {
     e.preventDefault();
-    const buttonClicked = e.nativeEvent.submitter?.value;
+
+    // const buttonClicked = e.nativeEvent.submitter?.value;
     try {
       setLoadingStates({
         ...loadingStates,
-        addProduct: buttonClicked !== "Draft",
-        draftProduct: buttonClicked === "Draft",
+
+        addProduct: status !== "Draft",
+        draftProduct: status === "Draft",
       });
 
       const formDataInstance = new FormData();
@@ -412,7 +414,7 @@ export default function ProductForm({
       formDataInstance.append("category", formData?.category);
       formDataInstance.append("subcategory", formData?.subcategory);
       formDataInstance.append("stock", formData?.stock);
-      formDataInstance.append("status", buttonClicked || formData?.status);
+      formDataInstance.append("status", status || formData?.status);
       formDataInstance.append(
         "discountPercentage",
         formData?.discountPercentage
@@ -1359,7 +1361,7 @@ export default function ProductForm({
                   color="warning"
                   value="Draft"
                   onClick={(e) => {
-                    productFormHandler(e);
+                    productFormHandler(e, "Draft");
                   }}
                 >
                   Update & Draft
@@ -1373,7 +1375,7 @@ export default function ProductForm({
                   variant="contained"
                   color="success"
                   value="Published"
-                  onClick={(e) => productFormHandler(e)}
+                  onClick={(e) => productFormHandler(e, "Published")}
                 >
                   Update Product
                 </LoadingButton>
