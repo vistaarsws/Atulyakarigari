@@ -350,8 +350,8 @@ const AddressUI = () => {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleAddressSelection = (addressId) => {
-    const addr = addressId === selectedAddress ? null : addressId
-    setSelectedAddress(addr); 
+    const addr = addressId === selectedAddress ? null : addressId;
+    setSelectedAddress(addr);
     localStorage.setItem("selectedAddressID", JSON.stringify(addr));
     console.log(addr);
   };
@@ -376,6 +376,26 @@ const AddressUI = () => {
   useEffect(() => {
     getAllAddress();
   }, []);
+
+  useEffect(() => {
+    const storedAddress = JSON.parse(localStorage.getItem("selectedAddressID"));
+    getAllAddress();
+
+    if (storedAddress) {
+      setSelectedAddress(storedAddress);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (addresses.length > 0 && !selectedAddress) {
+      const defaultAddr = addresses.find((addr) => addr.isDefault);
+      const firstAddr = addresses[0];
+
+      const addrToSelect = defaultAddr ? defaultAddr._id : firstAddr._id;
+      setSelectedAddress(addrToSelect);
+      localStorage.setItem("selectedAddressID", JSON.stringify(addrToSelect));
+    }
+  }, [addresses]);
 
   return (
     <>
