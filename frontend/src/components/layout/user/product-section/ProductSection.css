@@ -101,4 +101,7 @@
   .productCategorySection_container {
     padding: 5% 0;
   }
+  .skeletonCard {
+    height: 30rem;
+  }
 }

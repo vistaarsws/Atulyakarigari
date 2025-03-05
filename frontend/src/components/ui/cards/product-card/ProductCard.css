@@ -295,4 +295,8 @@
       margin: 0.2rem auto 0.5rem;
     }
   }
+
+  .productCard_container {
+    height: 30rem;
+  }
 }
