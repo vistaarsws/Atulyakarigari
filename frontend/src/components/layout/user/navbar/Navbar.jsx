@@ -239,7 +239,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 849) {
+      if (window.innerWidth < 1045) {
         setIsMobileView(true);
         setIsNavVisible(false);
       } else {
@@ -287,9 +287,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               onMouseOut={() => setIsCategoryHovered(null)}
             >
               <NavLink
-                style={{
-                  marginInline: "2rem",
-                }}
                 to={link.path}
                 onClick={() => {
                   if (link.dropdown) {

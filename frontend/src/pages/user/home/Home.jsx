@@ -40,8 +40,6 @@ export default function Home() {
     navigate(`/categories/6799c7eb464f0c78506ba77c`); // Redirect to category
   };
 
-
-
   return (
     <>
       <section className="heroSection">
@@ -127,7 +125,7 @@ export default function Home() {
                       ))
                     ) : (
                       <>
-                       <SkeletonLoader/>
+                        <SkeletonLoader />
                       </>
                     )}
                   </div>
@@ -137,8 +135,8 @@ export default function Home() {
           })
         ) : (
           <>
-            <SkeletonLoader/>
-            <SkeletonLoader/>
+            <SkeletonLoader />
+            <SkeletonLoader />
           </>
         )}
       </section>
