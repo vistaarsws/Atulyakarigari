@@ -173,36 +173,64 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
       inStock: event.target.checked,
     }));
   };
+  // Extract colors from product attributes
+const getProductColors = (product) => {
+  let productColors = [];
+
+  if (Array.isArray(product.attributes)) {
+    product.attributes.forEach((attr) => {
+      if (attr.key.toLowerCase().includes("color")) {
+        // Ensure `value` is always treated as an array
+        const colors = Array.isArray(attr.value) ? attr.value : [attr.value];
+
+        // Convert colors to lowercase and add them to the list
+        productColors = [...productColors, ...colors.map((c) => c.toLowerCase())];
+      }
+    });
+  }
+
+  return productColors;
+};
+
   const handleApplyFilters = () => {
     setInStock(tempFilters.inStock);
     setSelectedColors(tempFilters.selectedColors);
     setPriceRange(tempFilters.priceRange);
+  
     const filteredProducts = categoryData?.products?.filter((product) => {
-      // Stock Availability Check
-      const matchesStock =
-        !tempFilters.inStock ||
-        (product.inStock !== undefined && product.inStock);
-      // Price Range Check
-      const productPrice = product?.price || 0;
+      // ✅ Stock Availability Check
+      const matchesStock = !tempFilters.inStock || (product.stock && product.stock > 0);
+  
+      // ✅ Price Range Check
+      const productPrice = product.priceAfterDiscount ?? product.price ?? 0;
       const matchesPrice =
         productPrice >= tempFilters.priceRange[0] &&
         productPrice <= tempFilters.priceRange[1];
-      // Color Matching Check (Handles case-insensitive matching)
-      const productColor = product?.color?.toLowerCase() || "";
+  
+      // ✅ Extract Colors & Match Selection
+      const productColors = getProductColors(product);
       const matchesColor =
         tempFilters.selectedColors.length === 0 ||
-        tempFilters.selectedColors.some(
-          (color) => color.toLowerCase() === productColor
+        tempFilters.selectedColors.some((color) =>
+          productColors.includes(color.toLowerCase())
         );
-      return matchesStock && matchesPrice && matchesColor;
+  
+      // ✅ Ensure Product Is "Published"
+      const isPublished = product.status === "Published";
+  
+      return matchesStock && matchesPrice && matchesColor && isPublished;
     });
-    if (onFilterChange) {
-      onFilterChange(filteredProducts);
+  
+    // ✅ Prevent Unnecessary Updates
+    if (JSON.stringify(filteredProducts) !== JSON.stringify(categoryData.products)) {
+      onFilterChange && onFilterChange(filteredProducts);
     }
+  
     if (isMobile) {
       setIsToggled(false);
     }
   };
+  
   const handleResetFilters = () => {
     const defaultFilters = {
       inStock: false,
