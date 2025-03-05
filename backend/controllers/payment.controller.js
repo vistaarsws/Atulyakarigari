@@ -1,5 +1,5 @@
 import Payment from "../models/payment.js";
-import { encrypt } from "../utils/encryption/cryptoUtils.js";
+import { encrypt, decrypt } from "../utils/encryption/cryptoUtils.js";
 import { v4 as uuidv4 } from "uuid";
 import config from "../config/ccAvenue.js";
 
@@ -7,8 +7,16 @@ const generatePaymentOrderId = () => `ORD-${uuidv4()}`;
 
 export const createPayment = async (req, res) => {
   try {
-    const { amount, productId } = req.body;
+    console.log(
+      "📏 HEX Working Key Length:",
+      Buffer.from(config.workingKey, "hex").length
+    );
+
+    let { products, donationAmount  } = req.body;
     const userId = req.user?._id;
+    let amount =products.total;
+
+    productId = "65b7e2c4d6b2f507c6f1e101";
 
     if (!userId)
       return res.status(400).json({ error: "User authentication required" });
@@ -60,25 +68,32 @@ export const createPayment = async (req, res) => {
       merchant_param1: userId,
     }).toString();
 
+    console.log("📦 Post Data Before Encryption:", postData);
+
     const encRequest = encrypt(postData);
+    console.log("🔐 Encrypted Request:", encRequest);
+
     const paymentUrl = `https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=${encRequest}&access_code=${config.accessCode}`;
 
-    res.json({ success: true, paymentUrl });
+    res.status(201).json({ success: true, paymentUrl });
   } catch (error) {
-    console.error("Payment Creation Error:", error);
+    console.error("❌ Payment Creation Error:", error);
     res.status(500).json({ errorMessage: "Payment initiation failed", error });
   }
 };
-
 export const handlePaymentResponse = async (req, res) => {
   try {
     const { encResp } = req.body;
 
-    if (!encResp)
-      return res.status(400).json({ error: "Invalid CCAvenue response" });
+    if (!encResp) {
+      console.error("❌ Invalid CCAvenue Response: encResp is missing");
+      return res
+        .status(400)
+        .json({ errorMessage: "Invalid CCAvenue response" });
+    }
 
     const decryptedResponse = decrypt(encResp);
-    console.log("Decrypted Response:", decryptedResponse);
+    console.log("🔓 Decrypted Response:", decryptedResponse);
 
     const responseParams = new URLSearchParams(decryptedResponse);
     const paymentOrderId = responseParams.get("order_id");
@@ -86,9 +101,13 @@ export const handlePaymentResponse = async (req, res) => {
     const orderStatus = responseParams.get("order_status");
 
     const payment = await Payment.findOne({ paymentOrderId });
-    if (!payment) return res.status(404).json({ error: "Payment not found" });
+    if (!payment) {
+      console.error(`❌ Payment Not Found for Order ID: ${paymentOrderId}`);
+      return res.status(404).json({ error: "Payment not found" });
+    }
 
-    // Update payment status
+    console.log(`✅ Order Status: ${orderStatus}, Tracking ID: ${trackingId}`);
+
     payment.transactionId = trackingId;
     payment.status =
       orderStatus === "Success"
@@ -104,7 +123,7 @@ export const handlePaymentResponse = async (req, res) => {
         : config.frontendFailureUrl;
     res.redirect(frontendRedirectUrl);
   } catch (error) {
-    console.error("Payment Response Error:", error);
+    console.error("❌ Payment Response Error:", error);
     res.status(500).json({ error: "Payment response handling failed" });
   }
 };

@@ -26,7 +26,7 @@ const Progress = () => {
         }}
       >
         <Link
-          to={"/view-cart"}
+          to={"#"}
           style={{ textDecoration: "none", color: "#60a487" }}
         >
           Bag
@@ -59,7 +59,7 @@ const Progress = () => {
         }}
       >
         <Link
-          to={"/place-order"}
+          to={"#"}
           style={{
             textDecoration: "none",
             color: routes == "/place-order" ? "#60a487" : "#888888",

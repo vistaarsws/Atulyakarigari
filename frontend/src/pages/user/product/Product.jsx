@@ -88,7 +88,6 @@ const theme = createTheme({
 export default function Product() {
   let { id: productId } = useParams();
 
-  const [productQuantity, setProductQuantity] = useState(1);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -175,6 +174,15 @@ export default function Product() {
     setLoading(true);
     try {
       let { rating, comment } = formData;
+
+      if (!rating || !comment.trim()) {
+        enqueueSnackbar("Please provide a rating and comment.", {
+          variant: "warning",
+        });
+        setLoading(false);
+        return;
+      }
+
       let response;
 
       if (editingReviewId) {
@@ -190,13 +198,20 @@ export default function Product() {
             : "Review submitted successfully!",
           { variant: "success" }
         );
+
         fetchRatingAndReview();
         setFormData({ rating: 5, comment: "" });
         setEditingReviewId(null);
       } else {
+        enqueueSnackbar("Error submitting review. Please try again.", {
+          variant: "error",
+        });
         console.error("Error submitting review:", response);
       }
     } catch (error) {
+      enqueueSnackbar("Something went wrong! Please try again.", {
+        variant: "error",
+      });
       console.error("Unexpected error in handleSubmit:", error);
     } finally {
       setLoading(false);
@@ -261,21 +276,34 @@ export default function Product() {
     if (loading) return;
     setLoading(true);
 
-    try {
-      isInCart
-        ? await removeFromCart(productId)
-        : await addToCart(productId, productQuantity);
-      setIsInCart(!isInCart);
-    } catch (error) {
-      console.error("Error updating cart:", error);
-    } finally {
-      setLoading(false);
+    if (authToken) {
+      try {
+        isInCart
+          ? await removeFromCart(productId)
+          : await addToCart(productId, 1);
+        setIsInCart(!isInCart);
+      } catch (error) {
+        console.error("Error updating cart:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    else{
+      enqueueSnackbar("Please Login First", {
+        variant: "error",
+      });
     }
   };
 
   // buy now button
   const handleBuyToggle = () => {
-    navigate("/place-order", { state: { productId, productQuantity } });
+    if (authToken) {
+      navigate("/place-order", { state: { productId } });
+    } else {
+      enqueueSnackbar("Please Login to Buy Product", {
+        variant: "error",
+      });
+    }
   };
 
   // START Share Product
@@ -552,20 +580,6 @@ export default function Product() {
               </ul>
             </article>
             <article className="product_details_userInputs">
-              {/* <div className="productQuantityCounter_container">
-                <button
-                  onClick={() =>
-                    productQuantity > 1 &&
-                    setProductQuantity(productQuantity - 1)
-                  }
-                >
-                  -
-                </button>
-                <div>{productQuantity}</div>
-                <button onClick={() => setProductQuantity(productQuantity + 1)}>
-                  +
-                </button>
-              </div> */}
               <div>
                 <button onClick={handleBuyToggle}>Buy Now</button>
               </div>
