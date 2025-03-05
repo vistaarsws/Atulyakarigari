@@ -13,7 +13,6 @@ const PlaceOrder = () => {
   const authToken = useSelector((state) => state.auth.token);
   const location = useLocation();
   const productId = location.state?.productId; // Get productId if coming from "Buy Now"
-  const productQuantity = location.state?.productQuantity; // Get product quantity if coming from "Buy Now"
 
   const [cartData, setCartData] = useState(null);
 
@@ -22,15 +21,12 @@ const PlaceOrder = () => {
       if (productId) {
         const response = await getProductById(productId);
         const rate = {
-          items: productQuantity,
-          totalMRP: response?.data?.data?.priceAfterDiscount * productQuantity,
+          totalMRP: response?.data?.data?.priceAfterDiscount,
           totalDiscount:
-            (response?.data?.data?.price -
-              response?.data?.data?.priceAfterDiscount) *
-            productQuantity,
-          total: response?.data?.data?.priceAfterDiscount * productQuantity,
+            response?.data?.data?.price -
+            response?.data?.data?.priceAfterDiscount,
+          total: response?.data?.data?.priceAfterDiscount,
         };
-        console.log("Rate Data:", rate);
         setCartData(rate);
       } else {
         const response = await getCart();
