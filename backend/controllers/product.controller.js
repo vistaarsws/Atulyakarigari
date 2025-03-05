@@ -123,10 +123,10 @@ export const createProduct = async (req, res) => {
 
     if (!_detailDescription || _detailDescription.trim() === "") {
       return badRequest(req, res, null, "Detail description is required");
-  }
-  
-  const detailDescription = JSON.parse(_detailDescription);
-  
+    }
+
+    const detailDescription = JSON.parse(_detailDescription);
+
     if (!attributes || !Array.isArray(attributes)) {
       return badRequest(req, res, null, "Invalid Attributes");
     }
@@ -331,7 +331,7 @@ export const updateProduct = async (req, res) => {
       length,
       width,
       height,
-      detailDescription,
+      _detailDescription,
       price,
       category,
       subcategory,
@@ -432,7 +432,7 @@ export const updateProduct = async (req, res) => {
       );
     }
 
-    const _detailDescription = JSON.parse(detailDescription);
+    const detailDescription = JSON.parse(_detailDescription);
     // Handle artisan image
     const artisanImage = req.files?.artisanImage
       ? await uploadImageToCloudinary(req.files.artisanImage, "artisan")
@@ -441,8 +441,8 @@ export const updateProduct = async (req, res) => {
     // Prepare updated data
     const updatedData = {
       name: name?.trim() || existingProduct.name,
-      detailDescription:
-        _detailDescription || existingProduct.detailDescription,
+      _detailDescription:
+        detailDescription || existingProduct._detailDescription,
       price: price || existingProduct.price,
       category: category || existingProduct.category,
       subcategory: subcategory || existingProduct.subcategory,
