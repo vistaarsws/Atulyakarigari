@@ -12,6 +12,7 @@ const Index = () => {
   const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
+  console.log("cartData", cartData);
   const isMobile = useMediaQuery("(max-width:768px)");
 
   useEffect(() => {
@@ -20,13 +21,13 @@ const Index = () => {
     }
   }, [authToken, dispatch]);
 
-      const selectedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
-  
-      const orderData = {
-        products: cartData,
-        donationAmount:selectedDonation,
-      };
-      localStorage.setItem("orderData", JSON.stringify(orderData));
+  const selectedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
+
+  const orderData = {
+    products: cartData,
+    donationAmount: selectedDonation,
+  };
+  localStorage.setItem("orderData", JSON.stringify(orderData));
 
   return (
     <Box sx={{ pt: { sm: "0" } }}>
@@ -35,6 +36,7 @@ const Index = () => {
       {cartData.items?.length > 0 ? (
         <Box
           sx={{
+            marginTop: "2rem",
             height: "100%",
             display: "flex",
             justifyContent: "space-around",

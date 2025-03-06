@@ -47,13 +47,13 @@ const FlexItem = styled(Box)(({ theme }) => ({
 
 const LogoSection = styled(FlexItem)(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
-    width: "50%",
+    width: "40%",
   },
 }));
 
 const ContentSection = styled(FlexItem)(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
-    width: "50%",
+    width: "60%",
   },
 }));
 
@@ -100,13 +100,14 @@ export default function Footer() {
             sx={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
             {/* Logo and Description */}
             <LogoSection>
               <Typography
                 sx={{
-                  fontSize: "1.6rem",
+                  fontSize: "1.4rem",
                   fontWeight: 500,
                   lineHeight: "1.3rem",
                 }}
@@ -119,7 +120,7 @@ export default function Footer() {
                 sx={{
                   mb: 2,
                   fontWeight: 300,
-                  fontSize: "1.6rem",
+                  fontSize: "1.4rem",
                   lineHeight: "2.2rem",
                   fontFamily: "lato",
                   mr: 2,
@@ -170,14 +171,14 @@ export default function Footer() {
               sx={{
                 display: { sm: "flex" },
                 justifyContent: { sm: "space-between" },
-                width: { sm: "100%", md: "50%" },
+                width: { sm: "100%", md: "60%" },
               }}
             >
               {/* Quick Links */}
               <ContentSection>
                 <Typography
                   sx={{
-                    fontSize: "1.6rem",
+                    fontSize: "1.4rem",
                     fontWeight: 500,
                     lineHeight: "1.3rem",
                     marginBottom: 2,
@@ -189,7 +190,7 @@ export default function Footer() {
                 <Box component="nav">
                   {[
                     { text: "Home", link: "/" },
-                    { text: "About Us", link: "/about" },
+                    { text: "About", link: "/about" },
                     { text: "Artisans", link: "/artisans" },
                     // { text: "Categories", link: "/categories" },
                   ].map(({ text, link }) => (
@@ -197,7 +198,7 @@ export default function Footer() {
                       <StyledIcon component={ChevronRight} />
                       <Typography
                         sx={{
-                          fontSize: "1.6rem",
+                          fontSize: "1.4rem",
                           lineHeight: "1.3rem",
                           fontWeight: 400,
                           fontFamily: "lato",
@@ -214,7 +215,7 @@ export default function Footer() {
               <ContentSection>
                 <Typography
                   sx={{
-                    fontSize: "1.6rem",
+                    fontSize: "1.4rem",
                     fontWeight: 500,
                     lineHeight: "1.3rem",
                     marginBottom: 2,
@@ -235,7 +236,7 @@ export default function Footer() {
                       >
                         <Typography
                           sx={{
-                            fontSize: "1.6rem",
+                            fontSize: "1.4rem",
                             lineHeight: "1.9rem",
                             fontWeight: 500,
                             fontFamily: "lato",
@@ -263,7 +264,7 @@ export default function Footer() {
               <ContentSection>
                 <Typography
                   sx={{
-                    fontSize: "1.6rem",
+                    fontSize: "1.4rem",
                     fontWeight: 500,
                     lineHeight: "1.3rem",
                     marginBottom: 2,
@@ -297,7 +298,7 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={{
-                        fontSize: "1.6rem",
+                        fontSize: "1.4rem",
                         fontWeight: 400,
                         fontFamily: "lato",
                         mb: 1,

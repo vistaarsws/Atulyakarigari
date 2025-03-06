@@ -165,9 +165,9 @@ export const createShiprocketOrder = async (orderData) => {
 
   const payload = {
     order_id: orderData.order_id,
-    order_date: orderData.order_date || new Date().toISOString(), // Defaults to current date
-    pickup_location: orderData.pickup_location || "Primary", // Default pickup location
-    channel_id: orderData.channel_id || "", // Required if using a channel
+    order_date: orderData.order_date || new Date().toISOString(),
+    pickup_location: orderData.pickup_location || "Primary",
+    channel_id: orderData.channel_id || "",
     billing_customer_name: orderData.billing_customer_name,
     billing_last_name: orderData.billing_last_name || "",
     billing_address: orderData.billing_address,
@@ -178,7 +178,7 @@ export const createShiprocketOrder = async (orderData) => {
     billing_country: orderData.billing_country || "India",
     billing_email: orderData.billing_email || "",
     billing_phone: orderData.billing_phone,
-    shipping_is_billing: orderData.shipping_is_billing ?? true, // Defaults to true
+    shipping_is_billing: orderData.shipping_is_billing ?? true,
     shipping_customer_name:
       orderData.shipping_customer_name || orderData.billing_customer_name,
     shipping_last_name:

@@ -75,7 +75,7 @@ export default function ProductForm({
     artisanName: productDetails?.artisanName || "",
     artisanAbout: productDetails?.artisanAbout || "",
     artisanImage: productDetails?.artisanImage || null,
-    returnPolicy: productDetails?.returnPolicy,
+    expectedReturnDate: productDetails?.expectedReturnDate,
   }));
 
   const [loadingStates, setLoadingStates] = useState({
@@ -162,6 +162,7 @@ export default function ProductForm({
     artisanName: "",
     artisanAbout: "",
     artisanImage: null,
+    expectedReturnDate: "",
   };
 
   const handleOpenDialog = (variant = null) => {
@@ -393,14 +394,16 @@ export default function ProductForm({
 
   // --------------------------------------------------------------------------------------------------------
 
-  const productFormHandler = async (e) => {
+  const productFormHandler = async (e, status) => {
     e.preventDefault();
-    const buttonClicked = e.nativeEvent.submitter?.value;
+
+    // const buttonClicked = e.nativeEvent.submitter?.value;
     try {
       setLoadingStates({
         ...loadingStates,
-        addProduct: buttonClicked !== "Draft",
-        draftProduct: buttonClicked === "Draft",
+
+        addProduct: status !== "Draft",
+        draftProduct: status === "Draft",
       });
 
       const formDataInstance = new FormData();
@@ -411,7 +414,7 @@ export default function ProductForm({
       formDataInstance.append("category", formData?.category);
       formDataInstance.append("subcategory", formData?.subcategory);
       formDataInstance.append("stock", formData?.stock);
-      formDataInstance.append("status", buttonClicked || formData?.status);
+      formDataInstance.append("status", status || formData?.status);
       formDataInstance.append(
         "discountPercentage",
         formData?.discountPercentage
@@ -424,7 +427,10 @@ export default function ProductForm({
       formDataInstance.append("length", formData?.length);
       formDataInstance.append("width", formData?.width);
       formDataInstance.append("height", formData?.height);
-      formDataInstance.append("expectedReturnDate", formData?.returnPolicy);
+      formDataInstance.append(
+        "expectedReturnDate",
+        formData?.expectedReturnDate
+      );
 
       // Serialize _attributes
       if (formData._attributes) {
@@ -551,7 +557,7 @@ export default function ProductForm({
       });
     },
 
-    maxFiles: 5, // Limit to 5 images for multiple upload
+    maxFiles: 8, // Limit to 8 images for multiple upload
   });
 
   // Dropzone for single image
@@ -589,7 +595,18 @@ export default function ProductForm({
         <div className="form-fields">
           <article>
             <div className="image-upload">
-              <h2>Upload Image </h2>
+              <h2>
+                Upload Image {" "}
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "normal",
+                    color: "#666",
+                  }}
+                >
+                  (Supported formats: JPEG, PNG, JPG, GIF only)
+                </span>{" "}
+              </h2>
               <div
                 {...getRootPropsMultiple()}
                 className={`image-upload-area ${isDragActiveMultiple ? "active" : ""}`}
@@ -916,9 +933,9 @@ export default function ProductForm({
               <div>
                 <TextField
                   sx={{ width: "100%" }}
-                  id="returnPolicy"
+                  id="expectedReturnDate"
                   label="Expected Return/Cancel Days"
-                  value={formData.returnPolicy}
+                  value={formData.expectedReturnDate}
                   variant="outlined"
                   slotProps={{
                     input: {
@@ -928,7 +945,7 @@ export default function ProductForm({
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      returnPolicy: Number(e.target.value),
+                      expectedReturnDate: Number(e.target.value),
                     })
                   }
                 />
@@ -1118,7 +1135,7 @@ export default function ProductForm({
                         marginTop: 1,
                       }}
                     >
-                      {variant.value.map((value) => {
+                      {variantValues?.map((value) => {
                         return (
                           <Chip
                             key={value}
@@ -1317,6 +1334,7 @@ export default function ProductForm({
                   disabled={loadingStates.draftProduct}
                   value="Published"
                   sx={{ backgroundColor: "#5f3dc3" }}
+                  onClick={(e) => productFormHandler(e, "Published")}
                 >
                   Add Product
                 </LoadingButton>
@@ -1329,6 +1347,9 @@ export default function ProductForm({
                   variant="outlined"
                   color="success"
                   value="Draft"
+                  onClick={(e) => {
+                    productFormHandler(e, "Draft");
+                  }}
                 >
                   Save As Draft
                 </LoadingButton>
@@ -1355,7 +1376,7 @@ export default function ProductForm({
                   color="warning"
                   value="Draft"
                   onClick={(e) => {
-                    productFormHandler(e);
+                    productFormHandler(e, "Draft");
                   }}
                 >
                   Update & Draft
@@ -1369,7 +1390,7 @@ export default function ProductForm({
                   variant="contained"
                   color="success"
                   value="Published"
-                  onClick={(e) => productFormHandler(e)}
+                  onClick={(e) => productFormHandler(e, "Published")}
                 >
                   Update Product
                 </LoadingButton>

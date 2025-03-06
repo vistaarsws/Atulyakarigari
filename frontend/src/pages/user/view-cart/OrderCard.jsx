@@ -95,7 +95,7 @@ const ProductCard = ({ product }) => {
 
   const [productQuantity, setProductQuantity] = useState(1);
   return (
-    <StyledCard sx={{ marginTop: "5vh" }}>
+    <StyledCard>
       <Box sx={{ height: "100%" }}>
         <ProductImageWrapper
           sx={{
@@ -195,7 +195,20 @@ const ProductCard = ({ product }) => {
               sx={{ borderRadius: "0.5rem" }}
             >
               <Button
-                variant="contained"
+                variant="outlined"
+                sx={{
+                  padding: "9px 15px",
+                  borderColor: "#60a487",
+                  color: "#60a487",
+                  minWidth: "unset",
+                  fontSize: "1.5rem",
+                  lineHeight: 1,
+
+                  "&:hover": {
+                    color: "white",
+                    backgroundColor: "#60a487",
+                  },
+                }}
                 onClick={() =>
                   productQuantity > 1 && setProductQuantity(productQuantity - 1)
                 }
@@ -203,10 +216,25 @@ const ProductCard = ({ product }) => {
                 -
               </Button>
 
-              <Typography>{productQuantity}</Typography>
+              <Typography sx={{ minWidth: "1.2rem", textAlign: "center" }}>
+                {productQuantity}
+              </Typography>
 
               <Button
-                variant="contained"
+                variant="outlined"
+                sx={{
+                  padding: "9px 15px",
+                  borderColor: "#60a487",
+                  color: "#60a487",
+                  minWidth: "unset",
+                  fontSize: "1.5rem",
+                  lineHeight: 1,
+
+                  "&:hover": {
+                    color: "white",
+                    backgroundColor: "#60a487",
+                  },
+                }}
                 onClick={() => setProductQuantity(productQuantity + 1)}
               >
                 +
@@ -214,33 +242,36 @@ const ProductCard = ({ product }) => {
             </Box>
           </Box>
           <Box>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-                fontSize: "12px",
-                fontWeight: 400,
-              }}
-            >
-              <span
-                style={{
-                  fontWeight: 900,
-                  color: "rgb(56, 55, 55)",
+            {product.expectedReturnDate >= 0 ? (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
                   fontSize: "12px",
+                  fontWeight: 400,
                 }}
               >
-                10 Days
-              </span>{" "}
-              return available
-            </Typography>
-            <Box
+                <span
+                  style={{
+                    fontWeight: 900,
+                    color: "rgb(56, 55, 55)",
+                    fontSize: "12px",
+                  }}
+                >
+                  {`Easy ${product?.expectedReturnDate} days returns and exchanges`}
+                </span>
+              </Typography>
+            ) : (
+              "No Return"
+            )}
+
+            {/* <Box
               sx={{
                 display: "flex",
                 alignItems: "start",
                 mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
               }}
-            >
-            </Box>
+            ></Box> */}
           </Box>
         </Box>
       </CardContent>
@@ -248,6 +279,7 @@ const ProductCard = ({ product }) => {
   );
 };
 const OrderCard = ({ cartData }) => {
+  console.log("CART", cartData);
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -257,7 +289,7 @@ const OrderCard = ({ cartData }) => {
           padding: "2 2 2 0",
           bgcolor: "#fff",
           // height: "65vh"
-          height: { xs: "auto", sm: "65vh" },
+          height: { xs: "auto", sm: "75vh" },
           overflow: "scroll",
           scrollbarWidth: "none",
         }}

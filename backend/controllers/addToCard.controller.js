@@ -1,6 +1,7 @@
 import Cart from "../models/addToCart.js";
 import Product from "../models/product.js";
 import { badRequest, internalServerError, notFoundRequest } from "../helpers/api-response.js";
+import sendEmail from "../utils/mail-sender/index.js";
 
 // Centralized success response function
 const successResponse = (res, data, message) => {
@@ -13,22 +14,23 @@ const successResponse = (res, data, message) => {
 };
 
 // Helper function to format the cart data
-const formatCart = (cart,total) => ({
-    userId: cart.userId,
-    items: cart.items.map(item => ({
-        productId: item.productId._id,
-        quantity: item.quantity,
-        description: item.productId.description,
-        price: item.productId.price,
-        priceAfterDiscount: item.productId.priceAfterDiscount,
-        images: item.productId.images,
-        name: item.productId.name,
-        _id: item._id,
-    })),
-    total: total.total, // Total after discounts
-    totalMRP: total.totalMRP, // Total original price
-    totalDiscount: total.totalDiscount, // Total discount
-    _id: cart._id,
+const formatCart = (cart, total) => ({
+  userId: cart.userId,
+  items: cart.items.map((item) => ({
+    productId: item.productId._id,
+    quantity: item.quantity,
+    description: item.productId.description,
+    price: item.productId.price,
+    priceAfterDiscount: item.productId.priceAfterDiscount,
+    images: item.productId.images,
+    name: item.productId.name,
+    expectedReturnDate: item.productId.expectedReturnDate,
+    _id: item._id,
+  })),
+  total: total.total, // Total after discounts
+  totalMRP: total.totalMRP, // Total original price
+  totalDiscount: total.totalDiscount, // Total discount
+  _id: cart._id,
 });
 
 // Add or update item in the cart
@@ -49,6 +51,7 @@ export const addToCart = async (req, res) => {
         if (product.stock < quantity) {
             return badRequest(req, res, null, "Insufficient stock");
         }
+        const expectedReturnDate = product.expectedReturnDate;
 
         // Find or create the cart
         let cart = await Cart.findOne({ userId });
@@ -62,9 +65,10 @@ export const addToCart = async (req, res) => {
         if (itemIndex > -1) {
             // Replace the quantity if the product exists in the cart
             cart.items[itemIndex].quantity = quantity;
+            cart.items[itemIndex].expectedReturnDate = expectedReturnDate;
         } else {
             // Add new item to the cart
-            cart.items.push({ productId, quantity });
+            cart.items.push({ productId, quantity, expectedReturnDate });
         }
 
         // Recalculate the totals
@@ -84,6 +88,7 @@ export const addToCart = async (req, res) => {
     }
 };
 
+
 // Get the cart for the user
 export const getCart = async (req, res) => {
   try {
@@ -93,8 +98,11 @@ export const getCart = async (req, res) => {
       return notFoundRequest(req, res, null, "User not authenticated");
     }
 
-        // Fetch the user's cart and populate product details
-        let cart = await Cart.findOne({ userId }).populate("items.productId", "name price description priceAfterDiscount images");
+    // Fetch the user's cart and populate product details
+    let cart = await Cart.findOne({ userId }).populate(
+      "items.productId",
+      "name price description priceAfterDiscount images expectedReturnDate"
+    );
 
         if (!cart) {
             // Create an empty cart if not found
@@ -179,4 +187,18 @@ const calculateCartTotal = async (items) => {
     }
 
     return { total, totalMRP, totalDiscount };
+};
+
+export const sendCartReminderEmail = async (user, cart) => {
+    try {
+        const emailData = {
+            user,
+            cart
+        };
+
+        await sendEmail(user.email, "Don't Forget Your Cart!", "cartReminder", emailData);
+        console.log(`Reminder email sent to ${user.email}`);
+    } catch (error) {
+        console.error(`Failed to send cart reminder email to ${user.email}:`, error);
+    }
 };

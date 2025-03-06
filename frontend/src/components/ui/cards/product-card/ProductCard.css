@@ -97,6 +97,7 @@
 .productCard_container > article {
   height: 20%;
   letter-spacing: 3%;
+  text-align: start;
   color: #383737;
   & > h1 {
     font-size: 1.6rem;
@@ -293,5 +294,9 @@
       font-size: 1rem;
       margin: 0.2rem auto 0.5rem;
     }
+  }
+
+  .productCard_container {
+    height: 30rem;
   }
 }
