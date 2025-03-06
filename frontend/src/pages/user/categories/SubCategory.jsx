@@ -1,53 +1,33 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSubCategoryDataById } from "../../../Redux/features/CategorySlice";
 import BanarsiSilkFilter from "./BanarsiSilkFilter";
 import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
-import { Pagination, Skeleton } from "@mui/material";
-import { getSubCategoryById } from "../../../services/admin/adminAPI";
+import { Skeleton } from "@mui/material";
 import "./CategoryPage.css";
 import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
+
 const Index = () => {
   const { id } = useParams();
-  const [subCategoryData, setSubCategoryData] = useState(null);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState(false);
-  const productsPerPage = 20;
-  const hasFetched = useRef(false);
-  const fetchSubCategoryData = useCallback(async () => {
-    if (!id || hasFetched.current) return;
-    hasFetched.current = true;
-    setLoading(true);
-    setError(false);
-    try {
-      const response = await getSubCategoryById(id);
-      const products = response?.data?.data?.products || [];
-      setSubCategoryData(response?.data?.data || null);
-      setFilteredProducts(products);
-    } catch (error) {
-      console.error("Error fetching category data:", error);
-      setSubCategoryData(null);
-      setFilteredProducts([]);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchSubCategoryData();
-  }, []);
+    if (id) {
+      console.log("Fetching...");
+      dispatch(fetchSubCategoryDataById(id));
+    }
+  }, [id, dispatch]);
 
-  const handleFilterChange = (newFilteredProducts) => {
-    setFilteredProducts(newFilteredProducts);
-    setPage(1); // Reset pagination on filter change
-  };
+  const { subcategory, loading, error } = useSelector(
+    (state) => state.categories
+  );
+
   if (loading) {
     return (
       <div className="categoryPage_container">
         <section>
-          <BanarsiSilkFilter onFilterChange={handleFilterChange} />
+          <BanarsiSilkFilter />
           <div className="productList">
             {[...Array(10)].map((_, index) => (
               <div key={index} className="skeletonCard">
@@ -61,33 +41,26 @@ const Index = () => {
       </div>
     );
   }
+
   if (error) {
     return (
       <div className="error">
         <SkeletonLoader />
         <SkeletonLoader />
-        <button onClick={fetchSubCategoryData}>Retry</button>
+        <button onClick={() => dispatch(fetchSubCategoryDataById(id))}>
+          Retry
+        </button>
       </div>
     );
   }
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredProducts.length / productsPerPage)
-  );
-  const paginatedProducts = filteredProducts.slice(
-    (page - 1) * productsPerPage,
-    page * productsPerPage
-  );
+
   return (
     <div className="categoryPage_container">
       <section>
-        <BanarsiSilkFilter
-          categoryData={subCategoryData}
-          onFilterChange={handleFilterChange}
-        />
+        <BanarsiSilkFilter categoryData={subcategory} />
         <div className="productList">
-          {paginatedProducts.length > 0 ? (
-            paginatedProducts.map((product) => (
+          {subcategory?.products?.length > 0 ? (
+            subcategory.products.map((product) => (
               <ProductCard
                 key={product?._id}
                 id={product?._id}
@@ -109,16 +82,8 @@ const Index = () => {
           )}
         </div>
       </section>
-      {totalPages > 1 && (
-        <div className="paginationContainer">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(event, value) => setPage(value)}
-          />
-        </div>
-      )}
     </div>
   );
 };
+
 export default Index;

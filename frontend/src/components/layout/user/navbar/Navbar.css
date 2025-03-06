@@ -1,7 +1,7 @@
 .navbar_container {
   position: sticky;
   top: 0;
-  z-index: 99999;
+  z-index: 999;
   height: 10vh;
   width: 100vw;
   display: flex;
@@ -109,6 +109,7 @@
         div:last-of-type {
           height: 1px;
           width: 3.2rem;
+          z-index: -55;
           background-color: rgba(111, 111, 111, 0.2);
         }
       }
@@ -497,6 +498,7 @@ input:not(:placeholder-shown) ~ .reset {
   }
 
   .navLinks {
+    display: none !important;
     flex-direction: column;
     height: 85vh;
     overflow-y: scroll;
@@ -507,7 +509,6 @@ input:not(:placeholder-shown) ~ .reset {
     width: 80%;
 
     max-width: 40rem;
-    z-index: 999;
     /* box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; */
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     background-color: #60a486;
@@ -578,7 +579,7 @@ input:not(:placeholder-shown) ~ .reset {
 
     top: 10vh;
     left: 0;
-    z-index: 800;
+    z-index: -1;
     width: 100%;
   }
 
@@ -598,10 +599,6 @@ input:not(:placeholder-shown) ~ .reset {
   .navbar_container > div:nth-of-type(1) form {
     border-radius: 0;
     width: 100%;
-  }
-
-  .navLinks {
-    top: 16.5vh;
   }
 
   .navWithoutSearchBar_list {
@@ -808,6 +805,12 @@ input:not(:placeholder-shown) ~ .reset {
     top: 7vh;
     border-radius: 8px;
     max-height: 60vh;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .css-1rju2q6-MuiButtonBase-root-MuiMenuItem-root {
+    min-height: unset !important;
   }
 }
 

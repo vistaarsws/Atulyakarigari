@@ -1,48 +1,45 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getCategory, getSubCategoryById } from "../../services/admin/adminAPI";
 
+// Async thunk to fetch all categories
 export const fetchAllCategory = createAsyncThunk(
   "category/fetchCategory",
-  async () => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await getCategory();
-      const categories_arr = Object.values(response.data.data).map((cat) => ({
-        id: cat._id,
-        name: cat.name,
-        products: cat.products,
-        subcategory: cat.subcategory,
-      }));
+
+      const categories_arr = Object.values(response.data.data);
       return categories_arr;
     } catch (error) {
-      console.log(error);
+      return rejectWithValue(error.message || "Failed to fetch categories");
     }
   }
 );
 
-// Async thunk for fetching subcategory data
+// Async thunk to fetch a subcategory by ID
 export const fetchSubCategoryDataById = createAsyncThunk(
   "subCategory/fetchById",
   async (id, { rejectWithValue }) => {
     try {
       const response = await getSubCategoryById(id);
-
-      return response?.data?.data || null;
+      return response?.data?.data;
     } catch (error) {
-      return rejectWithValue(error.message || "Failed to fetch data");
+      return rejectWithValue(error.message || "Failed to fetch subcategory");
     }
   }
 );
 
 const initialState = {
   categories: [],
-
+  subcategory: null, // ✅ Start as null
   loading: false,
   error: null,
+  hasFetched: false,
 };
 
 const categorySlice = createSlice({
-  name: "category",
-  initialState: initialState,
+  name: "categories",
+  initialState,
   reducers: {
     setCategories: (state, action) => {
       state.categories = action.payload;
@@ -51,6 +48,7 @@ const categorySlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      // Handle fetchAllCategory
       .addCase(fetchAllCategory.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -63,25 +61,24 @@ const categorySlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       })
+
+      // Handle fetchSubCategoryDataById
       .addCase(fetchSubCategoryDataById.pending, (state) => {
-        if (!state.hasFetched) {
-          state.loading = true;
-          state.error = null;
-        }
+        state.loading = true;
+        state.error = null;
       })
       .addCase(fetchSubCategoryDataById.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.subcategory = action.payload; // ✅ Fix state update
         state.loading = false;
         state.hasFetched = true;
       })
       .addCase(fetchSubCategoryDataById.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
-        state.data = null;
+        state.subcategory = null;
       });
   },
 });
 
 export const { setCategories } = categorySlice.actions;
-
 export default categorySlice.reducer;
