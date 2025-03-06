@@ -15,22 +15,34 @@ import toggleArrow from "../../../assets/images/left-arrow-return-svgrepo-com.sv
 import toggleFilter from "../../../assets/images/filter-list-svgrepo-com.svg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-const colors = [
-  { name: "Alizarin Crimson", hex: "#E32636" },
-  { name: "Coral", hex: "#FF7F50" },
-  { name: "Teal", hex: "#008080" },
-  { name: "Pale Turquoise", hex: "#AFEEEE" },
-  { name: "Goldenrod", hex: "#DAA520" },
-  { name: "Deep Sky Blue", hex: "#00BFFF" },
-  { name: "Slate Gray", hex: "#708090" },
-  { name: "Firebrick", hex: "#B22222" },
-  { name: "Sea Green", hex: "#2E8B57" },
-  { name: "Black", hex: "#000000" },
-  { name: "White", hex: "#FFFFFF" },
-  { name: "Gray", hex: "#808080" },
-  { name: "Blue", hex: "#0000FF" },
-  { name: "Red", hex: "#FF0000" },
-];
+import toHex from "colornames";
+
+const extractColors = (categoryData) => {
+  const colorsSet = new Set();
+
+  categoryData?.products?.forEach((product) => {
+    if (Array.isArray(product.attributes)) {
+      product.attributes.forEach((attr) => {
+        if (attr.key.toLowerCase().includes("color")) {
+          let colorValues = Array.isArray(attr.value)
+            ? attr.value
+            : [attr.value];
+
+          colorValues.forEach((color) => {
+            color
+              .replace(/[\[\]]/g, "") // Remove brackets []
+              .split(/,|\/|&/) // Split by comma, slash, or "&"
+              .map((c) => c.trim().toLowerCase()) // Trim and lowercase
+              .forEach((c) => colorsSet.add(c)); // Add to Set
+          });
+        }
+      });
+    }
+  });
+
+  return Array.from(colorsSet);
+};
+
 const sidebarStyles = {
   container: {
     backgroundColor: "#fff",
@@ -139,13 +151,21 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
   const [inStock, setInStock] = useState(false);
   const [isToggled, setIsToggled] = useState(false);
   const [selectedColors, setSelectedColors] = useState([]);
-  const [priceRange, setPriceRange] = useState([2000, 30000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [availableColors, setAvailableColors] = useState([]);
+
   const [tempFilters, setTempFilters] = useState({
     inStock: false,
     selectedColors: [],
-    priceRange: [2000, 30000],
+    priceRange: [0, 100000],
   });
   const navigate = useNavigate();
+  useEffect(() => {
+    if (categoryData) {
+      setAvailableColors(extractColors(categoryData));
+    }
+  }, [categoryData]);
+
   useEffect(() => {
     setTempFilters({
       inStock,
@@ -173,74 +193,95 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
       inStock: event.target.checked,
     }));
   };
+  const getBaseColor = (colorName) => {
+    const words = colorName.split(" ");
+    if (words.length > 1) {
+      return toHex(words[words.length - 1]) || toHex(words[0]) || "#808080";
+    }
+    return toHex(colorName) || "#808080";
+  };
   // Extract colors from product attributes
-const getProductColors = (product) => {
-  let productColors = [];
+  const getProductColors = (product) => {
+    let productColors = [];
 
-  if (Array.isArray(product.attributes)) {
-    product.attributes.forEach((attr) => {
-      if (attr.key.toLowerCase().includes("color")) {
-        // Ensure `value` is always treated as an array
-        const colors = Array.isArray(attr.value) ? attr.value : [attr.value];
+    if (Array.isArray(product.attributes)) {
+      product.attributes.forEach((attr) => {
+        if (attr.key.toLowerCase().includes("color")) {
+          // Ensure `value` is always treated as an array
+          const colors = Array.isArray(attr.value) ? attr.value : [attr.value];
 
-        // Convert colors to lowercase and add them to the list
-        productColors = [...productColors, ...colors.map((c) => c.toLowerCase())];
-      }
-    });
-  }
+          // Convert colors to lowercase and add them to the list
+          productColors = [
+            ...productColors,
+            ...colors.map((c) => c.toLowerCase()),
+          ];
+        }
+      });
+    }
 
-  return productColors;
-};
+    return productColors;
+  };
 
   const handleApplyFilters = () => {
     setInStock(tempFilters.inStock);
     setSelectedColors(tempFilters.selectedColors);
     setPriceRange(tempFilters.priceRange);
-  
+
     const filteredProducts = categoryData?.products?.filter((product) => {
-      // ✅ Stock Availability Check
-      const matchesStock = !tempFilters.inStock || (product.stock && product.stock > 0);
-  
-      // ✅ Price Range Check
+      
+      const matchesStock =
+        !tempFilters.inStock || (product.stock && product.stock > 0);
+
+   
       const productPrice = product.priceAfterDiscount ?? product.price ?? 0;
       const matchesPrice =
         productPrice >= tempFilters.priceRange[0] &&
         productPrice <= tempFilters.priceRange[1];
-  
-      // ✅ Extract Colors & Match Selection
+
+     
       const productColors = getProductColors(product);
       const matchesColor =
         tempFilters.selectedColors.length === 0 ||
-        tempFilters.selectedColors.some((color) =>
-          productColors.includes(color.toLowerCase())
-        );
-  
-      // ✅ Ensure Product Is "Published"
+        tempFilters.selectedColors.some((color) => {
+          if (color.split(" ").length > 1) {
+            // If color name has multiple words (specific shade), match exactly
+            return productColors.includes(color.toLowerCase());
+          } else {
+            // If it's a general color, allow partial matches
+            return productColors.some((prodColor) =>
+              prodColor.includes(color.toLowerCase())
+            );
+          }
+        });
+
+    
       const isPublished = product.status === "Published";
-  
+
       return matchesStock && matchesPrice && matchesColor && isPublished;
     });
-  
-    // ✅ Prevent Unnecessary Updates
-    if (JSON.stringify(filteredProducts) !== JSON.stringify(categoryData.products)) {
+
+   
+    if (
+      JSON.stringify(filteredProducts) !== JSON.stringify(categoryData.products)
+    ) {
       onFilterChange && onFilterChange(filteredProducts);
     }
-  
+
     if (isMobile) {
       setIsToggled(false);
     }
   };
-  
+
   const handleResetFilters = () => {
     const defaultFilters = {
       inStock: false,
       selectedColors: [],
-      priceRange: [2000, 30000],
+      priceRange: [0, 100000],
     };
     setTempFilters(defaultFilters);
     setInStock(false);
     setSelectedColors([]);
-    setPriceRange([2000, 30000]);
+    setPriceRange([0, 100000]);
     if (onFilterChange) {
       onFilterChange(categoryData?.products || []);
     }
@@ -306,47 +347,58 @@ const getProductColors = (product) => {
           <Box sx={sidebarStyles.section}>
             <Typography sx={sidebarStyles.sectionTitle}>Colors</Typography>
             <Box sx={sidebarStyles.colorList}>
-              {colors.map((color) => (
-                <Box key={color.name} sx={sidebarStyles.colorItem}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="large"
-                        checked={tempFilters.selectedColors.includes(
-                          color.name
-                        )}
-                        onChange={() => toggleColor(color.name)}
-                        sx={{
-                          "&.Mui-checked": {
-                            "& .MuiSvgIcon-root": { color: "#10B981" },
-                          },
-                        }}
-                      />
-                    }
-                    label={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Box
+              {availableColors.map((color) => {
+                // Convert color name to hex and provide a fallback if undefined
+                const hexColor = toHex(color) || "#808080";
+
+                return (
+                  <Box key={color} sx={sidebarStyles.colorItem}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          size="large"
+                          checked={tempFilters.selectedColors.includes(color)}
+                          onChange={() => toggleColor(color)}
                           sx={{
-                            ...sidebarStyles.colorSwatch,
-                            backgroundColor: color.hex,
+                            "&.Mui-checked": {
+                              "& .MuiSvgIcon-root": { color: "#10B981" },
+                            },
                           }}
                         />
-                        <Typography sx={{ fontSize: "14px", color: "#383737" }}>
-                          {color.name}
-                        </Typography>
-                      </Box>
-                    }
-                    sx={{
-                      "&.MuiFormControlLabel-root": {
-                        margin: 0,
-                        boxShadow: "none !important",
-                      },
-                    }}
-                  />
-                </Box>
-              ))}
+                      }
+                      label={
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          {/* Color Swatch */}
+                          <Box
+                            sx={{
+                              ...sidebarStyles.colorSwatch,
+                              backgroundColor: getBaseColor(color), // Updated color logic
+                            }}
+                          />
+                          <Typography
+                            sx={{
+                              fontSize: "14px",
+                              color: "#383737",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {color}
+                          </Typography>
+                        </Box>
+                      }
+                      sx={{
+                        "&.MuiFormControlLabel-root": {
+                          margin: 0,
+                          boxShadow: "none !important",
+                        },
+                      }}
+                    />
+                  </Box>
+                );
+              })}
             </Box>
           </Box>
+          ;
         </Box>
         {/* Fixed Bottom Buttons */}
         <Box sx={sidebarStyles.buttonContainer}>
