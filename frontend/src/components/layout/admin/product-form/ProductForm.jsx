@@ -162,7 +162,7 @@ export default function ProductForm({
     artisanName: "",
     artisanAbout: "",
     artisanImage: null,
-    expectedReturnDate: null,
+    expectedReturnDate: "",
   };
 
   const handleOpenDialog = (variant = null) => {
@@ -557,7 +557,7 @@ export default function ProductForm({
       });
     },
 
-    maxFiles: 5, // Limit to 5 images for multiple upload
+    maxFiles: 8, // Limit to 8 images for multiple upload
   });
 
   // Dropzone for single image
@@ -595,7 +595,18 @@ export default function ProductForm({
         <div className="form-fields">
           <article>
             <div className="image-upload">
-              <h2>Upload Image </h2>
+              <h2>
+                Upload Image {" "}
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "normal",
+                    color: "#666",
+                  }}
+                >
+                  (Supported formats: JPEG, PNG, JPG, GIF only)
+                </span>{" "}
+              </h2>
               <div
                 {...getRootPropsMultiple()}
                 className={`image-upload-area ${isDragActiveMultiple ? "active" : ""}`}
@@ -1323,6 +1334,7 @@ export default function ProductForm({
                   disabled={loadingStates.draftProduct}
                   value="Published"
                   sx={{ backgroundColor: "#5f3dc3" }}
+                  onClick={(e) => productFormHandler(e, "Published")}
                 >
                   Add Product
                 </LoadingButton>
@@ -1335,6 +1347,9 @@ export default function ProductForm({
                   variant="outlined"
                   color="success"
                   value="Draft"
+                  onClick={(e) => {
+                    productFormHandler(e, "Draft");
+                  }}
                 >
                   Save As Draft
                 </LoadingButton>
