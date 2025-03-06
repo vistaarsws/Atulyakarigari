@@ -1,6 +1,7 @@
 import Cart from "../models/addToCart.js";
 import Product from "../models/product.js";
 import { badRequest, internalServerError, notFoundRequest } from "../helpers/api-response.js";
+import sendEmail from "../utils/mail-sender/index.js";
 
 // Centralized success response function
 const successResponse = (res, data, message) => {
@@ -186,4 +187,18 @@ const calculateCartTotal = async (items) => {
     }
 
     return { total, totalMRP, totalDiscount };
+};
+
+export const sendCartReminderEmail = async (user, cart) => {
+    try {
+        const emailData = {
+            user,
+            cart
+        };
+
+        await sendEmail(user.email, "Don't Forget Your Cart!", "cartReminder", emailData);
+        console.log(`Reminder email sent to ${user.email}`);
+    } catch (error) {
+        console.error(`Failed to send cart reminder email to ${user.email}:`, error);
+    }
 };
