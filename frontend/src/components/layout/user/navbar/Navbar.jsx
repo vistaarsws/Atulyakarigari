@@ -75,23 +75,29 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     );
 
     const filteredCategories = categories.filter((category) =>
-      `${category.name}`
-        .toLowerCase()
-        .includes(debouncedSearch.toLowerCase())
+      `${category.name}`.toLowerCase().includes(debouncedSearch.toLowerCase())
     );
 
-    const filteredSubcategories = categories.flatMap((category) =>
-      category.subcategory?.filter((sub) =>
-        `${sub.name}`
-          .toLowerCase()
-          .includes(debouncedSearch.toLowerCase())
-      ) || []
+    const filteredSubcategories = categories.flatMap(
+      (category) =>
+        category.subcategory?.filter((sub) =>
+          `${sub.name}`.toLowerCase().includes(debouncedSearch.toLowerCase())
+        ) || []
     );
 
     const combinedResults = [
-      ...filteredProducts.map((product) => ({ type: 'product', data: product })),
-      ...filteredCategories.map((category) => ({ type: 'category', data: category })),
-      ...filteredSubcategories.map((subcategory) => ({ type: 'subcategory', data: subcategory })),
+      ...filteredProducts.map((product) => ({
+        type: "product",
+        data: product,
+      })),
+      ...filteredCategories.map((category) => ({
+        type: "category",
+        data: category,
+      })),
+      ...filteredSubcategories.map((subcategory) => ({
+        type: "subcategory",
+        data: subcategory,
+      })),
     ];
 
     setFilteredResults(combinedResults);
@@ -108,7 +114,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   // Handle category selection
   const handleSelectCategory = (category) => {
     console.log("handleSelectCategory", category);
-    
+
     navigate(`/categories/${category.id}`);
     setSearchQuery("");
     setFilteredResults([]);
@@ -133,11 +139,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       const selectedItem = filteredResults[selectedIndex];
-      if (selectedItem.type === 'product') {
+      if (selectedItem.type === "product") {
         handleSelectProduct(selectedItem.data);
-      } else if (selectedItem.type === 'category') {
+      } else if (selectedItem.type === "category") {
         handleSelectCategory(selectedItem.data);
-      } else if (selectedItem.type === 'subcategory') {
+      } else if (selectedItem.type === "subcategory") {
         handleSelectSubCategory(selectedItem.data);
       }
     }
@@ -252,13 +258,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const logoutHandler = (isLogout) => {
-    if (isLogout === "Logout") {
-      enqueueSnackbar("Logout Successfully", { variant: "success" });
-      dispatch(logout());
-    }
-  };
 
   useEffect(() => {
     dispatch(fetchAllCategory());
@@ -431,28 +430,33 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                       className={index === selectedIndex ? "selected" : ""}
                       onMouseEnter={() => setSelectedIndex(index)}
                       onClick={() => {
-                        if (item?.type === 'product') {
+                        if (item?.type === "product") {
                           handleSelectProduct(item?.data);
-                        } else if (item?.type === 'category') {
+                        } else if (item?.type === "category") {
                           handleSelectCategory(item?.data);
-                        } else if (item?.type === 'subcategory') {
+                        } else if (item?.type === "subcategory") {
                           handleSelectSubCategory(item?.data);
                         }
                       }}
                     >
-                      {item?.type === 'product' && highlightMatch(item?.data?.name, searchQuery)}
-                      {item?.type === 'category' && `Category:  ${searchQuery}`}
-                      {item?.type === 'subcategory' && `Subcategory:  ${searchQuery}`}
+                      {item?.type === "product" &&
+                        highlightMatch(item?.data?.name, searchQuery)}
+                      {item?.type === "category" && `Category:  ${searchQuery}`}
+                      {item?.type === "subcategory" &&
+                        `Subcategory:  ${searchQuery}`}
                     </li>
                   ))}
                 </ul>
               )}
 
-              {searchQuery && filteredResults.length === 0 && !productsLoading && !categoriesLoading && (
-                <ul className="search-dropdown">
-                  <li>No results found</li>
-                </ul>
-              )}
+              {searchQuery &&
+                filteredResults.length === 0 &&
+                !productsLoading &&
+                !categoriesLoading && (
+                  <ul className="search-dropdown">
+                    <li>No results found</li>
+                  </ul>
+                )}
 
               {(productsLoading || categoriesLoading) && searchQuery && (
                 <ul className="search-dropdown">
@@ -624,4 +628,3 @@ function highlightMatch(text, query) {
     )
   );
 }
-
