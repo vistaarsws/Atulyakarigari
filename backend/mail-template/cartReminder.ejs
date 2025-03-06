@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oops! You Left Something Behind</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
+        .container { width: 90%; max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        .logo { text-align: center; margin-bottom: 20px; }
+        .logo img { max-width: 150px; }
+        h2 { text-align: center; color: #333; }
+        p { text-align: center; color: #555; }
+        .cart-items { margin: 20px 0; }
+        .cart-item { display: flex; align-items: center; margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 5px; }
+        .cart-item img { width: 60px; height: 60px; border-radius: 5px; margin-right: 15px; }
+        .cart-item-details { flex: 1; }
+        .btn { display: block; width: 80%; margin: 15px auto; text-align: center; background: #28a745; color: #fff; padding: 12px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold; }
+        .btn:hover { background: #218838; }
+        .discount { text-align: center; background: #ffcc00; padding: 10px; border-radius: 5px; margin-top: 15px; font-size: 16px; font-weight: bold; }
+        .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Company Logo -->
+        <div class="logo">
+            <img src="https://yourcompany.com/logo.png" alt="YourStore Logo">
+        </div>
+
+        <!-- Header Message -->
+        <h2>Oops! You Left Something in Your Cart, <%= user.name %> 🛒</h2>
+        <p>Your cart is waiting for you! Complete your purchase before these items go out of stock.</p>
+
+        <!-- Cart Items -->
+        <div class="cart-items">
+            <% cart.items.forEach(item => { %>
+                <div class="cart-item">
+                    <img src="<%= item.image %>" alt="<%= item.name %>">
+                    <div class="cart-item-details">
+                        <strong><%= item.name %></strong><br>
+                        <span>₹<%= item.price %> (x<%= item.quantity %>)</span>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Discount Offer (Optional) -->
+        <div class="discount">
+            🎉 Use Code <strong>WELCOME10</strong> for 10% Off!
+        </div>
+
+        <!-- Return to Cart Button -->
+        <a href="https://yourstore.com/cart" class="btn">Return to Your Cart & Checkout</a>
+
+        <p>Hurry! Your items are selling fast. ⏳</p>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Need help? <a href="mailto:support@yourstore.com">Contact Support</a></p>
+            <p>© 2024 Atulyakarigari. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

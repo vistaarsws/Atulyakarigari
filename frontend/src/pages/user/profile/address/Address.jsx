@@ -22,6 +22,9 @@ import {
   getAddress,
   updateAddress,
 } from "../../../../services/user/userAPI";
+import { setSelectedAddressID } from "../../../../Redux/features/AddressSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const theme = createTheme({
   typography: {
@@ -37,6 +40,7 @@ const theme = createTheme({
   },
 });
 
+
 const AddressCard = ({
   address,
   city,
@@ -47,25 +51,26 @@ const AddressCard = ({
   mobileNumber,
   pincode,
   typeOfAddress,
-  isSelected,
-  onSelect,
   getAllAddress,
   addressId,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
 
-  const deleteAddressHandler = async (id) => {
-    try {
-      await deleteAddress(id);
+  const dispatch = useDispatch();
+  const selectedAddressID = useSelector((state) => state.address.selectedAddressID); 
 
+  const deleteAddressHandler = async () => {
+    try {
+      await deleteAddress(addressId);
       getAllAddress();
     } catch (error) {
-      console.log(error);
+      console.error("Failed to delete address:", error);
     }
+  };
+
+  const handleSelectAddress = () => {
+    dispatch(setSelectedAddressID(addressId));
   };
 
   return (
@@ -81,55 +86,25 @@ const AddressCard = ({
           }}
         >
           <Box display="flex" justifyContent="space-between" mb={2}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "start",
-              }}
-            >
-              <Box>
+            <Box display="flex" alignItems="center">
+              {/* **Radio Button for Selecting Address** */}
+              {isPlaceOrder && (
                 <FormControlLabel
-                  sx={{
-                    mr: 0,
-                    display: isPlaceOrder ? "" : "none",
-                  }}
+                  sx={{ mr: 1 }}
                   value={addressId}
                   control={<Radio />}
-                  checked={isSelected}
-                  onChange={() => onSelect(addressId)}
+                  checked={selectedAddressID === addressId}
+                  onChange={handleSelectAddress}
                 />
-                {/* <Typography
-                  color="rgba(96, 164, 135, 1)"
-                  fontWeight={700}
-                  fontSize="14px"
-                  lineHeight="21px"
-                >
-                  {isDefault ? "Default Address" : "Other Address"}
-                </Typography> */}
-              </Box>
+              )}
 
-              <Typography
-                fontWeight={400}
-                color="rgba(56, 55, 55, 1)"
-                fontSize="12px"
-                lineHeight="21px"
-              >
+              {/* **Address Date** */}
+              <Typography fontSize="12px" fontWeight={400} color="rgba(56, 55, 55, 1)">
                 Added on {date}
               </Typography>
             </Box>
-            {/* <Button
-              variant="outlined"
-              sx={{
-                color: "#6B7280",
-                borderColor: "#D1D5DB",
-                textTransform: "capitalize",
-                fontWeight: 400,
-                fontSize: "14px",
-              }}
-            >
-              {type}
-            </Button> */}
+
+            {/* **Address Type Label** */}
             <Button
               variant="outlined"
               sx={{
@@ -137,193 +112,60 @@ const AddressCard = ({
                 padding: "9px 20px",
                 color: "#9f9f9f",
                 borderColor: "#e2e2e2",
-                // fontSize: "16px",
-                fontSize: {
-                  xs: "12px",
-                  md: "16px",
-                },
+                fontSize: { xs: "12px", md: "16px" },
                 fontWeight: 400,
-                textAlign: "left",
                 textTransform: "capitalize",
               }}
             >
               {typeOfAddress}
             </Button>
           </Box>
+
+          {/* **Address Details** */}
           <Box color="#374151">
-            <Typography
-              fontWeight={600}
-              fontSize="14px"
-              color="rgba(56, 55, 55, 1)"
-              mb="1rem"
-            >
+            <Typography fontWeight={600} fontSize="14px" mb="1rem" color="rgba(56, 55, 55, 1)">
               {fullName}
             </Typography>
-            <Typography
-              color="rgba(111, 111, 111, 1)"
-              fontSize="14px"
-              fontWeight={400}
-            >
-              {address}
-            </Typography>
-            <Typography
-              color="rgba(111, 111, 111, 1)"
-              fontSize="14px"
-              fontWeight={400}
-            >
-              {city}
-            </Typography>
-            <Typography
-              color="rgba(111, 111, 111, 1)"
-              fontSize="14px"
-              fontWeight={400}
-            >
-              {locality}
-            </Typography>
-            <Typography
-              color="rgba(111, 111, 111, 1)"
-              fontSize="14px"
-              fontWeight={400}
-              mt="3rem"
-            >
+            {[address, city, locality].map((line, index) => (
+              <Typography key={index} color="rgba(111, 111, 111, 1)" fontSize="14px" fontWeight={400}>
+                {line}
+              </Typography>
+            ))}
+            <Typography mt="1rem" color="rgba(111, 111, 111, 1)" fontSize="14px" fontWeight={400}>
               Mobile: {mobileNumber}
             </Typography>
           </Box>
-          <Box
-            gap={2}
-            sx={{
-              mt: "1rem",
 
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            {isPlaceOrder ? (
-              <>
-                <Button
-                  variant="outlined"
-                  color="success"
-                  sx={{
-                    width: "102px",
-                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                    height: "35px",
-                    padding: "9px 20px",
-                    color: "#73af96",
-                    borderColor: "#73af96",
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    textAlign: "left",
-                    textTransform: "capitalize",
-                    "&:hover": {
-                      color: "#ffffff",
-                      borderColor: "#60a487",
-                      backgroundColor: "#60a487",
-                    },
-                  }}
-                  onClick={() => deleteAddressHandler(addressId)}
-                >
-                  Remove
-                </Button>
+          {/* **Action Buttons** */}
+          <Box display="flex" justifyContent="flex-end" gap={2} mt="1rem">
+            <Button
+              variant="outlined"
+              color="success"
+              sx={buttonStyles("outlined", "#73af96", "#60a487")}
+              onClick={() => setIsModalOpen(true)}
+            >
+              Edit
+            </Button>
 
-                <Button
-                  variant="contained"
-                  color="error"
-                  sx={{
-                    width: "102px",
-                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                    height: "35px",
-                    padding: "9px 20px",
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    textAlign: "left",
-                    color: "#ffffff",
-                    textTransform: "capitalize",
-                    backgroundColor: "rgba(173, 63, 56, 1)",
-                    border: "none",
-                    "&:hover": {
-                      color: "#ffffff",
-                      borderColor: "#6d001d",
-                      backgroundColor: "#6d001d",
-                    },
-                  }}
-                  onClick={handleOpenModal}
-                >
-                  Edit
-                </Button>
-              </>
-            ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "end",
-                  gap: 2,
-                  mt: 2,
-                  width: "100%",
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  color="success"
-                  sx={{
-                    width: "102px",
-                    height: "35px",
-                    padding: "9px 20px",
-                    color: "#73af96",
-                    borderColor: "#73af96",
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    textAlign: "left",
-                    textTransform: "capitalize",
-                    "&:hover": {
-                      color: "#ffffff",
-                      borderColor: "#60a487",
-                      backgroundColor: "#60a487",
-                    },
-
-                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                  }}
-                  onClick={handleOpenModal}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  sx={{
-                    width: useMediaQuery("(max-width:425px)")
-                      ? "100%"
-                      : "102px",
-                    height: "35px",
-                    padding: "9px 20px",
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    textAlign: "left",
-                    color: "#ffffff",
-                    textTransform: "capitalize",
-                    backgroundColor: "rgba(173, 63, 56, 1)",
-                    border: "none",
-                    "&:hover": {
-                      color: "#ffffff",
-                      borderColor: "#6d001d",
-                      backgroundColor: "#6d001d",
-                    },
-                    flexBasis: useMediaQuery("(max-width:425px)") ? "50%" : "",
-                  }}
-                  onClick={() => deleteAddressHandler(addressId)}
-                >
-                  Delete
-                </Button>
-              </Box>
-            )}
+            <Button
+              variant="contained"
+              color="error"
+              sx={buttonStyles("contained", "rgba(173, 63, 56, 1)", "#6d001d")}
+              onClick={deleteAddressHandler}
+            >
+              {isPlaceOrder ? "Remove" : "Delete"}
+            </Button>
           </Box>
         </Paper>
       </Box>
+
+      {/* **Edit Address Modal** */}
       <AddressModal
-        title={"Edit"}
+        title="Edit"
         getAllAddress={getAllAddress}
         open={isModalOpen}
         addressId={addressId}
-        handleClose={handleCloseModal}
+        handleClose={() => setIsModalOpen(false)}
         addressData={{
           address,
           city,
@@ -339,6 +181,28 @@ const AddressCard = ({
     </>
   );
 };
+
+// **Reusable Button Styles**
+const buttonStyles = (variant, mainColor, hoverColor) => ({
+  width: "102px",
+  height: "35px",
+  padding: "9px 20px",
+  fontSize: "16px",
+  fontWeight: 400,
+  textTransform: "capitalize",
+  ...(variant === "outlined"
+    ? {
+        color: mainColor,
+        borderColor: mainColor,
+        "&:hover": { color: "#fff", borderColor: hoverColor, backgroundColor: hoverColor },
+      }
+    : {
+        color: "#fff",
+        backgroundColor: mainColor,
+        "&:hover": { borderColor: hoverColor, backgroundColor: hoverColor },
+      }),
+});
+
 
 const AddressUI = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
