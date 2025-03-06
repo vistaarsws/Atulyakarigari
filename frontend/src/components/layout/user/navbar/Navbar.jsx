@@ -51,57 +51,134 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   // Get products from Redux
 
-  // Fetch products only once
+  // Fetch products and categories on mount
   useEffect(() => {
     if (products.length === 0) {
       dispatch(fetchAllProducts());
     }
-  }, [dispatch, products.length]);
+    if (categories.length === 0) {
+      dispatch(fetchAllCategory());
+    }
+  }, [dispatch, products.length, categories.length]);
 
-  // MUI Debounce (Runs only when searchQuery changes)
-  const debouncedSearch = useDebounce(searchQuery, 300);
-
-  // Filter products when debounced value updates
+  // Filter products, categories, and subcategories
   useEffect(() => {
     if (debouncedSearch.length < 2) {
-      setFilteredProducts([]);
+      setFilteredResults([]);
       return;
     }
 
-    if (products.length > 0) {
-      const filtered = products.filter((product) =>
-        `${product.name} ${product.description} ${product.category} ${product.subcategory}`
+    const filteredProducts = products.filter((product) =>
+      `${product.name} ${product.description} ${product.category} ${product.subcategory}`
+        .toLowerCase()
+        .includes(debouncedSearch.toLowerCase())
+    );
+
+    const filteredCategories = categories.filter((category) =>
+      `${category.name}`
+        .toLowerCase()
+        .includes(debouncedSearch.toLowerCase())
+    );
+
+    const filteredSubcategories = categories.flatMap((category) =>
+      category.subcategory?.filter((sub) =>
+        `${sub.name}`
           .toLowerCase()
           .includes(debouncedSearch.toLowerCase())
-      );
+      ) || []
+    );
 
-      setFilteredProducts(filtered);
-      setSelectedIndex(-1); // Reset selection
-    }
-  }, [debouncedSearch, products]);
+    const combinedResults = [
+      ...filteredProducts.map((product) => ({ type: 'product', data: product })),
+      ...filteredCategories.map((category) => ({ type: 'category', data: category })),
+      ...filteredSubcategories.map((subcategory) => ({ type: 'subcategory', data: subcategory })),
+    ];
 
+    setFilteredResults(combinedResults);
+    setSelectedIndex(-1);
+  }, [debouncedSearch, products, categories]);
+
+  // Handle product selection
   const handleSelectProduct = (product) => {
     navigate(`/product/${product._id}`);
     setSearchQuery("");
-    setFilteredProducts([]); // Clear results after selection
+    setFilteredResults([]);
   };
 
-  // Keyboard navigation (Arrow keys & Enter)
+  // Handle category selection
+  const handleSelectCategory = (category) => {
+    console.log("handleSelectCategory", category);
+    
+    navigate(`/categories/${category.id}`);
+    setSearchQuery("");
+    setFilteredResults([]);
+  };
+
+  // Handle subcategory selection
+  const handleSelectSubCategory = (subcategory) => {
+    navigate(`/sub-categories/${subcategory._id}`);
+    setSearchQuery("");
+    setFilteredResults([]);
+  };
+
+  // Keyboard navigation
   const handleKeyDown = (e) => {
-    if (filteredProducts.length === 0) return;
+    if (filteredResults.length === 0) return;
 
     if (e.key === "ArrowDown") {
       setSelectedIndex((prev) =>
-        prev < filteredProducts.length - 1 ? prev + 1 : prev
+        prev < filteredResults.length - 1 ? prev + 1 : prev
       );
     } else if (e.key === "ArrowUp") {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === "Enter" && selectedIndex >= 0) {
-      handleSelectProduct(filteredProducts[selectedIndex]);
+      const selectedItem = filteredResults[selectedIndex];
+      if (selectedItem.type === 'product') {
+        handleSelectProduct(selectedItem.data);
+      } else if (selectedItem.type === 'category') {
+        handleSelectCategory(selectedItem.data);
+      } else if (selectedItem.type === 'subcategory') {
+        handleSelectSubCategory(selectedItem.data);
+      }
     }
   };
 
-  // -----------------------------------------------------------
+  // Fetch categories data
+  const fetchCategoriesData = async () => {
+    try {
+      const response = await getCategory();
+      const categories = Object.values(response.data.data);
+      if (categories.length) {
+        setGetAllCategories(categories);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      enqueueSnackbar("Failed to fetch categories", { variant: "error" });
+    }
+  };
+
+  useEffect(() => {
+    fetchCategoriesData();
+  }, [enqueueSnackbar]);
+
+  // Fetch cart, wishlist, and profile data if authenticated
+  useEffect(() => {
+    if (authToken) {
+      dispatch(fetchCart(authToken));
+      dispatch(fetchWishlist(authToken));
+      dispatch(fetchProfile(authToken));
+    }
+  }, [authToken, dispatch]);
+
+  // Handle logout
+  const logoutHandler = (isLogout) => {
+    if (isLogout === "Logout") {
+      enqueueSnackbar("Logout Successfully", { variant: "success" });
+      dispatch(logout());
+    }
+  };
+
+  // Navigation links
   const navigation = {
     links: [
       { name: "HOME", path: "/" },
@@ -122,6 +199,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
       { name: "BLOGS", path: "/blogs" },
     ],
   };
+
+  // Menu items for profile dropdown
   const menuItems = [
     { name: "My Profile", link: "/profile" },
     { name: "Wishlist", link: "/profile/wishlist" },
@@ -195,14 +274,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   return (
     <nav className="navbar_container">
-      {/* <Button onClick={() => navigate("/admin")}>admin</Button> */}
       <figure>
         <Link to={"/"}>
           <img src={headerLogo} alt="Atulyakarigari Logo" />
         </Link>
       </figure>
       <ul
-        // className={`navLinks ${isNavVisible || !isMobileView ? "" : "hidden"}`}
         className={` ${isNavVisible || !isMobileView ? "navLinks" : "hidden"} ${
           navWithoutSearchBar_list ? "navWithoutSearchBar_list" : ""
         }`}
@@ -338,33 +415,46 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                 <CloseIcon
                   className="clear-icon"
                   fontSize="large"
-                  onClick={() => setSearchQuery("")}
+                  onClick={() => {
+                    setSearchQuery("");
+                    setFilteredResults([]);
+                  }}
                 />
               )}
 
               {/* Search Results Dropdown */}
-              {searchQuery && filteredProducts.length > 0 && (
+              {searchQuery && filteredResults.length > 0 && (
                 <ul className="search-dropdown">
-                  {filteredProducts.map((product, index) => (
+                  {filteredResults.map((item, index) => (
                     <li
-                      key={product._id}
+                      key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
                       className={index === selectedIndex ? "selected" : ""}
                       onMouseEnter={() => setSelectedIndex(index)}
-                      onClick={() => handleSelectProduct(product)}
+                      onClick={() => {
+                        if (item?.type === 'product') {
+                          handleSelectProduct(item?.data);
+                        } else if (item?.type === 'category') {
+                          handleSelectCategory(item?.data);
+                        } else if (item?.type === 'subcategory') {
+                          handleSelectSubCategory(item?.data);
+                        }
+                      }}
                     >
-                      {highlightMatch(product.name, searchQuery)}
+                      {item?.type === 'product' && highlightMatch(item?.data?.name, searchQuery)}
+                      {item?.type === 'category' && `Category:  ${searchQuery}`}
+                      {item?.type === 'subcategory' && `Subcategory:  ${searchQuery}`}
                     </li>
                   ))}
                 </ul>
               )}
 
-              {searchQuery && filteredProducts.length === 0 && !loading && (
+              {searchQuery && filteredResults.length === 0 && !productsLoading && !categoriesLoading && (
                 <ul className="search-dropdown">
                   <li>No results found</li>
                 </ul>
               )}
 
-              {loading && searchQuery && (
+              {(productsLoading || categoriesLoading) && searchQuery && (
                 <ul className="search-dropdown">
                   <li>Loading...</li>
                 </ul>
@@ -393,7 +483,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         )}
         {authToken && (
           <IconButton
-            aria-label={notificationsLabel(100)}
+            aria-label={notificationsLabel(cartData?.items?.length)}
             onClick={() => navigate("/view-cart")}
           >
             <Badge
@@ -427,7 +517,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
               ) : (
                 <Avatar src="/broken-image.jpg" />
               )}
-              {/* {isProfileHovered && <div className="profile-dropdown"></div>} */}
             </div>
           </Button>
           <Menu
@@ -450,7 +539,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                   <MenuItem
                     key={index}
                     onClick={() => {
-                      if (item.name == "Logout") {
+                      if (item.name === "Logout") {
                         navigate("/");
                       }
                       navigate(item.link);
@@ -521,6 +610,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     </nav>
   );
 }
+
 // Function to highlight matching search text
 function highlightMatch(text, query) {
   const regex = new RegExp(`(${query})`, "gi");
@@ -534,3 +624,4 @@ function highlightMatch(text, query) {
     )
   );
 }
+
