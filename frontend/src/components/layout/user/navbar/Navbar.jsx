@@ -10,7 +10,6 @@ import { Button, ListItemIcon, Menu } from "@mui/material";
 import { useSnackbar } from "notistack";
 
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { getCategory } from "../../../../services/admin/adminAPI";
 import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -22,15 +21,23 @@ import { fetchProfile } from "../../../../Redux/features/ProfileSlice";
 import { fetchAllProducts } from "../../../../Redux/features/ProductSlice.jsx";
 import CloseIcon from "@mui/icons-material/Close";
 import useDebounce from "../../../../hooks/useDebounce";
+import SideNavbar from "../sidebar/SideNavbar.jsx";
+import { fetchAllCategory } from "../../../../Redux/features/CategorySlice.jsx";
 
 export default function Navbar({ navWithoutSearchBar_list }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { enqueueSnackbar } = useSnackbar();
+  const authToken = useSelector((state) => state.auth.token);
+
+  const { products, loading } = useSelector((state) => state.products);
+
   const wishlist = useSelector((state) => state.wishlist.items);
   const profile = useSelector((state) => state.profile);
   const cartData = useSelector((state) => state.cart);
+  const getAllCategories = useSelector((state) => state.categories.categories);
 
-  const [getAllCategories, setGetAllCategories] = useState([]);
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -43,7 +50,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [selectedIndex, setSelectedIndex] = useState(-1); // Keyboard navigation
 
   // Get products from Redux
-  const { products, loading } = useSelector((state) => state.products);
 
   // Fetch products only once
   useEffect(() => {
@@ -141,9 +147,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     setOpenCategoryIndex((prev) => (prev === index ? null : index));
   };
 
-  const authToken = useSelector((state) => state.auth.token);
-  const { enqueueSnackbar } = useSnackbar();
-
   function notificationsLabel(count) {
     if (count === 0) {
       return "no notifications";
@@ -178,19 +181,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     }
   };
 
-  const fetchCategoriesData = async () => {
-    try {
-      const response = await getCategory();
-      const categories = Object.values(response.data.data);
-      if (categories.length) {
-        setGetAllCategories(categories);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
   useEffect(() => {
-    fetchCategoriesData();
+    dispatch(fetchAllCategory());
   }, []);
 
   useEffect(() => {
@@ -238,7 +230,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                 <div
                   className={`categoryDropdown ${
                     isCategoryHovered === index ? "" : "hide"
-                  }`}
+                  } `}
                 >
                   <div className="categories-container">
                     {link.dropdown.map((categoryObj, catIndex) => (
@@ -502,8 +494,20 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             )}
           </Menu>
         </div>
+        <div
+          style={{
+            display: isNavVisible ? "none " : "",
+            justifyContent: "center",
+          }}
+        >
+          <SideNavbar
+            user={profile?.profile?.fullName}
+            linksArray={navigation.links}
+          />
+        </div>
       </div>
-      <div className="nav-mobile">
+
+      {/* <div className="nav-mobile">
         <button
           id="navbar-toggle"
           onClick={() => {
@@ -513,7 +517,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         >
           <span> </span>
         </button>
-      </div>
+      </div> */}
     </nav>
   );
 }
