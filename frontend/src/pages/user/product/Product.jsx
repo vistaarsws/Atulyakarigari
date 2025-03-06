@@ -138,20 +138,19 @@ export default function Product() {
 
   const fetchRatingAndReview = async () => {
     try {
+      const decodedToken = jwtDecode(authToken);
+
       const response = await getReviewById(productId);
 
       setReviewData(response?.data?.data);
 
       const reviews = response?.data?.data?.reviews;
-      if (authToken) {
-        const decodedToken = jwtDecode(authToken);
 
-        const existingReview = reviews.find(
-          (review) => review?.userId === decodedToken?._id
-        );
-        if (existingReview) {
-          setUserReview(existingReview);
-        }
+      const existingReview = reviews.find(
+        (review) => review?.userId === decodedToken?._id
+      );
+      if (existingReview) {
+        setUserReview(existingReview);
       }
 
       const updatedReviews = reviews.map((review) => ({
