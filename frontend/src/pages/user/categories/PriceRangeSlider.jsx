@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, Slider, Typography, styled } from "@mui/material";
+import { formatPrice } from "../../../utils/helpers";
 
 const StyledSlider = styled(Slider)(({ theme }) => ({
   color: "#10B981",
@@ -50,13 +51,13 @@ export default function PriceRangeSlider({ min, max, value, onChange }) {
         />
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
           <Typography sx={{ fontSize: "12px" }} color="text.secondary">
-            {min.toLocaleString()}
+            <p>Min</p>
+          {formatPrice(priceRange[0]).toLocaleString()}
           </Typography>
-          <Typography sx={{ fontSize: "12px", fontWeight: 500 }}>
-            {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()}
-          </Typography>
+          
           <Typography sx={{ fontSize: "12px" }} color="text.secondary">
-            {max.toLocaleString()}
+            <p>Max</p>
+          {formatPrice(priceRange[1]).toLocaleString()}
           </Typography>
         </Box>
       </Box>
