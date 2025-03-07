@@ -12,22 +12,13 @@ const Index = () => {
   const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
-  console.log("cartData", cartData);
   const isMobile = useMediaQuery("(max-width:768px)");
 
   useEffect(() => {
-    if (authToken) {
+    if (authToken && !cartData.items.length) {
       dispatch(fetchCart(authToken));
     }
-  }, [authToken, dispatch]);
-
-  const selectedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
-
-  const orderData = {
-    products: cartData,
-    donationAmount: selectedDonation,
-  };
-  localStorage.setItem("orderData", JSON.stringify(orderData));
+  }, [authToken, dispatch, cartData.items.length]);
 
   return (
     <Box sx={{ pt: { sm: "0" } }}>
@@ -55,7 +46,7 @@ const Index = () => {
             <OrderCard cartData={cartData} />
           </Box>
           <Box sx={{ width: { xs: "100%", md: "35%", marginBottom: "7rem" } }}>
-            <Payment orderData={orderData} />
+            <Payment/>
           </Box>
         </Box>
       ) : (
