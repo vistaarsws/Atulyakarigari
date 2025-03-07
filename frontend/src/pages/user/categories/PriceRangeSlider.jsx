@@ -3,17 +3,18 @@ import { Box, Slider, Typography, styled } from "@mui/material";
 import { formatPrice } from "../../../utils/helpers";
 
 const StyledSlider = styled(Slider)(({ theme }) => ({
-  color: "#10B981",
+  color: "#60a487",
   height: 8,
   "& .MuiSlider-track": {
     border: "none",
   },
   "& .MuiSlider-thumb": {
     height: 20,
-    backgroundColor: "#10B981",
+    backgroundColor: "#60a487",
     border: "2px solid white",
-    "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-      boxShadow: "0 0 0 8px rgba(16, 185, 129, 0.16)",
+    "&:hover": {
+      boxShadow:
+        "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)",
     },
     "&:before": {
       display: "none",
@@ -52,12 +53,12 @@ export default function PriceRangeSlider({ min, max, value, onChange }) {
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
           <Typography sx={{ fontSize: "12px" }} color="text.secondary">
             <p>Min</p>
-          {formatPrice(priceRange[0]).toLocaleString()}
+            {formatPrice(priceRange[0]).toLocaleString()}
           </Typography>
-          
+
           <Typography sx={{ fontSize: "12px" }} color="text.secondary">
             <p>Max</p>
-          {formatPrice(priceRange[1]).toLocaleString()}
+            {formatPrice(priceRange[1]).toLocaleString()}
           </Typography>
         </Box>
       </Box>
