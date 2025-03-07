@@ -344,9 +344,11 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
             />
           </Box>
           {/* Color Filter */}
-          <Box sx={sidebarStyles.section}>
+          {(availableColors?.length > 0) ? (<Box sx={sidebarStyles.section}>
             <Typography sx={sidebarStyles.sectionTitle}>Colors</Typography>
             <Box sx={sidebarStyles.colorList}>
+              {console.log("availableColors",availableColors?.length)}
+              
               {availableColors.map((color) => {
                 // Convert color name to hex and provide a fallback if undefined
                 const hexColor = toHex(color) || "#808080";
@@ -397,8 +399,9 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
                 );
               })}
             </Box>
-          </Box>
-          ;
+          </Box>):null}
+          
+          
         </Box>
         {/* Fixed Bottom Buttons */}
         <Box sx={sidebarStyles.buttonContainer}>
