@@ -31,7 +31,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const { enqueueSnackbar } = useSnackbar();
   const authToken = useSelector((state) => state.auth.token);
 
-  const { products, loading } = useSelector((state) => state.products);
+  const { products, loading : productsLoading } = useSelector((state) => state.products);
+  const { categories, loading: categoriesLoading } = useSelector((state) => state.categories);
 
   const wishlist = useSelector((state) => state.wishlist.items);
   const profile = useSelector((state) => state.profile);
@@ -46,10 +47,13 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const open = Boolean(anchorEl);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const [filteredResults, setFilteredResults] = useState([]);
+
   const [selectedIndex, setSelectedIndex] = useState(-1); // Keyboard navigation
 
-  // Get products from Redux
+
+    const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Fetch products and categories on mount
   useEffect(() => {
@@ -102,7 +106,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
     setFilteredResults(combinedResults);
     setSelectedIndex(-1);
-  }, [debouncedSearch, products, categories]);
+  }, [debouncedSearch, products, getAllCategories]);
 
   // Handle product selection
   const handleSelectProduct = (product) => {
@@ -115,7 +119,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const handleSelectCategory = (category) => {
     console.log("handleSelectCategory", category);
 
-    navigate(`/categories/${category.id}`);
+    navigate(`/categories/${category._id}`);
     setSearchQuery("");
     setFilteredResults([]);
   };
@@ -149,22 +153,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     }
   };
 
-  // Fetch categories data
-  const fetchCategoriesData = async () => {
-    try {
-      const response = await getCategory();
-      const categories = Object.values(response.data.data);
-      if (categories.length) {
-        setGetAllCategories(categories);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      enqueueSnackbar("Failed to fetch categories", { variant: "error" });
-    }
-  };
+
 
   useEffect(() => {
-    fetchCategoriesData();
+    dispatch(fetchAllCategory())
   }, [enqueueSnackbar]);
 
   // Fetch cart, wishlist, and profile data if authenticated
