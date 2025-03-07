@@ -2,17 +2,17 @@ import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, CardMedia, Stack, Divider, CircularProgress } from "@mui/material";
 import { getAddress, getServiceability } from "../../../services/user/userAPI";
-import { setSelectedAddressID } from "../../../Redux/features/AddressSlice"; // Import Redux action
 import ORDER_IMG from "../../../assets/images/order-img.png";
 
-const DeliveryEstimate = ({ orderData }) => {
-  const items = orderData?.products?.items || [];
+const DeliveryEstimate = () => {
   const dispatch = useDispatch();
   const selectedAddressID = useSelector((state) => state.address.selectedAddressID);
+  const cartData = useSelector((state) => state.cart);
 
   const [deliveryEstimations, setDeliveryEstimations] = useState({});
   const [deliveryPincode, setDeliveryPincode] = useState("");
   const [loading, setLoading] = useState(true);
+  const items = cartData?.items || [];
 
   const fetchAddressAndServiceability = useCallback(async () => {
     try {
@@ -98,7 +98,7 @@ const DeliveryEstimate = ({ orderData }) => {
               <Stack direction="row" justifyContent="space-between">
                 <Typography sx={{ fontSize: "12px", color: "#666" }}>QTY {item?.quantity || 1}</Typography>
                 <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#000" }}>
-                  ₹{item?.priceAfterDiscount || item?.price || 0}
+                  ₹{item.price * item.quantity}
                 </Typography>
               </Stack>
 

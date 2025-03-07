@@ -11,8 +11,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatPrice } from "../../../utils/helpers";
 import { useState, useEffect } from "react";
 import { createPayment } from "../../../services/user/userAPI";
+import { useSelector } from "react-redux";
 
-const Payment = ({ orderData }) => {
+
+const Payment = () => {
+  const cartData = useSelector((state) => state.cart);
   const navigate = useNavigate();
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const location = useLocation();
@@ -36,12 +39,14 @@ const Payment = ({ orderData }) => {
   };
 
   const totalAmount = isDonationEnabled
-    ? orderData?.products?.total + (selectedDonation || 0) || 0
-    : orderData?.products?.total || 0;
+    ? cartData?.total + (selectedDonation || 0) || 0
+    : cartData?.total || 0;
+
 
   const handlePayment = async () => {
+
     // Make API request
-    const response = await createPayment(orderData);
+    const response = await createPayment(cartData);
     console.log("Initiating payment with:", response.data);
 
     if (response.data) {
@@ -85,6 +90,7 @@ const Payment = ({ orderData }) => {
       <Box
         sx={{
           backgroundColor: "white",
+          boxShadow: 1,
           padding: { xs: 2, md: 4 },
           width: "100%",
         }}
@@ -185,14 +191,14 @@ const Payment = ({ orderData }) => {
             }}
           >
             Price Details (
-            {orderData?.products?.items?.items > 1
-              ? `${orderData?.products?.items} items`
-              : orderData?.products?.items === 1
-                ? `${orderData?.products?.items} item`
-                : orderData?.products?.items?.length === 1
-                  ? `${orderData?.products?.items?.length} item`
-                  : orderData?.products?.items?.length > 1
-                    ? `${orderData?.products?.items?.length} items`
+            {cartData?.items?.items > 1
+              ? `${cartData?.items} items`
+              : cartData?.items === 1
+                ? `${cartData?.items} item`
+                : cartData.items?.length === 1
+                  ? `${cartData?.items?.length} item`
+                  : cartData?.items?.length > 1
+                    ? `${cartData?.items?.length} items`
                     : "0 item"}
             )
           </Typography>
@@ -222,7 +228,7 @@ const Payment = ({ orderData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(orderData?.products?.totalMRP || 0)}
+                {formatPrice(cartData?.totalMRP || 0)}
               </Typography>
             </Box>
             <Box
@@ -251,7 +257,7 @@ const Payment = ({ orderData }) => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(orderData.products?.totalDiscount || 0)}
+                {formatPrice(cartData?.totalDiscount || 0)}
               </Typography>
             </Box>
             <Box
