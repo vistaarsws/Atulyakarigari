@@ -143,6 +143,7 @@ export default function App() {
       "/signup",
       "/otp",
       "/view-cart",
+      "/place-order",
     ];
 
     return {
