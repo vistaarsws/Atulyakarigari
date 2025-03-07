@@ -32,7 +32,6 @@ const Payment = ({ orderData }) => {
   const handleDonationSelect = (amount) => {
     setSelectedDonation(amount);
     localStorage.setItem("selectedDonation", JSON.stringify(amount));
-    console.log("selectedDonation", amount);
   };
 
   const totalAmount = isDonationEnabled
@@ -42,7 +41,6 @@ const Payment = ({ orderData }) => {
   const handlePayment = async () => {
     // Make API request
     const response = await createPayment(orderData);
-    console.log("Initiating payment with:", response.data);
 
     if (response.data) {
       window.location.href = response.data.paymentUrl;

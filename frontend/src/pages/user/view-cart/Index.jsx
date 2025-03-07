@@ -12,7 +12,6 @@ const Index = () => {
   const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
-  console.log("cartData", cartData);
   const isMobile = useMediaQuery("(max-width:768px)");
 
   useEffect(() => {

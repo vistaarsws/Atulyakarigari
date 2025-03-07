@@ -347,7 +347,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
           {(availableColors?.length > 0) ? (<Box sx={sidebarStyles.section}>
             <Typography sx={sidebarStyles.sectionTitle}>Colors</Typography>
             <Box sx={sidebarStyles.colorList}>
-              {console.log("availableColors",availableColors?.length)}
               
               {availableColors.map((color) => {
                 // Convert color name to hex and provide a fallback if undefined

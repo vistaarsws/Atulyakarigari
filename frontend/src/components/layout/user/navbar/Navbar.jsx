@@ -120,8 +120,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   // Handle category selection
   const handleSelectCategory = (category) => {
-    console.log("handleSelectCategory", category);
-
     navigate(`/categories/${category._id}`);
     setSearchQuery("");
     setFilteredResults([]);

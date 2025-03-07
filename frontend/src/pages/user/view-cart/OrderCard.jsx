@@ -256,7 +256,6 @@ const ProductCard = ({ product }) => {
   );
 };
 const OrderCard = ({ cartData }) => {
-  console.log("CART", cartData);
   return (
     <ThemeProvider theme={theme}>
       <Box
