@@ -39,9 +39,7 @@ const Payment = ({ orderData }) => {
     ? orderData?.products?.total + (selectedDonation || 0) || 0
     : orderData?.products?.total || 0;
 
-
   const handlePayment = async () => {
-
     // Make API request
     const response = await createPayment(orderData);
     console.log("Initiating payment with:", response.data);
@@ -76,11 +74,8 @@ const Payment = ({ orderData }) => {
         backgroundColor: "#f3f4f6",
         boxShadow: isPlaceOrder ? "" : "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
         mr: { xs: 0 },
-        height: {
-          xs: "auto",
-        },
 
-        overflow: "hidden",
+        // overflow: "scroll",
         scrollbarWidth: "none",
         // my: "10px",
         // borderRadius: 2,
@@ -90,7 +85,6 @@ const Payment = ({ orderData }) => {
       <Box
         sx={{
           backgroundColor: "white",
-          boxShadow: 1,
           padding: { xs: 2, md: 4 },
           width: "100%",
         }}

@@ -48,22 +48,7 @@ const CloseButton = styled(IconButton)({
   color: "#666666",
   padding: 4,
 });
-const QuantityContainer = styled(Box)({
-  display: "flex",
-  alignItems: "center",
-  border: "1px solid #E0E0E0",
-});
-const QuantityButton = styled(Button)({
-  minWidth: 32,
-  height: 32,
-  padding: 0,
-  border: "none",
-  color: "#333333",
-  fontSize: "15px",
-  "&:hover": {
-    backgroundColor: "#F5F5F5",
-  },
-});
+
 const ProductImage = styled("img")(({ theme }) => ({
   objectFit: "contain",
   objectPosition: "center",
@@ -264,14 +249,6 @@ const ProductCard = ({ product }) => {
             ) : (
               "No Return"
             )}
-
-            {/* <Box
-              sx={{
-                display: "flex",
-                alignItems: "start",
-                mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
-              }}
-            ></Box> */}
           </Box>
         </Box>
       </CardContent>

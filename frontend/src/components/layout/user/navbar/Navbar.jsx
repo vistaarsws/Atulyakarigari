@@ -31,8 +31,12 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const { enqueueSnackbar } = useSnackbar();
   const authToken = useSelector((state) => state.auth.token);
 
-  const { products, loading : productsLoading } = useSelector((state) => state.products);
-  const { categories, loading: categoriesLoading } = useSelector((state) => state.categories);
+  const { products, loading: productsLoading } = useSelector(
+    (state) => state.products
+  );
+  const { categories, loading: categoriesLoading } = useSelector(
+    (state) => state.categories
+  );
 
   const wishlist = useSelector((state) => state.wishlist.items);
   const profile = useSelector((state) => state.profile);
@@ -52,8 +56,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   const [selectedIndex, setSelectedIndex] = useState(-1); // Keyboard navigation
 
-
-    const debouncedSearch = useDebounce(searchQuery, 300);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Fetch products and categories on mount
   useEffect(() => {
@@ -153,10 +156,8 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     }
   };
 
-
-
   useEffect(() => {
-    dispatch(fetchAllCategory())
+    dispatch(fetchAllCategory());
   }, [enqueueSnackbar]);
 
   // Fetch cart, wishlist, and profile data if authenticated
@@ -374,90 +375,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         })}
       </ul>
       <div>
-        <div>
-          {!navWithoutSearchBar_list && (
-            <form className="form" onKeyDown={handleKeyDown}>
-              <button>
-                <svg
-                  width="17"
-                  height="16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-labelledby="search"
-                >
-                  <path
-                    d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
-                    stroke="white"
-                    strokeWidth="1.333"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></path>
-                </svg>
-              </button>
-              <input
-                className="input"
-                placeholder="Search here..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <CloseIcon
-                  className="clear-icon"
-                  fontSize="large"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setFilteredResults([]);
-                  }}
-                />
-              )}
-
-              {/* Search Results Dropdown */}
-              {searchQuery && filteredResults.length > 0 && (
-                <ul className="search-dropdown">
-                  {filteredResults.map((item, index) => (
-                    <li
-                      key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
-                      className={index === selectedIndex ? "selected" : ""}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      onClick={() => {
-                        if (item?.type === "product") {
-                          handleSelectProduct(item?.data);
-                        } else if (item?.type === "category") {
-                          handleSelectCategory(item?.data);
-                        } else if (item?.type === "subcategory") {
-                          handleSelectSubCategory(item?.data);
-                        }
-                      }}
-                    >
-                      {item?.type === "product" &&
-                        highlightMatch(item?.data?.name, searchQuery)}
-                      {item?.type === "category" && `Category:  ${searchQuery}`}
-                      {item?.type === "subcategory" &&
-                        `Subcategory:  ${searchQuery}`}
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              {searchQuery &&
-                filteredResults.length === 0 &&
-                !productsLoading &&
-                !categoriesLoading && (
-                  <ul className="search-dropdown">
-                    <li>No results found</li>
-                  </ul>
-                )}
-
-              {(productsLoading || categoriesLoading) && searchQuery && (
-                <ul className="search-dropdown">
-                  <li>Loading...</li>
-                </ul>
-              )}
-            </form>
-          )}
-        </div>
         {authToken && (
           <IconButton
             aria-label={`wishlist with ${wishlist.length} items`}
@@ -581,7 +498,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         </div>
         <div
           style={{
-            display: isNavVisible ? "none " : "",
+            display: !isMobileView || isNavVisible ? "none " : "",
             justifyContent: "center",
           }}
         >
@@ -603,6 +520,88 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           <span> </span>
         </button>
       </div> */}
+      {!navWithoutSearchBar_list && (
+        <form className="form" id="searchBar" onKeyDown={handleKeyDown}>
+          <button>
+            <svg
+              width="17"
+              height="16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-labelledby="search"
+            >
+              <path
+                d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
+                stroke="#6d001d"
+                strokeWidth="1.333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
+            </svg>
+          </button>
+          <input
+            className="input"
+            placeholder="Search here..."
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <CloseIcon
+              className="clear-icon"
+              fontSize="large"
+              onClick={() => {
+                setSearchQuery("");
+                setFilteredResults([]);
+              }}
+            />
+          )}
+
+          {/* Search Results Dropdown */}
+          {searchQuery && filteredResults.length > 0 && (
+            <ul className="search-dropdown">
+              {filteredResults.map((item, index) => (
+                <li
+                  key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
+                  className={index === selectedIndex ? "selected" : ""}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  onClick={() => {
+                    if (item?.type === "product") {
+                      handleSelectProduct(item?.data);
+                    } else if (item?.type === "category") {
+                      handleSelectCategory(item?.data);
+                    } else if (item?.type === "subcategory") {
+                      handleSelectSubCategory(item?.data);
+                    }
+                  }}
+                >
+                  {item?.type === "product" &&
+                    highlightMatch(item?.data?.name, searchQuery)}
+                  {item?.type === "category" && `Category:  ${searchQuery}`}
+                  {item?.type === "subcategory" &&
+                    `Subcategory:  ${searchQuery}`}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {searchQuery &&
+            filteredResults.length === 0 &&
+            !productsLoading &&
+            !categoriesLoading && (
+              <ul className="search-dropdown">
+                <li>No results found</li>
+              </ul>
+            )}
+
+          {(productsLoading || categoriesLoading) && searchQuery && (
+            <ul className="search-dropdown">
+              <li>Loading...</li>
+            </ul>
+          )}
+        </form>
+      )}
     </nav>
   );
 }
