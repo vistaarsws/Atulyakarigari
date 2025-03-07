@@ -60,7 +60,7 @@ export const addToTheCart = createAsyncThunk(
 
 export const updateQuantityInCart = createAsyncThunk(
   "cart/updateQuantity",
-  async ({ authToken, productId, quantity }, { rejectWithValue, dispatch, getState }) => {
+  async ({ productId, quantity }, { rejectWithValue, dispatch, getState }) => {
     try {
       const updatedCart = await dispatch(addToTheCart({ productId, quantity })).unwrap();
 

@@ -79,11 +79,8 @@ const Payment = () => {
         backgroundColor: "#f3f4f6",
         boxShadow: isPlaceOrder ? "" : "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
         mr: { xs: 0 },
-        height: {
-          xs: "auto",
-        },
 
-        overflow: "hidden",
+        // overflow: "scroll",
         scrollbarWidth: "none",
         // my: "10px",
         // borderRadius: 2,

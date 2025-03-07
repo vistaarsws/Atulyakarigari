@@ -21,14 +21,17 @@ const Index = () => {
   }, [authToken, dispatch, cartData.items.length]);
 
   return (
-    <Box sx={{ pt: { sm: "0" } }}>
+    <Box sx={{ pt: { sm: "0" }, height: "90vh", outline: "2px solid green" }}>
       <Stepper />
 
       {cartData.items?.length > 0 ? (
         <Box
           sx={{
             marginTop: "2rem",
-            height: "100%",
+            height: "80vh",
+            overflowY: "hidden",
+            scrollbarWidth: "none",
+            boxShadow: "none",
             display: "flex",
             justifyContent: "space-around",
             flexDirection: { xs: "column", md: "row" },
@@ -45,7 +48,16 @@ const Index = () => {
           >
             <OrderCard cartData={cartData} />
           </Box>
-          <Box sx={{ width: { xs: "100%", md: "35%", marginBottom: "7rem" } }}>
+          <Box
+            sx={{
+              width: {
+                xs: "100%",
+                md: "35%",
+                height: "83vh",
+                overflowY: "scroll",
+              },
+            }}
+          >
             <Payment/>
           </Box>
         </Box>

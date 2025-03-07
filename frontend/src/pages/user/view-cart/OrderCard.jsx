@@ -286,14 +286,6 @@ const ProductCard = ({ product }) => {
             ) : (
               "No Return"
             )}
-
-            {/* <Box
-              sx={{
-                display: "flex",
-                alignItems: "start",
-                mt: useMediaQuery("(max-width: 458px)") ? 0 : 1,
-              }}
-            ></Box> */}
           </Box>
         </Box>
       </CardContent>

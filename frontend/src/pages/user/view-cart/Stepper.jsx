@@ -12,9 +12,11 @@ const Progress = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-
+        position: "sticky",
+        top: "10vh",
         backgroundColor: "#f7f7f7",
         // p: 2,
+        zIndex: "899",
         flexWrap: isMobile ? "wrap" : "nowrap",
         height: "7vh",
       }}
@@ -25,10 +27,7 @@ const Progress = () => {
           fontSize: isSmallScreen ? "14px" : "16px",
         }}
       >
-        <Link
-          to={"#"}
-          style={{ textDecoration: "none", color: "#60a487" }}
-        >
+        <Link to={"#"} style={{ textDecoration: "none", color: "#60a487" }}>
           Bag
         </Link>
       </Typography>
