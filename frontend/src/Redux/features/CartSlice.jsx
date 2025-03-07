@@ -58,6 +58,28 @@ export const addToTheCart = createAsyncThunk(
   }
 );
 
+export const updateQuantityInCart = createAsyncThunk(
+  "cart/updateQuantity",
+  async ({ productId, quantity }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const updatedCart = await dispatch(addToTheCart({ productId, quantity })).unwrap();
+
+      dispatch(cartSlice.actions.updateItemQuantity({ productId, quantity }));
+
+      const totalMRP = updatedCart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = totalMRP; 
+
+      dispatch(cartSlice.actions.updateCartTotals({ totalMRP, total }));
+
+      return updatedCart;
+    } catch (err) {
+      console.error("Error updating cart quantity:", err);
+      return rejectWithValue(err.message || "Failed to update cart");
+    }
+  }
+);
+
+
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -71,9 +93,20 @@ const cartSlice = createSlice({
   reducers: {
     // ✅ Reducer to remove item immediately from Redux state
     removeItemFromState: (state, action) => {
-      state.items = state.items.filter(
-        (item) => item.productId !== action.payload
-      );
+      state.items = state.items.filter((item) => item.productId !== action.payload);
+    },
+    
+    updateItemQuantity: (state, action) => {
+      const { productId, quantity } = action.payload;
+      const item = state.items.find((item) => item.productId === productId);
+      if (item) {
+        item.quantity = quantity;
+      }
+    },
+
+    updateCartTotals: (state, action) => {
+      state.totalMRP = action.payload.totalMRP;
+      state.total = action.payload.total;
     },
   },
   extraReducers: (builder) => {
@@ -113,4 +146,5 @@ const cartSlice = createSlice({
   },
 });
 
+export const { removeItemFromState, updateItemQuantity, updateCartTotals } = cartSlice.actions;
 export default cartSlice.reducer;
