@@ -163,16 +163,10 @@
   color: #ff3f6c;
 }
 
-/* @media (max-width: 1045px) {
-  .sidenav {
-    transform: translateX(0);
-    position: static;
-    width: 250px;
-    height: auto;
-    box-shadow: none;
-  }
+@media (max-width: 1045px) {
+ 
 
   .menu-btn {
-    display: none;
+    display: block;
   }
-} */
+}
