@@ -58,6 +58,11 @@
 .hidden {
   display: none;
 }
+
+#searchIconBtn {
+  display: none;
+}
+
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 .navbar_container figure {
@@ -381,7 +386,7 @@ input:not(:placeholder-shown) ~ .reset {
 }
 /* ################## */
 
-@media screen and (max-width: 1045px) {
+@media screen and (max-width: 850px) {
   #category {
     width: 100%;
   }
@@ -581,6 +586,9 @@ input:not(:placeholder-shown) ~ .reset {
 @media screen and (max-width: 650px) {
   .form {
     background-color: white;
+    top: 100% !important;
+    transform: translate(-50%, 0%) !important;
+    background-color: white;
     & > input {
       color: black;
     }
@@ -595,10 +603,6 @@ input:not(:placeholder-shown) ~ .reset {
   .navbar_container > div:nth-of-type(1) form {
     border-radius: 0;
     width: 100%;
-  }
-
-  .navWithoutSearchBar_list {
-    top: 10vh !important;
   }
 }
 
@@ -642,8 +646,8 @@ input:not(:placeholder-shown) ~ .reset {
   font-size: 14px;
   outline: none;
   background: transparent;
-  color: #e6e5e5;
-  caret-color: white;
+  color: #ffffff;
+  caret-color: #b56f82;
   width: 100%;
 }
 
@@ -700,7 +704,7 @@ input:not(:placeholder-shown) ~ .reset {
 .search-dropdown li:hover,
 .search-dropdown li.selected {
   background: rgba(0, 0, 0, 0.04);
-  color: #1677ff;
+  color: #000000;
 }
 
 /* Scrollbar */
@@ -724,7 +728,7 @@ input:not(:placeholder-shown) ~ .reset {
 
 /* Highlighted search text */
 .highlight {
-  background-color: rgba(24, 144, 255, 0.2);
+  background-color: #60a487;
   font-weight: 500;
   border-radius: 2px;
   padding: 0 2px;
@@ -767,14 +771,25 @@ input:not(:placeholder-shown) ~ .reset {
   .form {
     width: 50%;
     top: 140%;
-    right: 3rem;
-    /* transform: translate(-50%, -50%); */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+
+    & .input {
+      color: #383737;
+      caret-color: #383737;
+
+      &::placeholder {
+        color: #383737;
+      }
+    }
+  }
+  #searchIconBtn {
+    display: flex;
   }
 }
 @media screen and (max-width: 768px) {
   .form {
-    width: 50%;
-
     left: 50%;
     transform: translate(-50%, -50%);
   }
