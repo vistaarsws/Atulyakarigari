@@ -217,7 +217,6 @@ const AddressUI = () => {
     const addr = addressId === selectedAddress ? null : addressId;
     setSelectedAddress(addr);
     localStorage.setItem("selectedAddressID", JSON.stringify(addr));
-    console.log(addr);
   };
 
   const getAllAddress = async () => {

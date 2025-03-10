@@ -486,7 +486,6 @@ const AddEditVariantDialog = ({
   const [localVariantKey, setLocalVariantKey] = useState(variant?.key || "");
   // Local state for variant value input
   const [inputValue, setInputValue] = useState("");
-  console.log("variant", variant);
 
   // Sync local key when dialog opens
   useEffect(() => {

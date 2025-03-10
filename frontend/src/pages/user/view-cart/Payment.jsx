@@ -36,7 +36,6 @@ const Payment = () => {
   const handleDonationSelect = (amount) => {
     setSelectedDonation(amount);
     localStorage.setItem("selectedDonation", JSON.stringify(amount));
-    console.log("selectedDonation", amount);
   };
 
   const totalAmount = isDonationEnabled

@@ -486,11 +486,6 @@ export default function ProductForm({
       await appendFiles("productImage", formData?.productImage);
       await appendFiles("artisanImage", formData?.artisanImage);
 
-      // Debugging: Log the FormData content
-      for (let pair of formDataInstance.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-      }
-
       // API call
       if (isProductEditing) {
         await updateProduct(productDetails._id, formDataInstance);
