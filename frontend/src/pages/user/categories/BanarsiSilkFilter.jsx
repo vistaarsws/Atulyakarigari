@@ -16,6 +16,7 @@ import toggleFilter from "../../../assets/images/filter-list-svgrepo-com.svg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toHex from "colornames";
+import { Transform } from "@mui/icons-material";
 
 const extractColors = (categoryData) => {
   const colorsSet = new Set();
@@ -54,10 +55,11 @@ const sidebarStyles = {
   header: {
     display: "flex",
     alignItems: "center",
-    padding: "16px",
+    padding: "8px",
     borderBottom: "1px solid #E5E7EB",
     position: "sticky",
     top: 0,
+  
     backgroundColor: "#fff",
     zIndex: 10,
   },
@@ -69,11 +71,10 @@ const sidebarStyles = {
     },
   },
   title: {
-    fontSize: "20px",
-    fontWeight: 500,
+    fontSize: "12px",
+    fontWeight: 400,
     color: "#383737",
     flexGrow: 1,
-    marginLeft: "8px",
   },
   content: {
     flex: 1,
@@ -120,12 +121,13 @@ const sidebarStyles = {
     flexDirection: { xs: "column", sm: "row" },
   },
   applyButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#60a487",
     color: "white",
     flex: { xs: "1", sm: "1" },
     padding: "10px 20px",
     "&:hover": {
-      backgroundColor: "#059669",
+      boxShadow:
+        "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)",
     },
   },
   resetButton: {
@@ -139,7 +141,6 @@ const sidebarStyles = {
     },
   },
   filterToggle: {
-    display: { sm: "flex", md: "none" },
     alignItems: "center",
     justifyContent: "center",
     padding: "8px",
@@ -228,17 +229,14 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
     setPriceRange(tempFilters.priceRange);
 
     const filteredProducts = categoryData?.products?.filter((product) => {
-      
       const matchesStock =
         !tempFilters.inStock || (product.stock && product.stock > 0);
 
-   
       const productPrice = product.priceAfterDiscount ?? product.price ?? 0;
       const matchesPrice =
         productPrice >= tempFilters.priceRange[0] &&
         productPrice <= tempFilters.priceRange[1];
 
-     
       const productColors = getProductColors(product);
       const matchesColor =
         tempFilters.selectedColors.length === 0 ||
@@ -254,13 +252,11 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
           }
         });
 
-    
       const isPublished = product.status === "Published";
 
       return matchesStock && matchesPrice && matchesColor && isPublished;
     });
 
-   
     if (
       JSON.stringify(filteredProducts) !== JSON.stringify(categoryData.products)
     ) {
@@ -303,10 +299,15 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
           </IconButton>
           <Typography sx={sidebarStyles.title}>
             {categoryData?.parentCategory?.name &&
-              `${categoryData.parentCategory.name}/`}
+              `${categoryData.parentCategory.name} / `}
             {categoryData?.name}
           </Typography>
-          <Box sx={sidebarStyles.filterToggle}>
+          <Box
+            sx={sidebarStyles.filterToggle}
+            style={{
+              display: useMediaQuery("(max-width: 768px)") ? "flex" : "none",
+            }}
+          >
             <img
               src={isToggled ? toggleArrow : toggleFilter}
               alt="Toggle Filter"

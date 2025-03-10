@@ -7,16 +7,17 @@ import {
   CardContent,
   createTheme,
   ThemeProvider,
-  Checkbox,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeFromTheCart } from "../../../Redux/features/CartSlice";
-import { useState } from "react";
+import {
+  removeFromTheCart,
+  updateQuantityInCart,
+} from "../../../Redux/features/CartSlice";
+import { useState, useEffect  } from "react";
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
   palette: {
@@ -48,7 +49,22 @@ const CloseButton = styled(IconButton)({
   color: "#666666",
   padding: 4,
 });
-
+const QuantityContainer = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  border: "1px solid #E0E0E0",
+});
+const QuantityButton = styled(Button)({
+  minWidth: 32,
+  height: 32,
+  padding: 0,
+  border: "none",
+  color: "#333333",
+  fontSize: "15px",
+  "&:hover": {
+    backgroundColor: "#F5F5F5",
+  },
+});
 const ProductImage = styled("img")(({ theme }) => ({
   objectFit: "contain",
   objectPosition: "center",
@@ -64,21 +80,40 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items); 
+  const [productQuantity, setProductQuantity] = useState(1);
+
+  useEffect(() => {
+    if (product?.productId) {
+      const cartProduct = cartItems.find(
+        (item) => item.productId === product.productId
+      );
+      if (cartProduct) {
+        setProductQuantity(cartProduct.quantity);
+      }
+    }
+  }, [cartItems, product?.productId]);
 
   const removeFromCartHandler = () => {
-    if (!product?.productId) {
-      console.error("No product ID found");
-      return;
-    }
-
-    dispatch(removeFromTheCart({ productId: product?.productId }));
+    if (!product?.productId) return;
+    dispatch(removeFromTheCart({ productId: product.productId }));
   };
 
   const handleCardClick = () => {
     navigate(`/product/${product.productId}`);
   };
 
-  const [productQuantity, setProductQuantity] = useState(1);
+  const handleQuantity = async (productId, qty) => {
+    if (qty < 1) return;
+
+    try {
+      await dispatch(updateQuantityInCart({ productId, quantity: qty }));
+      setProductQuantity(qty);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
   return (
     <StyledCard>
       <Box sx={{ height: "100%" }}>
@@ -188,15 +223,15 @@ const ProductCard = ({ product }) => {
                   minWidth: "unset",
                   fontSize: "1.5rem",
                   lineHeight: 1,
-
                   "&:hover": {
                     color: "white",
                     backgroundColor: "#60a487",
                   },
                 }}
                 onClick={() =>
-                  productQuantity > 1 && setProductQuantity(productQuantity - 1)
+                  handleQuantity(product?.productId, productQuantity - 1)
                 }
+                disabled={productQuantity <= 1}
               >
                 -
               </Button>
@@ -220,7 +255,9 @@ const ProductCard = ({ product }) => {
                     backgroundColor: "#60a487",
                   },
                 }}
-                onClick={() => setProductQuantity(productQuantity + 1)}
+                onClick={() =>
+                  handleQuantity(product?.productId, productQuantity + 1)
+                }
               >
                 +
               </Button>

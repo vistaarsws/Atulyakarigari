@@ -134,6 +134,7 @@ export default function App() {
       "/artisans",
       "/about",
       "/buy-now",
+      "/view-cart",
     ];
 
     const excludedNavBarRoutes = ["/admin", "/login", "/signup", "/otp"];

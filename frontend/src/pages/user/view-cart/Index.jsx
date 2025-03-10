@@ -15,18 +15,10 @@ const Index = () => {
   const isMobile = useMediaQuery("(max-width:768px)");
 
   useEffect(() => {
-    if (authToken) {
+    if (authToken && !cartData.items.length) {
       dispatch(fetchCart(authToken));
     }
-  }, [authToken, dispatch]);
-
-  const selectedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
-
-  const orderData = {
-    products: cartData,
-    donationAmount: selectedDonation,
-  };
-  localStorage.setItem("orderData", JSON.stringify(orderData));
+  }, [authToken, dispatch, cartData.items.length]);
 
   return (
     <Box sx={{ pt: { sm: "0" }, height: "90vh", outline: "2px solid green" }}>
@@ -66,7 +58,7 @@ const Index = () => {
               },
             }}
           >
-            <Payment orderData={orderData} />
+            <Payment/>
           </Box>
         </Box>
       ) : (

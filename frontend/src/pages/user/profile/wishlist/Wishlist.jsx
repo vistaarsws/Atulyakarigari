@@ -19,7 +19,7 @@ const Wishlist = () => {
   }, [userProfileToken, dispatch]);
 
   return (
-    <Box sx={{ textAlign: "center", mt: 4 }}>
+    <Box sx={{ textAlign: "center" }}>
       {wishlist.length > 0 ? (
         <div
           className={`wishlist_container ${

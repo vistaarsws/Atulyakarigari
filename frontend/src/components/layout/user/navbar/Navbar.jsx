@@ -372,6 +372,88 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           );
         })}
       </ul>
+      {!navWithoutSearchBar_list && (
+        <form className="form" id="searchBar" onKeyDown={handleKeyDown}>
+          <button>
+            <svg
+              width="17"
+              height="16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-labelledby="search"
+            >
+              <path
+                d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
+                stroke="#b56f82"
+                strokeWidth="1.333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
+            </svg>
+          </button>
+          <input
+            className="input"
+            placeholder="Search here..."
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <CloseIcon
+              className="clear-icon"
+              fontSize="large"
+              onClick={() => {
+                setSearchQuery("");
+                setFilteredResults([]);
+              }}
+            />
+          )}
+
+          {/* Search Results Dropdown */}
+          {searchQuery && filteredResults.length > 0 && (
+            <ul className="search-dropdown">
+              {filteredResults.map((item, index) => (
+                <li
+                  key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
+                  className={index === selectedIndex ? "selected" : ""}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  onClick={() => {
+                    if (item?.type === "product") {
+                      handleSelectProduct(item?.data);
+                    } else if (item?.type === "category") {
+                      handleSelectCategory(item?.data);
+                    } else if (item?.type === "subcategory") {
+                      handleSelectSubCategory(item?.data);
+                    }
+                  }}
+                >
+                  {item?.type === "product" &&
+                    highlightMatch(item?.data?.name, searchQuery)}
+                  {item?.type === "category" && `Category:  ${searchQuery}`}
+                  {item?.type === "subcategory" &&
+                    `Subcategory:  ${searchQuery}`}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {searchQuery &&
+            filteredResults.length === 0 &&
+            !productsLoading &&
+            !categoriesLoading && (
+              <ul className="search-dropdown">
+                <li>No results found</li>
+              </ul>
+            )}
+
+          {(productsLoading || categoriesLoading) && searchQuery && (
+            <ul className="search-dropdown">
+              <li>Loading...</li>
+            </ul>
+          )}
+        </form>
+      )}
       <div>
         {authToken && (
           <IconButton
@@ -435,14 +517,18 @@ export default function Navbar({ navWithoutSearchBar_list }) {
             anchorEl={anchorEl}
             open={open}
             onClose={() => setAnchorEl(null)}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
           >
             {authToken && (
-              <MenuItem>
+              <div
+                style={{
+                  backgroundColor: "#60a487",
+                  color: "white",
+                  padding: "1rem 2rem",
+                  marginBottom: "1rem",
+                }}
+              >
                 <p>Hello, {profile?.profile?.fullName}</p>
-              </MenuItem>
+              </div>
             )}
             {authToken ? (
               <ul>
@@ -518,88 +604,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           <span> </span>
         </button>
       </div> */}
-      {!navWithoutSearchBar_list && (
-        <form className="form" id="searchBar" onKeyDown={handleKeyDown}>
-          <button>
-            <svg
-              width="17"
-              height="16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-labelledby="search"
-            >
-              <path
-                d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
-                stroke="#6d001d"
-                strokeWidth="1.333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
-            </svg>
-          </button>
-          <input
-            className="input"
-            placeholder="Search here..."
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <CloseIcon
-              className="clear-icon"
-              fontSize="large"
-              onClick={() => {
-                setSearchQuery("");
-                setFilteredResults([]);
-              }}
-            />
-          )}
-
-          {/* Search Results Dropdown */}
-          {searchQuery && filteredResults.length > 0 && (
-            <ul className="search-dropdown">
-              {filteredResults.map((item, index) => (
-                <li
-                  key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
-                  className={index === selectedIndex ? "selected" : ""}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                  onClick={() => {
-                    if (item?.type === "product") {
-                      handleSelectProduct(item?.data);
-                    } else if (item?.type === "category") {
-                      handleSelectCategory(item?.data);
-                    } else if (item?.type === "subcategory") {
-                      handleSelectSubCategory(item?.data);
-                    }
-                  }}
-                >
-                  {item?.type === "product" &&
-                    highlightMatch(item?.data?.name, searchQuery)}
-                  {item?.type === "category" && `Category:  ${searchQuery}`}
-                  {item?.type === "subcategory" &&
-                    `Subcategory:  ${searchQuery}`}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {searchQuery &&
-            filteredResults.length === 0 &&
-            !productsLoading &&
-            !categoriesLoading && (
-              <ul className="search-dropdown">
-                <li>No results found</li>
-              </ul>
-            )}
-
-          {(productsLoading || categoriesLoading) && searchQuery && (
-            <ul className="search-dropdown">
-              <li>Loading...</li>
-            </ul>
-          )}
-        </form>
-      )}
     </nav>
   );
 }
