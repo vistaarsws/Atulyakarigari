@@ -8,11 +8,13 @@ const paymentSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Product",
-    },
+    productIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Product",
+      }
+    ],
     amount: { type: Number, required: true },
     status: {
       type: String,
@@ -24,7 +26,8 @@ const paymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-paymentSchema.index({ userId: 1, productId: 1 });
+// Updating the index for `productIds`
+paymentSchema.index({ userId: 1, productIds: 1 });
 
 const Payment = mongoose.model("Payment", paymentSchema);
 export default Payment;
