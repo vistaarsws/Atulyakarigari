@@ -13,7 +13,7 @@ const Index = () => {
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
   const isMobile = useMediaQuery("(max-width:768px)");
-
+  const mobileHeight = useMediaQuery("(max-width:900px)");
   useEffect(() => {
     if (authToken && !cartData.items.length) {
       dispatch(fetchCart(authToken));
@@ -21,14 +21,19 @@ const Index = () => {
   }, [authToken, dispatch, cartData.items.length]);
 
   return (
-    <Box sx={{ pt: { sm: "0" }, height: "90vh", outline: "2px solid green" }}>
+    <Box
+      sx={{
+        pt: { sm: "0" },
+        height: useMediaQuery("(max-width:900px)") ? "unset" : "90vh",
+      }}
+    >
       <Stepper />
 
       {cartData.items?.length > 0 ? (
         <Box
           sx={{
             marginTop: "2rem",
-            height: "80vh",
+            height: mobileHeight ? "100%" : "80vh",
             overflowY: "hidden",
             scrollbarWidth: "none",
             boxShadow: "none",
@@ -58,7 +63,7 @@ const Index = () => {
               },
             }}
           >
-            <Payment/>
+            <Payment />
           </Box>
         </Box>
       ) : (

@@ -11,13 +11,13 @@ import {
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   removeFromTheCart,
   updateQuantityInCart,
 } from "../../../Redux/features/CartSlice";
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
   palette: {
@@ -80,7 +80,7 @@ const ProductImageWrapper = styled(Box)(({ theme }) => ({
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items); 
+  const cartItems = useSelector((state) => state.cart.items);
   const [productQuantity, setProductQuantity] = useState(1);
 
   useEffect(() => {
@@ -107,7 +107,7 @@ const ProductCard = ({ product }) => {
     if (qty < 1) return;
 
     try {
-      await dispatch(updateQuantityInCart({ productId, quantity: qty }));
+      dispatch(updateQuantityInCart({ productId, quantity: qty }));
       setProductQuantity(qty);
     } catch (error) {
       console.error("Error updating quantity:", error);
@@ -153,6 +153,7 @@ const ProductCard = ({ product }) => {
             fontWeight: 600,
             fontSize: "14px",
             color: "rgba(56, 55, 55, 1)",
+            paddingRight: "2rem",
           }}
         >
           {product?.name}
@@ -275,7 +276,7 @@ const ProductCard = ({ product }) => {
               >
                 <span
                   style={{
-                    fontWeight: 900,
+                    fontWeight: 500,
                     color: "rgb(56, 55, 55)",
                     fontSize: "12px",
                   }}

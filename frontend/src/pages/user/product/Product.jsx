@@ -45,8 +45,9 @@ import {
   getServiceability,
 } from "../../../../src/services/user/userAPI";
 import { answerQuestion } from "../../../../src/services/admin/adminAPI";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import { fetchCart } from "../../../Redux/features/CartSlice";
 
 // ----------------------------------------------------------------------------------------
 function CustomTabPanel(props) {
@@ -87,7 +88,7 @@ const theme = createTheme({
 
 export default function Product() {
   let { id: productId } = useParams();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -283,13 +284,13 @@ export default function Product() {
           ? await removeFromCart(productId)
           : await addToCart(productId, 1);
         setIsInCart(!isInCart);
+        dispatch(fetchCart(authToken));
       } catch (error) {
         console.error("Error updating cart:", error);
       } finally {
         setLoading(false);
       }
-    }
-    else{
+    } else {
       enqueueSnackbar("Please Login First", {
         variant: "error",
       });
