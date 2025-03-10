@@ -1,34 +1,36 @@
 import crypto from "crypto";
 import config from "../../config/ccAvenue.js";
 
-const workingKey = Buffer.from(config.workingKey, "hex");
+const md5 = crypto.createHash("md5").update(config.workingKey).digest();
+const keyBase64 = Buffer.from(md5).toString("base64");
 
-console.log("📏 Initial HEX Working Key Length:", Buffer.from(config.workingKey, "hex").length);
-console.log("📏 Final Working Key Length (After Conversion):", workingKey.length);
+const ivBase64 = Buffer.from([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 
+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+]).toString("base64");
 
 const getAlgorithm = (key) => {
-  if (key.length === 16) return "aes-128-cbc";
-  if (key.length === 32) return "aes-256-cbc";
-  throw new Error(`Invalid key length: ${key.length}`);
+    const keyBuffer = Buffer.from(key, "base64");
+    if (keyBuffer.length === 16) return "aes-128-cbc";
+    if (keyBuffer.length === 32) return "aes-256-cbc";
+    throw new Error(`Invalid key length: ${keyBuffer.length}`);
 };
 
 export const encrypt = (data) => {
-  console.log("🔒 Encrypting with Working Key Length:", workingKey.length);
+    const key = Buffer.from(keyBase64, "base64");
+    const iv = Buffer.from(ivBase64, "base64");
+    const cipher = crypto.createCipheriv(getAlgorithm(keyBase64), key, iv);
 
-  const iv = Buffer.alloc(16);
-  const cipher = crypto.createCipheriv(getAlgorithm(workingKey), workingKey, iv);
+    let encrypted = cipher.update(data, "utf8", "hex");
+    encrypted += cipher.final("hex");
 
-  let encrypted = cipher.update(data, "utf8", "hex");
-  encrypted += cipher.final("hex");
-
-  return encrypted;
+    return encrypted;
 };
 
 export const decrypt = (data) => {
-  console.log("🔑 Decrypting with Working Key Length:", workingKey.length);  
-
-  const iv = Buffer.alloc(16);
-  const decipher = crypto.createDecipheriv(getAlgorithm(workingKey), workingKey, iv);
+  const key = Buffer.from(keyBase64, "base64");
+  const iv = Buffer.from(ivBase64, "base64");
+  const decipher = crypto.createDecipheriv(getAlgorithm(keyBase64), key, iv);
 
   let decrypted = decipher.update(data, "hex", "utf8");
   decrypted += decipher.final("utf8");

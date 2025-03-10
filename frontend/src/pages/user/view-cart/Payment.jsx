@@ -44,9 +44,18 @@ const Payment = () => {
 
 
   const handlePayment = async () => {
+    const productIds = cartData.items.map(item => item.productId);
+    
+    const payload = {
+      totalAmount,
+      selectedDonation,
+      productIds,
+    };
+
+    console.log("Payment Payload:", payload);
 
     // Make API request
-    const response = await createPayment(cartData);
+    const response = await createPayment(payload);
     console.log("Initiating payment with:", response.data);
 
     if (response.data) {
