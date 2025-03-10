@@ -11,15 +11,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatPrice } from "../../../utils/helpers";
 import { useState, useEffect } from "react";
 import { createPayment } from "../../../services/user/userAPI";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchCart } from "../../../Redux/features/CartSlice";
+import { useSelector } from "react-redux";
 
 const Payment = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const location = useLocation();
   const cartData = useSelector((state) => state.cart);
-  const authToken = useSelector((state) => state.auth.token);
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const [selectedDonation, setSelectedDonation] = useState(0);
   const [isDonationEnabled, setIsDonationEnabled] = useState(true);

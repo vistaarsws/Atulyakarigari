@@ -89,7 +89,7 @@ const Index = () => {
               backgroundColor: "#60A487",
               color: "white",
               mt: 3,
-              "&:hover": { backgroundColor: "#d8541e" },
+              "&:hover": { backgroundColor: "#46846a" },
             }}
             component={Link}
             to="/"
