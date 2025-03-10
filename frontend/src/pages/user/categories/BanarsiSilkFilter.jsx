@@ -59,7 +59,7 @@ const sidebarStyles = {
     borderBottom: "1px solid #E5E7EB",
     position: "sticky",
     top: 0,
-  
+
     backgroundColor: "#fff",
     zIndex: 10,
   },

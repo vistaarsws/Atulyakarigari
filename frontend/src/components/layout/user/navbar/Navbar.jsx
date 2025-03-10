@@ -5,8 +5,13 @@ import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";
 import { logout } from "../../../../Redux/features/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-
-import { Button, ListItemIcon, Menu } from "@mui/material";
+import {
+  Button,
+  ClickAwayListener,
+  ListItemIcon,
+  Menu,
+  useMediaQuery,
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -57,6 +62,10 @@ export default function Navbar({ navWithoutSearchBar_list }) {
   const [selectedIndex, setSelectedIndex] = useState(-1); // Keyboard navigation
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const [showSearchBar, setShowSearchBar] = useState(true);
+
+  const isSearchIcon = useMediaQuery("(max-width:1210px)");
 
   // Fetch products and categories on mount
   useEffect(() => {
@@ -235,7 +244,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1045) {
+      if (window.innerWidth < 850) {
         setIsMobileView(true);
         setIsNavVisible(false);
       } else {
@@ -372,89 +381,127 @@ export default function Navbar({ navWithoutSearchBar_list }) {
           );
         })}
       </ul>
-      {!navWithoutSearchBar_list && (
-        <form className="form" id="searchBar" onKeyDown={handleKeyDown}>
-          <button>
+
+      <div>
+        <>
+          <IconButton
+            id="searchIconBtn"
+            aria-label={`Search products here`}
+            onClick={() => setShowSearchBar(true)}
+          >
             <svg
-              width="17"
-              height="16"
+              width="16"
+              height="17"
+              viewBox="0 0 16 17"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-labelledby="search"
             >
               <path
-                d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
-                stroke="#b56f82"
-                strokeWidth="1.333"
+                d="M6.61875 1.4082C5.47116 1.4082 4.34933 1.7485 3.39514 2.38607C2.44095 3.02364 1.69725 3.92985 1.25809 4.99009C0.81892 6.05033 0.704015 7.21699 0.927899 8.34253C1.15178 9.46807 1.7044 10.502 2.51588 11.3134C3.32735 12.1249 4.36123 12.6775 5.48677 12.9014C6.61232 13.1253 7.77898 13.0104 8.83922 12.5712C9.89946 12.1321 10.8057 11.3883 11.4432 10.4342C12.0808 9.47997 12.4211 8.35814 12.4211 7.21055C12.421 5.6717 11.8097 4.19591 10.7215 3.10778C9.63339 2.01965 8.1576 1.4083 6.61875 1.4082Z"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M10.9478 11.5395L15 15.5918"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeMiterlimit="10"
                 strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
+              />
             </svg>
-          </button>
-          <input
-            className="input"
-            placeholder="Search here..."
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <CloseIcon
-              className="clear-icon"
-              fontSize="large"
-              onClick={() => {
-                setSearchQuery("");
-                setFilteredResults([]);
-              }}
-            />
-          )}
+          </IconButton>
 
-          {/* Search Results Dropdown */}
-          {searchQuery && filteredResults.length > 0 && (
-            <ul className="search-dropdown">
-              {filteredResults.map((item, index) => (
-                <li
-                  key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
-                  className={index === selectedIndex ? "selected" : ""}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                  onClick={() => {
-                    if (item?.type === "product") {
-                      handleSelectProduct(item?.data);
-                    } else if (item?.type === "category") {
-                      handleSelectCategory(item?.data);
-                    } else if (item?.type === "subcategory") {
-                      handleSelectSubCategory(item?.data);
-                    }
-                  }}
-                >
-                  {item?.type === "product" &&
-                    highlightMatch(item?.data?.name, searchQuery)}
-                  {item?.type === "category" && `Category:  ${searchQuery}`}
-                  {item?.type === "subcategory" &&
-                    `Subcategory:  ${searchQuery}`}
-                </li>
-              ))}
-            </ul>
-          )}
+          {!navWithoutSearchBar_list && showSearchBar && (
+            <ClickAwayListener
+              onClickAway={() =>
+                isSearchIcon ? setShowSearchBar(false) : setShowSearchBar(true)
+              }
+            >
+              <form className="form" id="searchBar" onKeyDown={handleKeyDown}>
+                <button>
+                  <svg
+                    width="17"
+                    height="16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    role="img"
+                    aria-labelledby="search"
+                  >
+                    <path
+                      d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
+                      stroke={isSearchIcon ? "#6d001d" : "#b56f82"}
+                      strokeWidth="1.333"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    ></path>
+                  </svg>
+                </button>
+                <input
+                  className="input"
+                  placeholder="Search here..."
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <CloseIcon
+                    className="clear-icon"
+                    fontSize="large"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setFilteredResults([]);
+                    }}
+                  />
+                )}
 
-          {searchQuery &&
-            filteredResults.length === 0 &&
-            !productsLoading &&
-            !categoriesLoading && (
-              <ul className="search-dropdown">
-                <li>No results found</li>
-              </ul>
-            )}
+                {/* Search Results Dropdown */}
+                {searchQuery && filteredResults.length > 0 && (
+                  <ul className="search-dropdown">
+                    {filteredResults.map((item, index) => (
+                      <li
+                        key={`${item?.type}-${item?.data?._id || item?.data?.name}`}
+                        className={index === selectedIndex ? "selected" : ""}
+                        onMouseEnter={() => setSelectedIndex(index)}
+                        onClick={() => {
+                          if (item?.type === "product") {
+                            handleSelectProduct(item?.data);
+                          } else if (item?.type === "category") {
+                            handleSelectCategory(item?.data);
+                          } else if (item?.type === "subcategory") {
+                            handleSelectSubCategory(item?.data);
+                          }
+                        }}
+                      >
+                        {item?.type === "product" &&
+                          highlightMatch(item?.data?.name, searchQuery)}
+                        {item?.type === "category" &&
+                          `Category:  ${searchQuery}`}
+                        {item?.type === "subcategory" &&
+                          `Subcategory:  ${searchQuery}`}
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
-          {(productsLoading || categoriesLoading) && searchQuery && (
-            <ul className="search-dropdown">
-              <li>Loading...</li>
-            </ul>
+                {searchQuery &&
+                  filteredResults.length === 0 &&
+                  !productsLoading &&
+                  !categoriesLoading && (
+                    <ul className="search-dropdown">
+                      <li>No results found</li>
+                    </ul>
+                  )}
+
+                {(productsLoading || categoriesLoading) && searchQuery && (
+                  <ul className="search-dropdown">
+                    <li>Loading...</li>
+                  </ul>
+                )}
+              </form>
+            </ClickAwayListener>
           )}
-        </form>
-      )}
-      <div>
+        </>
         {authToken && (
           <IconButton
             aria-label={`wishlist with ${wishlist.length} items`}
