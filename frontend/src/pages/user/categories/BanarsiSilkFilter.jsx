@@ -59,7 +59,7 @@ const sidebarStyles = {
     borderBottom: "1px solid #E5E7EB",
     position: "sticky",
     top: 0,
-  
+
     backgroundColor: "#fff",
     zIndex: 10,
   },
@@ -399,7 +399,6 @@ export default function SidebarFilter({ categoryData, onFilterChange }) {
               })}
             </Box>
           </Box>
-          ;
         </Box>
         {/* Fixed Bottom Buttons */}
         <Box sx={sidebarStyles.buttonContainer}>
