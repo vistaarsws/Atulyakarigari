@@ -10,7 +10,6 @@ const SideNavbar = ({ user, linksArray }) => {
   const [openSubcategory, setOpenSubcategory] = useState(null);
 
   const toggleMenu = (link) => {
-    console.log("Navigating to:", link);
     setIsOpen(!isOpen);
     if (link) {
       navigate(link);

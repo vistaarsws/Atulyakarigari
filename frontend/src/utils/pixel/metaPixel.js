@@ -16,21 +16,21 @@ export const initializeMetaPixel = (pixelId) => {
       document.head.appendChild(script);
   
       window.fbq("init", pixelId);
-      console.log("Meta Pixel initialized:", pixelId);
+      // console.log("Meta Pixel initialized:", pixelId);
     }
   };
   
   export const trackEvent = (eventName, eventData = {}) => {
     if (window.fbq) {
       window.fbq("track", eventName, eventData);
-      console.log(`Meta Pixel Event: ${eventName}`, eventData);
+      // console.log(`Meta Pixel Event: ${eventName}`, eventData);
     }
   };
   
   export const trackCustomEvent = (eventName, eventData = {}) => {
     if (window.fbq) {
       window.fbq("trackCustom", eventName, eventData);
-      console.log(`Meta Pixel Custom Event: ${eventName}`, eventData);
+      // console.log(`Meta Pixel Custom Event: ${eventName}`, eventData);
     }
   };
   
