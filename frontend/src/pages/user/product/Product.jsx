@@ -446,7 +446,9 @@ export default function Product() {
   const [deliveryPincode, setDeliveryPincode] = useState("");
   const handleServiceability = async () => {
     if (!deliveryPincode) {
-      console.log("Delivery pincodes is required.");
+      enqueueSnackbar("Delivery pincodes is required.", {
+        variant: "error",
+      });
       return;
     }
     let productId = product._id;

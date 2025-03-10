@@ -31,7 +31,6 @@ const GoogleAuth = () => {
         }
       );
       setSuccess(true);
-      console.log(res.data.data.token);
       dispatch(login(res.data.data.token));
       navigate("/");
       // Handle successful authentication (e.g., store token, redirect)

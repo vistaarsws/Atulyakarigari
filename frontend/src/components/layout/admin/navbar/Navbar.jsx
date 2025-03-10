@@ -22,9 +22,12 @@ import { jwtDecode } from "jwt-decode";
 import { getProfile } from "../../../../services/user/userAPI";
 import { logout } from "../../../../Redux/features/AuthSlice";
 import NotificationComponent from "./Notification/Notification";
+import ConfirmationModal from "../../../ui/modal/confirmation-modal/ConfirmationModal";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -79,11 +82,13 @@ export default function Navbar() {
     fetchProfileData();
   }, [authToken]);
 
-  // Logout Handler
-  const handleLogout = () => {
+  const confirmLogout = () => {
+    setOpenConfirm(true);
+  };
+  
+  const handleLogoutConfirmed = () => {
     dispatch(logout());
     navigate("/");
-
     window.location.reload();
   };
   const notifications = [
@@ -249,7 +254,7 @@ export default function Navbar() {
 
       <article>
         {/* Search Input */}
-        <input
+        {/* <input
           type="text"
           placeholder="Search..."
           style={{
@@ -258,12 +263,12 @@ export default function Navbar() {
             border: "1px solid #ccc",
             fontSize: "1.4rem",
             height: "5rem",
-            minWidth: "30rem",
+            minWidth: "30rem",q
             backgroundColor: "transparent",
             outline: "none",
             flexGrow: 1,
           }}
-        />
+        /> */}
 
          {/* Notification Component */}
          <NotificationComponent
@@ -276,17 +281,26 @@ export default function Navbar() {
 
         {/* Logout Icon */}
         <Box sx={{ border: "1px solid white", padding: "1rem" }}>
-          <img
-            src={adminLogoutIcon}
-            alt="Admin Logout Icon"
-            style={{
-              cursor: "pointer",
-              width: "2rem",
-              height: "2.4rem",
-            }}
-            onClick={handleLogout}
-          />
-        </Box>
+  <img
+    src={adminLogoutIcon}
+    alt="Admin Logout Icon"
+    style={{
+      cursor: "pointer",
+      width: "2rem",
+      height: "2.4rem",
+    }}
+    onClick={confirmLogout}
+  />
+</Box>
+
+<ConfirmationModal
+  open={openConfirm}
+  onClose={() => setOpenConfirm(false)}
+  onConfirm={handleLogoutConfirmed}
+  title="Logout Confirmation"
+  message="Are you sure you want to log out?"
+/>
+
       </article>
     </nav>
   );

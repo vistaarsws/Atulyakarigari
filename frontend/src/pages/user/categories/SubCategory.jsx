@@ -14,7 +14,6 @@ const Index = () => {
 
   useEffect(() => {
     if (id) {
-      console.log("Fetching...");
       dispatch(fetchSubCategoryDataById(id));
     }
   }, [id, dispatch]);

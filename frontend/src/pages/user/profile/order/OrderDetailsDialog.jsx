@@ -18,12 +18,16 @@ import {
   Download as DownloadIcon,
   Bolt,
 } from "@mui/icons-material";
+import { useSnackbar } from "notistack";
 
 export const OrderDetailsDialog = ({ open, handleClose, order }) => {
   if (!order) return null;
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleDownloadInvoice = () => {
-    console.log("Downloading invoice for order:", order.id);
+    enqueueSnackbar("Downloading invoice for order", {
+      variant: "success",
+    });
   };
 
   return (
