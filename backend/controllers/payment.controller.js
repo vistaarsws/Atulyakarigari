@@ -74,7 +74,7 @@ export const createPayment = async (req, res) => {
     const encRequest = encrypt(new URLSearchParams(postData).toString());
     console.log("Encrypted Request:", encRequest);
 
-    const paymentUrl = `${config.baseUrl}?command=initiateTransaction&encRequest=${encRequest}&access_code=${config.accessCode}`;
+    const paymentUrl = `https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=${encRequest}&access_code=${config.accessCode}`;
 
     res.status(201).json({
       success: true,
