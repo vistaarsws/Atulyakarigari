@@ -23,46 +23,7 @@ const SideNavbar = ({ user, linksArray }) => {
     setOpenSubcategory(openSubcategory === index ? null : index);
   };
 
-  const categories = [
-    {
-      name: "Home & Living",
-      subcategories: [
-        {
-          name: "Bed Linen & Furnishing",
-          items: [
-            {
-              name: "Bedsheets",
-              subItems: ["Cotton", "Silk", "Polyester"],
-            },
-            {
-              name: "Blankets",
-              subItems: ["Wool", "Fleece", "Electric"],
-            },
-          ],
-        },
-        {
-          name: "Flooring",
-          items: ["Carpets", "Mats"],
-        },
-        {
-          name: "Bath",
-          items: ["Towels", "Bathrobes"],
-        },
-        {
-          name: "Lamps & Lighting",
-          items: ["Table Lamps", "Ceiling Lights"],
-        },
-        {
-          name: "Home Décor",
-          items: ["Vases", "Wall Art"],
-        },
-      ],
-    },
-    {
-      name: "Beauty",
-      items: ["Makeup", "Skincare", "Haircare", "Perfumes", "Bath & Body"],
-    },
-  ];
+
 
   return (
     <div className="sidenav-container">
@@ -78,7 +39,7 @@ const SideNavbar = ({ user, linksArray }) => {
         <div>
           <ul className="sidenav-list">
             {linksArray.map((link, index) => (
-              <li key={index} className="sidenav-item">
+              <ul key={index} className="sidenav-item">
                 {/* If the link has subcategories (dropdown), render a button */}
                 {link.dropdown ? (
                   <li className="sidenav-category">
@@ -136,7 +97,7 @@ const SideNavbar = ({ user, linksArray }) => {
                     {link.name}
                   </li>
                 )}
-              </li>
+              </ul>
             ))}
           </ul>
         </div>
