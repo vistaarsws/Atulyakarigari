@@ -1,3 +1,4 @@
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
@@ -19,6 +20,8 @@ const GoogleAuth = () => {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar(); // Use notistack
+
   const handleGoogleLogin = async (response) => {
     setLoading(true);
     setError("");
@@ -32,6 +35,7 @@ const GoogleAuth = () => {
       );
       setSuccess(true);
       dispatch(login(res.data.data.token));
+      enqueueSnackbar("Successfully logged in!", { variant: "success" });
       navigate("/");
       // Handle successful authentication (e.g., store token, redirect)
     } catch (error) {

@@ -31,6 +31,8 @@ export const admin_endpoints = {
   DELETE_REVIEW_AND_RATING: BASE_URL + "/api/v1/ratingAndReviews/delete",
 
   GET_ALL_PROFILE: BASE_URL + "/api/v1/profile/getAll",
+
+  GET_ALL_ORDERS: BASE_URL + "/api/v1/orders/getOrders",
 };
 
 export const user_endpoints = {

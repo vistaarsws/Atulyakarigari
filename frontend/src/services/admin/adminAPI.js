@@ -158,6 +158,11 @@ const getAllProfiles = async () => {
   return response;
 };
 
+const getAllOrders = async () => {
+  const response = await apiConnector("GET", admin_endpoints.GET_ALL_ORDERS);
+  return response;
+}
+
 export {
   getCategory,
   createCategory,
@@ -175,4 +180,5 @@ export {
   deleteQuestion,
   getAllQuestions,
   getAllProfiles,
+  getAllOrders,
 };
