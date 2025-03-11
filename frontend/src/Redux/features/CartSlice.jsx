@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  getCart,
-  removeFromCart,
-  addToCart,
-} from "../../services/user/userAPI";
+import { getCart, removeFromCart, addToCart } from "../../services/user/userAPI";
 import { jwtDecode } from "jwt-decode";
+
+// Helper Function: Track Custom Events in Dynatrace
+const trackDynatraceEvent = (eventName, data) => {
+  if (window.dtrum) {
+    window.dtrum.sendCustomEvent(eventName, data);
+  }
+};
 
 // Fetch Cart Items
 export const fetchCart = createAsyncThunk(
@@ -13,6 +16,10 @@ export const fetchCart = createAsyncThunk(
     try {
       const { userId } = jwtDecode(authToken);
       const response = await getCart(userId);
+
+      // ✅ Track cart retrieval in Dynatrace
+      trackDynatraceEvent("Fetch Cart", { userId, itemCount: response.data.data.items.length });
+
       return response.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -27,11 +34,15 @@ export const removeFromTheCart = createAsyncThunk(
     try {
       await removeFromCart(productId);
 
-      // ✅ Update Redux state locally first (to remove the item instantly)
+      // ✅ Update Redux state immediately
       dispatch(cartSlice.actions.removeItemFromState(productId));
 
-      // ✅ Re-fetch the updated cart from backend (to refresh totals)
+      // ✅ Re-fetch updated cart from backend
       const updatedCart = await dispatch(fetchCart(authToken)).unwrap();
+
+      // ✅ Track removal event in Dynatrace
+      trackDynatraceEvent("Remove from Cart", { productId });
+
       return updatedCart;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -42,15 +53,16 @@ export const removeFromTheCart = createAsyncThunk(
 // ADD Item to Cart and Fetch Updated Cart
 export const addToTheCart = createAsyncThunk(
   "cart/addToCart",
-  async (
-    { authToken, productId, quantity = 1 },
-    { rejectWithValue, dispatch }
-  ) => {
+  async ({ authToken, productId, quantity = 1 }, { rejectWithValue, dispatch }) => {
     try {
       await addToCart(productId, quantity);
 
-      // ✅ Re-fetch the updated cart from the backend after addition
+      // ✅ Re-fetch updated cart from backend
       const updatedCart = await dispatch(fetchCart(authToken)).unwrap();
+
+      // ✅ Track "Add to Cart" event in Dynatrace
+      trackDynatraceEvent("Add to Cart", { productId, quantity });
+
       return updatedCart;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -58,18 +70,22 @@ export const addToTheCart = createAsyncThunk(
   }
 );
 
+// Update Quantity in Cart
 export const updateQuantityInCart = createAsyncThunk(
   "cart/updateQuantity",
-  async ({ productId, quantity }, { rejectWithValue, dispatch, getState }) => {
+  async ({ productId, quantity }, { rejectWithValue, dispatch }) => {
     try {
       const updatedCart = await dispatch(addToTheCart({ productId, quantity })).unwrap();
 
       dispatch(cartSlice.actions.updateItemQuantity({ productId, quantity }));
 
       const totalMRP = updatedCart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const total = totalMRP; 
+      const total = totalMRP;
 
       dispatch(cartSlice.actions.updateCartTotals({ totalMRP, total }));
+
+      // ✅ Track "Update Quantity" event in Dynatrace
+      trackDynatraceEvent("Update Cart Quantity", { productId, quantity });
 
       return updatedCart;
     } catch (err) {
@@ -79,7 +95,19 @@ export const updateQuantityInCart = createAsyncThunk(
   }
 );
 
+// Abandoned Cart Tracking (Trigger when user leaves page)
+const trackAbandonedCart = () => {
+  window.addEventListener("beforeunload", () => {
+    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    if (cartItems.length > 0) {
+      trackDynatraceEvent("Abandoned Cart", { items: cartItems, timestamp: new Date().toISOString() });
+    }
+  });
+};
 
+trackAbandonedCart(); // Call the function to set up the event listener
+
+// Cart Slice
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -91,11 +119,10 @@ const cartSlice = createSlice({
     status: "idle",
   },
   reducers: {
-    // ✅ Reducer to remove item immediately from Redux state
     removeItemFromState: (state, action) => {
       state.items = state.items.filter((item) => item.productId !== action.payload);
     },
-    
+
     updateItemQuantity: (state, action) => {
       const { productId, quantity } = action.payload;
       const item = state.items.find((item) => item.productId === productId);
@@ -146,5 +173,6 @@ const cartSlice = createSlice({
   },
 });
 
+// Export Actions & Reducer
 export const { removeItemFromState, updateItemQuantity, updateCartTotals } = cartSlice.actions;
 export default cartSlice.reducer;
