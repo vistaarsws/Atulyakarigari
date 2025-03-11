@@ -1,7 +1,12 @@
 import Order from "../models/order.js";
 import Address from "../models/Address.js";
 import Payment from "../models/payment.js";
-import { createShiprocketOrder } from "../utils/shiprocket-service/shiprocket.js";
+import {
+  createShiprocketOrder,
+  cancelShiprocketOrder,
+  ReturnShiprocketOrder,
+} from "../utils/shiprocket-service/shiprocket.js";
+import Product from "../models/product.js";
 
 const handleOrderNotFound = (res) => {
   return res.status(404).json({ message: "Order not found" });
@@ -9,42 +14,86 @@ const handleOrderNotFound = (res) => {
 
 export const createOrder = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const { orderData, selectedAddressID, paymentOrderId } = req.body;
-
-    const address = await Address.findOne({ _id: selectedAddressID, userId });
-    if (!address) {
-      return res.status(400).json({ error: "Invalid shipping address" });
-    }
+    const { loginId, _id } = req.user;
+    const { paymentOrderId } = req.body;
+    const userId = _id;
 
     const payment = await Payment.findOne({ paymentOrderId, userId });
     if (!payment || payment.status !== "COMPLETED") {
       return res.status(400).json({ error: "Invalid or incomplete payment" });
     }
 
-    const shippingCost = orderData.products.shippingCost || 0;
-    const totalAmount = orderData.products.total; 
-    const discountAmount = orderData.products.totalDiscount || 0;
+    const productIds = payment.productIds;
+    const productsData = await Product.find({ _id: { $in: productIds } });
 
-    const shiprocketResponse = await createShiprocketOrder(orderData);
+    if (productsData.length !== productIds.length) {
+      return res.status(400).json({ error: "Invalid product(s) in payment" });
+    }
+
+    const products = productsData.map((product) => ({
+      productId: product._id,
+      name: product.name,
+      quantity: product.quantity, 
+      price: product.price,
+      totalPrice: product.price,
+    }));
+    const addressId = payment.addressId;
+    const address = await Address.findOne({ _id: addressId, userId });
+
+    if (!address) {
+      return res.status(400).json({ error: "Invalid shipping address" });
+    }
+
+    const pickupDetails = await getShiprocketPickupLocations();
+    const payload = {
+      userId,
+      email: loginId,
+      products,
+      address,
+      payment,
+      pickupAddress: pickupDetails?.data?.shipping_address[0],
+    };
+
+    const shiprocketResponse = await createShiprocketOrder(payload);
     if (!shiprocketResponse || !shiprocketResponse.order_id) {
-      return res.status(500).json({ error: "Shiprocket order creation failed" });
+      return res
+        .status(500)
+        .json({ error: "Shiprocket order creation failed" });
     }
 
     const newOrder = await Order.create({
+      orderId: payment.paymentOrderId,
       userId,
-      products: orderData.products.items,
-      totalMRP: orderData.products.totalMRP,
-      discountAmount: discountAmount,
-      shippingCost: shippingCost,
-      donationAmount: orderData.products.donationAmount || 0,
-      totalAmount: totalAmount,
+      products,
+      totalMRP: payment.totalMRP,
+      discountAmount: payment.totalDiscount,
+      shippingCost: 0,
+      donationAmount: payment.donationAmounts || 0,
+      totalAmount: payment.amount,
       orderStatus: "Processing",
-      shippingAddress: address, 
-      billingAddress: orderData.billingAddress || address,
-      shippingMethod: orderData.shippingMethod || "Standard",
+      shippingAddress: {
+        fullName: address.fullName,
+        phone: address.mobileNumber,
+        addressLine1: address.address,
+        addressLine2: address.addressLine2 || "",
+        city: address.city,
+        state: address.state,
+        postalCode: address.pincode,
+        country: address.country || "India",
+      },
+      billingAddress: {
+        fullName: address.fullName,
+        phone: address.mobileNumber,
+        addressLine1: address.address,
+        addressLine2: address.addressLine2 || "",
+        city: address.city,
+        state: address.state,
+        postalCode: address.pincode,
+        country: address.country || "India",
+      },
+      shippingMethod: "Standard",
       paymentMethod: payment.paymentMethod,
-      transactionId: payment.transactionId,
+      transactionId: payment.transactionId || null,
       isPaid: true,
       paidAt: new Date(),
       shiprocketOrderId: shiprocketResponse.order_id,
@@ -54,12 +103,11 @@ export const createOrder = async (req, res) => {
       shippedAt: null,
       deliveredAt: null,
       cancelledAt: null,
-      notes: orderData.notes || "",
     });
 
     res.status(201).json({ success: true, order: newOrder });
   } catch (error) {
-    console.error("❌ Order Creation Error:", error);
+    console.error("Order Creation Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -101,6 +149,7 @@ export const returnOrder = async (req, res) => {
       { orderStatus: status },
       { new: true }
     );
+    const response = await ReturnShiprocketOrder(payload);
 
     if (!updatedOrder) return handleOrderNotFound(res);
 
@@ -112,10 +161,13 @@ export const returnOrder = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, status } = req.body;
     if (!id) return res.status(400).json({ message: "Order ID is required" });
 
-    const deletedOrder = await Order.findByIdAndDelete(id);
+    const response = await cancelShiprocketOrder(id);
+    const deletedOrder = await Order.findByIdAndUpdate(id, {
+      orderStatus: status,
+    });
 
     if (!deletedOrder) return handleOrderNotFound(res);
 

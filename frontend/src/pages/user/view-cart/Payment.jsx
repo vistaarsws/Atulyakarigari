@@ -17,6 +17,10 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const cartData = useSelector((state) => state.cart);
+
+  const selectedAddressID = useSelector(
+    (state) => state.address.selectedAddressID
+  );
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const [selectedDonation, setSelectedDonation] = useState(0);
   const [isDonationEnabled, setIsDonationEnabled] = useState(true);
@@ -40,12 +44,14 @@ const Payment = () => {
     : cartData?.total || 0;
 
   const handlePayment = async () => {
-    const productIds = cartData.items.map(item => item.productId);
-    
+    const productIds = cartData.items.map((item) => item.productId);
     const payload = {
-      totalAmount,
-      selectedDonation,
       productIds,
+      selectedAddressID,
+      totalAmount: cartData.total,
+      totalDiscount: cartData.totalDiscount,
+      totalMRP: cartData.totalMRP,
+      donationAmounts: selectedDonation,
     };
 
     console.log("Payment Payload:", payload);
