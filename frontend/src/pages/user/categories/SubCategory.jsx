@@ -1,16 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSubCategoryDataById } from "../../../Redux/features/CategorySlice";
-import BanarsiSilkFilter from "./BanarsiSilkFilter";
+import SidebarFilter from "./BanarsiSilkFilter";
 import ProductCard from "../../../components/ui/cards/product-card/ProductCard";
 import { Skeleton } from "@mui/material";
 import "./CategoryPage.css";
 import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
+import "./CategoryPage.css";
 
 const Index = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     if (id) {
@@ -22,11 +24,21 @@ const Index = () => {
     (state) => state.categories
   );
 
+  useEffect(() => {
+    if (subcategory?.products) {
+      setFilteredProducts(subcategory.products); // Initialize with all products
+    }
+  }, [subcategory]);
+
+  const handleFilterChange = (filtered) => {
+    setFilteredProducts(filtered);
+  };
+
   if (loading) {
     return (
       <div className="categoryPage_container">
         <section>
-          <BanarsiSilkFilter />
+          <SidebarFilter categoryData={subcategory} onFilterChange={handleFilterChange} />
           <div className="productList">
             {[...Array(10)].map((_, index) => (
               <div key={index} className="skeletonCard">
@@ -56,23 +68,21 @@ const Index = () => {
   return (
     <div className="categoryPage_container">
       <section>
-        <BanarsiSilkFilter categoryData={subcategory} />
+        <SidebarFilter categoryData={subcategory} onFilterChange={handleFilterChange} />
         <div className="productList">
-          {subcategory?.products?.length > 0 ? (
-            subcategory.products.map((product) => (
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
               <ProductCard
-                key={product?._id}
-                id={product?._id}
-                title={product?.name || "No Title"}
+                key={product._id}
+                id={product._id}
+                title={product.name || "No Title"}
                 picture={
-                  product?.images?.length
-                    ? product.images[0]
-                    : "/placeholder.png"
+                  product.images?.length ? product.images[0] : "/placeholder.png"
                 }
-                price={product?.price || "N/A"}
-                shortDescription={product?.description || "No Description"}
-                offer_inPercent={product?.discountPercentage || null}
-                priceAfterDiscount={product?.priceAfterDiscount || "N/A"}
+                price={product.price || "N/A"}
+                shortDescription={product.description || "No Description"}
+                offer_inPercent={product.discountPercentage || null}
+                priceAfterDiscount={product.priceAfterDiscount || "N/A"}
                 loading={loading}
               />
             ))
