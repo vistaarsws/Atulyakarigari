@@ -13,13 +13,11 @@ import { useState, useEffect } from "react";
 import { createPayment } from "../../../services/user/userAPI";
 import { useSelector } from "react-redux";
 
-
 const Payment = () => {
-  const cartData = useSelector((state) => state.cart);
   const navigate = useNavigate();
-  const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const location = useLocation();
-
+  const cartData = useSelector((state) => state.cart);
+  const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const [selectedDonation, setSelectedDonation] = useState(0);
   const [isDonationEnabled, setIsDonationEnabled] = useState(true);
 
@@ -40,7 +38,6 @@ const Payment = () => {
   const totalAmount = isDonationEnabled
     ? cartData?.total + (selectedDonation || 0) || 0
     : cartData?.total || 0;
-
 
   const handlePayment = async () => {
     const productIds = cartData.items.map(item => item.productId);
