@@ -10,13 +10,11 @@ import {
   Rating,
   Button,
   Stack,
-  Paper,
 } from "@mui/material";
 import {
   Close as CloseIcon,
   StarBorder,
   Download as DownloadIcon,
-  Bolt,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 
@@ -25,9 +23,15 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleDownloadInvoice = () => {
-    enqueueSnackbar("Downloading invoice for order", {
-      variant: "success",
-    });
+    enqueueSnackbar("Downloading invoice for order", { variant: "success" });
+  };
+
+  const handleReturnOrder = () => {
+    enqueueSnackbar("Return request submitted successfully!", { variant: "info" });
+  };
+
+  const handleCancelOrder = () => {
+    enqueueSnackbar("Order cancellation request submitted!", { variant: "warning" });
   };
 
   return (
@@ -48,58 +52,51 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
         <Grid container spacing={4}>
           {/* Left Side - Image */}
           <Grid item xs={12} md={5}>
-            
-              <img
-                src={order.image}
-                alt={order.product}
-                style={{
-                  width: "100%",
-                  height: "300px",
-                  objectFit: "contain",
-                  backgroundColor: "#f5f5f5",
-                  padding: "10px",
-                  borderRadius: "8px",
-                }}
-              />
+            <img
+              src={order.image}
+              alt={order.product}
+              style={{
+                width: "100%",
+                height: "300px",
+                objectFit: "contain",
+                backgroundColor: "#f5f5f5",
+                padding: "10px",
+                borderRadius: "8px",
+              }}
+            />
           </Grid>
 
           {/* Right Side - Order Details */}
-          <Grid item xs={12} md={7} >
+          <Grid item xs={12} md={7}>
             <Stack spacing={2}>
-              <Box  sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginTop: "50vh",
-                }}>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                {/* Order Status & Date */}
+                <Box>
+                  <Typography variant="body2" fontSize={14} color="#60a487" fontWeight={700}>
+                    {order.status}
+                  </Typography>
+                  <Typography variant="body2" fontSize={14} color="text.secondary">
+                    {order.date}
+                  </Typography>
+                </Box>
 
-              {/* Order Status & Date */}
-              <Box>
-                <Typography variant="body2" fontSize={14} color="#60a487" fontWeight={700}>
-                  {order.status}
-                </Typography>
-                <Typography variant="body2" fontSize={14} color="text.secondary">
-                  {order.date}
-                </Typography>
-              </Box>
-
-              {/* Download Invoice Button */}
-              <Button
-                variant="outlined"
-                startIcon={<DownloadIcon />}
-                onClick={handleDownloadInvoice}
-                sx={{
-                  color: "#60a487",
-                  borderColor: "#60a487",
-                  textTransform: "none",
-                  "&:hover": {
+                {/* Download Invoice Button */}
+                <Button
+                  variant="outlined"
+                  startIcon={<DownloadIcon />}
+                  onClick={handleDownloadInvoice}
+                  sx={{
+                    color: "#60a487",
                     borderColor: "#60a487",
-                    backgroundColor: "rgba(96, 164, 135, 0.04)",
-                  },
-                }}
-              >
-                Download Invoice
-              </Button>
+                    textTransform: "none",
+                    "&:hover": {
+                      borderColor: "#60a487",
+                      backgroundColor: "rgba(96, 164, 135, 0.04)",
+                    },
+                  }}
+                >
+                  Download Invoice
+                </Button>
               </Box>
 
               <Divider />
@@ -157,6 +154,35 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
                   <Typography fontSize={16} fontWeight={700}>₹20185.98</Typography>
                 </Box>
               </Stack>
+
+              <Divider />
+
+              {/* Action Buttons */}
+              <Box display="flex" justifyContent="space-between">
+                {/* Show Return Order button only if order is "Delivered" */}
+                {order.status === "Delivered" && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleReturnOrder}
+                    sx={{ textTransform: "none" }}
+                  >
+                    Return Order
+                  </Button>
+                )}
+
+                {/* Show Cancel Order button if order is not "Delivered" */}
+                {order.status !== "Delivered" && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleCancelOrder}
+                    sx={{ textTransform: "none" }}
+                  >
+                    Cancel Order
+                  </Button>
+                )}
+              </Box>
 
               {/* Rating Section */}
               <Box>

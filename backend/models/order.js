@@ -37,7 +37,6 @@ const OrderSchema = new mongoose.Schema(
       },
     ],
 
-    /** Order Cost Calculation */
     totalMRP: {
       type: Number,
       required: true,
@@ -61,16 +60,13 @@ const OrderSchema = new mongoose.Schema(
       required: true,
       min: [0, "Total amount cannot be negative"],
     },
-   
 
-    /** Order Status */
     orderStatus: {
       type: String,
       enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Pending",
     },
 
-    /** Shipping & Billing Details */
     shippingAddress: {
       fullName: { type: String, required: true },
       phone: { type: String, required: true },
@@ -97,10 +93,15 @@ const OrderSchema = new mongoose.Schema(
       default: "Standard",
     },
 
-    /** Payment & Transaction Details */
     paymentMethod: {
       type: String,
-      enum: ["Credit Card", "PayPal", "Cash on Delivery", "UPI", "Bank Transfer"],
+      enum: [
+        "Credit Card",
+        "PayPal",
+        "Cash on Delivery",
+        "UPI",
+        "Bank Transfer",
+      ],
       required: true,
     },
     transactionId: {
@@ -116,17 +117,16 @@ const OrderSchema = new mongoose.Schema(
       default: null,
     },
 
-    /** Shiprocket Order Details */
     shiprocketOrderId: {
-      type: String, // Order ID returned by Shiprocket
+      type: String,
       default: null,
     },
     trackingId: {
-      type: String, // Tracking ID provided by Shiprocket
+      type: String,
       default: null,
     },
     courierName: {
-      type: String, // Courier name assigned by Shiprocket
+      type: String,
       default: null,
     },
     estimatedDelivery: {
@@ -145,14 +145,36 @@ const OrderSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-
-    /** Additional Info */
-    notes: {
+    cancellationReason: {
       type: String,
+      default: null,
+    },
+    canceledBy: {
+      type: String,
+      enum: ["User", "Admin"],
+      default: null,
+    },
+
+    returnRequest: {
+      type: Boolean,
+      default: false,
+    },
+    returnReason: {
+      type: String,
+      default: null,
+    },
+    returnStatus: {
+      type: String,
+      enum: ["Requested", "Approved", "Rejected", "Completed"],
+      default: null,
+    },
+    returnedAt: {
+      type: Date,
+      default: null,
     },
   },
   {
-    timestamps: true, // Auto-creates createdAt & updatedAt fields
+    timestamps: true,
   }
 );
 

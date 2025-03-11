@@ -1,20 +1,29 @@
-import { v4 as uuidv4 } from "uuid";
 import { encrypt, decrypt } from "../utils/encryption/cryptoUtils.js";
 import config from "../config/ccAvenue.js";
 import Payment from "../models/payment.js";
 
-const generatePaymentOrderId = () => `ORD-${uuidv4()}`;
+const generatePaymentOrderId = () => {
+  const shortId = Math.random().toString().slice(2, 12);
+  return `ORD-${shortId}`;
+};
 
 export const createPayment = async (req, res) => {
   try {
-    let { totalAmount, selectedDonation = 0, productIds = [] } = req.body;
+    let {
+      totalAmount,
+      productIds = [],
+      selectedAddressID,
+      totalDiscount,
+      totalMRP,
+      donationAmounts,
+    } = req.body;
     const userId = req.user?._id;
 
     if (!userId) {
       return res.status(400).json({ error: "User authentication required" });
     }
 
-    let amount = Number(totalAmount) + Number(selectedDonation);
+    let amount = Number(totalAmount) + Number(donationAmounts);
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ error: "Invalid amount" });
@@ -29,6 +38,7 @@ export const createPayment = async (req, res) => {
     let payment = await Payment.findOne({
       userId,
       productIds: { $all: productIds },
+      selectedAddressID,
       status: { $in: ["PENDING", "FAILED"] },
     });
 
@@ -50,7 +60,11 @@ export const createPayment = async (req, res) => {
         paymentOrderId,
         userId,
         productIds,
+        addressId: selectedAddressID,
         amount,
+        totalDiscount,
+        totalMRP,
+        donationAmounts,
         status: "PENDING",
       });
 

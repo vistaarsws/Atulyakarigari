@@ -11,7 +11,7 @@ let tokenData = {
 };
 
 // GET SHIPROCKET AUTHNTICATION TOKEN SHIPROCKET
-export const getShiprocketToken = async () => {
+const getShiprocketToken = async () => {
   const currentTime = Date.now();
 
   if (
@@ -41,7 +41,7 @@ export const getShiprocketToken = async () => {
     }
 
     tokenData.token = response.data.token;
-    const expiresInSeconds = response.data.expires_in || 3600; // Default to 1 hour
+    const expiresInSeconds = response.data.expires_in || 300; // Default to 5 minutes
     tokenData.expiresAt = Date.now() + expiresInSeconds * 1000;
 
     logMessage(
@@ -61,7 +61,7 @@ export const getShiprocketToken = async () => {
 };
 
 // LOGOUT FROM SHIPROCKET
-export const logoutShiprocket = async () => {
+const logoutShiprocket = async () => {
   const authToken = await getShiprocketToken();
 
   try {
@@ -118,6 +118,7 @@ export const getShiprocketWalletBalance = async () => {
       `Wallet Balance fetched successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -127,6 +128,7 @@ export const getShiprocketWalletBalance = async () => {
       }`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -148,6 +150,7 @@ export const getAllProductsShipRocket = async () => {
       `Get Products successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -155,6 +158,7 @@ export const getAllProductsShipRocket = async () => {
       `Error getting products: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -164,49 +168,42 @@ export const createShiprocketOrder = async (orderData) => {
   const authToken = await getShiprocketToken();
 
   const payload = {
-    order_id: orderData.order_id,
-    order_date: orderData.order_date || new Date().toISOString(),
-    pickup_location: orderData.pickup_location || "Primary",
+    order_id: orderData.payment.paymentOrderId,
+    order_date: new Date().toISOString(),
+    pickup_location: orderData.pickupAddress || "Primary",
     channel_id: orderData.channel_id || "",
-    billing_customer_name: orderData.billing_customer_name,
-    billing_last_name: orderData.billing_last_name || "",
-    billing_address: orderData.billing_address,
-    billing_address_2: orderData.billing_address_2 || "",
-    billing_city: orderData.billing_city,
-    billing_pincode: orderData.billing_pincode,
-    billing_state: orderData.billing_state,
-    billing_country: orderData.billing_country || "India",
-    billing_email: orderData.billing_email || "",
-    billing_phone: orderData.billing_phone,
+    billing_customer_name: orderData.address.fullName,
+    billing_address: orderData.address.address,
+    billing_city: orderData.address.city,
+    billing_pincode: orderData.address.pincode,
+    billing_state: orderData.address.state,
+    billing_country: orderData.address.country || "India",
+    billing_email: orderData.email || "",
+    billing_phone: orderData.address.mobileNumber,
     shipping_is_billing: orderData.shipping_is_billing ?? true,
-    shipping_customer_name:
-      orderData.shipping_customer_name || orderData.billing_customer_name,
-    shipping_last_name:
-      orderData.shipping_last_name || orderData.billing_last_name || "",
-    shipping_address: orderData.shipping_address || orderData.billing_address,
-    shipping_address_2:
-      orderData.shipping_address_2 || orderData.billing_address_2 || "",
-    shipping_city: orderData.shipping_city || orderData.billing_city,
-    shipping_pincode: orderData.shipping_pincode || orderData.billing_pincode,
-    shipping_country:
-      orderData.shipping_country || orderData.billing_country || "India",
-    shipping_state: orderData.shipping_state || orderData.billing_state,
-    shipping_email: orderData.shipping_email || orderData.billing_email || "",
-    shipping_phone: orderData.shipping_phone || orderData.billing_phone,
-    order_items: orderData.order_items.map((item) => ({
+    shipping_customer_name: orderData.address.fullName,
+    shipping_address: orderData.address.address || "",
+    shipping_address_2: orderData.address.address2 || "",
+    shipping_city: orderData.address.city,
+    shipping_pincode: orderData.address.pincode,
+    shipping_country: orderData.address.country || "India",
+    shipping_state: orderData.address.state,
+    shipping_email: orderData.email || "",
+    shipping_phone: orderData.address.mobileNumber || "",
+    order_items: orderData.products.map((item) => ({
       name: item.name,
       sku: item.sku,
       units: item.units,
       selling_price: item.selling_price,
       discount: item.discount || 0,
       tax: item.tax || 0,
+      length: item.length || 10,
+      breadth: item.breadth || 10,
+      height: item.height || 10,
+      weight: item.weight || 0.5,
     })),
-    payment_method: orderData.payment_method || "Prepaid",
-    sub_total: orderData.sub_total,
-    length: orderData.length || 10,
-    breadth: orderData.breadth || 10,
-    height: orderData.height || 10,
-    weight: orderData.weight || 0.5,
+    payment_method: orderData.payment.paymentMethod || "Prepaid",
+    sub_total: orderData.payment.amount,
   };
 
   try {
@@ -226,6 +223,7 @@ export const createShiprocketOrder = async (orderData) => {
       `Order created successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -233,6 +231,7 @@ export const createShiprocketOrder = async (orderData) => {
       `Error creating order: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -262,6 +261,7 @@ export const cancelShiprocketOrder = async (orderId) => {
       `Order cancelled successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -269,6 +269,74 @@ export const cancelShiprocketOrder = async (orderId) => {
       `Error cancelling order: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
+    throw error;
+  }
+};
+
+// RETURN ORDER
+export const ReturnShiprocketOrder = async (orderData) => {
+  const authToken = await getShiprocketToken();
+
+  const payload = {
+    order_id: orderData.payment,
+    order_date: orderData.orderDate || new Date().toISOString().split("T")[0],
+    pickup_customer_name: orderData.address.fullName,
+    pickup_address: orderData.address.address,
+    pickup_city: orderData.address.city,
+    pickup_state: orderData.address.state,
+    pickup_country: "India", // Default to India
+    pickup_pincode: orderData.address.pincode,
+    pickup_email: orderData.email,
+    pickup_phone: orderData.address.mobileNumber,
+    shipping_customer_name: orderData.address.fullName,
+    shipping_address: orderData.address.address,
+    shipping_city: orderData.address.city,
+    shipping_state: orderData.address.state,
+    shipping_country: "India",
+    shipping_pincode: orderData.address.pincode,
+    shipping_email: orderData.email,
+    shipping_phone: orderData.address.mobileNumber,
+    order_items: orderData.products.map((item) => ({
+      sku: item.sku,
+      name: item.name,
+      units: item.units,
+      selling_price: item.sellingPrice,
+      length: item.length,
+      breadth: item.breadth,
+      height: item.height,
+      weight: item.weight,
+    })),
+    payment_method: orderData.payment.paymentMethod || "PREPAID",
+    sub_total: orderData.payment.amount,
+  };
+
+  try {
+    const response = await axios.post(
+      `${shiprocketConfig.API_BASE}orders/create/return`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+
+    logMessage(
+      "info",
+      `Return order created successfully: ${JSON.stringify(response.data)}`,
+      "shiprocket-info"
+    );
+    await logoutShiprocket();
+    return response.data;
+  } catch (error) {
+    logMessage(
+      "error",
+      `Error creating return order: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -306,6 +374,7 @@ export const getShiprocketCourierListWithCounts = async (
       `Courier list fetched successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -313,6 +382,7 @@ export const getShiprocketCourierListWithCounts = async (
       `Error fetching courier list: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -353,6 +423,7 @@ export const addShiprocketPickupLocation = async (pickupData) => {
       `Pickup location added successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -360,6 +431,7 @@ export const addShiprocketPickupLocation = async (pickupData) => {
       `Error adding pickup location: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -384,6 +456,7 @@ export const getShiprocketPickupLocations = async () => {
       `Pickup locations fetched successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -393,6 +466,7 @@ export const getShiprocketPickupLocations = async () => {
       }`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -429,6 +503,7 @@ export const getShiprocketDeliveryEstimate = async (
       `Serviceability check successful: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -438,6 +513,7 @@ export const getShiprocketDeliveryEstimate = async (
       }`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -459,6 +535,7 @@ export const getAllShiprocketShipments = async () => {
       `Shipments fetched successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -466,6 +543,7 @@ export const getAllShiprocketShipments = async () => {
       `Error fetching shipments: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -495,6 +573,7 @@ export const generateShiprocketManifest = async (shipmentIds) => {
       `Manifest generated successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -502,6 +581,7 @@ export const generateShiprocketManifest = async (shipmentIds) => {
       `Error generating manifest: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -533,6 +613,7 @@ export const printShiprocketManifest = async (shipmentIds) => {
       )}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -542,6 +623,7 @@ export const printShiprocketManifest = async (shipmentIds) => {
       }`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -571,6 +653,7 @@ export const generateShiprocketLabel = async (shipmentIds) => {
       `Shipping label generated successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -580,6 +663,7 @@ export const generateShiprocketLabel = async (shipmentIds) => {
       }`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -609,6 +693,7 @@ export const printShiprocketInvoice = async (orderIds) => {
       `Invoice generated successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -616,6 +701,7 @@ export const printShiprocketInvoice = async (orderIds) => {
       `Error generating invoice: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -648,6 +734,7 @@ export const getShiprocketAccountStatement = async (fromDate, toDate) => {
       )}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -657,6 +744,7 @@ export const getShiprocketAccountStatement = async (fromDate, toDate) => {
       }`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
@@ -681,6 +769,7 @@ export const getShiprocketOrderDetails = async (orderId) => {
       `Order details fetched successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    await logoutShiprocket();
     return response.data;
   } catch (error) {
     logMessage(
@@ -688,6 +777,7 @@ export const getShiprocketOrderDetails = async (orderId) => {
       `Error fetching order details: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    await logoutShiprocket();
     throw error;
   }
 };
