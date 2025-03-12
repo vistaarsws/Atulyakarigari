@@ -4,25 +4,32 @@ export const initializeMetaPixel = (pixelId) => {
     return;
   }
 
-  if (!window.fbq) {
-    window.fbq = function () {
-      window.fbq.callMethod
-        ? window.fbq.callMethod(...arguments)
-        : window.fbq.queue.push(...arguments);
-    };
-    if (!window._fbq) window._fbq = window.fbq;
-    window.fbq.push = window.fbq;
-    window.fbq.loaded = true;
-    window.fbq.version = "2.0";
-    window.fbq.queue = [];
+  // Prevent multiple initializations
+  if (window.fbq && window.fbq.loaded) {
+    console.warn("Meta Pixel is already initialized.");
+    return;
+  }
 
+  window.fbq = function () {
+    window.fbq.callMethod
+      ? window.fbq.callMethod(...arguments)
+      : window.fbq.queue.push(...arguments);
+  };
+
+  if (!window._fbq) window._fbq = window.fbq;
+  window.fbq.loaded = true;
+  window.fbq.version = "2.0";
+  window.fbq.queue = [];
+
+  // ✅ Prevent adding the script multiple times
+  if (!document.querySelector('script[src="https://connect.facebook.net/en_US/fbevents.js"]')) {
     const script = document.createElement("script");
     script.async = true;
     script.src = "https://connect.facebook.net/en_US/fbevents.js";
     
-    // ✅ Add event listeners for error handling
-    script.onload = () => console.log("Meta Pixel loaded successfully.");
-    script.onerror = () => console.warn("Meta Pixel failed to load (possibly blocked by an ad blocker).");
+    // ✅ Add event listeners for better debugging
+    script.onload = () => console.log("✅ Meta Pixel loaded successfully.");
+    script.onerror = () => console.warn("❌ Meta Pixel failed to load (possibly blocked by an ad blocker).");
 
     document.head.appendChild(script);
   }
@@ -31,18 +38,19 @@ export const initializeMetaPixel = (pixelId) => {
   window.fbq("track", "PageView");
 };
 
-  
-  export const trackEvent = (eventName, eventData = {}) => {
-    if (window.fbq) {
-      window.fbq("track", eventName, eventData);
-      // console.log(`Meta Pixel Event: ${eventName}`, eventData);
-    }
-  };
-  
-  export const trackCustomEvent = (eventName, eventData = {}) => {
-    if (window.fbq) {
-      window.fbq("trackCustom", eventName, eventData);
-      // console.log(`Meta Pixel Custom Event: ${eventName}`, eventData);
-    }
-  };
-  
+// ✅ Queue events if fbq isn’t ready yet
+const queueEvent = (method, eventName, eventData) => {
+  if (window.fbq && window.fbq.loaded) {
+    window.fbq(method, eventName, eventData);
+  } else {
+    window.fbq.queue.push([method, eventName, eventData]);
+  }
+};
+
+export const trackEvent = (eventName, eventData = {}) => {
+  queueEvent("track", eventName, eventData);
+};
+
+export const trackCustomEvent = (eventName, eventData = {}) => {
+  queueEvent("trackCustom", eventName, eventData);
+};

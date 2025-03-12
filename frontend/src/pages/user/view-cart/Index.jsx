@@ -1,24 +1,77 @@
+import { useEffect, useState } from "react";
 import OrderCard from "./OrderCard";
 import Payment from "./Payment";
 import Stepper from "./Stepper";
 import { Box, Typography, Button, useMediaQuery } from "@mui/material";
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCart } from "../../../Redux/features/CartSlice";
 import { FaShoppingBag } from "react-icons/fa";
 import { Link } from "react-router-dom";
+
+// ✅ Custom Hook for Dynatrace Event Tracking
+const useDynatrace = () => {
+  const [isDynatraceReady, setIsDynatraceReady] = useState(false);
+
+  const trackEvent = (eventName, data) => {
+    if (isDynatraceReady) {
+      console.log("✅ Dynatrace RUM is ready");
+      window.dtrum.sendCustomEvent(eventName, data);
+      console.log(`✅ Dynatrace Event Tracked: ${eventName}`, data);
+    } else {
+      console.warn(`⚠️ Dynatrace RUM not initialized yet: ${eventName}`);
+    }
+  };
+
+  useEffect(() => {
+    const checkDtrum = setInterval(() => {
+      if (window.dtrum && typeof window.dtrum.sendCustomEvent === "function") {
+        setIsDynatraceReady(true);
+        console.log("✅ Dynatrace RUM is ready");
+        clearInterval(checkDtrum);
+      }
+    }, 500);
+
+    return () => clearInterval(checkDtrum);
+  }, []);
+
+  return trackEvent; // ✅ Return the function so it can be used
+};
 
 const Index = () => {
   const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
   const isMobile = useMediaQuery("(max-width:768px)");
+  const trackDynatraceEvent = useDynatrace(); // ✅ Now correctly returns `trackEvent`
+  
+  // ✅ Fetch cart on component mount
   const mobileHeight = useMediaQuery("(max-width:900px)");
+
   useEffect(() => {
-    if (authToken && !cartData.items.length) {
+    if (authToken && cartData.items?.length === 0) {
       dispatch(fetchCart(authToken));
     }
-  }, [authToken, dispatch, cartData.items.length]);
+  }, [authToken, dispatch, cartData.items]);
+
+  // ✅ Track Cart Events
+  useEffect(() => {
+    trackDynatraceEvent("Viewed Cart", { itemCount: cartData.items?.length });
+
+    const handleBeforeUnload = () => {
+      if (cartData.items?.length > 0) {
+        trackDynatraceEvent("Abandoned Cart", {
+          items: cartData.items,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [cartData.items, trackDynatraceEvent]);
 
   return (
     <Box
