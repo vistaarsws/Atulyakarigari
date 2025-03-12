@@ -11,10 +11,10 @@ import {
 export const createAddress = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { fullName, mobileNumber, pincode, address, locality, city, typeOfAddress, isDefault } = req.body;
+        const { fullName, mobileNumber, pincode, address, state, city, typeOfAddress, isDefault } = req.body;
 
         // Validate required fields
-        if (!fullName || !mobileNumber || !pincode || !address || !locality || !city || !typeOfAddress) {
+        if (!fullName || !mobileNumber || !pincode || !address || !state || !city || !typeOfAddress) {
             return badRequest(req, res, null, "All fields are required");
         }
 
@@ -29,7 +29,7 @@ export const createAddress = async (req, res) => {
             mobileNumber,
             pincode,
             address,
-            locality,
+            state,
             city,
             typeOfAddress,
             isDefault,
