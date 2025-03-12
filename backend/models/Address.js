@@ -19,7 +19,7 @@ const addressSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    locality: {
+    state: {
         type: String,
         required: true,
     },

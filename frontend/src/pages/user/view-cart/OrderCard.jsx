@@ -11,13 +11,15 @@ import {
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  fetchCart,
   removeFromTheCart,
   updateQuantityInCart,
 } from "../../../Redux/features/CartSlice";
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
+
 const theme = createTheme({
   typography: { fontFamily: "Lato" },
   palette: {
@@ -30,6 +32,7 @@ const theme = createTheme({
     },
   },
 });
+
 const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
   padding: useMediaQuery("(max-width: 458px)") ? "1rem !important" : "2rem",
@@ -49,38 +52,24 @@ const CloseButton = styled(IconButton)({
   color: "#666666",
   padding: 4,
 });
-const QuantityContainer = styled(Box)({
-  display: "flex",
-  alignItems: "center",
-  border: "1px solid #E0E0E0",
-});
-const QuantityButton = styled(Button)({
-  minWidth: 32,
-  height: 32,
-  padding: 0,
-  border: "none",
-  color: "#333333",
-  fontSize: "15px",
-  "&:hover": {
-    backgroundColor: "#F5F5F5",
-  },
-});
+
 const ProductImage = styled("img")(({ theme }) => ({
   objectFit: "contain",
   objectPosition: "center",
   height: "100%",
   width: useMediaQuery("(max-width: 458px)") ? "100%" : "",
-  // Added responsive styling for mobile
   [theme.breakpoints.down("sm")]: {},
 }));
 const ProductImageWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   flexBasis: useMediaQuery("(max-width: 458px)") ? "30%" : "25%",
 }));
+
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items); 
+  const authToken = useSelector((state) => state.auth.token);
+  const cartItems = useSelector((state) => state.cart.items);
   const [productQuantity, setProductQuantity] = useState(1);
 
   useEffect(() => {
@@ -92,11 +81,16 @@ const ProductCard = ({ product }) => {
         setProductQuantity(cartProduct.quantity);
       }
     }
-  }, [cartItems, product?.productId]);
+  }, [product?.productId]);
 
-  const removeFromCartHandler = () => {
-    if (!product?.productId) return;
-    dispatch(removeFromTheCart({ productId: product.productId }));
+  const removeFromCartHandler = async () => {
+    try {
+      if (!product?.productId) return;
+      await dispatch(removeFromTheCart({ productId: product.productId }));
+      await dispatch(fetchCart(authToken));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleCardClick = () => {
@@ -104,10 +98,10 @@ const ProductCard = ({ product }) => {
   };
 
   const handleQuantity = async (productId, qty) => {
-    if (qty < 1) return;
-
     try {
+      if (qty < 1) return;
       await dispatch(updateQuantityInCart({ productId, quantity: qty }));
+      await dispatch(fetchCart(authToken));
       setProductQuantity(qty);
     } catch (error) {
       console.error("Error updating quantity:", error);
@@ -140,8 +134,6 @@ const ProductCard = ({ product }) => {
         sx={{
           ml: useMediaQuery("(max-width: 458px)") ? "" : "1rem",
           flexBasis: useMediaQuery("(max-width: 458px)") ? "70%" : "",
-          // padding: "1rem 1rem 1rem 0", // paddingBottom: 0, // Optional, already handled by padding: 0,
-          // pb: "1rem !important",
           padding: "0 0 0  1rem!important",
         }}
       >
@@ -153,6 +145,7 @@ const ProductCard = ({ product }) => {
             fontWeight: 600,
             fontSize: "14px",
             color: "rgba(56, 55, 55, 1)",
+            paddingRight: "2rem",
           }}
         >
           {product?.name}
@@ -165,12 +158,12 @@ const ProductCard = ({ product }) => {
             my: useMediaQuery("(max-width: 458px)") ? "" : 1,
             fontWeight: 400,
             lineHeight: "18px",
-            height: "2rem", // You can adjust the height based on how many lines you want to show
-            overflow: "hidden", // Hides the overflowed content
-            textOverflow: "ellipsis", // Adds the ellipsis after the text is truncated
-            display: "-webkit-box", // Creates a multi-line box for truncation
-            WebkitBoxOrient: "vertical", // Ensures text wraps vertically
-            WebkitLineClamp: 1, // Limits the number of lines (change this number to suit your needs)
+            height: "2rem",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 1,
           }}
         >
           {product?.sku || "No sku ID available"}
@@ -275,7 +268,7 @@ const ProductCard = ({ product }) => {
               >
                 <span
                   style={{
-                    fontWeight: 900,
+                    fontWeight: 500,
                     color: "rgb(56, 55, 55)",
                     fontSize: "12px",
                   }}

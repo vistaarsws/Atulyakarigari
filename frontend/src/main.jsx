@@ -4,22 +4,22 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import ReactGA from "react-ga4";
-
-ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
 import store from "./Redux/store/store.js";
 import { Provider } from "react-redux";
-import { initializeDynatrace } from "./utils/dynatrace/dynatrace.js";
+import { initializeMetaPixel } from "./utils/pixel/metaPixel.js"; 
 
-initializeDynatrace();
+// Initialize Google Analytics
+ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
+
+// Initialize Meta Pixel
+initializeMetaPixel(import.meta.env.VITE_PIXEL_ID);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      {/* <AuthProvider> */}
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <App />
       </BrowserRouter>
-      {/* </AuthProvider> */}
     </Provider>
   </StrictMode>
 );

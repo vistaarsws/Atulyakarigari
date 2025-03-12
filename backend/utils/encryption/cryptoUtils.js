@@ -1,37 +1,34 @@
 import crypto from "crypto";
 import config from "../../config/ccAvenue.js";
 
-const workingKey = Buffer.from(config.workingKey, "hex");
+const key = crypto.createHash("sha256").update(config.workingKey).digest(); 
 
-console.log("📏 Initial HEX Working Key Length:", Buffer.from(config.workingKey, "hex").length);
-console.log("📏 Final Working Key Length (After Conversion):", workingKey.length);
-
-const getAlgorithm = (key) => {
-  if (key.length === 16) return "aes-128-cbc";
-  if (key.length === 32) return "aes-256-cbc";
-  throw new Error(`Invalid key length: ${key.length}`);
-};
+// IV should be exactly 16 bytes (128-bit)
+const iv = Buffer.from([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 
+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+]);
 
 export const encrypt = (data) => {
-  console.log("🔒 Encrypting with Working Key Length:", workingKey.length);
-
-  const iv = Buffer.alloc(16);
-  const cipher = crypto.createCipheriv(getAlgorithm(workingKey), workingKey, iv);
-
-  let encrypted = cipher.update(data, "utf8", "hex");
-  encrypted += cipher.final("hex");
-
-  return encrypted;
+    try {
+        const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+        let encrypted = cipher.update(data, "utf8", "hex");
+        encrypted += cipher.final("hex");
+        return encrypted;
+    } catch (error) {
+        console.error("Encryption Error:", error);
+        throw new Error("Encryption failed");
+    }
 };
 
 export const decrypt = (data) => {
-  console.log("🔑 Decrypting with Working Key Length:", workingKey.length);  
-
-  const iv = Buffer.alloc(16);
-  const decipher = crypto.createDecipheriv(getAlgorithm(workingKey), workingKey, iv);
-
-  let decrypted = decipher.update(data, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-
-  return decrypted;
+    try {
+        const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+        let decrypted = decipher.update(data, "hex", "utf8");
+        decrypted += decipher.final("utf8");
+        return decrypted;
+    } catch (error) {
+        console.error("Decryption Error:", error);
+        throw new Error("Decryption failed");
+    }  
 };

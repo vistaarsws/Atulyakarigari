@@ -75,14 +75,22 @@ export const updateQuantityInCart = createAsyncThunk(
   "cart/updateQuantity",
   async ({ productId, quantity }, { rejectWithValue, dispatch }) => {
     try {
-      const updatedCart = await dispatch(addToTheCart({ productId, quantity })).unwrap();
+      const updatedCart = await dispatch(
+        addToTheCart({ productId, quantity })
+      ).unwrap();
 
       dispatch(cartSlice.actions.updateItemQuantity({ productId, quantity }));
 
-      const totalMRP = updatedCart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const totalMRP = updatedCart.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+   
+     
       const total = totalMRP;
 
       dispatch(cartSlice.actions.updateCartTotals({ totalMRP, total }));
+      fetchCart();
 
       // ✅ Track "Update Quantity" event in Dynatrace
       trackDynatraceEvent("Update Cart Quantity", { productId, quantity });
@@ -95,19 +103,6 @@ export const updateQuantityInCart = createAsyncThunk(
   }
 );
 
-// Abandoned Cart Tracking (Trigger when user leaves page)
-const trackAbandonedCart = () => {
-  window.addEventListener("beforeunload", () => {
-    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    if (cartItems.length > 0) {
-      trackDynatraceEvent("Abandoned Cart", { items: cartItems, timestamp: new Date().toISOString() });
-    }
-  });
-};
-
-trackAbandonedCart(); // Call the function to set up the event listener
-
-// Cart Slice
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -120,7 +115,9 @@ const cartSlice = createSlice({
   },
   reducers: {
     removeItemFromState: (state, action) => {
-      state.items = state.items.filter((item) => item.productId !== action.payload);
+      state.items = state.items.filter(
+        (item) => item.productId !== action.payload
+      );
     },
 
     updateItemQuantity: (state, action) => {
@@ -173,6 +170,6 @@ const cartSlice = createSlice({
   },
 });
 
-// Export Actions & Reducer
-export const { removeItemFromState, updateItemQuantity, updateCartTotals } = cartSlice.actions;
+export const { removeItemFromState, updateItemQuantity, updateCartTotals } =
+  cartSlice.actions;
 export default cartSlice.reducer;

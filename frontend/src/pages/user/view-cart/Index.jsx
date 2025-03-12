@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import OrderCard from "./OrderCard";
 import Payment from "./Payment";
 import Stepper from "./Stepper";
@@ -43,8 +43,10 @@ const Index = () => {
   const cartData = useSelector((state) => state.cart);
   const isMobile = useMediaQuery("(max-width:768px)");
   const trackDynatraceEvent = useDynatrace(); // ✅ Now correctly returns `trackEvent`
-
+  
   // ✅ Fetch cart on component mount
+  const mobileHeight = useMediaQuery("(max-width:900px)");
+
   useEffect(() => {
     if (authToken && cartData.items?.length === 0) {
       dispatch(fetchCart(authToken));
@@ -72,14 +74,19 @@ const Index = () => {
   }, [cartData.items, trackDynatraceEvent]);
 
   return (
-    <Box sx={{ pt: { sm: "0" }, height: "90vh", outline: "2px solid green" }}>
+    <Box
+      sx={{
+        pt: { sm: "0" },
+        height: useMediaQuery("(max-width:900px)") ? "unset" : "90vh",
+      }}
+    >
       <Stepper />
 
       {cartData.items?.length > 0 ? (
         <Box
           sx={{
             marginTop: "2rem",
-            height: "80vh",
+            height: mobileHeight ? "100%" : "80vh",
             overflowY: "hidden",
             scrollbarWidth: "none",
             boxShadow: "none",
@@ -135,7 +142,7 @@ const Index = () => {
               backgroundColor: "#60A487",
               color: "white",
               mt: 3,
-              "&:hover": { backgroundColor: "#d8541e" },
+              "&:hover": { backgroundColor: "#46846a" },
             }}
             component={Link}
             to="/"

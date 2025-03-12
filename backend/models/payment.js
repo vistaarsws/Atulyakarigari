@@ -8,12 +8,26 @@ const paymentSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    productId: {
+    productIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Product",
+      },
+    ],
+    addressId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "Product",
+      ref: "Address",
     },
     amount: { type: Number, required: true },
+    totalDiscount: { type: Number, required: true },
+    totalMRP: { type: Number, required: true },
+    donationAmounts: { type: Number, required: true },
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "CARD", "UPI", "NET_BANKING", "WALLET"],
+    },
     status: {
       type: String,
       enum: ["PENDING", "COMPLETED", "FAILED", "CANCELED"],
@@ -24,7 +38,8 @@ const paymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-paymentSchema.index({ userId: 1, productId: 1 });
+paymentSchema.index({ userId: 1, productIds: 1 });
+paymentSchema.index({ userId: 1, addressId: 1 });
 
 const Payment = mongoose.model("Payment", paymentSchema);
 export default Payment;
