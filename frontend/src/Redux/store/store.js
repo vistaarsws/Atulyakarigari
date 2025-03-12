@@ -19,6 +19,10 @@ const store = configureStore({
     address: addressReducer,
     orders: ordersReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // Disables the middleware in production
+    }),
 });
 
 export default store;
