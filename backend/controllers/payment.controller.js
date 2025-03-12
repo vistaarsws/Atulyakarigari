@@ -28,7 +28,7 @@ export const createPayment = async (req, res) => {
     if (!Array.isArray(productIds) || productIds.length === 0)
       return res.status(400).json({ error: "Product IDs are required" });
 
-    productIds = [...new Set(productIds.map((id) => id.toString()))];
+    // productIds = [...new Set(productIds.map((id) => id.toString()))];
 
     let payment = await Payment.findOne({
       userId,
@@ -63,7 +63,7 @@ export const createPayment = async (req, res) => {
         <body>
           <center>
             <iframe width="482" height="500" scrolling="No" frameborder="0" id="paymentFrame"
-              src="https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${config.merchantId}&encRequest=${encRequest}&access_code=${config.accessCode}">
+              src="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${config.merchantId}&encRequest=${encRequest}&access_code=${config.accessCode}">
             </iframe>
           </center>
           <script>
