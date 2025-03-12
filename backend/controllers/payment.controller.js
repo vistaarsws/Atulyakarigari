@@ -58,25 +58,16 @@ export const createPayment = async (req, res) => {
     const postData = `merchant_id=${config.merchantId}&order_id=${paymentOrderId}&currency=INR&amount=${amount}&redirect_url=${config.redirectUrl}&cancel_url=${config.cancelUrl}&integration_type=iframe_normal&language=EN&merchant_param1=${userId}`;
     const encRequest = encrypt(postData);
 
-    const paymentForm = `
-      <html>
-        <body>
-          <center>
-            <iframe width="482" height="500" scrolling="No" frameborder="0" id="paymentFrame"
-              src="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${config.merchantId}&encRequest=${encRequest}&access_code=${config.accessCode}">
-            </iframe>
-          </center>
-          <script>
-            document.getElementById("paymentFrame").onload = function() {
-              window.addEventListener("message", function(e) {
-                document.getElementById("paymentFrame").style.height = e.data["newHeight"] + "px";
-              }, false);
-            };
-          </script>
-        </body>
-      </html>`;
+    const paymentUrl = `https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=${encRequest}&access_code=${config.accessCode}`;
 
-    res.status(201).send(paymentForm);
+    res.status(201).json({
+      success: true,
+      message: "Payment initiated successfully",
+      paymentOrderId,
+      paymentUrl,
+      encRequest,
+      accessCode: config.accessCode,
+    });
   } catch (error) {
     console.error("Payment Creation Error:", error);
     res.status(500).json({ errorMessage: "Payment initiation failed", error });
