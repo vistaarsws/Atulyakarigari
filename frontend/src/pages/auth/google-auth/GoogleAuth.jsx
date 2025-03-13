@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { login } from "../../../Redux/features/AuthSlice";
 import { useDispatch } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 const GoogleAuth = () => {
   const [loading, setLoading] = useState(false);
@@ -35,8 +36,15 @@ const GoogleAuth = () => {
       );
       setSuccess(true);
       dispatch(login(res.data.data.token));
+      if (
+        jwtDecode(res.data.data.token).role === "admin" ||
+        jwtDecode(res.data.data.token).role === "super-admin"
+      ) {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
       enqueueSnackbar("Successfully logged in!", { variant: "success" });
-      navigate("/");
       // Handle successful authentication (e.g., store token, redirect)
     } catch (error) {
       setError(
