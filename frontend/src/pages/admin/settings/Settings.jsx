@@ -23,8 +23,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  FormControlLabel,
-  Switch,
   InputAdornment,
   Alert,
 } from "@mui/material";
@@ -40,7 +38,10 @@ import {
   TrendingUp,
   TrendingDown,
 } from "@mui/icons-material";
-import { fetchProfile } from "../../../Redux/features/ProfileSlice";
+import {
+  fetchProfile,
+  fetchAllProfiles,
+} from "../../../Redux/features/ProfileSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Profile from "../../user/profile/profile/Profile";
 import { jwtDecode } from "jwt-decode";
@@ -109,10 +110,13 @@ export default function Settings() {
   const profile = useSelector((state) => state.profile.profile);
   const authToken = useSelector((state) => state.auth.token);
 
+  const profiles = useSelector((state) => state.profile.profiles);
+
   const defaultProfilePicture = "/broken-image.jpg";
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
+    dispatch(fetchAllProfiles());
     dispatch(fetchProfile(authToken));
     if (authToken) {
       const decodedToken = jwtDecode(authToken);
@@ -138,6 +142,17 @@ export default function Settings() {
     setNewAdminEmail("");
     setAdminDialogOpen(true);
   };
+  // 🔹 Filter only admin users
+  const adminUsers = profiles?.filter(
+    (profile) => profile.userId?.accountType === "admin"
+  );
+
+  // 🔍 Search functionality
+  const filteredAdmins = adminUsers?.filter(
+    (admin) =>
+      admin.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      admin.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleCloseAdminDialog = () => {
     setAdminDialogOpen(false);
@@ -161,19 +176,7 @@ export default function Settings() {
     }
   };
 
-  const handleToggleAdminStatus = (adminId) => {
-    setAdmins(
-      admins.map((admin) => {
-        if (admin.id === adminId) {
-          return {
-            ...admin,
-            status: admin.status === "active" ? "inactive" : "active",
-          };
-        }
-        return admin;
-      })
-    );
-  };
+
 
   const handleSaveAdmin = () => {
     setAdminDialogOpen(false);
@@ -194,12 +197,6 @@ export default function Settings() {
     setConfirmDialogOpen(false);
   };
 
-  const filteredAdmins = admins.filter(
-    (admin) =>
-      admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      admin.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <Container maxWidth="xl" sx={{}}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ my: 3 }}>
@@ -208,33 +205,41 @@ export default function Settings() {
 
       <Paper elevation={3} sx={{ mb: 4 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider", paddingBottom: 1 }}>
-  <Tabs
-    value={tabValue}
-    onChange={handleTabChange}
-    aria-label="settings tabs"
-    variant="scrollable"
-    scrollButtons="auto"
-    sx={{
-      "& .MuiTab-root": {
-        fontSize: "1.1rem", // Increase font size
-        fontWeight: "bold", // Make text bold
-        padding: "12px 20px", // Add more padding
-        minHeight: "60px", // Increase tab height
-      },
-      "& .MuiTabs-indicator": {
-        backgroundColor: "primary.main",
-      },
-    }}
-  >
-    <Tab icon={<AccountCircle sx={{ fontSize: 20 }} />} label="Profile" />
-    <Tab icon={<Home sx={{ fontSize: 20 }} />} label="Pickup Address" />
-    <Tab icon={<AccountBalanceWallet sx={{ fontSize: 20 }} />} label="ShipRocket Wallet" />
-    {user.role === "super-admin" && (
-      <Tab icon={<AdminPanelSettings sx={{ fontSize: 20 }} />} label="Admin Management" />
-    )}
-  </Tabs>
-</Box>
-
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="settings tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              "& .MuiTab-root": {
+                fontSize: "1.1rem", // Increase font size
+                fontWeight: "bold", // Make text bold
+                padding: "12px 20px", // Add more padding
+                minHeight: "60px", // Increase tab height
+              },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "primary.main",
+              },
+            }}
+          >
+            <Tab
+              icon={<AccountCircle sx={{ fontSize: 20 }} />}
+              label="Profile"
+            />
+            <Tab icon={<Home sx={{ fontSize: 20 }} />} label="Pickup Address" />
+            <Tab
+              icon={<AccountBalanceWallet sx={{ fontSize: 20 }} />}
+              label="ShipRocket Wallet"
+            />
+            {user.role === "super-admin" && (
+              <Tab
+                icon={<AdminPanelSettings sx={{ fontSize: 20 }} />}
+                label="Admin Management"
+              />
+            )}
+          </Tabs>
+        </Box>
 
         {/* Profile Tab */}
         <TabPanel value={tabValue} index={0}>
@@ -551,41 +556,6 @@ export default function Settings() {
                     divider
                     secondaryAction={
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={admin.status === "active"}
-                              onChange={() => {
-                                handleToggleAdminStatus(admin.id);
-                                enqueueSnackbar(
-                                  `Admin ${admin.name} is now ${admin.status === "active" ? "Inactive" : "Active"}.`,
-                                  {
-                                    variant:
-                                      admin.status === "active"
-                                        ? "error"
-                                        : "success", // Red for Inactive, Green for Active
-                                    autoHideDuration: 3000, // Notification disappears after 3 seconds
-                                  }
-                                );
-                              }}
-                              
-                            />
-                          }
-                          label={
-                            <Typography
-                              sx={{
-                                fontWeight: "bold",
-                                color:
-                                  admin.status === "active" ? "green" : "red",
-                              }}
-                            >
-                              {admin.status === "active"
-                                ? "Active"
-                                : "Inactive"}
-                            </Typography>
-                          }
-                        />
-
                         <IconButton
                           edge="end"
                           aria-label="delete"
@@ -598,7 +568,7 @@ export default function Settings() {
                     }
                   >
                     <ListItemAvatar>
-                      <Avatar>{admin.name.charAt(0)}</Avatar>
+                    <Avatar src={admin.profilePicture || "/default-avatar.png"} />
                     </ListItemAvatar>
                     <ListItemText
                       primary={admin.name}
@@ -612,7 +582,7 @@ export default function Settings() {
                             {admin.email}
                           </Typography>
                           {" — "}
-                          {admin.role === "admin" ? "Admin" : "Super Admin"}
+                          {admin?.userId?.accountType}
                         </>
                       }
                     />
