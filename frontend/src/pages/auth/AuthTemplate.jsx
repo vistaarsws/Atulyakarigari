@@ -236,7 +236,7 @@ export default function AuthTemplate({ page }) {
     <>
       <div className={`authTemplate_container `}>
         <section>
-          {isLoginPage && <h1>Atulyakarigari</h1>}
+          { <h1>Atulyakarigari</h1>}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
           {isLoginPage && (
             <article className="logIn_container">
@@ -349,6 +349,9 @@ export default function AuthTemplate({ page }) {
                   </LoadingButton>
                 </div>
               </form>
+              {/* Google login button */}
+
+              <GoogleAuth />
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
