@@ -189,10 +189,10 @@ export const getProfile = async (req, res) => {
 
 export const getAllProfiles = async (req, res) => {
   try {
-    // Fetch all profiles from the database
-    const profiles = await Profile.find();
+    // Fetch all profiles and populate related user details if applicable
+    const profiles = await Profile.find().populate('userId', 'userId accountType'); 
 
-    if (!profiles || profiles.length === 0) {
+    if (!profiles.length) {
       return notFoundRequest(req, res, null, "No profiles found");
     }
 

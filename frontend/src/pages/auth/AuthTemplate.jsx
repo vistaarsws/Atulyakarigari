@@ -164,7 +164,10 @@ export default function AuthTemplate({ page }) {
 
         const successMessage =
           otpType === "login" ? "Login Successful!" : "Signup Successful!";
-        if (res.data.data.accountType === "admin") {
+        if (
+          res.data.data.accountType === "admin" ||
+          res.data.data.accountType === "super-admin"
+        ) {
           navigate("/admin", { state: { type: otpType } });
         } else {
           navigate("/", { state: { type: otpType } });
@@ -233,7 +236,7 @@ export default function AuthTemplate({ page }) {
     <>
       <div className={`authTemplate_container `}>
         <section>
-          {isLoginPage && <h1>Atulyakarigari</h1>}
+          { <h1>Atulyakarigari</h1>}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}
           {isLoginPage && (
             <article className="logIn_container">
@@ -346,6 +349,9 @@ export default function AuthTemplate({ page }) {
                   </LoadingButton>
                 </div>
               </form>
+              {/* Google login button */}
+
+              <GoogleAuth />
             </article>
           )}
           {/* ----------------------------------------------------------------------------------------------------------------------------------- */}

@@ -1,6 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import PageNotFound from "../pages/PageNotFound";
+
 
 const AdminRoute = ({ children }) => {
   // Access the token from Redux
@@ -19,6 +21,13 @@ const AdminRoute = ({ children }) => {
   // Check if the user is authenticated
   if (!token || isTokenExpired(token)) {
     return <Navigate to="/login" replace />;
+  }
+  if (jwtDecode(token)?.role === "customer") {
+    return (
+      <>
+      <PageNotFound />
+      </>
+    );
   }
 
   // Render the children if authenticated
