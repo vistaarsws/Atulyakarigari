@@ -161,7 +161,28 @@ const getAllProfiles = async () => {
 const getAllOrders = async () => {
   const response = await apiConnector("GET", admin_endpoints.GET_ALL_ORDERS);
   return response;
-}
+};
+
+const addAdmin = async (email) => {
+  try {
+    const response = await apiConnector("POST", admin_endpoints.ADD_ADMIN, { email });
+    return response;
+  } catch (error) {
+    console.error("Error adding admin:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+const removeAdmin = async (email) => {
+  try {
+    const response = await apiConnector("POST", admin_endpoints.REMOVE_ADMIN, { email });
+    return response;
+  } catch (error) {
+    console.error("Error removing admin:", error);
+    return { success: false, error: error.message };
+  }
+};
+
 
 export {
   getCategory,
@@ -181,4 +202,6 @@ export {
   getAllQuestions,
   getAllProfiles,
   getAllOrders,
+  addAdmin,
+  removeAdmin,
 };

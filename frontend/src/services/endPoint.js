@@ -33,6 +33,9 @@ export const admin_endpoints = {
   GET_ALL_PROFILE: BASE_URL + "/api/v1/profile/getAll",
 
   GET_ALL_ORDERS: BASE_URL + "/api/v1/orders/getOrders",
+
+  ADD_ADMIN: BASE_URL + "/api/v1/admin/add-admin",
+  REMOVE_ADMIN: BASE_URL + "/api/v1/admin/remove-admin",
 };
 
 export const user_endpoints = {

@@ -42,6 +42,10 @@ import {
   fetchProfile,
   fetchAllProfiles,
 } from "../../../Redux/features/ProfileSlice";
+import {
+  addAdminThunk,
+  removeAdminThunk,
+} from "../../../Redux/features/AdminSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Profile from "../../user/profile/profile/Profile";
 import { jwtDecode } from "jwt-decode";
@@ -63,29 +67,7 @@ export default function Settings() {
     isDefault: true,
   });
 
-  const [admins, setAdmins] = useState([
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      email: "sarah.j@shiprocket.com",
-      role: "admin",
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      email: "michael.c@shiprocket.com",
-      role: "admin",
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Priya Patel",
-      email: "priya.p@shiprocket.com",
-      role: "admin",
-      status: "inactive",
-    },
-  ]);
+
 
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [adminDialogOpen, setAdminDialogOpen] = useState(false);
@@ -168,33 +150,38 @@ export default function Settings() {
     setSelectedAdmin(null);
   };
 
-  const handleDeleteAdmin = () => {
-    if (selectedAdmin) {
-      setAdmins(admins.filter((admin) => admin.id !== selectedAdmin.id));
-      setDeleteDialogOpen(false);
-      setSelectedAdmin(null);
-    }
+  const handleDeleteAdmin = async () => {
+    dispatch(removeAdminThunk({ email: selectedAdmin.email }))
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(response.message, { variant: "success" });
+        setDeleteDialogOpen(false);
+      })
+      .catch((error) => {
+        enqueueSnackbar(error.message || "Failed to remove admin.", {
+          variant: "error",
+        });
+      });
+      
   };
-
-
 
   const handleSaveAdmin = () => {
     setAdminDialogOpen(false);
     setConfirmDialogOpen(true);
   };
 
-  const handleConfirmAddAdmin = () => {
-    // Create a new admin with the email
-    const newAdmin = {
-      id: admins.length + 1,
-      name: newAdminEmail.split("@")[0], // Simple name generation from email
-      email: newAdminEmail,
-      role: "admin",
-      status: "active",
-    };
-
-    setAdmins([...admins, newAdmin]);
-    setConfirmDialogOpen(false);
+  const handleConfirmAddAdmin = async () => {
+    dispatch(addAdminThunk({ email: newAdminEmail }))
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(response.message, { variant: "success" });
+        setConfirmDialogOpen(false);
+      })
+      .catch((error) => {
+        enqueueSnackbar(error.message || "Failed to add admin.", {
+          variant: "error",
+        });
+      });
   };
 
   return (
@@ -508,8 +495,8 @@ export default function Settings() {
                 Admin Management
               </Typography>
               <Typography variant="h5" color="text.secondary">
-                Create and manage admin accounts. Only super admins
-                have access to this section.
+                Create and manage admin accounts. Only super admins have access
+                to this section.
               </Typography>
             </Box>
 
@@ -568,7 +555,9 @@ export default function Settings() {
                     }
                   >
                     <ListItemAvatar>
-                    <Avatar src={admin.profilePicture || "/default-avatar.png"} />
+                      <Avatar
+                        src={admin.profilePicture || "/default-avatar.png"}
+                      />
                     </ListItemAvatar>
                     <ListItemText
                       primary={admin.name}
@@ -839,9 +828,6 @@ export default function Settings() {
             variant="contained"
             color="primary"
             onClick={() => {
-              enqueueSnackbar("Admin successfully confirmed!", {
-                variant: "success",
-              });
               handleConfirmAddAdmin();
             }}
           >
@@ -854,10 +840,13 @@ export default function Settings() {
       <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
         <DialogTitle>Delete Admin Account</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete {selectedAdmin?.name}'s admin
-            account? This action cannot be undone.
-          </DialogContentText>
+        <DialogContentText>
+  Are you sure you want to Demote   {' '}
+  <span style={{ fontWeight: 'bold', color:'black'}}>{selectedAdmin?.fullName}</span>  
+  {' '} from an admin to a customer?.
+</DialogContentText>
+
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
@@ -865,9 +854,6 @@ export default function Settings() {
             variant="contained"
             color="error"
             onClick={() => {
-              enqueueSnackbar("Admin account deleted successfully!", {
-                variant: "success",
-              });
               handleDeleteAdmin();
             }}
           >
