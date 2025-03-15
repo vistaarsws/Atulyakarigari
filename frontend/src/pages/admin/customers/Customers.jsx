@@ -48,10 +48,12 @@ export default function Customers() {
   const filteredCustomers = customers.filter((customer) => {
     const name = customer?.fullName?.toLowerCase() || "";
     const email = customer?.email?.toLowerCase() || "";
+    const accountType = customer?.userId?.accountType?.toLowerCase() || "";
     const phone = customer?.contactNumber?.toString() || ""; // Convert phone number to string
     const matchesSearch =
       name.includes(search.toLowerCase()) ||
       email.includes(search.toLowerCase()) ||
+      accountType.includes(search.toLowerCase()) ||
       phone.includes(search);
 
     if (tabValue === 1) {
@@ -103,7 +105,7 @@ export default function Customers() {
       <TextField
         fullWidth
         variant="outlined"
-        placeholder="Search by name, email, or phone..."
+        placeholder="Search here..."
         size="medium"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -130,6 +132,7 @@ export default function Customers() {
                 <TableCell>CUSTOMER</TableCell>
                 <TableCell>PHONE</TableCell>
                 <TableCell>EMAIL</TableCell>
+                <TableCell>Role</TableCell>
                 <TableCell>CREATED AT</TableCell>
                 <TableCell>TOTAL ORDER</TableCell>
                 <TableCell>VIEW</TableCell>
@@ -138,7 +141,7 @@ export default function Customers() {
             <TableBody>
               {filteredCustomers.length > 0 ? (
                 filteredCustomers.map((customer, index) => (
-                  <TableRow key={customer?.id || customer?.email || index}>
+                  <TableRow key={customer?.id || customer?.email || customer?.userId?.accountType || index}>
                     <TableCell>
                       <Box display="flex" alignItems="center" gap={1}>
                         <Avatar
@@ -152,6 +155,7 @@ export default function Customers() {
                     </TableCell>
                     <TableCell>{customer?.contactNumber || "N/A"}</TableCell>
                     <TableCell>{customer?.email || "N/A"}</TableCell>
+                    <TableCell>{customer?.userId?.accountType || "N/A"}</TableCell>
                     <TableCell>
                       {customer?.createdAt
                         ? new Date(customer.createdAt).toLocaleDateString()
