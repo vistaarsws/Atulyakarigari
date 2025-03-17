@@ -156,6 +156,7 @@ export default function Settings() {
       .then((response) => {
         enqueueSnackbar(response.message, { variant: "success" });
         setDeleteDialogOpen(false);
+        dispatch(fetchAllProfiles());
       })
       .catch((error) => {
         enqueueSnackbar(error.message || "Failed to remove admin.", {
@@ -176,6 +177,7 @@ export default function Settings() {
       .then((response) => {
         enqueueSnackbar(response.message, { variant: "success" });
         setConfirmDialogOpen(false);
+        dispatch(fetchAllProfiles());
       })
       .catch((error) => {
         enqueueSnackbar(error.message || "Failed to add admin.", {
