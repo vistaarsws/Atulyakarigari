@@ -184,8 +184,8 @@ export default function Settings() {
         setConfirmDialogOpen(false);
         dispatch(fetchAllProfiles());
       })
-      .catch((error) => {
-        enqueueSnackbar(error.message || "Failed to add admin.", {
+      .catch(() => {
+        enqueueSnackbar( "Profile not found. Please sign up with this email.", {
           variant: "error",
         });
       });
@@ -366,30 +366,35 @@ export default function Settings() {
         {/* Admin Management Tab - Only visible to Super Admin */}
         {user.role === "super-admin" && (
           <TabPanel value={tabValue} index={3}>
+            {/* Header Section */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
                 Admin Management
               </Typography>
-              <Typography variant="h5" color="text.secondary">
+              <Typography variant="h6" color="text.secondary">
                 Create and manage admin accounts. Only super admins have access
                 to this section.
               </Typography>
             </Box>
 
+            {/* Search & Add Button Section */}
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" }, // Column on mobile, row on larger screens
                 alignItems: "center",
+                justifyContent: "space-between",
+                gap: 2, // Adds spacing for mobile view
                 mb: 3,
               }}
             >
               <TextField
                 placeholder="Search admins..."
                 size="small"
+                fullWidth // Full width on small screens
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ width: "60%" }}
+                sx={{ maxWidth: { sm: "60%", md: "50%" } }} // Responsive width control
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -402,41 +407,65 @@ export default function Settings() {
                 variant="contained"
                 startIcon={<PersonAdd />}
                 onClick={handleOpenAdminDialog}
+                sx={{
+                  width: { xs: "100%", sm: "auto" }, // Full width button on mobile
+                }}
               >
                 Add New Admin
               </Button>
             </Box>
 
+            {/* No Admins Found Message */}
             {filteredAdmins.length === 0 ? (
-              <Alert severity="info" sx={{ mt: 2 }}>
+              <Alert severity="info" sx={{ mt: 2, textAlign: "center" }}>
                 No admin accounts found matching your search.
               </Alert>
             ) : (
-              <List sx={{ bgcolor: "background.paper" }}>
+              /* Admin List */
+              <List
+                sx={{
+                  bgcolor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  overflow: "hidden",
+                }}
+              >
                 {filteredAdmins.map((admin) => (
                   <ListItem
                     key={admin.id}
                     divider
                     secondaryAction={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <IconButton
-                          edge="end"
-                          aria-label="delete"
-                          onClick={() => handleOpenDeleteDialog(admin)}
-                          color="error"
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Box>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleOpenDeleteDialog(admin)}
+                        color="error"
+                        sx={{
+                          transition: "transform 0.2s ease",
+                          "&:hover": { transform: "scale(1.1)" },
+                        }}
+                      >
+                        <Delete />
+                      </IconButton>
                     }
                   >
                     <ListItemAvatar>
                       <Avatar
                         src={admin.profilePicture || "/default-avatar.png"}
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          border: "2px solid",
+                          borderColor: "primary.light",
+                        }}
                       />
                     </ListItemAvatar>
                     <ListItemText
-                      primary={admin.name}
+                      primary={
+                        <Typography variant="body1" fontWeight="bold">
+                          {admin.name}
+                        </Typography>
+                      }
                       secondary={
                         <>
                           <Typography
@@ -752,7 +781,7 @@ function TabPanel(props) {
       aria-labelledby={`settings-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 5 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 3.5 }}>{children}</Box>}
     </div>
   );
 }
