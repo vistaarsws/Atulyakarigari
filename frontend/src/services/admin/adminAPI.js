@@ -183,6 +183,14 @@ const removeAdmin = async (email) => {
   }
 };
 
+const getWallet = async ()=>{
+  try {
+    const response = await apiConnector("GET", admin_endpoints.GET_WALLET)
+    return response
+  } catch (error) {
+    console.error(error.message);
+  }
+}
 
 export {
   getCategory,
@@ -204,4 +212,5 @@ export {
   getAllOrders,
   addAdmin,
   removeAdmin,
+  getWallet,
 };

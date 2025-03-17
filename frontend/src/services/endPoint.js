@@ -36,6 +36,8 @@ export const admin_endpoints = {
 
   ADD_ADMIN: BASE_URL + "/api/v1/admin/add-admin",
   REMOVE_ADMIN: BASE_URL + "/api/v1/admin/remove-admin",
+
+  GET_WALLET: BASE_URL + "/api/v1/shiprocket/getWallet"
 };
 
 export const user_endpoints = {

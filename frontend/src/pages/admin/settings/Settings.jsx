@@ -15,7 +15,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   ListItemAvatar,
   IconButton,
   Dialog,
@@ -35,8 +34,6 @@ import {
   Search,
   PersonAdd,
   Delete,
-  TrendingUp,
-  TrendingDown,
 } from "@mui/icons-material";
 import {
   fetchProfile,
@@ -50,6 +47,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Profile from "../../user/profile/profile/Profile";
 import { jwtDecode } from "jwt-decode";
 import { useSnackbar } from "notistack";
+import { getWallet } from "../../../services/admin/adminAPI";
 
 export default function Settings() {
   const [tabValue, setTabValue] = useState(0);
@@ -67,8 +65,6 @@ export default function Settings() {
     isDefault: true,
   });
 
-
-
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [adminDialogOpen, setAdminDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -76,6 +72,16 @@ export default function Settings() {
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [wallet, setWallet] = useState(null);
+
+  const fetchWallet = async () => {
+    const response = await getWallet();
+    setWallet(response?.data?.message?.data);
+  };
+
+  useEffect(() => {
+    fetchWallet();
+  }, []);
 
   const handleAddressDialog = () => {
     setAddressDialogOpen(true);
@@ -163,7 +169,6 @@ export default function Settings() {
           variant: "error",
         });
       });
-      
   };
 
   const handleSaveAdmin = () => {
@@ -324,168 +329,37 @@ export default function Settings() {
         {/* ShipRocket Wallet Tab */}
         <TabPanel value={tabValue} index={2}>
           {/* Wallet Balance Section */}
-          <Card
+          <Box
             sx={{
               mb: 4,
               p: 3,
               borderRadius: 3,
-              boxShadow: 4,
-              transition: "all 0.3s",
-              "&:hover": { boxShadow: 6 },
-              bgcolor: "background.paper",
+              border: "1px solid #e0e0e0",
             }}
           >
-            <CardContent>
-              <Typography variant="h5" gutterBottom fontWeight="bold">
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: "2vw",
+                alignItems: "center",
+                justifyContent: "space-between",
+                textAlign: { xs: "center", sm: "left" },
+              }}
+            >
+              <Typography variant="h5" fontWeight="bold">
                 ShipRocket Wallet Balance
               </Typography>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  p: 2,
-                  borderRadius: 2,
-                  // bgcolor: "primary.light",
-                  boxShadow: 1,
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AccountBalanceWallet
-                    sx={{ fontSize: 50, mr: 2, color: "primary.main" }}
-                  />
-                  <Typography
-                    variant="h3"
-                    color="primary.main"
-                    fontWeight="bold"
-                  >
-                    ₹4,250.75
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Last updated: Today at 10:45 AM
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <AccountBalanceWallet
+                  sx={{ fontSize: 50, mr: 2, color: "primary.main" }}
+                />
+                <Typography variant="h3" color="primary.main" fontWeight="bold">
+                  ₹{wallet?.balance_amount}
                 </Typography>
               </Box>
             </CardContent>
-          </Card>
-
-          {/* Recent Transactions */}
-          <Typography variant="h6" gutterBottom fontWeight="bold">
-            Recent Transactions
-          </Typography>
-
-          <List
-            sx={{ bgcolor: "background.paper", borderRadius: 2, boxShadow: 2 }}
-          >
-            <ListItem divider sx={{ py: 2, px: 3 }}>
-              <ListItemAvatar>
-                <IconButton sx={{ color: "success.main" }}>
-                  <TrendingUp fontSize="medium" />
-                </IconButton>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="medium">Wallet Recharge</Typography>
-                }
-                secondary="Feb 15, 2025 • Transaction ID: SR2502151134"
-              />
-              <ListItemSecondaryAction>
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", color: "success.main" }}
-                >
-                  +₹2,000.00
-                </Typography>
-              </ListItemSecondaryAction>
-            </ListItem>
-
-            <ListItem divider sx={{ py: 2, px: 3 }}>
-              <ListItemAvatar>
-                <IconButton sx={{ color: "error.main" }}>
-                  <TrendingDown fontSize="medium" />
-                </IconButton>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="medium">
-                    Shipping Charge (Order #SR3421)
-                  </Typography>
-                }
-                secondary="Feb 10, 2025 • Transaction ID: SR2502101421"
-              />
-              <ListItemSecondaryAction>
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", color: "error.main" }}
-                >
-                  -₹145.50
-                </Typography>
-              </ListItemSecondaryAction>
-            </ListItem>
-
-            <ListItem sx={{ py: 2, px: 3 }}>
-              <ListItemAvatar>
-                <IconButton sx={{ color: "error.main" }}>
-                  <TrendingDown fontSize="medium" />
-                </IconButton>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="medium">
-                    Shipping Charge (Order #SR3409)
-                  </Typography>
-                }
-                secondary="Feb 05, 2025 • Transaction ID: SR2502051056"
-              />
-              <ListItemSecondaryAction>
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", color: "error.main" }}
-                >
-                  -₹210.25
-                </Typography>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </List>
-
-          {/* Action Buttons */}
-          <Box
-            sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{
-                px: 3,
-                py: 1.2,
-                fontSize: "1rem",
-                borderRadius: 2,
-                transition: "all 0.3s",
-                "&:hover": {
-                  bgcolor: "primary.dark",
-                  transform: "scale(1.05)",
-                },
-                "&:active": { transform: "scale(0.95)" },
-              }}
-            >
-              Add Funds
-            </Button>
-            <Button
-              variant="outlined"
-              sx={{
-                px: 3,
-                py: 1.2,
-                fontSize: "1rem",
-                borderRadius: 2,
-                borderColor: "grey.400",
-                transition: "all 0.3s",
-                "&:hover": { bgcolor: "grey.100", borderColor: "grey.600" },
-                "&:active": { transform: "scale(0.95)" },
-              }}
-            >
-              View All Transactions
-            </Button>
           </Box>
         </TabPanel>
 
@@ -842,13 +716,13 @@ export default function Settings() {
       <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
         <DialogTitle>Delete Admin Account</DialogTitle>
         <DialogContent>
-        <DialogContentText>
-  Are you sure you want to Demote   {' '}
-  <span style={{ fontWeight: 'bold', color:'black'}}>{selectedAdmin?.fullName}</span>  
-  {' '} from an admin to a customer?.
-</DialogContentText>
-
-
+          <DialogContentText>
+            Are you sure you want to Demote{" "}
+            <span style={{ fontWeight: "bold", color: "black" }}>
+              {selectedAdmin?.fullName}
+            </span>{" "}
+            from an admin to a customer?.
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
