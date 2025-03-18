@@ -1,18 +1,27 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, CardMedia, Stack, Divider, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CardMedia,
+  Stack,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import { getAddress, getServiceability } from "../../../services/user/userAPI";
 import ORDER_IMG from "../../../assets/images/order-img.png";
 
-const DeliveryEstimate = () => {
+const DeliveryEstimate = ({ buyNowItem }) => {
   const dispatch = useDispatch();
-  const selectedAddressID = useSelector((state) => state.address.selectedAddressID);
+  const selectedAddressID = useSelector(
+    (state) => state.address.selectedAddressID
+  );
   const cartData = useSelector((state) => state.cart);
 
   const [deliveryEstimations, setDeliveryEstimations] = useState({});
   const [deliveryPincode, setDeliveryPincode] = useState("");
   const [loading, setLoading] = useState(true);
-  const items = cartData?.items || [];
+  const items = buyNowItem.length !== 0 ? buyNowItem : cartData?.items;
 
   const fetchAddressAndServiceability = useCallback(async () => {
     try {
@@ -22,8 +31,12 @@ const DeliveryEstimate = () => {
       const addressResponse = await getAddress();
       const allAddresses = Object.values(addressResponse?.data?.data || {});
 
-      const matchedAddress = allAddresses.find((addr) => addr._id === selectedAddressID);
-      pincode = matchedAddress ? matchedAddress.pincode : allAddresses[0]?.pincode || "";
+      const matchedAddress = allAddresses.find(
+        (addr) => addr._id === selectedAddressID
+      );
+      pincode = matchedAddress
+        ? matchedAddress.pincode
+        : allAddresses[0]?.pincode || "";
 
       if (!pincode) return;
 
@@ -33,9 +46,14 @@ const DeliveryEstimate = () => {
       await Promise.all(
         items.map(async (item) => {
           try {
-            const response = await getServiceability(item.productId, pincode, false);
+            const response = await getServiceability(
+              item.productId,
+              pincode,
+              false
+            );
             newEstimations[item.productId] =
-              response?.data?.message?.fastest_delivery?.estimated_delivery || "Unavailable";
+              response?.data?.message?.fastest_delivery?.estimated_delivery ||
+              "Unavailable";
           } catch {
             newEstimations[item.productId] = "Unavailable";
           }
@@ -58,7 +76,9 @@ const DeliveryEstimate = () => {
 
   return (
     <Box padding={3} sx={{ backgroundColor: "#FAFAFA", borderRadius: 2 }}>
-      <Typography sx={{ color: "#333", fontSize: "16px", fontWeight: 600, mb: 2 }}>
+      <Typography
+        sx={{ color: "#333", fontSize: "16px", fontWeight: 600, mb: 2 }}
+      >
         📦 Delivery Estimate
       </Typography>
 
@@ -83,35 +103,55 @@ const DeliveryEstimate = () => {
             {/* Product Image */}
             <CardMedia
               component="img"
-              sx={{ width: 55, height: 65, borderRadius: 1, objectFit: "cover" }}
+              sx={{
+                width: 55,
+                height: 65,
+                borderRadius: 1,
+                objectFit: "cover",
+              }}
               image={item?.images?.[0] || ORDER_IMG}
               alt={item?.name || "Product"}
             />
 
             {/* Product Details */}
             <Stack spacing={0.5} sx={{ flexGrow: 1, ml: 2 }}>
-              <Typography sx={{ fontWeight: 500, fontSize: "13px", color: "#333" }}>
-                {item?.name?.length > 20 ? `${item.name.slice(0, 20)}...` : item?.name || "Product"}
+              <Typography
+                sx={{ fontWeight: 500, fontSize: "13px", color: "#333" }}
+              >
+                {item?.name?.length > 20
+                  ? `${item.name.slice(0, 20)}...`
+                  : item?.name || "Product"}
               </Typography>
 
               {/* Quantity & Price */}
               <Stack direction="row" justifyContent="space-between">
-                <Typography sx={{ fontSize: "12px", color: "#666" }}>QTY {item?.quantity || 1}</Typography>
-                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#000" }}>
-                  ₹{item.price * item.quantity}
+                <Typography sx={{ fontSize: "12px", color: "#666" }}>
+                  QTY {item?.quantity || 1}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: "12px", fontWeight: 600, color: "#000" }}
+                >
+                  ₹{item.price * (item?.quantity || 1)}
                 </Typography>
               </Stack>
 
               {/* Delivery Date */}
               <Divider sx={{ my: 1 }} />
-              <Typography sx={{ fontSize: "12px", color: "#388E3C", fontWeight: 500 }}>
-                🚚 Delivery by <strong>{deliveryEstimations[item.productId] || "Checking..."}</strong>
+              <Typography
+                sx={{ fontSize: "12px", color: "#388E3C", fontWeight: 500 }}
+              >
+                🚚 Delivery by{" "}
+                <strong>
+                  {deliveryEstimations[item.productId] || "Checking..."}
+                </strong>
               </Typography>
             </Stack>
           </Box>
         ))
       ) : (
-        <Typography sx={{ fontSize: "14px", color: "#666", textAlign: "center", mt: 2 }}>
+        <Typography
+          sx={{ fontSize: "14px", color: "#666", textAlign: "center", mt: 2 }}
+        >
           No items found.
         </Typography>
       )}
