@@ -86,8 +86,12 @@ const ProductCard = ({ product }) => {
   const removeFromCartHandler = async () => {
     try {
       if (!product?.productId) return;
-      await dispatch(removeFromTheCart({ productId: product.productId }));
-      await dispatch(fetchCart(authToken));
+      await dispatch(
+        removeFromTheCart({
+          authToken: authToken,
+          productId: product.productId,
+        })
+      );
     } catch (error) {
       console.log(error);
     }

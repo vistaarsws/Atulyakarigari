@@ -1,10 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCart, removeFromCart, addToCart } from "../../services/user/userAPI";
+import {
+  getCart,
+  removeFromCart,
+  addToCart,
+} from "../../services/user/userAPI";
 import { jwtDecode } from "jwt-decode";
 
 // Helper Function: Track Custom Events in Dynatrace
 const trackDynatraceEvent = (eventName, data) => {
-  if (window.dtrum) {
+  if (typeof window !== "undefined" && window.dtrum) {
     window.dtrum.sendCustomEvent(eventName, data);
   }
 };
@@ -17,8 +21,10 @@ export const fetchCart = createAsyncThunk(
       const { userId } = jwtDecode(authToken);
       const response = await getCart(userId);
 
-      // ✅ Track cart retrieval in Dynatrace
-      trackDynatraceEvent("Fetch Cart", { userId, itemCount: response.data.data.items.length });
+      trackDynatraceEvent("Fetch Cart", {
+        userId,
+        itemCount: response.data.data.items.length,
+      });
 
       return response.data.data;
     } catch (err) {
@@ -34,13 +40,10 @@ export const removeFromTheCart = createAsyncThunk(
     try {
       await removeFromCart(productId);
 
-      // ✅ Update Redux state immediately
       dispatch(cartSlice.actions.removeItemFromState(productId));
 
-      // ✅ Re-fetch updated cart from backend
       const updatedCart = await dispatch(fetchCart(authToken)).unwrap();
 
-      // ✅ Track removal event in Dynatrace
       trackDynatraceEvent("Remove from Cart", { productId });
 
       return updatedCart;
@@ -50,17 +53,18 @@ export const removeFromTheCart = createAsyncThunk(
   }
 );
 
-// ADD Item to Cart and Fetch Updated Cart
+// Add Item to Cart and Fetch Updated Cart
 export const addToTheCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ authToken, productId, quantity = 1 }, { rejectWithValue, dispatch }) => {
+  async (
+    { authToken, productId, quantity = 1 },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
       await addToCart(productId, quantity);
 
-      // ✅ Re-fetch updated cart from backend
       const updatedCart = await dispatch(fetchCart(authToken)).unwrap();
 
-      // ✅ Track "Add to Cart" event in Dynatrace
       trackDynatraceEvent("Add to Cart", { productId, quantity });
 
       return updatedCart;
@@ -73,10 +77,10 @@ export const addToTheCart = createAsyncThunk(
 // Update Quantity in Cart
 export const updateQuantityInCart = createAsyncThunk(
   "cart/updateQuantity",
-  async ({ productId, quantity }, { rejectWithValue, dispatch }) => {
+  async ({ authToken, productId, quantity }, { rejectWithValue, dispatch }) => {
     try {
       const updatedCart = await dispatch(
-        addToTheCart({ productId, quantity })
+        addToTheCart({ authToken, productId, quantity })
       ).unwrap();
 
       dispatch(cartSlice.actions.updateItemQuantity({ productId, quantity }));
@@ -85,14 +89,13 @@ export const updateQuantityInCart = createAsyncThunk(
         (sum, item) => sum + item.price * item.quantity,
         0
       );
-   
-     
-      const total = totalMRP;
 
-      dispatch(cartSlice.actions.updateCartTotals({ totalMRP, total }));
-      fetchCart();
+      dispatch(
+        cartSlice.actions.updateCartTotals({ totalMRP, total: totalMRP })
+      );
 
-      // ✅ Track "Update Quantity" event in Dynatrace
+      await dispatch(fetchCart(authToken)).unwrap(); // ✅ Dispatch fetchCart properly
+
       trackDynatraceEvent("Update Cart Quantity", { productId, quantity });
 
       return updatedCart;
