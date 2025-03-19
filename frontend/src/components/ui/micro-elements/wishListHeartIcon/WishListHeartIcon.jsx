@@ -22,11 +22,11 @@ export default function WishListHeartIcon({ productId }) {
   }, [wishlist]);
 
   // Fetch wishlist when component mounts
-  useEffect(() => {
-    if (userProfileToken) {
-      dispatch(fetchWishlist(userProfileToken));
-    }
-  }, [dispatch, userProfileToken]);
+  // useEffect(() => {
+  //   if (userProfileToken) {
+  //     dispatch(fetchWishlist(userProfileToken));
+  //   }
+  // }, [dispatch, userProfileToken]);
 
   const toggleWishlistHandler = async (e) => {
     e.stopPropagation();
@@ -41,9 +41,9 @@ export default function WishListHeartIcon({ productId }) {
     }
   };
 
-  useEffect(() => {
-    dispatch(fetchWishlist(userProfileToken));
-  }, [wishlist, dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchWishlist(userProfileToken));
+  // }, [wishlist]);
 
   return (
     <div className="wishListHeart_box" onClick={toggleWishlistHandler}>
