@@ -75,6 +75,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install Vercel CLI
+        run: |
+         npm install -g vercel
+
       - name: Deploy to Vercel (Development)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
