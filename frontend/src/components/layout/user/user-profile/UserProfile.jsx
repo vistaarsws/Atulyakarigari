@@ -71,7 +71,7 @@ export default function UserProfile() {
               fontSize: "16px",
             }}
           >
-            {location.pathname.replace("/user/", "")}
+            {location.pathname.replace(/^\/+/, "").replace(/\//g, " / ")}
           </Typography>
         </div>
         <Box

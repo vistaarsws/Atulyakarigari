@@ -15,7 +15,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   ListItemAvatar,
   IconButton,
   Dialog,
@@ -35,17 +34,20 @@ import {
   Search,
   PersonAdd,
   Delete,
-  TrendingUp,
-  TrendingDown,
 } from "@mui/icons-material";
 import {
   fetchProfile,
   fetchAllProfiles,
 } from "../../../Redux/features/ProfileSlice";
+import {
+  addAdminThunk,
+  removeAdminThunk,
+} from "../../../Redux/features/AdminSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Profile from "../../user/profile/profile/Profile";
 import { jwtDecode } from "jwt-decode";
 import { useSnackbar } from "notistack";
+import { getWallet } from "../../../services/admin/adminAPI";
 
 export default function Settings() {
   const [tabValue, setTabValue] = useState(0);
@@ -63,30 +65,6 @@ export default function Settings() {
     isDefault: true,
   });
 
-  const [admins, setAdmins] = useState([
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      email: "sarah.j@shiprocket.com",
-      role: "admin",
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      email: "michael.c@shiprocket.com",
-      role: "admin",
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Priya Patel",
-      email: "priya.p@shiprocket.com",
-      role: "admin",
-      status: "inactive",
-    },
-  ]);
-
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [adminDialogOpen, setAdminDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -94,6 +72,16 @@ export default function Settings() {
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [wallet, setWallet] = useState(null);
+
+  const fetchWallet = async () => {
+    const response = await getWallet();
+    setWallet(response?.data?.message?.data);
+  };
+
+  useEffect(() => {
+    fetchWallet();
+  }, []);
 
   const handleAddressDialog = () => {
     setAddressDialogOpen(true);
@@ -168,33 +156,39 @@ export default function Settings() {
     setSelectedAdmin(null);
   };
 
-  const handleDeleteAdmin = () => {
-    if (selectedAdmin) {
-      setAdmins(admins.filter((admin) => admin.id !== selectedAdmin.id));
-      setDeleteDialogOpen(false);
-      setSelectedAdmin(null);
-    }
+  const handleDeleteAdmin = async () => {
+    dispatch(removeAdminThunk({ email: selectedAdmin.email }))
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(response.message, { variant: "success" });
+        setDeleteDialogOpen(false);
+        dispatch(fetchAllProfiles());
+      })
+      .catch((error) => {
+        enqueueSnackbar(error.message || "Failed to remove admin.", {
+          variant: "error",
+        });
+      });
   };
-
-
 
   const handleSaveAdmin = () => {
     setAdminDialogOpen(false);
     setConfirmDialogOpen(true);
   };
 
-  const handleConfirmAddAdmin = () => {
-    // Create a new admin with the email
-    const newAdmin = {
-      id: admins.length + 1,
-      name: newAdminEmail.split("@")[0], // Simple name generation from email
-      email: newAdminEmail,
-      role: "admin",
-      status: "active",
-    };
-
-    setAdmins([...admins, newAdmin]);
-    setConfirmDialogOpen(false);
+  const handleConfirmAddAdmin = async () => {
+    dispatch(addAdminThunk({ email: newAdminEmail }))
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(response.message, { variant: "success" });
+        setConfirmDialogOpen(false);
+        dispatch(fetchAllProfiles());
+      })
+      .catch(() => {
+        enqueueSnackbar( "Profile not found. Please sign up with this email.", {
+          variant: "error",
+        });
+      });
   };
 
   return (
@@ -335,198 +329,72 @@ export default function Settings() {
         {/* ShipRocket Wallet Tab */}
         <TabPanel value={tabValue} index={2}>
           {/* Wallet Balance Section */}
-          <Card
+          <Box
             sx={{
               mb: 4,
               p: 3,
               borderRadius: 3,
-              boxShadow: 4,
-              transition: "all 0.3s",
-              "&:hover": { boxShadow: 6 },
-              bgcolor: "background.paper",
+              border: "1px solid #e0e0e0",
             }}
           >
-            <CardContent>
-              <Typography variant="h5" gutterBottom fontWeight="bold">
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: "2vw",
+                alignItems: "center",
+                justifyContent: "space-between",
+                textAlign: { xs: "center", sm: "left" },
+              }}
+            >
+              <Typography variant="h5" fontWeight="bold">
                 ShipRocket Wallet Balance
               </Typography>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  p: 2,
-                  borderRadius: 2,
-                  // bgcolor: "primary.light",
-                  boxShadow: 1,
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AccountBalanceWallet
-                    sx={{ fontSize: 50, mr: 2, color: "primary.main" }}
-                  />
-                  <Typography
-                    variant="h3"
-                    color="primary.main"
-                    fontWeight="bold"
-                  >
-                    ₹4,250.75
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Last updated: Today at 10:45 AM
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <AccountBalanceWallet
+                  sx={{ fontSize: 50, mr: 2, color: "primary.main" }}
+                />
+                <Typography variant="h3" color="primary.main" fontWeight="bold">
+                  ₹{wallet?.balance_amount}
                 </Typography>
               </Box>
             </CardContent>
-          </Card>
-
-          {/* Recent Transactions */}
-          <Typography variant="h6" gutterBottom fontWeight="bold">
-            Recent Transactions
-          </Typography>
-
-          <List
-            sx={{ bgcolor: "background.paper", borderRadius: 2, boxShadow: 2 }}
-          >
-            <ListItem divider sx={{ py: 2, px: 3 }}>
-              <ListItemAvatar>
-                <IconButton sx={{ color: "success.main" }}>
-                  <TrendingUp fontSize="medium" />
-                </IconButton>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="medium">Wallet Recharge</Typography>
-                }
-                secondary="Feb 15, 2025 • Transaction ID: SR2502151134"
-              />
-              <ListItemSecondaryAction>
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", color: "success.main" }}
-                >
-                  +₹2,000.00
-                </Typography>
-              </ListItemSecondaryAction>
-            </ListItem>
-
-            <ListItem divider sx={{ py: 2, px: 3 }}>
-              <ListItemAvatar>
-                <IconButton sx={{ color: "error.main" }}>
-                  <TrendingDown fontSize="medium" />
-                </IconButton>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="medium">
-                    Shipping Charge (Order #SR3421)
-                  </Typography>
-                }
-                secondary="Feb 10, 2025 • Transaction ID: SR2502101421"
-              />
-              <ListItemSecondaryAction>
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", color: "error.main" }}
-                >
-                  -₹145.50
-                </Typography>
-              </ListItemSecondaryAction>
-            </ListItem>
-
-            <ListItem sx={{ py: 2, px: 3 }}>
-              <ListItemAvatar>
-                <IconButton sx={{ color: "error.main" }}>
-                  <TrendingDown fontSize="medium" />
-                </IconButton>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="medium">
-                    Shipping Charge (Order #SR3409)
-                  </Typography>
-                }
-                secondary="Feb 05, 2025 • Transaction ID: SR2502051056"
-              />
-              <ListItemSecondaryAction>
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", color: "error.main" }}
-                >
-                  -₹210.25
-                </Typography>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </List>
-
-          {/* Action Buttons */}
-          <Box
-            sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{
-                px: 3,
-                py: 1.2,
-                fontSize: "1rem",
-                borderRadius: 2,
-                transition: "all 0.3s",
-                "&:hover": {
-                  bgcolor: "primary.dark",
-                  transform: "scale(1.05)",
-                },
-                "&:active": { transform: "scale(0.95)" },
-              }}
-            >
-              Add Funds
-            </Button>
-            <Button
-              variant="outlined"
-              sx={{
-                px: 3,
-                py: 1.2,
-                fontSize: "1rem",
-                borderRadius: 2,
-                borderColor: "grey.400",
-                transition: "all 0.3s",
-                "&:hover": { bgcolor: "grey.100", borderColor: "grey.600" },
-                "&:active": { transform: "scale(0.95)" },
-              }}
-            >
-              View All Transactions
-            </Button>
           </Box>
         </TabPanel>
 
         {/* Admin Management Tab - Only visible to Super Admin */}
         {user.role === "super-admin" && (
           <TabPanel value={tabValue} index={3}>
+            {/* Header Section */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
                 Admin Management
               </Typography>
-              <Typography variant="h5" color="text.secondary">
-                Create and manage admin accounts. Only super admins
-                have access to this section.
+              <Typography variant="h6" color="text.secondary">
+                Create and manage admin accounts. Only super admins have access
+                to this section.
               </Typography>
             </Box>
 
+            {/* Search & Add Button Section */}
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" }, // Column on mobile, row on larger screens
                 alignItems: "center",
+                justifyContent: "space-between",
+                gap: 2, // Adds spacing for mobile view
                 mb: 3,
               }}
             >
               <TextField
                 placeholder="Search admins..."
                 size="small"
+                fullWidth // Full width on small screens
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ width: "60%" }}
+                sx={{ maxWidth: { sm: "60%", md: "50%" } }} // Responsive width control
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -539,39 +407,65 @@ export default function Settings() {
                 variant="contained"
                 startIcon={<PersonAdd />}
                 onClick={handleOpenAdminDialog}
+                sx={{
+                  width: { xs: "100%", sm: "auto" }, // Full width button on mobile
+                }}
               >
                 Add New Admin
               </Button>
             </Box>
 
+            {/* No Admins Found Message */}
             {filteredAdmins.length === 0 ? (
-              <Alert severity="info" sx={{ mt: 2 }}>
+              <Alert severity="info" sx={{ mt: 2, textAlign: "center" }}>
                 No admin accounts found matching your search.
               </Alert>
             ) : (
-              <List sx={{ bgcolor: "background.paper" }}>
+              /* Admin List */
+              <List
+                sx={{
+                  bgcolor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  overflow: "hidden",
+                }}
+              >
                 {filteredAdmins.map((admin) => (
                   <ListItem
                     key={admin.id}
                     divider
                     secondaryAction={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <IconButton
-                          edge="end"
-                          aria-label="delete"
-                          onClick={() => handleOpenDeleteDialog(admin)}
-                          color="error"
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Box>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleOpenDeleteDialog(admin)}
+                        color="error"
+                        sx={{
+                          transition: "transform 0.2s ease",
+                          "&:hover": { transform: "scale(1.1)" },
+                        }}
+                      >
+                        <Delete />
+                      </IconButton>
                     }
                   >
                     <ListItemAvatar>
-                    <Avatar src={admin.profilePicture || "/default-avatar.png"} />
+                      <Avatar
+                        src={admin.profilePicture || "/default-avatar.png"}
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          border: "2px solid",
+                          borderColor: "primary.light",
+                        }}
+                      />
                     </ListItemAvatar>
                     <ListItemText
-                      primary={admin.name}
+                      primary={
+                        <Typography variant="body1" fontWeight="bold">
+                          {admin.name}
+                        </Typography>
+                      }
                       secondary={
                         <>
                           <Typography
@@ -839,9 +733,6 @@ export default function Settings() {
             variant="contained"
             color="primary"
             onClick={() => {
-              enqueueSnackbar("Admin successfully confirmed!", {
-                variant: "success",
-              });
               handleConfirmAddAdmin();
             }}
           >
@@ -855,8 +746,11 @@ export default function Settings() {
         <DialogTitle>Delete Admin Account</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete {selectedAdmin?.name}'s admin
-            account? This action cannot be undone.
+            Are you sure you want to Demote{" "}
+            <span style={{ fontWeight: "bold", color: "black" }}>
+              {selectedAdmin?.fullName}
+            </span>{" "}
+            from an admin to a customer?.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -865,9 +759,6 @@ export default function Settings() {
             variant="contained"
             color="error"
             onClick={() => {
-              enqueueSnackbar("Admin account deleted successfully!", {
-                variant: "success",
-              });
               handleDeleteAdmin();
             }}
           >
@@ -890,7 +781,7 @@ function TabPanel(props) {
       aria-labelledby={`settings-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 5 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 3.5 }}>{children}</Box>}
     </div>
   );
 }

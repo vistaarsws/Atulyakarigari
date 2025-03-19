@@ -23,6 +23,7 @@ import addToCartRoutes from "./routes/addToCart.routes.js";
 import questionsRoutes from "./routes/question.routes.js";
 import shiprocketRoute from "./routes/shiprocket.routes.js"
 import paymentRoute from "./routes/payment.routes.js"
+import adminRoute from "./routes/admin.routes.js"
 
 // Enhanced console styling with emojis and better formatting
 const log = {
@@ -122,6 +123,7 @@ app.use("/api/v1/addToCart", addToCartRoutes);
 app.use("/api/v1/questions", questionsRoutes);
 app.use("/api/v1/shiprocket", shiprocketRoute);
 app.use("/api/v1/payment", paymentRoute);
+app.use("/api/v1/admin", adminRoute);
 
 
 
