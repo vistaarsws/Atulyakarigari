@@ -2,42 +2,27 @@ import "./CategotyView.css";
 import rightArrow from "../../../../assets/images/rightArrow.svg";
 import { ourCollections } from "../../../../utils/Constant";
 
-import { getcategory } from "../../../../services/user/userAPI";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function CategoryView() {
-  const [ourCollection, setOurCollection] = useState([]);
-
-  const fetchCategoryData = async () => {
-    const response = await getcategory();
-    if (response?.data?.data) {
-      // Convert the object into an array
-      const categoryArray = Object.values(response.data.data);
-      setOurCollection(categoryArray);
-    }
-    return response;
-  };
-
-  useEffect(() => {
-    fetchCategoryData();
-  }, []);
+  const categoryArray = useSelector((state) => state.categories.categories);
 
   return (
     <div className="collection_container">
-      {ourCollections.map((collection, index) => {
+      {ourCollections?.map((collection, index) => {
         return (
           <div key={index}>
             <img src={collection.picture} alt={collection.collection_name} />
 
-            <Link to={`/categories/${ourCollection[index]?._id}`} key={index}>
+            <Link to={`/categories/${categoryArray[index]?._id}`} key={index}>
               <div
                 className="collection_descriptionCard"
                 style={{
                   backgroundColor: collection.hoverBgColor,
                 }}
               >
-                <h3>{ourCollection[index]?.name}</h3>
+                <h3>{categoryArray[index]?.name}</h3>
 
                 <div></div>
                 <p>{collection.collection_description}</p>

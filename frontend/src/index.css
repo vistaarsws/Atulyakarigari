@@ -9,9 +9,11 @@
   box-sizing: border-box;
 }
 
+/* Apply base styles */
 html {
   font-size: 62.5%;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  /* scrollbar-color: #6d001d transparent; */
 }
 
 :root {

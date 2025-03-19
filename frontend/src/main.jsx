@@ -6,7 +6,7 @@ import "./index.css";
 import ReactGA from "react-ga4";
 import store from "./Redux/store/store.js";
 import { Provider } from "react-redux";
-import { initializeMetaPixel } from "./utils/pixel/metaPixel.js"; 
+import { initializeMetaPixel } from "./utils/pixel/metaPixel.js";
 import { initializeDynatrace } from "./utils/dynatrace/dynatrace.js";
 
 // Ensure scripts run only in the browser (avoid SSR issues)
@@ -33,11 +33,13 @@ if (typeof window !== "undefined") {
 
 // Render React app
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <App />
-      </BrowserRouter>
-    </Provider>
-  </StrictMode>
+  // <StrictMode>
+  <Provider store={store}>
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <App />
+    </BrowserRouter>
+  </Provider>
+  // </StrictMode>
 );
