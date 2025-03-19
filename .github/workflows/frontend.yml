@@ -101,8 +101,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
         run: |
           cd frontend
-          npx vercel login --token $VERCEL_TOKEN
-          DEPLOYMENT_URL=$(npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes)
+          DEPLOYMENT_URL=$(npx vercel deploy --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes)
 
           echo "Deployment URL: $DEPLOYMENT_URL"
 
