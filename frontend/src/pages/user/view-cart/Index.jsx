@@ -43,7 +43,7 @@ const Index = () => {
   const cartData = useSelector((state) => state.cart);
   const isMobile = useMediaQuery("(max-width:768px)");
   const trackDynatraceEvent = useDynatrace(); // ✅ Now correctly returns `trackEvent`
-  
+
   // ✅ Fetch cart on component mount
   const mobileHeight = useMediaQuery("(max-width:900px)");
 
@@ -113,6 +113,9 @@ const Index = () => {
                 md: "35%",
                 height: "83vh",
                 overflowY: "scroll",
+                marginBottom: useMediaQuery("(max-width:450px)")
+                  ? "4rem"
+                  : "0rem",
               },
             }}
           >

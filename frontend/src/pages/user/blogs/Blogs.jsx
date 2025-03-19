@@ -10,7 +10,6 @@ import Stack from "@mui/material/Stack";
 import "./Blogs.css";
 
 export default function Blogs() {
-
   const topBlogs = [
     {
       title: "The Future of Handcrafted Fashion in a Digital World",
@@ -113,9 +112,9 @@ export default function Blogs() {
           })}
         </div>
         <div>
-          <Stack spacing={2}>
+          {/* <Stack spacing={2}>
             <Pagination count={5} size="large" />
-          </Stack>
+          </Stack> */}
         </div>
       </section>
     </div>

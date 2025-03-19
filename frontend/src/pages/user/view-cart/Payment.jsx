@@ -110,7 +110,7 @@ const Payment = ({ buyNowItem }) => {
       <Box
         sx={{
           backgroundColor: "white",
-          boxShadow: 1,
+          // boxShadow: 1,
           padding: { xs: 2, md: 4 },
           width: "100%",
         }}
@@ -382,7 +382,7 @@ const Payment = ({ buyNowItem }) => {
             )}
           </Box>
         </Box>
-        <Divider sx={{ marginY: 3 }} />
+        <Divider sx={{ marginY: useMediaQuery("(max-width:768px)") ? 1 : 3 }} />
         <Box sx={{ marginBottom: 2 }}>
           <Box
             sx={{
