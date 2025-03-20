@@ -139,7 +139,6 @@ export default function Product() {
 
   const fetchRatingAndReview = async () => {
     try {
-      const decodedToken = jwtDecode(authToken);
 
       const response = await getReviewById(productId);
 
