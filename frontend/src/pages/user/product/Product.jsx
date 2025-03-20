@@ -139,7 +139,6 @@ export default function Product() {
 
   const fetchRatingAndReview = async () => {
     try {
-      const decodedToken = jwtDecode(authToken);
 
       const response = await getReviewById(productId);
 
@@ -270,7 +269,9 @@ export default function Product() {
   };
 
   useEffect(() => {
-    checkIfProductInCart();
+    if(authToken){
+      checkIfProductInCart();
+    }
   }, [productId]);
 
   const handleCartToggle = async () => {

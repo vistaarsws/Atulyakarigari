@@ -4,7 +4,6 @@ import { getWishlist, toggleItemInWishlist } from "../controllers/wishlist.contr
 const router = Router();
 
 router.use(auth);
-router.use(isUser);
 
 router.get('/get', getWishlist);
 router.post('/toggle', toggleItemInWishlist);

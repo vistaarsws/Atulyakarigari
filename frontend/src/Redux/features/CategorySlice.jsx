@@ -9,7 +9,6 @@ export const fetchAllCategory = createAsyncThunk(
       const response = await getCategory();
 
       const categories_arr = Object.values(response.data.data);
-      console.log("CATEGORY ", categories_arr);
       return categories_arr;
     } catch (error) {
       return rejectWithValue(error.message || "Failed to fetch categories");
