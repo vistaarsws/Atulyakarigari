@@ -269,7 +269,9 @@ export default function Product() {
   };
 
   useEffect(() => {
-    checkIfProductInCart();
+    if(authToken){
+      checkIfProductInCart();
+    }
   }, [productId]);
 
   const handleCartToggle = async () => {
