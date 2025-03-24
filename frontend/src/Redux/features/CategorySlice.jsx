@@ -6,9 +6,19 @@ export const fetchAllCategory = createAsyncThunk(
   "category/fetchCategory",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getCategory();
+      // Check if categories exist in localStorage
+      const cachedCategories = localStorage.getItem("categories");
+      if (cachedCategories) {
+        return JSON.parse(cachedCategories);
+      }
 
+      // If not, fetch from API
+      const response = await getCategory();
       const categories_arr = Object.values(response.data.data);
+
+      // Store in localStorage
+      localStorage.setItem("categories", JSON.stringify(categories_arr));
+
       return categories_arr;
     } catch (error) {
       return rejectWithValue(error.message || "Failed to fetch categories");
