@@ -33,7 +33,7 @@ export default function ProductSection({ productCategorySection, bgColor }) {
   const productCards = useMemo(() => {
     if (loading) {
       // Show 5 skeleton placeholders while loading
-      return [...Array(5)].map((_, index) => (
+      return [...Array(products.length)].map((_, index) => (
         <div className="skeletonCard" key={index}>
           <div className="skeleton_rating"></div>
           <div className="skeleton_image"></div>
@@ -55,18 +55,18 @@ export default function ProductSection({ productCategorySection, bgColor }) {
       );
     });
 
-    // Fill with skeletons if fewer than 5 real products exist
-    const skeletons = [...Array(Math.max(0, 6 - realProducts.length))].map(
-      (_, index) => (
-        <div className="skeletonCard" key={`skeleton-${index}`}>
-          <div className="skeleton_image"></div>
-          <div className="skeleton_text"></div>
-          <div className="skeleton_text short"></div>
-        </div>
-      )
-    );
+    console.log("PPPPPPPP", products.length);
 
-    return [...realProducts, ...skeletons]; // Merge real products and skeletons
+    // Fill with skeletons if fewer than 5 real products exist
+    const skeletons = [...Array(products.length)].map((_, index) => (
+      <div className="skeletonCard" key={`skeleton-${index}`}>
+        <div className="skeleton_image"></div>
+        <div className="skeleton_text"></div>
+        <div className="skeleton_text short"></div>
+      </div>
+    ));
+
+    return [...realProducts]; // Merge real products and skeletons
   }, [products, loading]);
 
   const navigate = useNavigate();
