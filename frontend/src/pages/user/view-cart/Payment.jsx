@@ -19,10 +19,6 @@ const Payment = ({ buyNowItem }) => {
   const cartData =
     buyNowItem?.length == 1 ? buyNowItem : useSelector((state) => state.cart);
 
-  console.log("cart data", cartData.items);
-
-  console.log("ORDER DATA", buyNowItem);
-
   const selectedAddressID = useSelector(
     (state) => state.address.selectedAddressID
   );
@@ -286,8 +282,7 @@ const Payment = ({ buyNowItem }) => {
                 {formatPrice(
                   cartData?.items?.length > 0
                     ? cartData?.totalDiscount
-                    : (cartData[0]?.price - cartData[0]?.priceAfterDiscount ??
-                        0)
+                    : (cartData[0]?.price ?? 0) - (cartData[0]?.priceAfterDiscount ?? 0)
                 )}
               </Typography>
             </Box>
