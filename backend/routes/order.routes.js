@@ -5,6 +5,7 @@ import {
   getOrderById,
   cancelOrder,
   returnOrder,
+  getUserOrders,
 } from "../controllers/order.controller.js";
 import { auth, isAdmin } from "../middlewares/auth.middleware.js";
 
@@ -15,8 +16,9 @@ router.post("/create", createOrder);
 router.post("/getOrder", getOrderById);
 router.post("/cancel", cancelOrder);
 router.post("/return", returnOrder);
+router.get("/getUserOrders", getUserOrders);
 
 router.use(isAdmin);
-router.get("/getOrders", getAllOrders);
+router.get("/getOrders", getUserOrders);
 
 export default router;

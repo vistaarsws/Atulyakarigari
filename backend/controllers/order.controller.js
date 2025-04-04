@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Order from "../models/order.js";
+import User from "../models/user.js";
 import Address from "../models/Address.js";
 import Payment from "../models/payment.js";
 import {
@@ -181,3 +183,208 @@ export const cancelOrder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getUserOrders = async (req, res) => {
+  try{
+    const { loginId, _id } = req.user;
+    let userDetails = await User.findById(_id)
+    if (!userDetails) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    let matchQuery = {
+      userId: new mongoose.Types.ObjectId(req.user._id)
+    }
+    const agg = [
+      {
+        $match: matchQuery
+      },
+      {
+        $lookup:
+        /**
+         * from: The target collection.
+         * localField: The local join field.
+         * foreignField: The target join field.
+         * as: The name for the results.
+         * pipeline: Optional pipeline to run on the foreign collection.
+         * let: Optional variables to use in the pipeline field stages.
+         */
+        {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userData"
+        }
+      },
+      {
+        $unwind:
+        /**
+         * path: Path to the array field.
+         * includeArrayIndex: Optional name for index.
+         * preserveNullAndEmptyArrays: Optional
+         *   toggle to unwind null and empty values.
+         */
+        {
+          path: "$userData",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $unwind:
+        /**
+         * path: Path to the array field.
+         * includeArrayIndex: Optional name for index.
+         * preserveNullAndEmptyArrays: Optional
+         *   toggle to unwind null and empty values.
+         */
+        {
+          path: "$products",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup:
+        /**
+         * from: The target collection.
+         * localField: The local join field.
+         * foreignField: The target join field.
+         * as: The name for the results.
+         * pipeline: Optional pipeline to run on the foreign collection.
+         * let: Optional variables to use in the pipeline field stages.
+         */
+        {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productDetails"
+        }
+      },
+      {
+        $unwind:
+        /**
+         * path: Path to the array field.
+         * includeArrayIndex: Optional name for index.
+         * preserveNullAndEmptyArrays: Optional
+         *   toggle to unwind null and empty values.
+         */
+        {
+          path: "$productDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $group:
+        /**
+         * _id: The id of the group.
+         * fieldN: The first field name.
+         */
+        {
+          _id: {
+            orderId: "$orderId",
+            productId: "$products.productId",
+            quantity: "$products.quantity",
+            price: "$products.price",
+            totalPrice: "$products.totalPrice",
+            totalMRP: "$totalMRP",
+            discountAmount: "$discountAmount",
+            donationAmount: "$donationAmount",
+            totalAmount: "$totalAmount",
+            shippingCost: "$shippingCost"
+          },
+          productDetails: {
+            $first: "$productDetails"
+          },
+          shippingAddress: {
+            $first: "$shippingAddress"
+          },
+          billingAddress: {
+            $first: "$billingAddress"
+          },
+          shiprocketOrderId: {
+            $first: "$shiprocketOrderId"
+          },
+          transactionId: {
+            $first: "$transactionId"
+          },
+          paymentMethod: {
+            $first: "$paymentMethod"
+          },
+          orderStatus: {
+            $first: "$orderStatus"
+          },
+          shippingMethod: {
+            $first: "$shippingMethod"
+          },
+          paidAt: {
+            $first: "$paidAt"
+          },
+          isPaid: {
+            $first: "$isPaid"
+          },
+          trackingId: {
+            $first: "$trackingId"
+          },
+          paymentMethod: {
+            $first: "$paymentMethod"
+          },
+          courierName: {
+            $first: "$courierName"
+          },
+          estimatedDelivery: {
+            $first: "$estimatedDelivery"
+          },
+          shippedAt: {
+            $first: "$shippedAt"
+          },
+          deliveredAt: {
+            $first: "$deliveredAt"
+          },
+          cancelledAt: {
+            $first: "$cancelledAt"
+          },
+          cancellationReason: {
+            $first: "$cancellationReason"
+          },
+          canceledBy: {
+            $first: "$canceledBy"
+          },
+          returnRequest: {
+            $first: "$returnRequest"
+          },
+          returnReason: {
+            $first: "$deliveredAt"
+          },
+          returnStatus: {
+            $first: "$deliveredAt"
+          },
+          returnedAt: {
+            $first: "$deliveredAt"
+          },
+          createdAt: {
+            $first: "$createdAt"
+          }
+        }
+      },
+      {
+        $sort:
+        /**
+         * Provide any number of field/order pairs.
+         */
+        {
+          createdAt: 1
+        }
+      }
+    ]
+    const orders = await Order.aggregate(agg);
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ success : false ,data :[] });
+    }
+    return res.status(200).json({
+      success: true,
+      data : orders
+    })
+  }
+  catch(error){
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
