@@ -22,7 +22,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleAuthHandler = async (req, res) => {
   const { token } = req.body;
-
+{console.log(Otp,"otp")}
   try {
     // Verify the Google token and get the user payload
     const ticket = await client.verifyIdToken({
@@ -62,6 +62,7 @@ export const googleAuthHandler = async (req, res) => {
     let authToken;
     try {
       authToken = await user.generateAuthToken(); // Ensure we await the token generation
+
     } catch (error) {
       console.error("Error generating token:", error);
       return internalServerError(req, res, error, "Token generation failed");

@@ -22,6 +22,7 @@ export const createPayment = async (req, res) => {
       return res.status(400).json({ error: "User authentication required" });
 
     let amount = Number(totalAmount) + Number(donationAmounts);
+    
     if (!amount || amount <= 0)
       return res.status(400).json({ error: "Invalid amount" });
 

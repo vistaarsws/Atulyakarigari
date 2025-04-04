@@ -10,6 +10,7 @@ const iv = Buffer.from([
 ]);
 
 export const encrypt = (data) => {
+   
     try {
         const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
         let encrypted = cipher.update(data, "utf8", "hex");

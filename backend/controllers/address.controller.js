@@ -14,7 +14,7 @@ export const createAddress = async (req, res) => {
         const { fullName, mobileNumber, pincode, address, state, city, typeOfAddress, isDefault } = req.body;
 
         // Validate required fields
-        if (!fullName || !mobileNumber || !pincode || !address || !state || !city || !typeOfAddress) {
+        if (!fullName || !mobileNumber || !pincode || !address  || !city || !typeOfAddress) {
             return badRequest(req, res, null, "All fields are required");
         }
 
@@ -38,7 +38,7 @@ export const createAddress = async (req, res) => {
         await newAddress.save();
         return success(req, res, "Address created successfully", newAddress.toObject());
     } catch (error) {
-        console.error("Error creating address:", error);
+        console.error("Error creating address:", error.message);
         return internalServerError(req, res, error, "Error creating address");
     }
 };

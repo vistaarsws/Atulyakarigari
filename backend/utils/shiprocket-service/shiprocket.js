@@ -30,7 +30,6 @@ const getShiprocketToken = async () => {
         password: shiprocketConfig.PASSWORD,
       }
     );
-
     if (response.status !== 200 || !response.data?.token) {
       logMessage(
         "error",
@@ -43,7 +42,6 @@ const getShiprocketToken = async () => {
     tokenData.token = response.data.token;
     const expiresInSeconds = response.data.expires_in || 300; // Default to 5 minutes
     tokenData.expiresAt = Date.now() + expiresInSeconds * 1000;
-
     logMessage(
       "info",
       "Shiprocket Auth Token acquired successfully",
@@ -166,49 +164,55 @@ export const getAllProductsShipRocket = async () => {
 // CREATE SHIPROCKET ORDER
 export const createShiprocketOrder = async (orderData) => {
   const authToken = await getShiprocketToken();
-
+  console.log(authToken)
   const payload = {
     order_id: orderData.payment.paymentOrderId,
-    order_date: new Date().toISOString(),
-    pickup_location: orderData.pickupAddress || "Primary",
-    channel_id: orderData.channel_id || "",
+    order_date: orderData.payment.createdAt,
+    pickup_location: orderData.pickupAddress.pickup_location,
     billing_customer_name: orderData.address.fullName,
+    billing_last_name: orderData.address.fullName,
     billing_address: orderData.address.address,
     billing_city: orderData.address.city,
     billing_pincode: orderData.address.pincode,
     billing_state: orderData.address.state,
-    billing_country: orderData.address.country || "India",
-    billing_email: orderData.email || "",
+    billing_country: orderData.address.country || 'India',
+    billing_email: orderData.email,
     billing_phone: orderData.address.mobileNumber,
-    shipping_is_billing: orderData.shipping_is_billing ?? true,
+    shipping_is_billing: false,
     shipping_customer_name: orderData.address.fullName,
-    shipping_address: orderData.address.address || "",
-    shipping_address_2: orderData.address.address2 || "",
-    shipping_city: orderData.address.city,
-    shipping_pincode: orderData.address.pincode,
-    shipping_country: orderData.address.country || "India",
-    shipping_state: orderData.address.state,
-    shipping_email: orderData.email || "",
-    shipping_phone: orderData.address.mobileNumber || "",
-    order_items: orderData.products.map((item) => ({
-      name: item.name,
-      sku: item.sku,
-      units: item.units,
-      selling_price: item.selling_price,
-      discount: item.discount || 0,
-      tax: item.tax || 0,
-      length: item.length || 10,
-      breadth: item.breadth || 10,
-      height: item.height || 10,
-      weight: item.weight || 0.5,
-    })),
-    payment_method: orderData.payment.paymentMethod || "Prepaid",
-    sub_total: orderData.payment.amount,
+    shipping_address: "Bhopal, Madhya Pradesh",
+    shipping_city: "Bhopal",
+    shipping_pincode: "462022",
+    shipping_state: "Madhya Pradesh",
+    shipping_country: "India",
+    shipping_phone: "7410852963",
+    channel_id: 1776074,
+    payment_method: "COD",
+    sub_total: "500",
+    length: "10",
+    breadth: "5",
+    height: "3",
+    weight: "2",
+    order_items: [
+        {
+            productId: "6799cf78e40d0806d042af3b",
+            name: "Banarsi Saree Blue-Hand woven",
+            price: 18000,
+            totalPrice: 18000,
+            sku: "BSB-001",
+            units: "1",
+            selling_price: "18000",
+            length: "10",
+            breadth: "5",
+            height: "3",
+            weight: "2"
+        }
+    ],
   };
 
   try {
     const response = await axios.post(
-      `${shiprocketConfig.API_BASE}/orders/create`,
+      `${shiprocketConfig.API_BASE}/orders/create/adhoc`,
       payload,
       {
         headers: {
@@ -226,11 +230,13 @@ export const createShiprocketOrder = async (orderData) => {
     await logoutShiprocket();
     return response.data;
   } catch (error) {
+
     logMessage(
       "error",
       `Error creating order: ${error?.response?.data || error.message}`,
       "shiprocket-errors"
     );
+    
     await logoutShiprocket();
     throw error;
   }
@@ -438,8 +444,9 @@ export const addShiprocketPickupLocation = async (pickupData) => {
 
 // GET PICKUP LOCATION
 export const getShiprocketPickupLocations = async () => {
+  
   const authToken = await getShiprocketToken();
-
+  console.log(authToken)
   try {
     const response = await axios.get(
       `${shiprocketConfig.API_BASE}/settings/company/pickup`,
@@ -450,12 +457,12 @@ export const getShiprocketPickupLocations = async () => {
         },
       }
     );
-
     logMessage(
       "info",
       `Pickup locations fetched successfully: ${JSON.stringify(response.data)}`,
       "shiprocket-info"
     );
+    
     await logoutShiprocket();
     return response.data;
   } catch (error) {

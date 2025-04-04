@@ -5,6 +5,7 @@ import {
   createShiprocketOrder,
   cancelShiprocketOrder,
   ReturnShiprocketOrder,
+  getShiprocketPickupLocations,
 } from "../utils/shiprocket-service/shiprocket.js";
 import Product from "../models/product.js";
 
@@ -16,7 +17,9 @@ export const createOrder = async (req, res) => {
   try {
     const { loginId, _id } = req.user;
     const { paymentOrderId } = req.body;
+   
     const userId = _id;
+  
 
     const payment = await Payment.findOne({ paymentOrderId, userId });
     if (!payment || payment.status !== "COMPLETED") {
@@ -33,7 +36,7 @@ export const createOrder = async (req, res) => {
     const products = productsData.map((product) => ({
       productId: product._id,
       name: product.name,
-      quantity: product.quantity, 
+      quantity: product.quantity || 1, 
       price: product.price,
       totalPrice: product.price,
     }));
@@ -45,6 +48,7 @@ export const createOrder = async (req, res) => {
     }
 
     const pickupDetails = await getShiprocketPickupLocations();
+    
     const payload = {
       userId,
       email: loginId,
@@ -55,6 +59,7 @@ export const createOrder = async (req, res) => {
     };
 
     const shiprocketResponse = await createShiprocketOrder(payload);
+    console.log(shiprocketResponse, 'ship response')
     if (!shiprocketResponse || !shiprocketResponse.order_id) {
       return res
         .status(500)
@@ -92,7 +97,7 @@ export const createOrder = async (req, res) => {
         country: address.country || "India",
       },
       shippingMethod: "Standard",
-      paymentMethod: payment.paymentMethod,
+      paymentMethod: payment.paymentMethod || "Cash on Delivery",
       transactionId: payment.transactionId || null,
       isPaid: true,
       paidAt: new Date(),
