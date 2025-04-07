@@ -5,6 +5,7 @@ import {
   notFoundRequest,
 } from "../helpers/api-response.js";
 import {
+  addShiprocketPickupLocation,
   getShiprocketDeliveryEstimate,
   getShiprocketPickupLocations,
   getShiprocketWalletBalance,
@@ -106,6 +107,7 @@ export const getServiceability = async (req, res) => {
 
 export const getWallet = async (req, res) => {
   try {
+    console.log("here in getWallet");
     const walletBalence = await getShiprocketWalletBalance();
     return success(req, res, walletBalence);
   } catch (error) {
