@@ -6,8 +6,8 @@ const TrackPageView = () => {
   const location = useLocation();
 
   useEffect(() => {
-    logPageView(location.pathname);
-  }, []);
+    logPageView(location.pathname + location.search);
+  }, [location]);
 
   return null;
 };
