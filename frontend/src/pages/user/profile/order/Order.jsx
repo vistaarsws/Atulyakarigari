@@ -73,7 +73,7 @@ export default function Component() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [allOrder, setAllOrder] = useState();
-
+  const data = {};
   const breakpoints = {
     max768: useMediaQuery("(max-width:768px)"),
     min769Max1024: useMediaQuery("((min-width:769px) and (max-width:1024px))"),
