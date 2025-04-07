@@ -37,7 +37,7 @@ export default function Navbar() {
 
   const authToken = useSelector((state) => state.auth.token);
   const [fetchedData, setProfileData] = useState(null);
-
+console.log(authToken,"hi")
   useEffect(() => {
     const fetchProfileData = async () => {
       try {

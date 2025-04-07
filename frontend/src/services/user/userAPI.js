@@ -252,20 +252,27 @@ const getServiceability = async (productId, delivery_postcode, cod) => {
     throw error;
   }
 };
-const createOrder = async (payload) => {
-  try {
-    const response = await apiConnector(
-      "POST",
-      user_endpoints.CREATE_ORDER,
-      payload
-    );
 
+const createOrder = async (paymentOrderId) => {
+  try {
+    console.log("Sending request to:", user_endpoints.CREATE_ORDER);
+    console.log("Payload:", { paymentOrderId });
+
+    const response = await apiConnector("POST", user_endpoints.CREATE_ORDER, {
+      paymentOrderId: paymentOrderId,
+    });
+
+    console.log("Response received:", response);
     return response;
   } catch (error) {
-    console.error("Error creating order:", error);
+    console.error(
+      "Error creating order:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
+
 const getORderById = async (id) => {
   try {
     const response = await apiConnector(
@@ -320,7 +327,7 @@ const createPayment = async (payload) => {
   }
 };
 const paymentResponse = async (payload) => {
-  try { 
+  try {
     const response = await apiConnector(
       "POST",
       user_endpoints.VERIFY_PAYMENT,
@@ -332,6 +339,25 @@ const paymentResponse = async (payload) => {
     throw error;
   }
 };
+
+// In services/user.js
+const getAllUserOrders = async (token) => {
+  try {
+    console.log(user_endpoints.GET_ALL_USER_OREDERS, 'endpoint');
+    const response = await apiConnector(
+      "GET", // HTTP method
+      user_endpoints.GET_ALL_USER_OREDERS, // API endpoint
+      null, // No body data for GET request
+      { Authorization: `Bearer ${token}` } // Headers, including Authorization token
+    );
+    return response;
+  } catch (error) {
+    console.log("Error in getAllUserOrders", error);
+    throw error;
+  }
+};
+
+
 
 export {
   createProduct,
@@ -364,4 +390,5 @@ export {
   returnOrder,
   createPayment,
   paymentResponse,
+  getAllUserOrders,
 };

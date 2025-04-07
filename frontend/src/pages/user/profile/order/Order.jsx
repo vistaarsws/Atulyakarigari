@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
  
   Box,
@@ -15,61 +15,64 @@ import {
 } from "@mui/icons-material";
 import { InputBase } from "@mui/material";
 
-import TEST_01 from "../../../../assets/images/order-img.png";
-import TEST_02 from "../../../../assets/images/aboutBanner.png";
-import TEST_03 from "../../../../assets/images/artistry_1.png";
-import TEST_04 from "../../../../assets/images/ourCollections_2.png";
+// import TEST_01 from "../../../../assets/images/order-img.png";
+// import TEST_02 from "../../../../assets/images/aboutBanner.png";
+// import TEST_03 from "../../../../assets/images/artistry_1.png";
+// import TEST_04 from "../../../../assets/images/ourCollections_2.png";
 import { OrderDetailsDialog } from "./OrderDetailsDialog";
-
+import { getAllUserOrders } from "../../../../services/user/userAPI";
+import { useSelector } from "react-redux";
 
 
 export default function Component() {
-  const orders = [
-    {
-      id: 1,
-      status: "Delivered",
-      date: "On Wed, 3 Apr 2024",
-      product: "BANARSI SAARI",
-      description:
-        "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-      exchangeDate: "Wed, 10 Apr 2024",
-      image: TEST_01,
-    },
-    {
-      id: 2,
-      status: "Delivered",
-      date: "On Wed, 3 Apr 2024",
-      product: "BANARSI SAARI",
-      description:
-        "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-      exchangeDate: "Wed, 10 Apr 2024",
-      image: TEST_02,
-    },
-    {
-      id: 3,
-      status: "Delivered",
-      date: "On Wed, 3 Apr 2024",
-      product: "BANARSI SAARI",
-      description:
-        "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-      exchangeDate: "Wed, 10 Apr 2024",
-      image: TEST_03,
-    },
-    {
-      id: 4,
-      status: "Delivered",
-      date: "On Wed, 3 Apr 2024",
-      product: "BANARSI SAARI",
-      description:
-        "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
-      exchangeDate: "Wed, 10 Apr 2024",
-      image: TEST_04,
-    },
-  ];
+  // const orders = [
+  //   {
+  //     id: 1,
+  //     status: "Delivered",
+  //     date: "On Wed, 3 Apr 2024",
+  //     product: "BANARSI SAARI",
+  //     description:
+  //       "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
+  //     exchangeDate: "Wed, 10 Apr 2024",
+  //     image: TEST_01,
+  //   },
+  //   {
+  //     id: 2,
+  //     status: "Delivered",
+  //     date: "On Wed, 3 Apr 2024",
+  //     product: "BANARSI SAARI",
+  //     description:
+  //       "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
+  //     exchangeDate: "Wed, 10 Apr 2024",
+  //     image: TEST_02,
+  //   },
+  //   {
+  //     id: 3,
+  //     status: "Delivered",
+  //     date: "On Wed, 3 Apr 2024",
+  //     product: "BANARSI SAARI",
+  //     description:
+  //       "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
+  //     exchangeDate: "Wed, 10 Apr 2024",
+  //     image: TEST_03,
+  //   },
+  //   {
+  //     id: 4,
+  //     status: "Delivered",
+  //     date: "On Wed, 3 Apr 2024",
+  //     product: "BANARSI SAARI",
+  //     description:
+  //       "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
+  //     exchangeDate: "Wed, 10 Apr 2024",
+  //     image: TEST_04,
+  //   },
+  // ];
 
+  const authToken = useSelector((state) => state.auth.token);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [allOrder, setAllOrder] = useState();
 
   const breakpoints = {
     max768: useMediaQuery("(max-width:768px)"),
@@ -85,6 +88,19 @@ export default function Component() {
     setIsOrderModalOpen(true);
     handleArrowClick(index);
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await getAllUserOrders(authToken);
+        setAllOrder(response.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
+
+
 
   return (
     <>
@@ -177,30 +193,29 @@ export default function Component() {
                 scrollbarWidth: "none",
               }}
             >
-              {orders.map((order, index) => (
-               <div
-               key={order.id}
-               style={{
-                 paddingTop: "24px",
-                 marginBottom: breakpoints.max768 ? "2rem" : "24px",
-                 display: "flex",
-                 padding: "2.4rem",
-                 gap: "24px",
-                 transition: "box-shadow 0.3s ease, transform 0.3s ease",  // Add transform to transition
-                 borderRadius: "8px",
-                 cursor: "pointer",
-               }}
-               onClick={() => handleOrderClick(order, index)}
-               onMouseEnter={(e) => {
-                 e.currentTarget.style.border = "1.5px solid #60a487";  // Border on hover
-                 e.currentTarget.style.transform = "scale(.99)";  // Zoom in
-               }}
-               onMouseLeave={(e) => {
-                 e.currentTarget.style.border = "1px solid #eee";  // Revert border
-                 e.currentTarget.style.transform = "scale(1)";  // Revert zoom
-               }}
-             >
-              
+              {allOrder?.map((order, index) => (
+                <div
+                  key={order._id.orderId}
+                  style={{
+                    paddingTop: "24px",
+                    marginBottom: breakpoints.max768 ? "2rem" : "24px",
+                    display: "flex",
+                    padding: "2.4rem",
+                    gap: "24px",
+                    transition: "box-shadow 0.3s ease, transform 0.3s ease", // Add transform to transition
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleOrderClick(order, index)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.border = "1.5px solid #60a487"; // Border on hover
+                    e.currentTarget.style.transform = "scale(.99)"; // Zoom in
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.border = "1px solid #eee"; // Revert border
+                    e.currentTarget.style.transform = "scale(1)"; // Revert zoom
+                  }}
+                >
                   <div style={{ flex: 1 }}>
                     <div
                       style={{
@@ -234,10 +249,9 @@ export default function Component() {
                               objectFit: "cover",
                               width: "100%",
                               height: "100%",
-                             
                             }}
-                            src={orders[index].image}
-                            alt={orders[index].product}
+                            src={order.productDetails?.images[0]}
+                            alt={order.productDetails?.name}
                           />
                         </div>
                         <div>
@@ -248,7 +262,7 @@ export default function Component() {
                               color: "rgba(96, 164, 135, 1)",
                             }}
                           >
-                            {order.status}
+                            {order.orderStatus}
                           </h3>
                           <p
                             style={{
@@ -257,7 +271,7 @@ export default function Component() {
                               fontWeight: 400,
                             }}
                           >
-                            {order.date}
+                            {new Date(order.createdAt).toDateString()}
                           </p>
                         </div>
                       </div>
@@ -270,7 +284,7 @@ export default function Component() {
                         color: "rgba(56, 55, 55, 1)",
                       }}
                     >
-                      {order.product}
+                      {order.productDetails?.name}
                     </h4>
                     <p
                       style={{
@@ -281,7 +295,7 @@ export default function Component() {
                         lineHeight: "21px",
                       }}
                     >
-                      {order.description}
+                      {order.productDetails?.description}
                     </p>
 
                     <ul style={{ paddingLeft: "15px" }}>
@@ -292,7 +306,8 @@ export default function Component() {
                           fontWeight: 400,
                         }}
                       >
-                        Exchange/Return window closed on {order.exchangeDate}
+                        Exchange/Return window closed on{" "}
+                        {order?.productDetails?.expectedReturnDate}
                       </li>
                     </ul>
 
@@ -333,8 +348,6 @@ export default function Component() {
         handleClose={() => setIsOrderModalOpen(false)}
         order={selectedOrder}
       />
-
-     
     </>
   );
 }

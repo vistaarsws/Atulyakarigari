@@ -14,7 +14,7 @@ const OrderStatus = () => {
       const payload = { }
       
       const response = await createOrder(payload);
-
+     
       if (!response.ok) throw new Error("Order creation failed");
 
       const data = await response.json();

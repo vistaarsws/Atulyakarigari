@@ -7,16 +7,26 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useHref, useLocation, useNavigate } from "react-router-dom";
+const CCAVENUE_WORKING_KEY = import.meta.env.VITE_CCAVENUE_WORKING_KEY;
+const CCAVENUE_MERCHANT_ID = import.meta.env.VITE_CCAVENUE_MERCHANT_ID;
+const CCAVENUE_ACCESS_CODE = import.meta.env.VITE_CCAVENUE_ACCESS_CODE;
 import { formatPrice } from "../../../utils/helpers";
 import { useState, useEffect } from "react";
-import { createPayment } from "../../../services/user/userAPI";
+import { createOrder, createPayment } from "../../../services/user/userAPI";
 import { useSelector } from "react-redux";
+import CCAvenue from "../../../utils/CcavenuePay/CCAvenue";
+import toast from "react-hot-toast";
+import { getAddress } from "../../../services/user/userAPI";
 
 const Payment = () => {
   const navigate = useNavigate();
+
   const location = useLocation();
   const cartData = useSelector((state) => state.cart);
+  const {profile} = useSelector((state) => state.profile);
+  
+
 
   const selectedAddressID = useSelector(
     (state) => state.address.selectedAddressID
@@ -24,15 +34,30 @@ const Payment = () => {
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const [selectedDonation, setSelectedDonation] = useState(0);
   const [isDonationEnabled, setIsDonationEnabled] = useState(true);
+  const [address,setAddress] = useState();
 
   const donationAmounts = [0, 10, 20, 50, 100];
+  const authToken = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     const savedDonation = JSON.parse(localStorage.getItem("selectedDonation"));
     if (savedDonation) {
       setSelectedDonation(savedDonation);
     }
+    console.log(authToken, "authToken");
   }, []);
+
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      const {data} = await getAddress();
+      if (data.data) {
+        setAddress(data.data);
+      }
+    };
+    fetchAddress();
+  }, []);
+
 
   const handleDonationSelect = (amount) => {
     setSelectedDonation(amount);
@@ -44,44 +69,62 @@ const Payment = () => {
     : cartData?.total || 0;
 
   const handlePayment = async () => {
-    const productIds = cartData.items.map((item) => item.productId);
-    const payload = {
-      productIds,
-      selectedAddressID,
-      totalAmount: cartData.total,
-      totalDiscount: cartData.totalDiscount,
-      totalMRP: cartData.totalMRP,
-      donationAmounts: selectedDonation,
+    console.log(CCAVENUE_WORKING_KEY, "text");
+    const host = "http://localhost:3000";
+
+    let paymentData = {
+      merchant_id: CCAVENUE_MERCHANT_ID,
+      order_id: "ORD123", // Order ID - It can be generated from our project
+      amount: "50", // Payment Amount (Required)
+      currency: "INR", // Payment Currency Type (Required)
+      billing_email: "johndoe@gmail.com", // Billing Email (Optional)
+      billing_name: "John Doe", // Billing Name (Optional)
+      billing_address: "Address Details", // Billing Address (Optional)
+      billing_city: "Ahmedabad", // Billing City (Optional)
+      billing_state: "Gujarat", // Billing State (Optional)
+      billing_zip: "380002", // Billing Zip (Optional)
+      billing_country: "India", // Billing Country (Optional)
+      redirect_url: `${host}/api/ccavenue-handle`, // Success URL (Required)
+      cancel_url: `${host}/api/ccavenue-handle`, // Failed/Cancel Payment URL (Required)
+      merchant_param1: "Extra Information", // Extra Information (Optional)
+      merchant_param2: "Extra Information", // Extra Information (Optional)
+      merchant_param3: "Extra Information", // Extra Information (Optional)
+      merchant_param4: "Extra Information", // Extra Information (Optional)
+      language: "EN", // Language (Optional)
+      billing_tel: "1234567890", // Billing Mobile Number (Optional)
     };
 
-    console.log("Payment Payload:", payload);
+    try {
+      // Wait for the encryption to complete
+      let encReq = await CCAvenue.getEncryptedOrder(paymentData);
+      let accessCode = CCAVENUE_ACCESS_CODE;
 
-    // Make API request
-    const response = await createPayment(payload);
-    console.log("Initiating payment with:", response.data);
+      // Constructing the URL for payment redirection
+      let URL = `https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${paymentData.merchant_id}&encRequest=${encReq}&access_code=${accessCode}`;
 
-    if (response.data) {
-      window.location.href = response.data.paymentUrl;
-      // The response contains the payment form
-      // document.body.innerHTML = response.data.paymentUrl; // Load the form & auto-submit
+      // Opening the payment page in a new tab
+      window.open(URL, "_blank");
+    } catch (error) {
+      console.error("Error encrypting payment data:", error);
     }
-
-    // if (!response || !response.data) {
-    //   alert("Error: No response from payment server");
-    //   return;
-    // }
-
-    // if (response.data.success && response.data.paymentUrl) {
-    //   window.location.href = response.data.paymentUrl; // Redirect to CCAvenue
-    // } else {
-    //   alert("Payment initiation failed. Please try again.");
-    // }
-    // } catch (error) {
-    //   console.error("Payment Error:", error);
-    //   // alert("Error initiating payment. Please try again.");
-    // }
+    orderCreate();
   };
 
+  const orderCreate = async () => {
+    
+    try {
+      await createOrder("ORD-9787352165");
+      toast.success("Order Created Successfully!", {
+        duration: 5000, 
+      });
+      navigate("/profile/orders");
+      console.log("Order created successfully!");
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
+  };
+
+  console.log(cartData.items,"hi",profile,"hello",address);
   return (
     <Box
       sx={{

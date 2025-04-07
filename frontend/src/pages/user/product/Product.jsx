@@ -284,6 +284,12 @@ export default function Product() {
           : await addToCart(productId, 1);
         setIsInCart(!isInCart);
         dispatch(fetchCart(authToken));
+
+        logEvent(
+          "Cart",
+          isInCart ? "Removed from Cart" : "Added to Cart",
+          productId
+        );
       } catch (error) {
         console.error("Error updating cart:", error);
       } finally {
@@ -299,7 +305,9 @@ export default function Product() {
   // buy now button
   const handleBuyToggle = () => {
     if (authToken) {
+      logEvent("Purchase", "Buy Now Clicked", productId);
       navigate("/place-order", { state: { productId } });
+      
     } else {
       enqueueSnackbar("Please Login to Buy Product", {
         variant: "error",
@@ -319,6 +327,8 @@ export default function Product() {
           text: `Check out this product: ${product?.name}`,
           url: productUrl,
         });
+
+        logEvent("Share", "Product Shared", productId);
       } catch (error) {
         console.error("Error sharing:", error);
       }

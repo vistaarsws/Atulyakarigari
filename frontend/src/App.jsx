@@ -42,6 +42,8 @@ import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
 import CustomerDetails from "./pages/admin/customers/CustomerDetails";
 import OrderCancel from "./pages/user/order/OrderCancel";
+import TrackingOrder from "./pages/user/trackorder/TrackingOrder";
+import { Toaster } from "react-hot-toast";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -67,6 +69,7 @@ const getRoutesConfig = () => ({
     { path: "address", element: <Address /> },
     { path: "wishlist", element: <Wishlist /> },
     { path: "logout", element: <Logout /> },
+    { path :"trackOrder", element: <TrackingOrder/>}
   ],
   adminRoutes: [
     { path: "add-product", element: <AddNewProduct /> },
@@ -160,6 +163,18 @@ export default function App() {
 
   return (
     <SnackbarProvider maxSnack={3}>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            width: "300px",
+            height: "60px",
+            fontSize: "15px",
+            padding: "10px",
+          },
+        }}
+      />
       <ScrollToTop />
       <TrackPageView /> {/* Track page views on route changes */}
       <div>

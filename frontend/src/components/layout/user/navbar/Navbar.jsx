@@ -69,17 +69,17 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   // Fetch products and categories on mount
   useEffect(() => {
-    if (products.length === 0) {
+    if (products?.length === 0) {
       dispatch(fetchAllProducts());
     }
-    if (categories.length === 0) {
+    if (categories?.length === 0) {
       dispatch(fetchAllCategory());
     }
-  }, [dispatch, products.length, categories.length]);
+  }, [dispatch, products?.length, categories?.length]);
 
   // Filter products, categories, and subcategories
   useEffect(() => {
-    if (debouncedSearch.length < 2) {
+    if (debouncedSearch?.length < 2) {
       setFilteredResults([]);
       return;
     }
@@ -143,11 +143,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
 
   // Keyboard navigation
   const handleKeyDown = (e) => {
-    if (filteredResults.length === 0) return;
+    if (filteredResults?.length === 0) return;
 
     if (e.key === "ArrowDown") {
       setSelectedIndex((prev) =>
-        prev < filteredResults.length - 1 ? prev + 1 : prev
+        prev < filteredResults?.length - 1 ? prev + 1 : prev
       );
     } else if (e.key === "ArrowUp") {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
@@ -456,7 +456,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                 )}
 
                 {/* Search Results Dropdown */}
-                {searchQuery && filteredResults.length > 0 && (
+                {searchQuery && filteredResults?.length > 0 && (
                   <ul className="search-dropdown">
                     {filteredResults.map((item, index) => (
                       <li
@@ -485,7 +485,7 @@ export default function Navbar({ navWithoutSearchBar_list }) {
                 )}
 
                 {searchQuery &&
-                  filteredResults.length === 0 &&
+                  filteredResults?.length === 0 &&
                   !productsLoading &&
                   !categoriesLoading && (
                     <ul className="search-dropdown">
@@ -504,11 +504,11 @@ export default function Navbar({ navWithoutSearchBar_list }) {
         </>
         {authToken && (
           <IconButton
-            aria-label={`wishlist with ${wishlist.length} items`}
+            aria-label={`wishlist with ${wishlist?.length} items`}
             onClick={() => navigate("/profile/wishlist")}
           >
             <Badge
-              badgeContent={wishlist.length}
+              badgeContent={wishlist?.length}
               sx={{
                 "& .MuiBadge-badge": {
                   backgroundColor: "#b56f82",

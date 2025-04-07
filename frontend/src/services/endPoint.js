@@ -75,5 +75,6 @@ export const user_endpoints = {
   GET_ORDER_BY_ID: BASE_URL + "/api/v1/orders/getOrder",
   RETURN_ORDER: BASE_URL + "/api/v1/orders/return",
   CANCEL_ORDER: BASE_URL + "/api/v1/orders/cancel",
+  GET_ALL_USER_OREDERS: BASE_URL + "/api/v1/orders/getUserOrders",
   
 };

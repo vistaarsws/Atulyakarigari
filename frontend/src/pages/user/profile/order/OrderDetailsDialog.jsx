@@ -17,6 +17,7 @@ import {
   Download as DownloadIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
+import { Link as RouterLink } from "react-router-dom";
 
 export const OrderDetailsDialog = ({ open, handleClose, order }) => {
   if (!order) return null;
@@ -27,15 +28,26 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
   };
 
   const handleReturnOrder = () => {
-    enqueueSnackbar("Return request submitted successfully!", { variant: "info" });
+    enqueueSnackbar("Return request submitted successfully!", {
+      variant: "info",
+    });
   };
 
   const handleCancelOrder = () => {
-    enqueueSnackbar("Order cancellation request submitted!", { variant: "warning" });
+    enqueueSnackbar("Order cancellation request submitted!", {
+      variant: "warning",
+    });
   };
 
+  
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth sx={{ mt: "5vh" }}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
+      fullWidth
+      sx={{ mt: "5vh" }}
+    >
       {/* Header */}
       <DialogTitle sx={{ pb: 1, borderBottom: "1px solid #e0e0e0" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -53,8 +65,8 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
           {/* Left Side - Image */}
           <Grid item xs={12} md={5}>
             <img
-              src={order.image}
-              alt={order.product}
+              src={order?.productDetails?.images[0]}
+              alt={order.productDetails?.name}
               style={{
                 width: "100%",
                 height: "300px",
@@ -69,14 +81,27 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
           {/* Right Side - Order Details */}
           <Grid item xs={12} md={7}>
             <Stack spacing={2}>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 {/* Order Status & Date */}
                 <Box>
-                  <Typography variant="body2" fontSize={14} color="#60a487" fontWeight={700}>
-                    {order.status}
+                  <Typography
+                    variant="body2"
+                    fontSize={14}
+                    color="#60a487"
+                    fontWeight={700}
+                  >
+                    {order?.orderStatus}
                   </Typography>
-                  <Typography variant="body2" fontSize={14} color="text.secondary">
-                    {order.date}
+                  <Typography
+                    variant="body2"
+                    fontSize={14}
+                    color="text.secondary"
+                  >
+                    {order?.estimatedDelivery ? order?.estimatedDelivery : "Not Available"}
                   </Typography>
                 </Box>
 
@@ -103,10 +128,10 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
 
               {/* Product Details */}
               <Typography variant="h6" fontWeight={600}>
-                {order.product}
+                {order?.productDetails?.name}
               </Typography>
               <Typography color="text.secondary" fontSize={11} lineHeight={1.6}>
-                {order.description}
+                {order?.productDetails?.description}
               </Typography>
 
               <Divider />
@@ -119,16 +144,34 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
               {/* Order Information */}
               <Stack spacing={1}>
                 <Typography fontSize={14} fontWeight={600}>
-                  Order ID: <span style={{ fontWeight: "normal" }}>#12345678</span>
+                  Order ID:{" "}
+                  <span style={{ fontWeight: "normal" }}>
+                    {order?._id?.orderId}
+                  </span>
                 </Typography>
                 <Typography fontSize={14} fontWeight={600}>
-                  Payment Method: <span style={{ fontWeight: "normal" }}>Credit Card (**** 1234)</span>
+                  Payment Method:{" "}
+                  <span style={{ fontWeight: "normal" }}>
+                    {order?.paymentMethod}
+                  </span>
                 </Typography>
                 <Typography fontSize={14} fontWeight={600}>
                   Shipping Address:
                 </Typography>
                 <Typography fontSize={14} color="text.secondary">
-                  John Doe, 123 Main St, Springfield, IL, 62704, USA
+                  {order?.shippingAddress?.addressLine1},
+                  {order?.shippingAddress?.city},{" "}
+                  {order?.shippingAddress?.state} -{" "}
+                  {order?.shippingAddress?.postalCode},
+                  {order?.shippingAddress?.country},
+                </Typography>
+                <Typography
+                  component={RouterLink} // Making Typography act as a React Router Link
+                  to="/profile/trackOrder" // The route to navigate to
+                  sx={{ textDecoration: "none", color: "primary.main" }} // Material UI styling
+                  fontSize={14}
+                >
+                  Track Your Order
                 </Typography>
               </Stack>
 
@@ -138,20 +181,36 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
               <Stack spacing={1}>
                 <Box display="flex" justifyContent="space-between">
                   <Typography fontSize={14}>Subtotal:</Typography>
-                  <Typography fontSize={14} fontWeight={600}>₹20199.99</Typography>
+                  <Typography fontSize={14} fontWeight={600}>
+                    ₹{order?._id?.totalPrice}
+                  </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography fontSize={14}>Discount:</Typography>
-                  <Typography fontSize={14} fontWeight={600} color="error">-₹2020.00</Typography>
+                  <Typography fontSize={14} fontWeight={600} color="error">
+                    -₹{order?._id?.discountAmount}
+                  </Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography fontSize={14}>Donation</Typography>
+                  <Typography fontSize={14} fontWeight={600} >
+                    {order?._id?.donationAmount ? order?._id?.donationAmount : '-' }
+                  </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography fontSize={14}>Tax:</Typography>
-                  <Typography fontSize={14} fontWeight={600}>₹205.99</Typography>
+                  <Typography fontSize={14} fontWeight={600}>
+                    -
+                  </Typography>
                 </Box>
                 <Divider />
                 <Box display="flex" justifyContent="space-between">
-                  <Typography fontSize={16} fontWeight={700}>Total:</Typography>
-                  <Typography fontSize={16} fontWeight={700}>₹20185.98</Typography>
+                  <Typography fontSize={16} fontWeight={700}>
+                    Total:
+                  </Typography>
+                  <Typography fontSize={16} fontWeight={700}>
+                    ₹{order?._id?.totalAmount}
+                  </Typography>
                 </Box>
               </Stack>
 
