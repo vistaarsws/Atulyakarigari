@@ -543,7 +543,7 @@ export default function ProductForm({
     isDragActive: isDragActiveMultiple,
   } = useDropzone({
     accept: {
-      "image/*": [".jpeg", ".png", ".jpg", ".gif"],
+      "image/*": [".jpeg", ".png", ".jpg", ".gif", ".webp"],
     },
     onDrop: (acceptedFiles) => {
       setFormData({
@@ -591,7 +591,7 @@ export default function ProductForm({
           <article>
             <div className="image-upload">
               <h2>
-                Upload Image {" "}
+                Upload Image{" "}
                 <span
                   style={{
                     fontSize: "12px",
