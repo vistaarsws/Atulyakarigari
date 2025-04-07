@@ -137,3 +137,29 @@ export const pickupAddress = async (req, res) => {
     );
   }
 };
+
+export const getAllPickupLocations = async (req, res) => {
+  try{
+    let pickupLocations = await getShiprocketPickupLocations();
+    pickupLocations = pickupLocations?.data?.shipping_address || [];
+    if (!pickupLocations || pickupLocations.length === 0) {
+      return notFoundRequest(req, res, null, "No pickup locations found");
+    }
+    return success(
+      req,
+      res,
+      pickupLocations,
+      "Pickup locations retrieved successfully"
+    );
+    
+  }
+  catch(error) {
+    console.error("Error fetching pickup locations:", error);
+    return internalServerError(
+      req,
+      res,
+      error,
+      "⚠️ Failed to retrieve pickup locations"
+    );
+  }
+}
