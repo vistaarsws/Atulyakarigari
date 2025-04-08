@@ -9,6 +9,7 @@ import {
   getShiprocketDeliveryEstimate,
   getShiprocketPickupLocations,
   getShiprocketWalletBalance,
+  trackShiprocketOrder,
 } from "../utils/shiprocket-service/shiprocket.js";
 import Product from "../models/product.js";
 
@@ -161,5 +162,31 @@ export const getAllPickupLocations = async (req, res) => {
       error,
       "⚠️ Failed to retrieve pickup locations"
     );
+  }
+}
+
+export const trackPackage = async (req,res) =>{
+  try{
+    let {  shipmentID } = req.query;
+    if(shipmentID){
+      let data = await trackShiprocketOrder(shipmentID);
+      return success(
+        req,
+        res,
+        data,
+        "Package tracking retrieved successfully"
+      );
+    }
+
+
+
+  }
+  catch(error){
+    console.error("Error tracking Order :", error);
+    return internalServerError(
+      req,
+      res,
+      "⚠️ Failed to track order"
+    )
   }
 }

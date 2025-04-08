@@ -790,3 +790,34 @@ export const getShiprocketOrderDetails = async (orderId) => {
     throw error;
   }
 };
+
+
+export const trackShiprocketOrder = async (shipmentID) => {
+  const authToken = await getShiprocketToken();
+  let response = null;
+  try{
+    if (shipmentID){
+      response = await axios.get(
+        `${shiprocketConfig.API_BASE}/courier/track/shipment/${shipmentID}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      console.log(response)
+      return response;
+    }
+
+  }
+  catch(error){
+    logMessage(
+      "error",
+      `Error tracking order: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    );
+    await logoutShiprocket();
+    throw error;
+  }
+}

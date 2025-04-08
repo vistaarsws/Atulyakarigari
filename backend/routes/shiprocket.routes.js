@@ -3,7 +3,8 @@ import {
   getServiceability,
   getWallet,
   pickupAddress,
-  getAllPickupLocations
+  getAllPickupLocations,
+  trackPackage
 } from "../controllers/shiprocket.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
@@ -14,5 +15,6 @@ router.post("/getServiceability", getServiceability);
 router.get("/getWallet", getWallet);
 router.put("/pickupAddress", pickupAddress);
 router.get("/getPickupLocations", getAllPickupLocations);
+router.get("/trackPackage",trackPackage)
 
 export default router;
