@@ -161,9 +161,52 @@ const getAllProfiles = async () => {
 const getAllOrders = async () => {
   const response = await apiConnector("GET", admin_endpoints.GET_ALL_ORDERS);
   return response;
-}
+};
+
+const getWalletData = async (authToken) => {
+  console.log(authToken, "authToken");
+  const response = await apiConnector(
+    "GET",
+    admin_endpoints.GET_WALLET_DATA,
+    null,
+    {
+      Authorization: authToken,
+    }
+  );
+  return response;
+};
+
+const get_Address = async (authToken) => {
+  console.log(authToken, "autht");
+  const response = await apiConnector(
+    "GET",
+    admin_endpoints.GET_ADDRESS,
+    null,
+    {
+      Authorization: authToken,
+    }
+  );
+  return response.data;
+};
+
+const Change_Address = async (authToken, formData) => {
+  const response = await apiConnector(
+    "PUT",
+    admin_endpoints.UPDATE_ADDRESS,
+    formData,
+    {
+      Authorization: `Bearer ${authToken}`, // ✅ Add Bearer prefix
+    }
+  );
+  return response;
+};
+
+
 
 export {
+  Change_Address,
+  get_Address,
+  getWalletData,
   getCategory,
   createCategory,
   updateCategory,

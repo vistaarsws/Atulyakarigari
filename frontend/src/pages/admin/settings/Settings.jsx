@@ -46,7 +46,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Profile from "../../user/profile/profile/Profile";
 import { jwtDecode } from "jwt-decode";
 import { useSnackbar } from "notistack";
-
+import {
+  Change_Address,
+  getWalletData,
+  get_Address,
+} from "../../../services/admin/adminAPI";
 export default function Settings() {
   const [tabValue, setTabValue] = useState(0);
   const [user, setUser] = useState("");
@@ -95,6 +99,7 @@ export default function Settings() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [newAdminEmail, setNewAdminEmail] = useState("");
 
+
   const handleAddressDialog = () => {
     setAddressDialogOpen(true);
   };
@@ -114,6 +119,63 @@ export default function Settings() {
 
   const defaultProfilePicture = "/broken-image.jpg";
   const [formData, setFormData] = useState({});
+  const [balance, setBalance] = useState();
+  const [adminAddress, setAdminAddress] = useState();
+  const [editAddress, setEditAddress] = useState({
+    name: address.name || "",
+    line1: address.line1 || "",
+    line2: address.line2 || "",
+    city: address.city || "",
+    state: address.state || "",
+    zip: address.zip || "",
+    country: address.country || "",
+    phone: address.phone || "",
+  });
+
+
+  const handleSubmit = async () => {
+  try {
+    if (
+      !formData.name ||
+      !formData.line1 ||
+      !formData.city ||
+      !formData.state ||
+      !formData.zip ||
+      !formData.country ||
+      !formData.phone 
+    ) {
+      enqueueSnackbar("Please fill in all required fields.", {
+        variant: "warning",
+      });
+      return;
+    }
+
+    const pickupdata = {
+      pickup_location: formData.name,
+      name: formData.name,
+      email: formData.email || "",
+      phone: formData.phone,
+      address: formData.line1,
+      address_2: formData.line2 || "",
+      city: formData.city,
+      state: formData.state,
+      country: formData.country,
+      pin_code: formData.zip,
+    };
+
+    // ✅ Send the object directly, not wrapped in `pickupdata`
+    await Change_Address(authToken, pickupdata);
+
+    getAdminAddress();
+    enqueueSnackbar("Address updated successfully!", { variant: "success" });
+    handleCloseAddressDialog();
+  } catch (error) {
+    console.error("Error updating address:", error);
+    enqueueSnackbar("Failed to update address.", { variant: "error" });
+  }
+};
+
+
 
   useEffect(() => {
     dispatch(fetchAllProfiles());
@@ -132,6 +194,53 @@ export default function Settings() {
       });
     }
   }, [profile]);
+
+  useEffect(() => {
+    const getData = async (authToken) => {
+      try {
+        const data = await getWalletData(authToken);
+        setBalance(data.data);
+        console.log(balance.message.data.balance_amount, "data");
+      } catch (error) {
+        console.error("Error fetching wallet data:", error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    getAdminAddress();
+  }, [authToken]);
+
+  const getAdminAddress = async (authToken) => {
+    try {
+      const data = await get_Address(authToken);
+      setAdminAddress(data);
+      console.log(adminAddress, "data");
+    } catch (error) {
+      console.error("Error fetching Address:", error);
+    }
+  };
+
+  const handleChange = (field) => (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  // const handleSubmit = async () => {
+  //   try {
+  //     console.log()
+  //     // Replace with your API call
+  //     Change_Address(authToken,Change_Address);
+  //     await onSubmit(formData); // or call fetch/axios here
+  //     console.log("Address submitted:", formData);
+  //   } catch (error) {
+  //     console.error("API Error:", error);
+  //   }
+  // };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -175,8 +284,6 @@ export default function Settings() {
       setSelectedAdmin(null);
     }
   };
-
-
 
   const handleSaveAdmin = () => {
     setAdminDialogOpen(false);
@@ -256,80 +363,85 @@ export default function Settings() {
           </Box>
 
           {/* Address Card */}
-          <Card
-            sx={{
-              m: 2,
-              p: 3,
-              borderRadius: 2,
-              boxShadow: 3,
-              transition: "all 0.3s",
-              "&:hover": { boxShadow: 6 },
-              bgcolor: "background.paper",
-            }}
-          >
-            <CardContent>
-              <Grid container spacing={2} alignItems="center">
-                {/* Address Details */}
-                <Grid item xs={12} sm={10}>
-                  <Typography variant="h6" fontWeight="bold">
-                    {address.name}
-                  </Typography>
-
-                  <Typography variant="subtitle1" color="text.primary">
-                    {address.line1}
-                  </Typography>
-                  {address.line2 && (
-                    <Typography variant="subtitle1" color="text.primary">
-                      {address.line2}
+          {adminAddress?.message?.map((item, index) => (
+            <Card
+              key={index}
+              sx={{
+                m: 2,
+                p: 3,
+                borderRadius: 2,
+                boxShadow: 3,
+                transition: "all 0.3s",
+                "&:hover": { boxShadow: 6 },
+                bgcolor: "background.paper",
+              }}
+            >
+              <CardContent>
+                <Grid container spacing={2} alignItems="center">
+                  {/* Address Details */}
+                  <Grid item xs={12} sm={10}>
+                    <Typography variant="h6" fontWeight="bold">
+                      {item.name}
                     </Typography>
-                  )}
-                  <Typography variant="subtitle1" color="text.secondary">
-                    {address.city}, {address.state} {address.zip}
-                  </Typography>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    {address.country}
-                  </Typography>
 
-                  {/* Phone Number with Icon */}
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      mt: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      color: "text.secondary",
-                    }}
-                  >
-                    📞 {address.phone}
-                  </Typography>
-                </Grid>
+                    <Typography variant="subtitle1" color="text.primary">
+                      {item.address}
+                    </Typography>
 
-                {/* Edit Button */}
-                <Grid item xs={12} sm={2} textAlign="right">
-                  <IconButton
-                    edge="end"
-                    aria-label="edit"
-                    onClick={handleAddressDialog}
-                    sx={{
-                      bgcolor: "primary.light",
-                      color: "primary.dark",
-                      borderRadius: "50%",
-                      boxShadow: 2,
-                      transition: "all 0.3s",
-                      "&:hover": {
-                        bgcolor: "primary.dark",
-                        color: "white",
-                        boxShadow: 4,
-                      },
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
+                    {item.address_2 && (
+                      <Typography variant="subtitle1" color="text.primary">
+                        {item.address_2}
+                      </Typography>
+                    )}
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                      {item.city}, {item.state} {item.pin_code}
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                      {item.country}
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        mt: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        color: "text.secondary",
+                      }}
+                    >
+                      📞 {item.phone}
+                    </Typography>
+                  </Grid>
+
+                  {/* Edit Button */}
+                  <Grid item xs={12} sm={2} textAlign="right">
+                    <IconButton
+                      edge="end"
+                      aria-label="edit"
+                      onClick={() => handleAddressDialog(item)}
+                      sx={{
+                        bgcolor: "primary.light",
+                        color: "primary.dark",
+                        borderRadius: "50%",
+                        boxShadow: 2,
+                        transition: "all 0.3s",
+                        "&:hover": {
+                          bgcolor: "primary.dark",
+                          color: "white",
+                          boxShadow: 4,
+                        },
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </TabPanel>
 
         {/* ShipRocket Wallet Tab */}
@@ -371,7 +483,7 @@ export default function Settings() {
                     color="primary.main"
                     fontWeight="bold"
                   >
-                    ₹4,250.75
+                    ₹{balance?.message?.data?.balance_amount}
                   </Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary">
@@ -508,8 +620,8 @@ export default function Settings() {
                 Admin Management
               </Typography>
               <Typography variant="h5" color="text.secondary">
-                Create and manage admin accounts. Only super admins
-                have access to this section.
+                Create and manage admin accounts. Only super admins have access
+                to this section.
               </Typography>
             </Box>
 
@@ -568,7 +680,9 @@ export default function Settings() {
                     }
                   >
                     <ListItemAvatar>
-                    <Avatar src={admin.profilePicture || "/default-avatar.png"} />
+                      <Avatar
+                        src={admin.profilePicture || "/default-avatar.png"}
+                      />
                     </ListItemAvatar>
                     <ListItemText
                       primary={admin.name}
@@ -609,23 +723,28 @@ export default function Settings() {
             label="Address Name (e.g. Home, Office)"
             type="text"
             fullWidth
-            defaultValue={address.name}
+            value={formData.name}
+            onChange={handleChange("name")}
             sx={{ mb: 2, mt: 1 }}
+            required
           />
           <TextField
             margin="dense"
             label="Address Line 1"
             type="text"
             fullWidth
-            defaultValue={address.line1}
+            value={formData.line1}
+            onChange={handleChange("line1")}
             sx={{ mb: 2 }}
+            required
           />
           <TextField
             margin="dense"
             label="Address Line 2 (Optional)"
             type="text"
             fullWidth
-            defaultValue={address.line2}
+            value={formData.line2}
+            onChange={handleChange("line2")}
             sx={{ mb: 2 }}
           />
           <Grid container spacing={2}>
@@ -635,7 +754,9 @@ export default function Settings() {
                 label="City"
                 type="text"
                 fullWidth
-                defaultValue={address.city}
+                value={formData.city}
+                onChange={handleChange("city")}
+                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -644,7 +765,9 @@ export default function Settings() {
                 label="State/Province"
                 type="text"
                 fullWidth
-                defaultValue={address.state}
+                value={formData.state}
+                onChange={handleChange("state")}
+                required
               />
             </Grid>
           </Grid>
@@ -655,7 +778,9 @@ export default function Settings() {
                 label="Postal/ZIP Code"
                 type="text"
                 fullWidth
-                defaultValue={address.zip}
+                value={formData.zip}
+                onChange={handleChange("zip")}
+                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -664,7 +789,9 @@ export default function Settings() {
                 label="Country"
                 type="text"
                 fullWidth
-                defaultValue={address.country}
+                value={formData.country}
+                onChange={handleChange("country")}
+                required
               />
             </Grid>
           </Grid>
@@ -673,111 +800,26 @@ export default function Settings() {
             label="Phone Number"
             type="tel"
             fullWidth
-            defaultValue={address.phone}
+            value={formData.phone}
+            onChange={handleChange("phone")}
             sx={{ mb: 1, mt: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddressDialog}>Cancel</Button>
-          <Button variant="contained" onClick={handleCloseAddressDialog}>
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Address Dialog */}
-      <Dialog
-        open={addressDialogOpen}
-        onClose={handleCloseAddressDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Edit Address</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Address Name (e.g. Home, Office)"
-            type="text"
-            fullWidth
-            defaultValue={address.name}
-            sx={{ mb: 2, mt: 1 }}
-          />
-          <TextField
-            margin="dense"
-            label="Address Line 1"
-            type="text"
-            fullWidth
-            defaultValue={address.line1}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            label="Address Line 2 (Optional)"
-            type="text"
-            fullWidth
-            defaultValue={address.line2}
-            sx={{ mb: 2 }}
-          />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="City"
-                type="text"
-                fullWidth
-                defaultValue={address.city}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="State/Province"
-                type="text"
-                fullWidth
-                defaultValue={address.state}
-              />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="Postal/ZIP Code"
-                type="text"
-                fullWidth
-                defaultValue={address.zip}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="Country"
-                type="text"
-                fullWidth
-                defaultValue={address.country}
-              />
-            </Grid>
-          </Grid>
-          <TextField
-            margin="dense"
-            label="Phone Number"
-            type="tel"
-            fullWidth
-            defaultValue={address.phone}
-            sx={{ mb: 1, mt: 2 }}
+            required
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAddressDialog}>Cancel</Button>
           <Button
             variant="contained"
-            onClick={() => {
-              enqueueSnackbar("Address updated successfully!", {
-                variant: "success",
-              });
-              handleCloseAddressDialog();
-            }}
+            onClick={handleSubmit}
+            disabled={
+              !formData.name ||
+              !formData.line1 ||
+              !formData.city ||
+              !formData.state ||
+              !formData.zip ||
+              !formData.country ||
+              !formData.phone
+            }
           >
             Save Changes
           </Button>

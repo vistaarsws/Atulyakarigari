@@ -33,6 +33,9 @@ export const admin_endpoints = {
   GET_ALL_PROFILE: BASE_URL + "/api/v1/profile/getAll",
 
   GET_ALL_ORDERS: BASE_URL + "/api/v1/orders/getOrders",
+  GET_WALLET_DATA: BASE_URL + "/api/v1/shiprocket/getWallet",
+  GET_ADDRESS: BASE_URL + "/api/v1/shiprocket/getPickupLocations",
+  UPDATE_ADDRESS: BASE_URL + "/api/v1/shiprocket/pickupAddress",
 };
 
 export const user_endpoints = {
