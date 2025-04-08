@@ -195,7 +195,7 @@ const Change_Address = async (authToken, formData) => {
     admin_endpoints.UPDATE_ADDRESS,
     formData,
     {
-      Authorization: `Bearer ${authToken}`, // ✅ Add Bearer prefix
+      Authorization: authToken, // ✅ Add Bearer prefix
     }
   );
   return response;
