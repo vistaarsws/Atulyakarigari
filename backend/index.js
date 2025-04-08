@@ -63,7 +63,7 @@ const corsOptions = {
   credentials: true,
   maxAge: 3600,
 };
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: "50mb" }));
