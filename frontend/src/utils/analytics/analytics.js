@@ -10,6 +10,7 @@ export const logPageView = (path) => {
   ReactGA.send({ hitType: "pageview", page: path });
 };
 
+
 export const logEvent = (category, action, label, value) => {
   const key = `${category}-${action}-${label}`;
   if (!eventGuard[key]) {

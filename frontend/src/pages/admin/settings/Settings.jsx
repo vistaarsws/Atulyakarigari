@@ -150,21 +150,23 @@ export default function Settings() {
       return;
     }
 
-    const pickupdata = {
-      pickup_location: formData.name,
-      name: formData.name,
-      email: formData.email || "",
-      phone: formData.phone,
-      address: formData.line1,
-      address_2: formData.line2 || "",
-      city: formData.city,
-      state: formData.state,
-      country: formData.country,
-      pin_code: formData.zip,
+    const data = {
+      pickupdata: {
+        pickup_location: formData.name,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.line1,
+        address_2: formData.line2,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        pin_code: formData.zip,
+      },
     };
 
     // ✅ Send the object directly, not wrapped in `pickupdata`
-    await Change_Address(authToken, pickupdata);
+    await Change_Address(authToken, data);
 
     getAdminAddress();
     enqueueSnackbar("Address updated successfully!", { variant: "success" });
@@ -215,7 +217,7 @@ export default function Settings() {
 
   const getAdminAddress = async (authToken) => {
 
-    
+
     try {
       const data = await get_Address(authToken);
       setAdminAddress(data);

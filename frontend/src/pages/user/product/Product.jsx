@@ -273,6 +273,15 @@ export default function Product() {
     checkIfProductInCart();
   }, [productId]);
 
+  useEffect(() => {
+    logEvent(
+      "Ecommerce",
+      "View Item",
+      `${product?.name} (ID: ${product?.id})`,
+      product?.price
+    );
+  }, [product]);
+
   const handleCartToggle = async () => {
     if (loading) return;
     setLoading(true);
@@ -307,7 +316,6 @@ export default function Product() {
     if (authToken) {
       logEvent("Purchase", "Buy Now Clicked", productId);
       navigate("/place-order", { state: { productId } });
-      
     } else {
       enqueueSnackbar("Please Login to Buy Product", {
         variant: "error",
