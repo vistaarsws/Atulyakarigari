@@ -214,6 +214,8 @@ export default function Settings() {
   }, [authToken]);
 
   const getAdminAddress = async (authToken) => {
+
+    
     try {
       const data = await get_Address(authToken);
       setAdminAddress(data);
