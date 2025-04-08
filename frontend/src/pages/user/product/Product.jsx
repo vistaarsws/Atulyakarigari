@@ -103,7 +103,7 @@ export default function Product() {
   const authToken = useSelector((state) => state.auth.token);
   const [ratingAndReview, setRatingAndReview] = useState({
     reviews: [],
-    averageRating: "0 ",
+    averageRating: "0",
   });
   const [value, setValue] = useState(0);
 
