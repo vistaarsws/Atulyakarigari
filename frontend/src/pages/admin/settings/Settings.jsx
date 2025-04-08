@@ -25,6 +25,7 @@ import {
   DialogActions,
   InputAdornment,
   Alert,
+  Skeleton,
 } from "@mui/material";
 import {
   AccountCircle,
@@ -37,7 +38,9 @@ import {
   Delete,
   TrendingUp,
   TrendingDown,
+  Add,
 } from "@mui/icons-material";
+
 import {
   fetchProfile,
   fetchAllProfiles,
@@ -99,7 +102,6 @@ export default function Settings() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [newAdminEmail, setNewAdminEmail] = useState("");
 
-
   const handleAddressDialog = () => {
     setAddressDialogOpen(true);
   };
@@ -132,50 +134,47 @@ export default function Settings() {
     phone: address.phone || "",
   });
 
-
   const handleSubmit = async () => {
-  try {
-    if (
-      !formData.name ||
-      !formData.line1 ||
-      !formData.city ||
-      !formData.state ||
-      !formData.zip ||
-      !formData.country ||
-      !formData.phone 
-    ) {
-      enqueueSnackbar("Please fill in all required fields.", {
-        variant: "warning",
-      });
-      return;
+    try {
+      if (
+        !formData.name ||
+        !formData.line1 ||
+        !formData.city ||
+        !formData.state ||
+        !formData.zip ||
+        !formData.country ||
+        !formData.phone
+      ) {
+        enqueueSnackbar("Please fill in all required fields.", {
+          variant: "warning",
+        });
+        return;
+      }
+
+      const pickupdata = {
+        pickup_location: formData.name,
+        name: formData.name,
+        email: formData.email || "",
+        phone: formData.phone,
+        address: formData.line1,
+        address_2: formData.line2 || "",
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        pin_code: formData.zip,
+      };
+
+      // ✅ Send the object directly, not wrapped in `pickupdata`
+      await Change_Address(authToken, pickupdata);
+
+      getAdminAddress();
+      enqueueSnackbar("Address updated successfully!", { variant: "success" });
+      handleCloseAddressDialog();
+    } catch (error) {
+      console.error("Error updating address:", error);
+      enqueueSnackbar("Failed to update address.", { variant: "error" });
     }
-
-    const pickupdata = {
-      pickup_location: formData.name,
-      name: formData.name,
-      email: formData.email || "",
-      phone: formData.phone,
-      address: formData.line1,
-      address_2: formData.line2 || "",
-      city: formData.city,
-      state: formData.state,
-      country: formData.country,
-      pin_code: formData.zip,
-    };
-
-    // ✅ Send the object directly, not wrapped in `pickupdata`
-    await Change_Address(authToken, pickupdata);
-
-    getAdminAddress();
-    enqueueSnackbar("Address updated successfully!", { variant: "success" });
-    handleCloseAddressDialog();
-  } catch (error) {
-    console.error("Error updating address:", error);
-    enqueueSnackbar("Failed to update address.", { variant: "error" });
-  }
-};
-
-
+  };
 
   useEffect(() => {
     dispatch(fetchAllProfiles());
@@ -195,23 +194,15 @@ export default function Settings() {
     }
   }, [profile]);
 
-  useEffect(() => {
-    const getData = async (authToken) => {
-      try {
-        const data = await getWalletData(authToken);
-        setBalance(data.data);
-        console.log(balance.message.data.balance_amount, "data");
-      } catch (error) {
-        console.error("Error fetching wallet data:", error);
-      }
-    };
-
-    getData();
-  }, []);
-
-  useEffect(() => {
-    getAdminAddress();
-  }, [authToken]);
+  const getData = async (authToken) => {
+    try {
+      const data = await getWalletData(authToken);
+      setBalance(data.data);
+      console.log(balance.message.data.balance_amount, "data");
+    } catch (error) {
+      console.error("Error fetching wallet data:", error);
+    }
+  };
 
   const getAdminAddress = async (authToken) => {
     try {
@@ -222,6 +213,11 @@ export default function Settings() {
       console.error("Error fetching Address:", error);
     }
   };
+
+  useEffect(() => {
+    getAdminAddress();
+    getData();
+  }, [authToken]);
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
@@ -361,87 +357,95 @@ export default function Settings() {
               Manage ShipRocket Pickup Address
             </Typography>
           </Box>
-
-          {/* Address Card */}
-          {adminAddress?.message?.map((item, index) => (
-            <Card
-              key={index}
+          <Grid item xs={12} sm={2} textAlign="right">
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={handleAddressDialog}
               sx={{
-                m: 2,
-                p: 3,
-                borderRadius: 2,
-                boxShadow: 3,
+                bgcolor: "primary.light",
+                color: "primary.dark",
+                borderRadius: "25px",
+                boxShadow: 2,
+                textTransform: "none",
+                px: 2,
+                py: 1,
                 transition: "all 0.3s",
-                "&:hover": { boxShadow: 6 },
-                bgcolor: "background.paper",
+                whiteSpace: "nowrap", // prevents button from breaking text
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                  color: "white",
+                  boxShadow: 4,
+                },
               }}
             >
-              <CardContent>
-                <Grid container spacing={2} alignItems="center">
-                  {/* Address Details */}
-                  <Grid item xs={12} sm={10}>
-                    <Typography variant="h6" fontWeight="bold">
-                      {item.name}
-                    </Typography>
+              Add Address
+            </Button>
+          </Grid>
 
-                    <Typography variant="subtitle1" color="text.primary">
-                      {item.address}
-                    </Typography>
-
-                    {item.address_2 && (
-                      <Typography variant="subtitle1" color="text.primary">
-                        {item.address_2}
+          {/* Address Card */}
+          {adminAddress != null ? (
+            adminAddress?.message?.map((item, index) => (
+              <Card
+                key={index}
+                sx={{
+                  m: 2,
+                  p: 3,
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  transition: "all 0.3s",
+                  "&:hover": { boxShadow: 6 },
+                  bgcolor: "background.paper",
+                }}
+              >
+                <CardContent>
+                  <Grid container spacing={2} alignItems="center">
+                    {/* Address Details */}
+                    <Grid item xs={12} sm={10}>
+                      <Typography variant="h6" fontWeight="bold">
+                        {item.name}
                       </Typography>
-                    )}
 
-                    <Typography variant="subtitle1" color="text.secondary">
-                      {item.city}, {item.state} {item.pin_code}
-                    </Typography>
+                      <Typography variant="subtitle1" color="text.primary">
+                        {item.address}
+                      </Typography>
 
-                    <Typography variant="subtitle1" color="text.secondary">
-                      {item.country}
-                    </Typography>
+                      {item.address_2 && (
+                        <Typography variant="subtitle1" color="text.primary">
+                          {item.address_2}
+                        </Typography>
+                      )}
 
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        mt: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        color: "text.secondary",
-                      }}
-                    >
-                      📞 {item.phone}
-                    </Typography>
+                      <Typography variant="subtitle1" color="text.secondary">
+                        {item.city}, {item.state} {item.pin_code}
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                        {item.country}
+                      </Typography>
+
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mt: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          color: "text.secondary",
+                        }}
+                      >
+                        📞 {item.phone}
+                      </Typography>
+                    </Grid>
+
+                    {/* Edit Button */}
                   </Grid>
-
-                  {/* Edit Button */}
-                  <Grid item xs={12} sm={2} textAlign="right">
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      onClick={() => handleAddressDialog(item)}
-                      sx={{
-                        bgcolor: "primary.light",
-                        color: "primary.dark",
-                        borderRadius: "50%",
-                        boxShadow: 2,
-                        transition: "all 0.3s",
-                        "&:hover": {
-                          bgcolor: "primary.dark",
-                          color: "white",
-                          boxShadow: 4,
-                        },
-                      }}
-                    >
-                      <Edit />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Skeleton variant="text" width={400} height={50} />
+          )}
         </TabPanel>
 
         {/* ShipRocket Wallet Tab */}
@@ -459,10 +463,6 @@ export default function Settings() {
             }}
           >
             <CardContent>
-              <Typography variant="h5" gutterBottom fontWeight="bold">
-                ShipRocket Wallet Balance
-              </Typography>
-
               <Box
                 sx={{
                   display: "flex",
@@ -478,13 +478,17 @@ export default function Settings() {
                   <AccountBalanceWallet
                     sx={{ fontSize: 50, mr: 2, color: "primary.main" }}
                   />
-                  <Typography
-                    variant="h3"
-                    color="primary.main"
-                    fontWeight="bold"
-                  >
-                    ₹{balance?.message?.data?.balance_amount}
-                  </Typography>
+                  {balance ? (
+                    <Typography
+                      variant="h3"
+                      color="primary.main"
+                      fontWeight="bold"
+                    >
+                      ₹{balance.message.data.balance_amount}
+                    </Typography>
+                  ) : (
+                    <Skeleton variant="text" width={200} height={50} />
+                  )}
                 </Box>
                 <Typography variant="body2" color="text.secondary">
                   Last updated: Today at 10:45 AM
