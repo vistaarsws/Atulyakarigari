@@ -13,7 +13,7 @@ const logDir = path.join(__dirname, "../../logs");
 
 // Ensure log directory exists
 if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive  : true });
+  // fs.mkdirSync(logDir, { recursive  : true });  //removed this to deploy
 }
 
 // Define custom log format
