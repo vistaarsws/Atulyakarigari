@@ -175,7 +175,7 @@ export default function Settings() {
   }
 };
 
-
+//add api
 
   useEffect(() => {
     dispatch(fetchAllProfiles());
