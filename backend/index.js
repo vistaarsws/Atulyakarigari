@@ -95,19 +95,7 @@ app.use((req, res, next) => {
 });
 
 // Development logging with clean format
-if (NODE_ENV === "development") {
-  morgan.token('statusColor', (req, res) => {
-    const status = res.statusCode;
-    return status >= 500 ? chalk.red(status) :
-      status >= 400 ? chalk.yellow(status) :
-        status >= 300 ? chalk.cyan(status) :
-          chalk.green(status);
-  });
 
-  app.use(morgan((tokens, req, res) => {
-    return false; // Disable default Morgan logging as we have our custom logger
-  }));
-}
 app.get("/", (req, res) => res.send("Express on Vercel"));
 // API Routes
 app.use("/api/v1/auth", authRoutes);

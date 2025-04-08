@@ -25,4 +25,4 @@ const sendAbandonedCartEmails = async () => {
 //     timezone: "Asia/Kolkata"
 // });
 
-console.log("Scheduled abandoned cart email job set to run at 8 AM daily.");
+// console.log("Scheduled abandoned cart email job set to run at 8 AM daily.");
