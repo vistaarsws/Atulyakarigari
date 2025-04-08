@@ -108,7 +108,7 @@ if (NODE_ENV === "development") {
     return false; // Disable default Morgan logging as we have our custom logger
   }));
 }
-
+app.get("/", (req, res) => res.send("Express on Vercel"));
 // API Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
