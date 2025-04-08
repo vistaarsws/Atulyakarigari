@@ -19,6 +19,6 @@ router.post("/return", returnOrder);
 router.get("/getUserOrders", getUserOrders);
 
 router.use(isAdmin);
-router.get("/getOrders", getUserOrders);
+router.get("/getOrders", getAllOrders);
 
 export default router;
