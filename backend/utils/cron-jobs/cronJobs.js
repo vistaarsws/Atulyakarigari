@@ -20,9 +20,9 @@ const sendAbandonedCartEmails = async () => {
 };
 
 // Schedule cron job to run every day at 8 AM
-cron.schedule("0 8 * * *", sendAbandonedCartEmails, {
-    scheduled: true,
-    timezone: "Asia/Kolkata"
-});
+// cron.schedule("0 8 * * *", sendAbandonedCartEmails, {
+//     scheduled: true,
+//     timezone: "Asia/Kolkata"
+// });
 
 console.log("Scheduled abandoned cart email job set to run at 8 AM daily.");
