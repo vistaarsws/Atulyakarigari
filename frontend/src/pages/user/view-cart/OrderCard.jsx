@@ -71,7 +71,9 @@ const ProductCard = ({ product }) => {
   const authToken = useSelector((state) => state.auth.token);
   const cartItems = useSelector((state) => state.cart.items);
   const [productQuantity, setProductQuantity] = useState(1);
+ 
 
+  //changes
   useEffect(() => {
     if (product?.productId) {
       const cartProduct = cartItems.find(
