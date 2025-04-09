@@ -343,7 +343,7 @@ const paymentResponse = async (payload) => {
 // In services/user.js
 const getAllUserOrders = async (token) => {
   try {
-    console.log(user_endpoints.GET_ALL_USER_OREDERS, 'endpoint');
+    console.log(user_endpoints.GET_ALL_USER_OREDERS, "endpoint");
     const response = await apiConnector(
       "GET", // HTTP method
       user_endpoints.GET_ALL_USER_OREDERS, // API endpoint
@@ -358,8 +358,26 @@ const getAllUserOrders = async (token) => {
 };
 
 
+const getShipmentAddress = async (token, Id) => {
+  try {
+    const response = await apiConnector(
+      "GET",
+      user_endpoints.GET_SHIPMENT_ADDRESS + Id,
+      null,
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error in getShipmentAddress", error);
+    throw error;
+  }
+};
+
 
 export {
+  getShipmentAddress,
   createProduct,
   getProducts,
   deleteProduct,

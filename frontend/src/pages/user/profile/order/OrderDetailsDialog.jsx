@@ -18,10 +18,19 @@ import {
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { Link as RouterLink } from "react-router-dom";
+import { useEffect } from "react";
+import { getShipmentAddress } from "../../../../services/user/userAPI";
+import { useSelector } from "react-redux";
 
-export const OrderDetailsDialog = ({ open, handleClose, order }) => {
+export const OrderDetailsDialog = ({
+  open,
+  handleClose,
+  order,
+  shiprocketOrderId,
+}) => {
   if (!order) return null;
   const { enqueueSnackbar } = useSnackbar();
+  const authToken = useSelector((state) => state.auth.token);
 
   const handleDownloadInvoice = () => {
     enqueueSnackbar("Downloading invoice for order", { variant: "success" });
@@ -39,7 +48,12 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
     });
   };
 
-  
+  useEffect(()=>
+  {
+   const data =  getShipmentAddress(authToken,shiprocketOrderId);
+   console.log(data,"get shipment data");
+  },[])
+
   return (
     <Dialog
       open={open}
@@ -101,7 +115,9 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
                     fontSize={14}
                     color="text.secondary"
                   >
-                    {order?.estimatedDelivery ? order?.estimatedDelivery : "Not Available"}
+                    {order?.estimatedDelivery
+                      ? order?.estimatedDelivery
+                      : "Not Available"}
                   </Typography>
                 </Box>
 
@@ -193,8 +209,10 @@ export const OrderDetailsDialog = ({ open, handleClose, order }) => {
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography fontSize={14}>Donation</Typography>
-                  <Typography fontSize={14} fontWeight={600} >
-                    {order?._id?.donationAmount ? order?._id?.donationAmount : '-' }
+                  <Typography fontSize={14} fontWeight={600}>
+                    {order?._id?.donationAmount
+                      ? order?._id?.donationAmount
+                      : "-"}
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">

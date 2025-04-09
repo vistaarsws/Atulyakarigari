@@ -45,15 +45,30 @@ export default function OrderDetails() {
       </Box>
 
       <Box sx={{ mt: 2, mb: 2 }}>
-        <Typography variant="body1"><b>State:</b> {order.shippingAddress?.state}</Typography>
-        <Typography variant="body1"><b>Address:</b> {order.shippingAddress?.addressLine1}, {order.shippingAddress?.city}</Typography>
-        <Typography variant="body1"><b>Order Date:</b> {new Date(order.createdAt).toLocaleDateString()}</Typography>
-        <Typography variant="body1"><b>Payment:</b> {order.paymentMethod}</Typography>
+        <Typography variant="body1">
+          <b>State:</b> {order.shippingAddress?.state}
+        </Typography>
+        <Typography variant="body1">
+          <b>Address:</b> {order.shippingAddress?.addressLine1},{" "}
+          {order.shippingAddress?.city}
+        </Typography>
+        <Typography variant="body1">
+          <b>Order Date:</b> {new Date(order.createdAt).toLocaleDateString()}
+        </Typography>
+        <Typography variant="body1">
+          <b>Payment:</b> {order.paymentMethod}
+        </Typography>
+        <Typography variant="body1">
+          <b>transaction Id :</b>
+          {order?.transactionId}
+        </Typography>
       </Box>
 
       <Divider sx={{ mb: 2 }} />
 
-      <Typography variant="h6" sx={{ mb: 2 }}>Products Ordered</Typography>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Products Ordered
+      </Typography>
 
       <TableContainer component={Paper} sx={{ mt: 1 }}>
         <Table>
@@ -68,6 +83,35 @@ export default function OrderDetails() {
             {order.products.map((product, index) => (
               <TableRow key={index}>
                 <TableCell>{product.name}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>₹{product.price}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Typography variant="h6" sx={{ mb: 2, mt: 2 }}>
+        shippingAddress
+      </Typography>
+      <TableContainer component={Paper} sx={{ mt: 1 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>fullName</TableCell>
+              <TableCell>phone</TableCell>
+              <TableCell>addressLine</TableCell>
+              <TableCell>city</TableCell>
+              <TableCell>state</TableCell>
+              <TableCell>postalCode</TableCell>
+              <TableCell>country</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {order.products.map((product, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  {/* {product.orderData.shippingAddress.addressLine1} */}
+                </TableCell>
                 <TableCell>{product.quantity}</TableCell>
                 <TableCell>₹{product.price}</TableCell>
               </TableRow>

@@ -20,7 +20,7 @@ import { InputBase } from "@mui/material";
 // import TEST_03 from "../../../../assets/images/artistry_1.png";
 // import TEST_04 from "../../../../assets/images/ourCollections_2.png";
 import { OrderDetailsDialog } from "./OrderDetailsDialog";
-import { getAllUserOrders } from "../../../../services/user/userAPI";
+import { getAllUserOrders, getShipmentAddress } from "../../../../services/user/userAPI";
 import { useSelector } from "react-redux";
 
 
@@ -73,6 +73,8 @@ export default function Component() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [allOrder, setAllOrder] = useState();
+  const [shippingAddress, setShippingAddress] = useState();
+
   const data = {};
   const breakpoints = {
     max768: useMediaQuery("(max-width:768px)"),
@@ -94,12 +96,16 @@ export default function Component() {
       try {
         const response = await getAllUserOrders(authToken);
         setAllOrder(response.data.data);
+        
       } catch (error) {
         console.error(error);
       }
     })();
   }, []);
 
+  useEffect(() => {
+    getShipmentAddress(authToken);
+  }, []);
 
 
   return (
@@ -344,6 +350,7 @@ export default function Component() {
 
       {/* Order Details Dialog */}
       <OrderDetailsDialog
+         shiprocketOrderId={selectedOrder?.shiprocketOrderId}
         open={isOrderModalOpen}
         handleClose={() => setIsOrderModalOpen(false)}
         order={selectedOrder}

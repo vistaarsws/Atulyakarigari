@@ -113,12 +113,13 @@ const Payment = () => {
   const orderCreate = async () => {
     
     try {
-      await createOrder("ORD-9787352165");
+     const data =  await createOrder("ORD-5828423686");
       toast.success("Order Created Successfully!", {
         duration: 5000, 
       });
       navigate("/profile/orders");
-      console.log("Order created successfully!");
+      console.log("Order created successfully!", data.data.order.shiprocketOrderId);
+      console.log("order create",data);
     } catch (error) {
       console.error("Error creating order:", error);
     }
