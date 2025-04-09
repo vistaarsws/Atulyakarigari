@@ -808,8 +808,8 @@ export const trackShiprocketOrder = async (shipmentID) => {
           },
         }
       );
-      console.log(response)
-      return response;
+      // console.log(response.data)
+      return response.data;
     }
 
   }
