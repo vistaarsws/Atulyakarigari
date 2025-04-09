@@ -49,7 +49,7 @@ export const removeFromTheCart = createAsyncThunk(
     }
   }
 );
-
+//Add
 // ADD Item to Cart and Fetch Updated Cart
 export const addToTheCart = createAsyncThunk(
   "cart/addToCart",
