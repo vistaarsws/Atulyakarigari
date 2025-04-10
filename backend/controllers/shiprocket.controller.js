@@ -6,6 +6,7 @@ import {
 } from "../helpers/api-response.js";
 import {
   addShiprocketPickupLocation,
+  getAllDeliveryPartner,
   getShiprocketDeliveryEstimate,
   getShiprocketPickupLocations,
   getShiprocketWalletBalance,
@@ -188,5 +189,26 @@ export const trackPackage = async (req,res) =>{
       res,
       "⚠️ Failed to track order"
     )
+  }
+}
+
+
+export const getAllDeliveryAssociatePartner = async (req, res) => {
+  try{
+    let deliveryAssociatePartner = await getAllDeliveryPartner();
+    deliveryAssociatePartner = deliveryAssociatePartner || [];
+    if (!deliveryAssociatePartner || deliveryAssociatePartner.length === 0) {
+      return notFoundRequest(req, res, null, "No delivery associate partner found");
+    }
+    return success(
+      req,
+      res,
+      deliveryAssociatePartner,
+      "Delivery associate partner retrieved successfully"
+    );
+  }
+  catch(error){
+    console.error("Error fetching delivery associate partner:", error);
+   
   }
 }

@@ -823,3 +823,37 @@ export const trackShiprocketOrder = async (shipmentID) => {
     throw error;
   }
 }
+
+
+export const getAllDeliveryPartner = async () => {
+  try{
+    const authToken = await getShiprocketToken();
+    let url = `${shiprocketConfig.API_BASE}/courier/courierListWithCounts`;
+   
+    const response = await axios.get(
+      url,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+    logMessage(
+      "info",
+      `Delivery partners fetched successfully: ${JSON.stringify(response.data)}`,
+      "shiprocket-info"
+    );
+    await logoutShiprocket();
+    return response.data;
+  }
+  catch(error){
+    logMessage(
+      "error",
+      `Error fetching delivery partner: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    );
+    await logoutShiprocket();
+    throw error;
+  }
+}
