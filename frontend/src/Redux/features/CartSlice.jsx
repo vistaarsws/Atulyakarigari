@@ -1,5 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCart, removeFromCart, addToCart } from "../../services/user/userAPI";
+import {
+  getCart,
+  removeFromCart,
+  addToCart,
+} from "../../services/user/userAPI";
 import { jwtDecode } from "jwt-decode";
 
 // Helper Function: Track Custom Events in Dynatrace
@@ -18,7 +22,10 @@ export const fetchCart = createAsyncThunk(
       const response = await getCart(userId);
 
       // ✅ Track cart retrieval in Dynatrace
-      trackDynatraceEvent("Fetch Cart", { userId, itemCount: response.data.data.items.length });
+      trackDynatraceEvent("Fetch Cart", {
+        userId,
+        itemCount: response.data.data.items.length,
+      });
 
       return response.data.data;
     } catch (err) {
@@ -53,7 +60,10 @@ export const removeFromTheCart = createAsyncThunk(
 // ADD Item to Cart and Fetch Updated Cart
 export const addToTheCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ authToken, productId, quantity = 1 }, { rejectWithValue, dispatch }) => {
+  async (
+    { authToken, productId, quantity = 1 },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
       await addToCart(productId, quantity);
 
@@ -85,8 +95,7 @@ export const updateQuantityInCart = createAsyncThunk(
         (sum, item) => sum + item.price * item.quantity,
         0
       );
-   
-     
+
       const total = totalMRP;
 
       dispatch(cartSlice.actions.updateCartTotals({ totalMRP, total }));

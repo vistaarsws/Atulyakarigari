@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ProductView from "../../../components/layout/user/product-view/ProductView";
 import share from "../../../assets/images/share.svg";
 import star from "../../../assets/images/reviewStar.svg";
@@ -25,7 +25,7 @@ import { useSnackbar } from "notistack";
 import ConfirmationModal from "../../../components/ui/modal/confirmation-modal/ConfirmationModal";
 
 import { useEffect, useRef } from "react";
-import { logEvent } from "../../../utils/analytics/analytics";
+import { logEvent, logPageView, trackPerformance } from "../../../utils/analytics/analytics";
 
 import "./Product.css";
 import WishListHeartIcon from "../../../components/ui/micro-elements/wishListHeartIcon/WishListHeartIcon";
@@ -122,6 +122,14 @@ export default function Product() {
     const response = await getProductById(productId);
     setProduct(response?.data?.data);
   };
+
+
+  useEffect(() => {
+    const location = useLocation();
+   trackPerformance();
+    logPageView(location.pathname);
+  }, []);
+
 
   useEffect(() => {
     // Record the time the user enters the page

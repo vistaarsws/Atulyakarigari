@@ -18,15 +18,13 @@ import { useSelector } from "react-redux";
 import CCAvenue from "../../../utils/CcavenuePay/CCAvenue";
 import toast from "react-hot-toast";
 import { getAddress } from "../../../services/user/userAPI";
-
+import { logPageView } from "../../../utils/analytics/analytics";
 const Payment = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
   const cartData = useSelector((state) => state.cart);
-  const {profile} = useSelector((state) => state.profile);
-  
-
+  const { profile } = useSelector((state) => state.profile);
 
   const selectedAddressID = useSelector(
     (state) => state.address.selectedAddressID
@@ -34,7 +32,7 @@ const Payment = () => {
   const isPlaceOrder = useLocation()?.pathname === "/place-order";
   const [selectedDonation, setSelectedDonation] = useState(0);
   const [isDonationEnabled, setIsDonationEnabled] = useState(true);
-  const [address,setAddress] = useState();
+  const [address, setAddress] = useState();
 
   const donationAmounts = [0, 10, 20, 50, 100];
   const authToken = useSelector((state) => state.auth.token);
@@ -47,10 +45,9 @@ const Payment = () => {
     console.log(authToken, "authToken");
   }, []);
 
-
   useEffect(() => {
     const fetchAddress = async () => {
-      const {data} = await getAddress();
+      const { data } = await getAddress();
       if (data.data) {
         setAddress(data.data);
       }
@@ -58,6 +55,11 @@ const Payment = () => {
     fetchAddress();
   }, []);
 
+  useEffect(() => {
+    const location = useLocation();
+
+    logPageView(location.pathname);
+  }, []);
 
   const handleDonationSelect = (amount) => {
     setSelectedDonation(amount);
@@ -111,21 +113,23 @@ const Payment = () => {
   };
 
   const orderCreate = async () => {
-    
     try {
-     const data =  await createOrder("ORD-5828423686");
+      const data = await createOrder("ORD-5828423686");
       toast.success("Order Created Successfully!", {
-        duration: 5000, 
+        duration: 5000,
       });
       navigate("/profile/orders");
-      console.log("Order created successfully!", data.data.order.shiprocketOrderId);
-      console.log("order create",data);
+      console.log(
+        "Order created successfully!",
+        data.data.order.shiprocketOrderId
+      );
+      console.log("order create", data);
     } catch (error) {
       console.error("Error creating order:", error);
     }
   };
 
-  console.log(cartData.items,"hi",profile,"hello",address);
+  console.log(cartData.items, "hi", profile, "hello", address);
   return (
     <Box
       sx={{
