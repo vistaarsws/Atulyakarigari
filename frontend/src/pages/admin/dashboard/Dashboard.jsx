@@ -14,8 +14,9 @@ import {
   Chip,
   Select,
   MenuItem,
+  Icon,
 } from "@mui/material";
-import { Bar, Line, Pie } from "react-chartjs-2";
+import { Bar, Doughnut, Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -39,9 +40,32 @@ ChartJS.register(
   BarElement
 );
 
+import "./Dashboard.css";
+import totalOrderBp from "../../../assets/images/totalOrderBp.svg";
+import newCustomersBp from "../../../assets/images/graphPattern.svg";
+import totalRevenueBp from "../../../assets/images/linePattern.svg";
+
+import totalOrdersIcon from "../../../assets/images/totalOrders.svg";
+import userIcon from "../../../assets/images/user.svg";
+import couponsIcon from "../../../assets/images/coupons.svg";
+import moneyBagIcon from "../../../assets/images/moneyBag.svg";
+
 const Dashboard = () => {
   const salesData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         label: "Sales",
@@ -65,7 +89,7 @@ const Dashboard = () => {
     datasets: [
       {
         data: [55, 15, 30],
-        backgroundColor: ["#ff9900", "#6c63ff", "#34c759"],
+        backgroundColor: ["#FFCF56", "#3CF871", "#5D78FF"],
       },
     ],
   };
@@ -82,34 +106,109 @@ const Dashboard = () => {
 
   const productData = [
     { name: "Banarasi Silk Saari", price: 6527, sell: "7,203", status: "Sold" },
-    { name: "Banarasi Silk Saari", price: 6527, sell: "7,203", status: "Stock" },
-    { name: "Banarasi Silk Saari", price: 6527, sell: "7,203", status: "Stock" },
-    { name: "Banarasi Silk Saari", price: 6527, sell: "7,203", status: "Stock" },
-    { name: "Banarasi Silk Saari", price: 6527, sell: "7,203", status: "Stock" },
+    {
+      name: "Banarasi Silk Saari",
+      price: 6527,
+      sell: "7,203",
+      status: "Stock",
+    },
+    {
+      name: "Banarasi Silk Saari",
+      price: 6527,
+      sell: "7,203",
+      status: "Stock",
+    },
+    {
+      name: "Banarasi Silk Saari",
+      price: 6527,
+      sell: "7,203",
+      status: "Stock",
+    },
+    {
+      name: "Banarasi Silk Saari",
+      price: 6527,
+      sell: "7,203",
+      status: "Stock",
+    },
   ];
 
   return (
     <Box sx={{ padding: 4, backgroundColor: "#f9f9fb" }}>
       <Grid container spacing={3}>
         {[
-          { title: "Total Orders", value: "16,358", subtitle: "8.5% New Sessions Today" },
-          { title: "New Customers", value: "532", subtitle: "0.6% Bounce Rate Weekly" },
-          { title: "Top Coupons", value: "78%", subtitle: "1.5% Weekly Avg. Sessions" },
-          { title: "Total Revenue", value: "28,71,943", subtitle: "10.5% higher from previous month", dark: true },
+          {
+            title: "Total Orders",
+            value: "16,358",
+            subtitle: "8.5% New Sessions Today",
+            backgroundPattern: totalOrderBp,
+            icon: totalOrdersIcon,
+          },
+          {
+            title: "New Customers",
+            value: "532",
+            subtitle: "0.6% Bounce Rate Weekly",
+            backgroundPattern: newCustomersBp,
+            icon: userIcon,
+          },
+          {
+            title: "Top Coupons",
+            value: "78%",
+            subtitle: "1.5% Weekly Avg. Sessions",
+            backgroundPattern: "",
+            icon: couponsIcon,
+          },
+          {
+            title: "Total Revenue",
+            value: "28,71,943",
+            subtitle: "10.5% higher from previous month",
+            backgroundPattern: totalRevenueBp,
+            icon: moneyBagIcon,
+            dark: true,
+          },
         ].map((item, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card
               sx={{
                 backgroundColor: item.dark ? "#121212" : "white",
                 color: item.dark ? "white" : "black",
-                boxShadow: 2,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                position: "relative",
+                boxShadow: "rgba(0, 0, 0, 0.09) 0px 3px 12px",
               }}
             >
-              <CardContent>
-                <Typography variant="h6">{item.title}</Typography>
-                <Typography variant="h4">{item.value}</Typography>
-                <Typography variant="body2">{item.subtitle}</Typography>
-              </CardContent>
+              <Box>
+                <CardContent>
+                  <Typography variant="h6">{item.title}</Typography>
+                  <Typography variant="h4">{item.value}</Typography>
+                  <Typography variant="body2">{item.subtitle}</Typography>
+                </CardContent>
+                <figure
+                  style={{
+                    position: "absolute",
+                    right: "16px",
+                    top: "16px",
+                    height: "21px",
+                    width: "21px",
+                  }}
+                >
+                  <img
+                    src={item.icon}
+                    height="100%"
+                    width="100%"
+                    alt="Cart Image"
+                  />
+                </figure>
+              </Box>
+
+              {item.backgroundPattern && (
+                <img
+                  src={item.backgroundPattern}
+                  style={{ objectFit: "cover", height: "80px" }}
+                  className="background Pattern"
+                />
+              )}
             </Card>
           </Grid>
         ))}
@@ -117,15 +216,32 @@ const Dashboard = () => {
 
       <Grid container spacing={3} sx={{ mt: 3 }}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ boxShadow: 2 }}>
+          <Card>
             <CardContent>
-              <Typography variant="h6">Devices Mode</Typography>
-              <Pie data={deviceData} />
+              <Typography
+                variant="h6"
+                sx={{ fontSize: "16px", fontWeight: "500" }}
+              >
+                Devices Mode
+              </Typography>
+              <Typography
+                variant="p"
+                sx={{
+                  fontSize: "12px",
+                  fontWeight: "400",
+                  color: "#9F9F9F",
+                }}
+              >
+                Device mode users prefer to view our website or make purchases.
+              </Typography>
+              <Box sx={{ marginTop: "1.5rem" }}>
+                <Doughnut data={deviceData} />
+              </Box>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} md={8}>
-          <Card sx={{ boxShadow: 2 }}>
+          <Card>
             <CardContent>
               <Typography variant="h6">Sales Report</Typography>
               <Select defaultValue="Monthly" sx={{ mb: 2 }}>
@@ -141,12 +257,14 @@ const Dashboard = () => {
 
       <Grid container spacing={3} sx={{ mt: 3 }}>
         <Grid item xs={12} md={6}>
-          <Card sx={{ boxShadow: 2 }}>
+          <Card>
             <CardContent>
-              <Typography variant="h6">Earnings Reports</Typography>
-              <TableContainer>
+              <Typography variant="h6" sx={{ mb: 1, fontWeight: 500 }}>
+                Earnings Reports
+              </Typography>
+              <TableContainer className="tableContainer">
                 <Table>
-                  <TableHead>
+                  <TableHead className="earningReportHeader">
                     <TableRow>
                       <TableCell>Date</TableCell>
                       <TableCell>Item Count</TableCell>
@@ -159,7 +277,13 @@ const Dashboard = () => {
                       <TableRow key={index}>
                         <TableCell>{row.date}</TableCell>
                         <TableCell>{row.itemCount}</TableCell>
-                        <TableCell style={{ color: row.tax === "--" ? "gray" : "red" }}>{row.tax}</TableCell>
+                        <TableCell
+                          style={{
+                            color: row.tax === "--" ? "gray" : "#AD3F38",
+                          }}
+                        >
+                          {row.tax}
+                        </TableCell>
                         <TableCell>{row.earnings}</TableCell>
                       </TableRow>
                     ))}
@@ -171,12 +295,14 @@ const Dashboard = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Card sx={{ boxShadow: 2 }}>
+          <Card>
             <CardContent>
-              <Typography variant="h6">Most Popular Products</Typography>
-              <TableContainer>
+              <Typography variant="h6" sx={{ mb: 1, fontWeight: 500 }}>
+                Most Popular Products
+              </Typography>
+              <TableContainer className="tableContainer">
                 <Table>
-                  <TableHead>
+                  <TableHead className="earningReportHeader">
                     <TableRow>
                       <TableCell>Product Name</TableCell>
                       <TableCell>Price</TableCell>
@@ -191,7 +317,26 @@ const Dashboard = () => {
                         <TableCell>{product.price}</TableCell>
                         <TableCell>{product.sell}</TableCell>
                         <TableCell>
-                          <Chip label={product.status} color={product.status === "Sold" ? "error" : "success"} />
+                          <Chip
+                            sx={{
+                              borderRadius: "4px",
+                              maxWidth: "60px",
+                              width: "100%",
+                              fontSize: "12px",
+                              backgroundColor:
+                                product.status === "Sold"
+                                  ? "#AD3F381A"
+                                  : "#76CBA763",
+                              color:
+                                product.status === "Sold"
+                                  ? "#AD3F38"
+                                  : "#60A487",
+                            }}
+                            label={product.status}
+                            color={
+                              product.status === "Sold" ? "error" : "success"
+                            }
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
