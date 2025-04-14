@@ -25,7 +25,11 @@ import { useSnackbar } from "notistack";
 import ConfirmationModal from "../../../components/ui/modal/confirmation-modal/ConfirmationModal";
 
 import { useEffect, useRef } from "react";
-import { logEvent, logPageView, trackPerformance } from "../../../utils/analytics/analytics";
+import {
+  logEvent,
+  logPageView,
+  trackPerformance,
+} from "../../../utils/analytics/analytics";
 
 import "./Product.css";
 import WishListHeartIcon from "../../../components/ui/micro-elements/wishListHeartIcon/WishListHeartIcon";
@@ -123,13 +127,11 @@ export default function Product() {
     setProduct(response?.data?.data);
   };
 
-
-  useEffect(() => {
-    const location = useLocation();
-   trackPerformance();
-    logPageView(location.pathname);
-  }, []);
-
+  // useEffect(() => {
+  //   const location = useLocation();
+  //   trackPerformance();
+  //   // logPageView(location.pathname);
+  // }, []);
 
   useEffect(() => {
     // Record the time the user enters the page
@@ -282,12 +284,15 @@ export default function Product() {
   }, [productId]);
 
   useEffect(() => {
-    logEvent(
-      "Ecommerce",
-      "View Item",
-      `${product?.name} (ID: ${product?.id})`,
-      product?.price
-    );
+    if (product !== null && product !== undefined) {
+      logEvent(
+        "Ecommerce",
+        "View Item",
+        `${product?.name} (ID: ${product?.id})`,
+        product?.price
+      );
+      console.log("product viewd", product);
+    }
   }, [product]);
 
   const handleCartToggle = async () => {
