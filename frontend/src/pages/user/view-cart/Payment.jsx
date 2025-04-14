@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import CCAvenue from "../../../utils/CcavenuePay/CCAvenue";
 import toast from "react-hot-toast";
 import { getAddress } from "../../../services/user/userAPI";
-import { logPageView } from "../../../utils/analytics/analytics";
+// import { logPageView } from "../../../utils/analytics/analytics";
 const Payment = () => {
   const navigate = useNavigate();
 
@@ -55,11 +55,11 @@ const Payment = () => {
     fetchAddress();
   }, []);
 
-  useEffect(() => {
-    const location = useLocation();
+  // useEffect(() => {
+  //   const location = useLocation();
 
-    logPageView(location.pathname);
-  }, []);
+  //   logPageView(location.pathname);
+  // }, []);
 
   const handleDonationSelect = (amount) => {
     setSelectedDonation(amount);
