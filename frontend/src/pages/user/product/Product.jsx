@@ -284,13 +284,15 @@ export default function Product() {
   }, [productId]);
 
   useEffect(() => {
-    logEvent(
-      "Ecommerce",
-      "View Item",
-      `${product?.name} (ID: ${product?.id})`,
-      product?.price
-    );
-    console.log("event logged", product);
+    if (product !== null && product !== undefined) {
+      logEvent(
+        "Ecommerce",
+        "View Item",
+        `${product?.name} (ID: ${product?.id})`,
+        product?.price
+      );
+      console.log("product viewd", product);
+    }
   }, [product]);
 
   const handleCartToggle = async () => {
