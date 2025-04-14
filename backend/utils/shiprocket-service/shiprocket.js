@@ -161,7 +161,30 @@ export const getAllProductsShipRocket = async () => {
   }
 };
 
-//new cmnt
+export const getShiprocketSpecificOrderDetails = async (orderId) =>{
+  const authToken = await getShiprocketToken();
+
+  try {
+    const config = {
+      method : 'GET',
+      url: `${shiprocketConfig.API_BASE}/orders/show/${orderId}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    }
+    let response = await axios.request(config);
+    return response.data.data;
+  }
+  catch(error){
+    console.error("Error fetching order details:", error);
+    logMessage(
+      "error",
+      `Error fetching order details: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    )
+  }
+}
 
 // CREATE SHIPROCKET ORDER
 export const createShiprocketOrder = async (orderData) => {
@@ -800,7 +823,7 @@ export const trackShiprocketOrder = async (shipmentID) => {
   try{
     if (shipmentID){
       response = await axios.get(
-        `${shiprocketConfig.API_BASE}/courier/track/shipment/${shipmentID}`,
+        `${shiprocketConfig.API_BASE}/courier/track/awb/${shipmentID}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -855,5 +878,127 @@ export const getAllDeliveryPartner = async () => {
     );
     await logoutShiprocket();
     throw error;
+  }
+}
+
+
+export const assignDeliveryPartner = async(shipmentID, partnerID) =>{
+  try{
+    let authToken = await getShiprocketToken();
+    let url = `${shiprocketConfig.API_BASE}/courier/assign/awb`;
+    let orderDetails = await getShiprocketSpecificOrderDetails(shipmentID)
+    let payload = {
+      shipment_id: orderDetails.shipments.id,
+      partner_id: partnerID
+    };
+    const response = await axios.post(
+      url,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+    logMessage(
+      "info",
+      `Delivery partner assigned successfully: ${JSON.stringify(response.data)}`,
+      "shiprocket-info"
+    );
+    await logoutShiprocket();
+    return response.data.response.data;
+  }
+  catch(error){
+    console.log(error.message);
+    logMessage(
+      "error",
+      `Error assigning delivery partner: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    );
+    await logoutShiprocket();
+  }
+}
+
+
+export const generatePickup = async (shipmentID, status, pickupDate) => {
+  try {
+    let authToken = await getShiprocketToken();
+    let url = `${shiprocketConfig.API_BASE}/courier/generate/pickup`;
+    let dateOfPickup = [new Date()];
+
+    if(pickupDate){
+      dateOfPickup = [...pickupDate]
+    }
+    
+    
+    let payload = {
+      shipment_id: [...shipmentID],
+      status: status || "scheduled",
+      pickup_date : [...dateOfPickup]
+    };
+
+    const response = await axios.post(
+      url,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+
+    logMessage(
+      "info",
+      `Pickup generated successfully: ${JSON.stringify(response.data)}`,
+      "shiprocket-info"
+    );
+    await logoutShiprocket();
+    return response.data;
+  } catch (error) {
+    console.error("Error generating pickup:", error);
+    logMessage(
+      "error",
+      `Error generating pickup: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    );
+  }
+}
+
+
+export const cancelShipment = async(awbCode) => {
+  try{
+    let authToken = await getShiprocketToken();
+    let url = `${shiprocketConfig.API_BASE}/shipments/cancel`;
+    let payload = {
+      awb_code: [...awbCode],
+      reason: "Customer Cancellation",
+    };
+    const response = await axios.post(
+      url,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+    logMessage(
+      "info",
+      `Shipment cancelled successfully: ${JSON.stringify(response.data)}`,
+      "shiprocket-info"
+    );
+    await logoutShiprocket();
+    return response.data;
+  }
+  catch(error){
+    console.error("Error cancelling shipment:", error);
+    logMessage(
+      "error",
+      `Error cancelling shipment: ${error?.response?.data || error.message}`,
+      "shiprocket-errors"
+    );
   }
 }

@@ -36,6 +36,30 @@ const OrderSchema = new mongoose.Schema(
         },
       },
     ],
+    awbCode:{
+      type: String,
+      default: null,
+    },
+    shipRocketInvoiceNumber : {
+      type: String,
+      default: null,
+    },
+    shipRocketRoutingCode :{
+      type: String,
+      default: null,
+    },
+    courierCompanyId :{
+      type: String,
+      default: null,
+    },
+    awbCodeStatus :{
+      type: String,
+      default: null,
+    },
+    shipRocketShipmentID :{
+      type: String,
+      default: null,
+    },
 
     totalMRP: {
       type: Number,

@@ -24,6 +24,7 @@ export const createOrder = async (req, res) => {
   
 
     const payment = await Payment.findOne({ paymentOrderId, userId });
+    console.log(payment)
     if (!payment || payment.status !== "COMPLETED") {
       return res.status(400).json({ error: "Invalid or incomplete payment" });
     }
