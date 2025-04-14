@@ -290,6 +290,7 @@ export default function Product() {
       `${product?.name} (ID: ${product?.id})`,
       product?.price
     );
+    console.log("event logged", product);
   }, [product]);
 
   const handleCartToggle = async () => {
