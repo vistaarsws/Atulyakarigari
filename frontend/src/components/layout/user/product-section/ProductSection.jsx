@@ -55,8 +55,6 @@ export default function ProductSection({ productCategorySection, bgColor }) {
       );
     });
 
-    console.log("PPPPPPPP", products.length);
-
     // Fill with skeletons if fewer than 5 real products exist
     const skeletons = [...Array(products.length)].map((_, index) => (
       <div className="skeletonCard" key={`skeleton-${index}`}>

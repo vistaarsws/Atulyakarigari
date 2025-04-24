@@ -301,6 +301,7 @@ export default function Product() {
   const handleBuyToggle = () => {
     if (authToken) {
       navigate("/place-order", { state: { productId } });
+      navigate("/place-order", { state: { productId } });
     } else {
       enqueueSnackbar("Please Login to Buy Product", {
         variant: "error",

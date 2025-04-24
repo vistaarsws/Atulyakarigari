@@ -116,7 +116,7 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
 
   // Add this to inject the CSS
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = cardStyles;
     document.head.appendChild(style);
     return () => {
@@ -126,30 +126,35 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
 
   const getCategory = useSelector((state) => state.categories.categories);
   const allProducts = useSelector((state) => state?.products?.products || []);
-  
+
   // Filter products based on status and search query
   const products = useMemo(() => {
-    return allProducts?.filter(prod => {
-      if (!prod) return false;
-      
-      // Status filter
-      const statusMatch = 
-        productStatus === "all" ? true :
-        productStatus === "outofstock" ? prod.stock === 0 :
-        (prod.status && prod.status.toLowerCase() === productStatus);
-      
-      // If no search query, just apply status filter
-      if (!searchQuery || searchQuery.trim() === "") return statusMatch;
-      
-      // Apply search filter - with null checks
-      const query = searchQuery.toLowerCase();
-      return statusMatch && (
-        (prod.name && prod.name.toLowerCase().includes(query)) ||
-        (prod.sku && prod.sku.toLowerCase().includes(query)) ||
-        (prod._id && prod._id.toLowerCase().includes(query)) ||
-        (prod.price !== undefined && String(prod.price).includes(query))
-      );
-    }) || [];
+    return (
+      allProducts?.filter((prod) => {
+        if (!prod) return false;
+
+        // Status filter
+        const statusMatch =
+          productStatus === "all"
+            ? true
+            : productStatus === "outofstock"
+              ? prod.stock === 0
+              : prod.status && prod.status.toLowerCase() === productStatus;
+
+        // If no search query, just apply status filter
+        if (!searchQuery || searchQuery.trim() === "") return statusMatch;
+
+        // Apply search filter - with null checks
+        const query = searchQuery.toLowerCase();
+        return (
+          statusMatch &&
+          ((prod.name && prod.name.toLowerCase().includes(query)) ||
+            (prod.sku && prod.sku.toLowerCase().includes(query)) ||
+            (prod._id && prod._id.toLowerCase().includes(query)) ||
+            (prod.price !== undefined && String(prod.price).includes(query)))
+        );
+      }) || []
+    );
   }, [allProducts, productStatus, searchQuery]);
 
   useEffect(() => {
@@ -170,37 +175,42 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
   };
 
   const getCategoryName = useMemo(
-    () => (id) => getCategory?.find((cat) => cat && cat.id === id)?.name || "Unknown",
+    () => (id) =>
+      getCategory?.find((cat) => cat && cat._id === id)?.name || "Unknown",
     [getCategory]
   );
 
   const transformData = useMemo(
     () =>
       Array.isArray(products)
-        ? products.map((product) => {
-            if (!product) return null;
-            return {
-              productImgTitle: {
-                prodImg: product.images?.[0] || "default-image-path.jpg",
-                prodName: product.name || "Unnamed Product",
-              },
-              category: getCategoryName(product?.category),
-              stock: product.stock || 0,
-              productID: product?._id || "No ID",
-              sku: product.sku || "No SKU",
-              price: product.price || 0,
-              date: product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : "No date",
-              name: product.name || "Unnamed Product",
-              fullProduct: product,
-            };
-          }).filter(Boolean)
+        ? products
+            .map((product) => {
+              if (!product) return null;
+              return {
+                productImgTitle: {
+                  prodImg: product.images?.[0] || "default-image-path.jpg",
+                  prodName: product.name || "Unnamed Product",
+                },
+                category: getCategoryName(product?.category),
+                stock: product.stock || 0,
+                productID: product?._id || "No ID",
+                sku: product.sku || "No SKU",
+                price: product.price || 0,
+                date: product.updatedAt
+                  ? new Date(product.updatedAt).toLocaleDateString()
+                  : "No date",
+                name: product.name || "Unnamed Product",
+                fullProduct: product,
+              };
+            })
+            .filter(Boolean)
         : [],
     [products, getCategoryName]
   );
 
   const profileImageRenderer = (params) => {
     if (!params.value) return <div>No Image</div>;
-    
+
     const { prodImg, prodName } = params.value;
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -221,7 +231,7 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
 
   const priceRenderer = (params) => {
     if (!params.data) return <div>No Data</div>;
-    
+
     const originalPrice = params.data.price || 0;
     const discount = params.data.fullProduct?.discountPercentage || 0;
     const effectivePrice = originalPrice - (originalPrice * discount) / 100;
@@ -281,7 +291,7 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
 
   const actionCellRenderer = (params) => {
     if (!params.data?.fullProduct) return <div>No Actions</div>;
-    
+
     return (
       <div>
         <IconButton
@@ -336,23 +346,24 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
   // Search status info display
   const renderSearchInfo = () => {
     if (!searchQuery) return null;
-    
+
     if (products.length === 0) {
       return (
         <Zoom in={true}>
           <div className="no-results-message">
             <SearchIcon className="search-icon" />
-           { `No products found matching ${searchQuery}`}
+            {`No products found matching ${searchQuery}`}
           </div>
         </Zoom>
       );
     }
-    
+
     return (
       <div className="search-results-container">
         <div className="search-results-count">
-          <SearchIcon className="search-icon"  />
-          Found {products.length} {products.length === 1 ? "product" : "products"}
+          <SearchIcon className="search-icon" />
+          Found {products.length}{" "}
+          {products.length === 1 ? "product" : "products"}
         </div>
       </div>
     );
@@ -374,7 +385,7 @@ export default function AdminProductCard({ productStatus, searchQuery = "" }) {
           defaultColDef={{
             sortable: true,
             filter: true,
-            resizable: true
+            resizable: true,
           }}
         />
       ) : (

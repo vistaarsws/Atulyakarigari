@@ -1,0 +1,32 @@
+.earningReportHeader {
+  background-color: #efecf9;
+
+  border-radius: 4px;
+  & > tr {
+    & > th {
+      border-bottom: none;
+      color: #6f6f6f;
+      text-transform: uppercase;
+    }
+  }
+}
+
+.tableContainer {
+  & tbody {
+    & > tr {
+      & > td {
+        border-bottom: 1px dashed #c0c0c0;
+      }
+
+      & > td:last-of-type {
+        font-weight: 700;
+      }
+      & > td:first-of-type {
+        color: #9f9f9f;
+      }
+      & > td:nth-of-type(2) {
+        color: #9f9f9f;
+      }
+    }
+  }
+}
