@@ -9,7 +9,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { getAddress, getServiceability } from "../../../services/user/userAPI";
-import ORDER_IMG from "../../../assets/images/order-img.png";
 
 const DeliveryEstimate = ({ buyNowItem }) => {
   const dispatch = useDispatch();
@@ -109,7 +108,7 @@ const DeliveryEstimate = ({ buyNowItem }) => {
                 borderRadius: 1,
                 objectFit: "cover",
               }}
-              image={item?.images?.[0] || ORDER_IMG}
+              image={item?.images?.[0]}
               alt={item?.name || "Product"}
             />
 

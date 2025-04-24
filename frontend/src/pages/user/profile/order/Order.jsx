@@ -1,18 +1,6 @@
 import { useState } from "react";
-import {
- 
-  Box,
- 
-  useMediaQuery,
-  
-} from "@mui/material";
-import {
-  
-  Search,
-
-  StarBorder,
-
-} from "@mui/icons-material";
+import { Box, useMediaQuery } from "@mui/material";
+import { Search, StarBorder } from "@mui/icons-material";
 import { InputBase } from "@mui/material";
 
 import TEST_01 from "../../../../assets/images/order-img.png";
@@ -20,8 +8,6 @@ import TEST_02 from "../../../../assets/images/aboutBanner.png";
 import TEST_03 from "../../../../assets/images/artistry_1.png";
 import TEST_04 from "../../../../assets/images/ourCollections_2.png";
 import { OrderDetailsDialog } from "./OrderDetailsDialog";
-
-
 
 export default function Component() {
   const orders = [
@@ -178,29 +164,28 @@ export default function Component() {
               }}
             >
               {orders.map((order, index) => (
-               <div
-               key={order.id}
-               style={{
-                 paddingTop: "24px",
-                 marginBottom: breakpoints.max768 ? "2rem" : "24px",
-                 display: "flex",
-                 padding: "2.4rem",
-                 gap: "24px",
-                 transition: "box-shadow 0.3s ease, transform 0.3s ease",  // Add transform to transition
-                 borderRadius: "8px",
-                 cursor: "pointer",
-               }}
-               onClick={() => handleOrderClick(order, index)}
-               onMouseEnter={(e) => {
-                 e.currentTarget.style.border = "1.5px solid #60a487";  // Border on hover
-                 e.currentTarget.style.transform = "scale(.99)";  // Zoom in
-               }}
-               onMouseLeave={(e) => {
-                 e.currentTarget.style.border = "1px solid #eee";  // Revert border
-                 e.currentTarget.style.transform = "scale(1)";  // Revert zoom
-               }}
-             >
-              
+                <div
+                  key={order.id}
+                  style={{
+                    paddingTop: "24px",
+                    marginBottom: breakpoints.max768 ? "2rem" : "24px",
+                    display: "flex",
+                    padding: "2.4rem",
+                    gap: "24px",
+                    transition: "box-shadow 0.3s ease, transform 0.3s ease", // Add transform to transition
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleOrderClick(order, index)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.border = "1.5px solid #60a487"; // Border on hover
+                    e.currentTarget.style.transform = "scale(.99)"; // Zoom in
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.border = "1px solid #eee"; // Revert border
+                    e.currentTarget.style.transform = "scale(1)"; // Revert zoom
+                  }}
+                >
                   <div style={{ flex: 1 }}>
                     <div
                       style={{
@@ -234,7 +219,6 @@ export default function Component() {
                               objectFit: "cover",
                               width: "100%",
                               height: "100%",
-                             
                             }}
                             src={orders[index].image}
                             alt={orders[index].product}
@@ -333,8 +317,6 @@ export default function Component() {
         handleClose={() => setIsOrderModalOpen(false)}
         order={selectedOrder}
       />
-
-     
     </>
   );
 }
