@@ -23,7 +23,8 @@ const Payment = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-  const cartData = useSelector((state) => state.cart);
+  const cartData =
+    buyNowItem?.length == 1 ? buyNowItem : useSelector((state) => state.cart);
   const { profile } = useSelector((state) => state.profile);
 
   const selectedAddressID = useSelector(
@@ -68,6 +69,10 @@ const Payment = () => {
 
   const totalAmount = isDonationEnabled
     ? cartData?.total + (selectedDonation || 0) || 0
+    : cartData?.total || 0;
+
+  const totalAmountOfSingleProduct = isDonationEnabled
+    ? cartData?.price + (selectedDonation || 0) || 0
     : cartData?.total || 0;
 
   const handlePayment = async () => {
@@ -149,7 +154,7 @@ const Payment = () => {
       <Box
         sx={{
           backgroundColor: "white",
-          boxShadow: 1,
+          // boxShadow: 1,
           padding: { xs: 2, md: 4 },
           width: "100%",
         }}
@@ -258,7 +263,7 @@ const Payment = () => {
                   ? `${cartData?.items?.length} item`
                   : cartData?.items?.length > 1
                     ? `${cartData?.items?.length} items`
-                    : "0 item"}
+                    : "1 item"}
             )
           </Typography>
           <Box sx={{ marginTop: 2 }}>
@@ -287,7 +292,11 @@ const Payment = () => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(cartData?.totalMRP || 0)}
+                {formatPrice(
+                  cartData?.items?.length > 0
+                    ? cartData?.totalMRP
+                    : (cartData[0]?.price ?? 0)
+                )}
               </Typography>
             </Box>
             <Box
@@ -316,7 +325,13 @@ const Payment = () => {
                   lineHeight: "25px",
                 }}
               >
-                {formatPrice(cartData?.totalDiscount || 0)}
+                {/* {formatPrice(cartData?.totalDiscount || 0)} */}
+                {"- "}
+                {formatPrice(
+                  cartData?.items?.length > 0
+                    ? cartData?.totalDiscount
+                    : (cartData[0]?.price ?? 0) - (cartData[0]?.priceAfterDiscount ?? 0)
+                )}
               </Typography>
             </Box>
             <Box
@@ -410,7 +425,7 @@ const Payment = () => {
             )}
           </Box>
         </Box>
-        <Divider sx={{ marginY: 3 }} />
+        <Divider sx={{ marginY: useMediaQuery("(max-width:768px)") ? 1 : 3 }} />
         <Box sx={{ marginBottom: 2 }}>
           <Box
             sx={{
@@ -438,7 +453,12 @@ const Payment = () => {
                 lineHeight: "25px",
               }}
             >
-              {formatPrice(totalAmount)}
+              {/* {formatPrice(totalAmount)} */}
+              {formatPrice(
+                cartData?.items?.length > 0
+                  ? totalAmount
+                  : totalAmountOfSingleProduct
+              )}
             </Typography>
           </Box>
         </Box>
@@ -472,7 +492,7 @@ const Payment = () => {
                 width: "100%",
               }}
               onClick={() => {
-                navigate("/place-order");
+                navigate("/place-order", cartData.items);
               }}
             >
               Place Order

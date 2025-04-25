@@ -149,7 +149,6 @@ export default function Product() {
 
   const fetchRatingAndReview = async () => {
     try {
-      const decodedToken = jwtDecode(authToken);
 
       const response = await getReviewById(productId);
 
@@ -280,7 +279,9 @@ export default function Product() {
   };
 
   useEffect(() => {
-    checkIfProductInCart();
+    if(authToken){
+      checkIfProductInCart();
+    }
   }, [productId]);
 
   useEffect(() => {
@@ -328,6 +329,7 @@ export default function Product() {
   const handleBuyToggle = () => {
     if (authToken) {
       logEvent("Purchase", "Buy Now Clicked", productId);
+      navigate("/place-order", { state: { productId } });
       navigate("/place-order", { state: { productId } });
     } else {
       enqueueSnackbar("Please Login to Buy Product", {

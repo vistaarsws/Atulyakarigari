@@ -75,17 +75,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install Vercel CLI
+        run: |
+         npm install -g vercel
+
       - name: Deploy to Vercel (Development)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_DEVELOPMENT_TOKEN }}
         run: |
           cd frontend
-          npx vercel login --token $VERCEL_TOKEN
-          DEPLOYMENT_URL=$(npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes)
+          DEPLOYMENT_URL=$(npx vercel deploy --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=development --yes)
 
-          echo "Deployment URL: $DEPLOYMENT_URL"
+        echo "Deployment URL: $DEPLOYMENT_URL"
 
-          npx vercel alias set $DEPLOYMENT_URL dev-atulyakarigari.vercel.app --token $VERCEL_TOKEN
+          npx vercel alias $DEPLOYMENT_URL dev-atulyakarigari.vercel.app --token $VERCEL_TOKEN
 
   deploy-to-production:
     name: 🚀 Deploy to Production (main branch)
@@ -102,8 +105,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_PROD_TOKEN }}
         run: |
           cd frontend
-          npx vercel login --token $VERCEL_TOKEN
-          DEPLOYMENT_URL=$(npx vercel --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes)
+          DEPLOYMENT_URL=$(npx vercel deploy --token $VERCEL_TOKEN --env MERN_PUBLIC_ENV=production --prod --yes)
 
           echo "Deployment URL: $DEPLOYMENT_URL"
 

@@ -92,12 +92,13 @@ const ProductSchema = new mongoose.Schema(
         type: String,
         validate: {
           validator: function (v) {
-            return /^(https?:\/\/).*\.(jpg|jpeg|png|gif)$/i.test(v);
+            return /^(https?:\/\/).*\.(jpg|jpeg|png|gif|webp)$/i.test(v);
           },
           message: "Invalid image URL",
         },
       },
     ],
+
     stock: {
       type: Number,
       required: [true, "Stock quantity is required"],

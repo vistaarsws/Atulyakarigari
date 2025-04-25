@@ -36,6 +36,11 @@ export const admin_endpoints = {
   GET_WALLET_DATA: BASE_URL + "/api/v1/shiprocket/getWallet",
   GET_ADDRESS: BASE_URL + "/api/v1/shiprocket/getPickupLocations",
   UPDATE_ADDRESS: BASE_URL + "/api/v1/shiprocket/pickupAddress",
+
+  ADD_ADMIN: BASE_URL + "/api/v1/admin/add-admin",
+  REMOVE_ADMIN: BASE_URL + "/api/v1/admin/remove-admin",
+
+  GET_WALLET: BASE_URL + "/api/v1/shiprocket/getWallet"
 };
 
 export const user_endpoints = {

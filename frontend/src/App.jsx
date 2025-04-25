@@ -146,6 +146,7 @@ export default function App() {
       "/otp",
       "/view-cart",
       "/place-order",
+      "/blogs",
     ];
 
     return {

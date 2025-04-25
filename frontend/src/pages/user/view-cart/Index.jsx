@@ -26,13 +26,13 @@ const useDynatrace = () => {
     const checkDtrum = setInterval(() => {
       if (window.dtrum && typeof window.dtrum.sendCustomEvent === "function") {
         setIsDynatraceReady(true);
-        console.log("✅ Dynatrace RUM is ready");
         clearInterval(checkDtrum);
       }
     }, 500);
-
-    return () => clearInterval(checkDtrum);
+  
+    return () => clearInterval(checkDtrum); // ✅ Ensures cleanup on unmount
   }, []);
+  
 
   return trackEvent; // ✅ Return the function so it can be used
 };
@@ -42,17 +42,19 @@ const Index = () => {
   const authToken = useSelector((state) => state.auth.token);
   const cartData = useSelector((state) => state.cart);
   const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobileHeight = useMediaQuery("(max-width:900px)");
+
   const trackDynatraceEvent = useDynatrace(); // ✅ Now correctly returns `trackEvent`
-  
+
   // ✅ Fetch cart on component mount
   const mobileHeight = useMediaQuery("(max-width:900px)");
 
   useEffect(() => {
-    if (authToken && cartData.items?.length === 0) {
-      dispatch(fetchCart(authToken));
+    if (authToken && cartData.status === "idle") {
+      dispatch(fetchCart(authToken)); 
     }
-  }, [authToken, dispatch, cartData.items]);
-
+  }, [authToken, dispatch, cartData.status]);
+  
   // ✅ Track Cart Events
   useEffect(() => {
     trackDynatraceEvent("Viewed Cart", { itemCount: cartData.items?.length });
@@ -113,6 +115,9 @@ const Index = () => {
                 md: "35%",
                 height: "83vh",
                 overflowY: "scroll",
+                marginBottom: useMediaQuery("(max-width:450px)")
+                  ? "4rem"
+                  : "0rem",
               },
             }}
           >
@@ -129,7 +134,7 @@ const Index = () => {
             height: "60vh",
           }}
         >
-          <FaShoppingBag size={100} color="#6D001D" />
+          <FaShoppingBag size={isMobile ? 80 : 100} color="#6D001D" />
           <Typography variant="h5" fontWeight="bold" mt={2}>
             Your cart is currently empty.
           </Typography>

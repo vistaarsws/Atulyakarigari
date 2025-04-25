@@ -11,7 +11,7 @@
     position: sticky;
     top: 10vh;
     height: 90vh;
-    /* padding-top: 1rem; */
+    padding-top: 1rem;
     overflow-y: scroll;
   }
 
@@ -25,7 +25,7 @@
     align-items: start;
     justify-content: start;
     margin: 0 2rem 2%;
-    margin-top: 5rem;
+    margin-top: 1rem;
     gap: 2rem 1rem;
   }
 
@@ -258,10 +258,9 @@
 @media screen and (max-width: 576px) {
   .categoryPage_container > section:first-of-type {
     & > div:first-of-type {
-      height: 5rem;
+      height: 6rem;
       position: sticky;
       width: 100%;
-      margin-top: 5rem;
     }
   }
 }

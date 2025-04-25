@@ -167,15 +167,6 @@ export default function Navbar({ navWithoutSearchBar_list }) {
     dispatch(fetchAllCategory());
   }, [enqueueSnackbar]);
 
-  // Fetch cart, wishlist, and profile data if authenticated
-  useEffect(() => {
-    if (authToken) {
-      dispatch(fetchCart(authToken));
-      dispatch(fetchWishlist(authToken));
-      dispatch(fetchProfile(authToken));
-    }
-  }, [authToken, dispatch]);
-
   // Handle logout
   const logoutHandler = (isLogout) => {
     if (isLogout === "Logout") {

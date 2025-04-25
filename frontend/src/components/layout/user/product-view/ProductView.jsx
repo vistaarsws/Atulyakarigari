@@ -1,29 +1,13 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import productpage_1 from "../../../../assets/images/cat5_2.png";
-import productpage_2 from "../../../../assets/images/productpage_2.png";
-import productpage_3 from "../../../../assets/images/productpage_3.png";
-import productpage_4 from "../../../../assets/images/productpage_4.png";
+// import productpage_1 from "../../../../assets/images/cat5_2.png";
+// import productpage_2 from "../../../../assets/images/productpage_2.png";
+// import productpage_3 from "../../../../assets/images/productpage_3.png";
+// import productpage_4 from "../../../../assets/images/productpage_4.png";
 
 import "./ProductView.css";
 
-const images = [
-  productpage_1,
-  productpage_2,
-  productpage_3,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-];
-
-export default function ProductView({ productImages = images }) {
+export default function ProductView({ productImages = [] }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const changeSlide = (index) => {
@@ -69,7 +53,6 @@ export default function ProductView({ productImages = images }) {
   );
 }
 
-ProductView.propTypes  = {
+ProductView.propTypes = {
   productImages: PropTypes.array,
-
-  }
+};
