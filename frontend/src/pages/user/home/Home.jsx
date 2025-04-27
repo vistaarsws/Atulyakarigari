@@ -11,6 +11,8 @@ import CategoryView from "../../../components/layout/user/category-view/Category
 import { useMediaQuery } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllCategory } from "../../../Redux/features/CategorySlice"; 
 import { useNavigate } from "react-router-dom";
 import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
 
@@ -18,6 +20,8 @@ export default function Home() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const [getAllCategories, setGetAllCategories] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { categories, loading, hasFetched } = useSelector((state) => state.categories);
 
   const fetchCategoriesData = async () => {
     try {
@@ -32,6 +36,12 @@ export default function Home() {
   useEffect(() => {
     fetchCategoriesData();
   }, []);
+
+  useEffect(() => {
+    if (!hasFetched) {
+      dispatch(fetchAllCategory()); // Fetch only if not already fetched
+    }
+  }, [dispatch, hasFetched]);
 
   const handleShopNow = () => {
     navigate(`/categories/6799c7d3464f0c78506ba778`); // Redirect to category page
@@ -59,8 +69,9 @@ export default function Home() {
       </div>
 
       <section className="category-mapping">
-        {getAllCategories.length > 0 ? (
-          getAllCategories.map((category, index) => {
+      {loading && <p>Loading...</p>}
+        {categories.length > 0 ? (
+          categories.map((category, index) => {
             return (
               <Fragment key={index}>
                 {index == 1 && (

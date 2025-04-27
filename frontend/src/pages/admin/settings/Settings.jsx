@@ -34,6 +34,7 @@ import {
   Search,
   PersonAdd,
   Delete,
+  Add,
 } from "@mui/icons-material";
 import {
   fetchProfile,
@@ -125,6 +126,20 @@ export default function Settings() {
     setTabValue(newValue);
   };
 
+  const [addresses, setAddresses] = useState([]);
+
+  const handleAddAddress = () => {
+    const newAddress = {
+      id: Date.now(), // unique id
+      value: "", // default empty value
+    };
+    setAddresses((prev) => [...prev, newAddress]);
+  };
+
+  const handleRemoveAddress = () => {
+    setAddresses((prev) => prev.slice(0, -1));
+  };
+
   // Admin management functions
   const handleOpenAdminDialog = () => {
     setNewAdminEmail("");
@@ -185,7 +200,7 @@ export default function Settings() {
         dispatch(fetchAllProfiles());
       })
       .catch(() => {
-        enqueueSnackbar( "Profile not found. Please sign up with this email.", {
+        enqueueSnackbar("Profile not found. Please sign up with this email.", {
           variant: "error",
         });
       });
@@ -243,10 +258,28 @@ export default function Settings() {
         {/* ShipRocket Pickup Address Tab */}
         <TabPanel value={tabValue} index={1}>
           {/* Page Title */}
-          <Box sx={{ m: 2, textAlign: "left" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              m: 2,
+              textAlign: "left",
+            }}
+          >
             <Typography variant="h5" fontWeight="bold">
               Manage ShipRocket Pickup Address
             </Typography>
+
+            <Button
+              variant="outlined"
+              color="success"
+              startIcon={<Add />}
+              onClick={handleAddressDialog}
+              size="small"
+              sx={{ minWidth: 0 }}
+            >
+              Add Address
+            </Button>
           </Box>
 
           {/* Address Card */}
@@ -301,25 +334,16 @@ export default function Settings() {
 
                 {/* Edit Button */}
                 <Grid item xs={12} sm={2} textAlign="right">
-                  <IconButton
-                    edge="end"
-                    aria-label="edit"
-                    onClick={handleAddressDialog}
-                    sx={{
-                      bgcolor: "primary.light",
-                      color: "primary.dark",
-                      borderRadius: "50%",
-                      boxShadow: 2,
-                      transition: "all 0.3s",
-                      "&:hover": {
-                        bgcolor: "primary.dark",
-                        color: "white",
-                        boxShadow: 4,
-                      },
-                    }}
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Delete />}
+                    onClick={handleRemoveAddress}
+                    size="small"
+                    sx={{ minWidth: 0 }}
                   >
-                    <Edit />
-                  </IconButton>
+                    Remove
+                  </Button>
                 </Grid>
               </Grid>
             </CardContent>
@@ -495,7 +519,7 @@ export default function Settings() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Edit Address</DialogTitle>
+        <DialogTitle>Add Address</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -503,7 +527,6 @@ export default function Settings() {
             label="Address Name (e.g. Home, Office)"
             type="text"
             fullWidth
-            defaultValue={address.name}
             sx={{ mb: 2, mt: 1 }}
           />
           <TextField
@@ -511,7 +534,6 @@ export default function Settings() {
             label="Address Line 1"
             type="text"
             fullWidth
-            defaultValue={address.line1}
             sx={{ mb: 2 }}
           />
           <TextField
@@ -519,18 +541,11 @@ export default function Settings() {
             label="Address Line 2 (Optional)"
             type="text"
             fullWidth
-            defaultValue={address.line2}
             sx={{ mb: 2 }}
           />
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="City"
-                type="text"
-                fullWidth
-                defaultValue={address.city}
-              />
+              <TextField margin="dense" label="City" type="text" fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -538,7 +553,6 @@ export default function Settings() {
                 label="State/Province"
                 type="text"
                 fullWidth
-                defaultValue={address.state}
               />
             </Grid>
           </Grid>
@@ -549,17 +563,10 @@ export default function Settings() {
                 label="Postal/ZIP Code"
                 type="text"
                 fullWidth
-                defaultValue={address.zip}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="Country"
-                type="text"
-                fullWidth
-                defaultValue={address.country}
-              />
+              <TextField margin="dense" label="Country" type="text" fullWidth />
             </Grid>
           </Grid>
           <TextField
@@ -567,98 +574,6 @@ export default function Settings() {
             label="Phone Number"
             type="tel"
             fullWidth
-            defaultValue={address.phone}
-            sx={{ mb: 1, mt: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddressDialog}>Cancel</Button>
-          <Button variant="contained" onClick={handleCloseAddressDialog}>
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Address Dialog */}
-      <Dialog
-        open={addressDialogOpen}
-        onClose={handleCloseAddressDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Edit Address</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Address Name (e.g. Home, Office)"
-            type="text"
-            fullWidth
-            defaultValue={address.name}
-            sx={{ mb: 2, mt: 1 }}
-          />
-          <TextField
-            margin="dense"
-            label="Address Line 1"
-            type="text"
-            fullWidth
-            defaultValue={address.line1}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            label="Address Line 2 (Optional)"
-            type="text"
-            fullWidth
-            defaultValue={address.line2}
-            sx={{ mb: 2 }}
-          />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="City"
-                type="text"
-                fullWidth
-                defaultValue={address.city}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="State/Province"
-                type="text"
-                fullWidth
-                defaultValue={address.state}
-              />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="Postal/ZIP Code"
-                type="text"
-                fullWidth
-                defaultValue={address.zip}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                margin="dense"
-                label="Country"
-                type="text"
-                fullWidth
-                defaultValue={address.country}
-              />
-            </Grid>
-          </Grid>
-          <TextField
-            margin="dense"
-            label="Phone Number"
-            type="tel"
-            fullWidth
-            defaultValue={address.phone}
             sx={{ mb: 1, mt: 2 }}
           />
         </DialogContent>
@@ -667,13 +582,13 @@ export default function Settings() {
           <Button
             variant="contained"
             onClick={() => {
-              enqueueSnackbar("Address updated successfully!", {
+              enqueueSnackbar("Address Added successfully!", {
                 variant: "success",
               });
               handleCloseAddressDialog();
             }}
           >
-            Save Changes
+            Save
           </Button>
         </DialogActions>
       </Dialog>

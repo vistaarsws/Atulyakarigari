@@ -41,7 +41,8 @@ const AddressModal = ({
 
   const createAddressHandler = async () => {
     try {
-      const response = await createAddress(formData);
+      debugger;
+      await createAddress(formData);
       handleClose();
       getAllAddress();
     } catch (error) {
