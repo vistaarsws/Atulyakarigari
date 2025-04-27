@@ -591,7 +591,7 @@ export default function ProductForm({
           <article>
             <div className="image-upload">
               <h2>
-                Upload Image {" "}
+                Upload Image{" "}
                 <span
                   style={{
                     fontSize: "12px",

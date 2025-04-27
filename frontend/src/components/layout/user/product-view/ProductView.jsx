@@ -7,21 +7,7 @@ import productpage_4 from "../../../../assets/images/productpage_4.png";
 
 import "./ProductView.css";
 
-const images = [
-  productpage_1,
-  productpage_2,
-  productpage_3,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-  productpage_4,
-];
+const images = [];
 
 export default function ProductView({ productImages = images }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -69,7 +55,6 @@ export default function ProductView({ productImages = images }) {
   );
 }
 
-ProductView.propTypes  = {
+ProductView.propTypes = {
   productImages: PropTypes.array,
-
-  }
+};

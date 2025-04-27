@@ -10,7 +10,7 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import {  Menu as MenuIcon } from "@mui/icons-material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 
 import notificationIcon from "../../../../assets/images/notificationIcon.svg";
 import adminLogoutIcon from "../../../../assets/images/adminLogoutIcon.svg";
@@ -71,7 +71,8 @@ export default function Navbar() {
 
         const fetchedData = {
           fullName: profile.fullName || "Unknow Admin",
-          profilePicture:profile.profilePicture || "/static/images/avatar/1.jpg",
+          profilePicture:
+            profile.profilePicture || "/static/images/avatar/1.jpg",
         };
         setProfileData(fetchedData);
       } catch (error) {
@@ -85,7 +86,7 @@ export default function Navbar() {
   const confirmLogout = () => {
     setOpenConfirm(true);
   };
-  
+
   const handleLogoutConfirmed = () => {
     dispatch(logout());
     navigate("/");
@@ -101,7 +102,7 @@ export default function Navbar() {
       priority: "high",
       type: "message",
       isPinned: false,
-      isRead: false
+      isRead: false,
     },
     {
       title: "System Update",
@@ -112,7 +113,7 @@ export default function Navbar() {
       priority: "medium",
       type: "system",
       isPinned: true,
-      isRead: false
+      isRead: false,
     },
     {
       title: "Task Completed",
@@ -123,7 +124,7 @@ export default function Navbar() {
       priority: "low",
       type: "task",
       isPinned: false,
-      isRead: true
+      isRead: true,
     },
     {
       title: "Meeting Reminder",
@@ -134,7 +135,7 @@ export default function Navbar() {
       priority: "high",
       type: "calendar",
       isPinned: true,
-      isRead: false
+      isRead: false,
     },
     {
       title: "Security Alert",
@@ -145,8 +146,8 @@ export default function Navbar() {
       priority: "high",
       type: "security",
       isPinned: false,
-      isRead: false
-    }
+      isRead: false,
+    },
   ];
 
   const DrawerList = (
@@ -154,7 +155,7 @@ export default function Navbar() {
       sx={{
         width: 250,
         alignItems: "center",
-
+        bgcolor: "#5E3CC3",
         height: "100vh",
         display: "flex",
         padding: "2rem",
@@ -172,14 +173,21 @@ export default function Navbar() {
           { label: "Settings", path: "/admin/settings" },
         ].map((obj) => (
           <ListItem key={obj.label} disablePadding>
-            <Link href={obj.path} underline="none">
-              <ListItemButton>
+            <Link href={obj.path} underline="none" sx={{ width: "100%" }}>
+              <ListItemButton
+                sx={{
+                  "&:hover": {
+                    bgcolor: "#8768DE",
+                  },
+                  borderRadius: "0.5rem",
+                }}
+              >
                 <ListItemText
                   primary={obj.label}
                   primaryTypographyProps={{
                     fontSize: "18px",
                     fontWeight: "semi-bold",
-                    color: "#8668df",
+                    color: "#CBD3E0",
                   }}
                 />
               </ListItemButton>
@@ -243,11 +251,10 @@ export default function Navbar() {
             sx={{ fontSize: "1.6rem", fontWeight: "700", color: "#383737" }}
           >
             {fetchedData?.fullName}
-
           </Typography>
 
           <h2 style={{ margin: 0, fontSize: "1.3rem", color: "#6F6F6F" }}>
-          {jwtDecode(authToken)?.role}
+            {jwtDecode(authToken)?.role}
           </h2>
         </Box>
       </article>
@@ -270,8 +277,8 @@ export default function Navbar() {
           }}
         /> */}
 
-         {/* Notification Component */}
-         <NotificationComponent
+        {/* Notification Component */}
+        <NotificationComponent
           notifications={notifications}
           notificationIcon={notificationIcon}
           onMarkAllRead={() => console.log("Marked all as read")}
@@ -281,26 +288,25 @@ export default function Navbar() {
 
         {/* Logout Icon */}
         <Box sx={{ border: "1px solid white", padding: "1rem" }}>
-  <img
-    src={adminLogoutIcon}
-    alt="Admin Logout Icon"
-    style={{
-      cursor: "pointer",
-      width: "2rem",
-      height: "2.4rem",
-    }}
-    onClick={confirmLogout}
-  />
-</Box>
+          <img
+            src={adminLogoutIcon}
+            alt="Admin Logout Icon"
+            style={{
+              cursor: "pointer",
+              width: "2rem",
+              height: "2.4rem",
+            }}
+            onClick={confirmLogout}
+          />
+        </Box>
 
-<ConfirmationModal
-  open={openConfirm}
-  onClose={() => setOpenConfirm(false)}
-  onConfirm={handleLogoutConfirmed}
-  title="Logout Confirmation"
-  message="Are you sure you want to log out?"
-/>
-
+        <ConfirmationModal
+          open={openConfirm}
+          onClose={() => setOpenConfirm(false)}
+          onConfirm={handleLogoutConfirmed}
+          title="Logout Confirmation"
+          message="Are you sure you want to log out?"
+        />
       </article>
     </nav>
   );

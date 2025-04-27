@@ -139,7 +139,6 @@ export default function Product() {
 
   const fetchRatingAndReview = async () => {
     try {
-
       const response = await getReviewById(productId);
 
       setReviewData(response?.data?.data);
@@ -269,7 +268,7 @@ export default function Product() {
   };
 
   useEffect(() => {
-    if(authToken){
+    if (authToken) {
       checkIfProductInCart();
     }
   }, [productId]);
@@ -299,13 +298,14 @@ export default function Product() {
 
   // buy now button
   const handleBuyToggle = () => {
-    if (authToken) {
-      navigate("/place-order", { state: { productId } });
-    } else {
-      enqueueSnackbar("Please Login to Buy Product", {
-        variant: "error",
-      });
-    }
+    navigate("/place-order", { state: { productId } });
+    // if (authToken) {
+    //   navigate("/place-order", { state: { productId } });
+    // } else {
+    //   enqueueSnackbar("Please Login to Buy Product", {
+    //     variant: "error",
+    //   });
+    // }
   };
 
   // START Share Product
