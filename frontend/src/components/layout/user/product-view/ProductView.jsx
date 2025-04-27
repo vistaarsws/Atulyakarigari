@@ -7,7 +7,9 @@ import PropTypes from "prop-types";
 
 import "./ProductView.css";
 
-export default function ProductView({ productImages = [] }) {
+const images = [];
+
+export default function ProductView({ productImages = images }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const changeSlide = (index) => {
