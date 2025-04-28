@@ -1,5 +1,5 @@
 import "./Navbar.css";
-import headerLogo from "../../../../assets/images/headerLogo.svg";
+import headerLogo from "../../../../assets/images/ATK Logo White_1.svg";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import { useState, useEffect } from "react";

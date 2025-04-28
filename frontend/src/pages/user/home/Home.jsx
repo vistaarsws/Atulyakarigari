@@ -1,7 +1,7 @@
 import "./Home.css";
 import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
 import { HeroBanner_array } from "../../../utils/Constant";
-import artistry_1 from "../../../assets/images/cat5_2.png";
+import artistry_1 from "../../../assets/images/ATK02.png";
 import artistry_2 from "../../../assets/images/artistry_2.png";
 import artistry_3 from "../../../assets/images/artistry_3.png";
 import bg_pattern from "../../../assets/images/bgSidePattern.svg";
@@ -12,7 +12,7 @@ import { useMediaQuery } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { getCategory } from "../../../services/admin/adminAPI";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCategory } from "../../../Redux/features/CategorySlice"; 
+import { fetchAllCategory } from "../../../Redux/features/CategorySlice";
 import { useNavigate } from "react-router-dom";
 import SkeletonLoader from "../../../components/ui/modal/confirmation-modal/card-skeleton/SkeletonLoader";
 
@@ -21,7 +21,9 @@ export default function Home() {
   const [getAllCategories, setGetAllCategories] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { categories, loading, hasFetched } = useSelector((state) => state.categories);
+  const { categories, loading, hasFetched } = useSelector(
+    (state) => state.categories
+  );
 
   const fetchCategoriesData = async () => {
     try {
@@ -69,7 +71,7 @@ export default function Home() {
       </div>
 
       <section className="category-mapping">
-      {loading && <p>Loading...</p>}
+        {loading && <p>Loading...</p>}
         {categories.length > 0 ? (
           categories.map((category, index) => {
             return (

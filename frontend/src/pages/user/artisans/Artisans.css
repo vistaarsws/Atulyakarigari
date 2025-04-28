@@ -71,7 +71,7 @@
 }
 
 .artisans_heroBanner {
-  background-image: url(../../../assets/images/artisansBanner2.png);
+  background-image: url(../../../assets/images/ATK-banner-04.png);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center top;
@@ -86,7 +86,7 @@
 
 @keyframes fade {
   0% {
-    background-image: url(../../../assets/images/artisansBanner.svg);
+    /* background-image: url(../../../assets/images/artisansBanner.svg); */
     background-blend-mode: overlay;
   }
   100% {
