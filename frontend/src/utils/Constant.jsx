@@ -1,9 +1,7 @@
 import HeroSlider from "../components/ui/slider/heroSlider/HeroSlider";
 import TeamSlider from "../components/ui/slider/teamSlider/TeamSlider";
 
-// import banner1 from "../assets/images/banner_1.png";
-// import banner2 from "../assets/images/homeBanner2.png";
-// import banner3 from "../assets/images/homeBanner3.png";
+
 
 import banner1 from "../assets/images/ATK-banner-01.jpg";
 import banner2 from "../assets/images/ATK-banner-02.jpg";
