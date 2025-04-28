@@ -19,7 +19,7 @@ import {
 } from "@mui/icons-material";
 import WAVES_IMG from "../../../../assets/images/footer-wave-effect.png";
 import LEAFE_IMG from "../../../../assets/images/FooterLeafe.png";
-import footerLogo from "../../../../assets/images/headerLogo.svg";
+import footerLogo from "../../../../assets/images/ATK Logo White_1.svg";
 
 // Styled components
 const StyledFooter = styled("footer")(({ theme }) => ({
@@ -113,7 +113,9 @@ export default function Footer() {
                 }}
                 gutterBottom
               >
-                <img src={footerLogo} alt="Brand Logo" />
+                <figure style={{ marginRight: "30%" }}>
+                  <img src={footerLogo} alt="Brand Logo" />
+                </figure>
               </Typography>
               <Typography
                 variant="body1"

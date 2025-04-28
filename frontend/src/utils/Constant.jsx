@@ -7,8 +7,8 @@ import banner3 from "../assets/images/ATK-banner-01.jpg";
 
 import team_1 from "../assets/images/team_1.png";
 
-import artisan_1 from "../assets/images/artisan_3.png";
-import artisan_2 from "../assets/images/artisan_4.png";
+import artisan_2 from "../assets/images/artisan_3.png";
+import artisan_1 from "../assets/images/artisan_4.png";
 
 import ourCollections_1 from "../assets/images/ATK01.png";
 import ourCollections_2 from "../assets/images/ourCollections_2.png";
