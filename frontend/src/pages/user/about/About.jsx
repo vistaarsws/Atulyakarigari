@@ -1,5 +1,5 @@
 import "./About.css";
-import aboutImg_1 from "../../../assets/images/aboutImg_1.png";
+import aboutImg_1 from "../../../assets/images/WhoWeAre.png";
 import aboutImg_2 from "../../../assets/images/aboutImg_2.png";
 import { EmblaSlider } from "../../../components/ui/slider/EmblaSlider";
 import { ourTeam_array } from "../../../utils/Constant";
