@@ -6,9 +6,12 @@ import {
   isProductInWishlist,
 } from "../../../../Redux/features/WishlistSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useSnackbar } from "notistack";
 
 export default function WishListHeartIcon({ productId }) {
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+
   const userProfileToken = useSelector((state) => state.auth.token);
   const isInWishlist = useSelector((state) =>
     isProductInWishlist(state, productId)
@@ -31,10 +34,16 @@ export default function WishListHeartIcon({ productId }) {
   const toggleWishlistHandler = async (e) => {
     e.stopPropagation();
     try {
-      const updatedWishlist = !wishlist;
-      setWishlist(updatedWishlist);
-      await toggleWishlistItem(productId);
-      dispatch(fetchWishlist(userProfileToken));
+      if (userProfileToken) {
+        const updatedWishlist = !wishlist;
+        setWishlist(updatedWishlist);
+        await toggleWishlistItem(productId);
+        dispatch(fetchWishlist(userProfileToken));
+      } else {
+        enqueueSnackbar("Please Login First", {
+          variant: "error",
+        });
+      }
     } catch (error) {
       console.error("Error toggling wishlist item:", error.message || error);
       setWishlist(wishlist);

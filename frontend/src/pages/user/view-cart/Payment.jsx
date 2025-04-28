@@ -19,7 +19,7 @@ import CCAvenue from "../../../utils/CcavenuePay/CCAvenue";
 import toast from "react-hot-toast";
 import { getAddress } from "../../../services/user/userAPI";
 // import { logPageView } from "../../../utils/analytics/analytics";
-const Payment = () => {
+const Payment = ({ buyNowItem }) => {
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -72,13 +72,12 @@ const Payment = () => {
     : cartData?.total || 0;
 
   const totalAmountOfSingleProduct = isDonationEnabled
-    ? cartData?.price + (selectedDonation || 0) || 0
-    : cartData?.total || 0;
-
+    ? parseInt(cartData[0]?.price) + parseInt(selectedDonation || 0)
+    : cartData[0]?.price;
   const handlePayment = async () => {
-    console.log(CCAVENUE_WORKING_KEY, "text");
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const host = "http://localhost:3000";
-
+    console.log(BASE_URL);
     let paymentData = {
       merchant_id: CCAVENUE_MERCHANT_ID,
       order_id: "ORD123", // Order ID - It can be generated from our project
@@ -114,7 +113,7 @@ const Payment = () => {
     } catch (error) {
       console.error("Error encrypting payment data:", error);
     }
-    orderCreate();
+    // orderCreate();
   };
 
   const orderCreate = async () => {
@@ -330,7 +329,8 @@ const Payment = () => {
                 {formatPrice(
                   cartData?.items?.length > 0
                     ? cartData?.totalDiscount
-                    : (cartData[0]?.price ?? 0) - (cartData[0]?.priceAfterDiscount ?? 0)
+                    : (cartData[0]?.price ?? 0) -
+                        (cartData[0]?.priceAfterDiscount ?? 0)
                 )}
               </Typography>
             </Box>

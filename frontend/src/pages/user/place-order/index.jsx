@@ -13,7 +13,7 @@ const PlaceOrder = () => {
   const location = useLocation();
   const isMobile = useMediaQuery("(max-width:900px)");
   // const authToken = useSelector((state) => state.auth.token);
-  const productId = location.state?.productId; 
+  const productId = location.state?.productId;
   const products = useSelector((state) => state.products.products);
   const buyNowItem = products.filter((item) => item._id == productId);
 
