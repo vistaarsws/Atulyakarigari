@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import LoadingButton from "@mui/lab/LoadingButton";
-
+import redCrossIcon from "../../../../assets/images/redCircularCrossIcon.svg";
 import "./ProductForm.css";
 
 import {
@@ -583,6 +583,13 @@ export default function ProductForm({
     }
   };
 
+  const handleImageDelete = (index) => {
+    setFormData((prev) => {
+      const updatedImages = prev.productImage.filter((_, i) => i !== index); // Remove the image at the selected index
+      return { ...prev, productImage: updatedImages };
+    });
+  };
+
   return (
     <form id="productForm" onSubmit={productFormHandler}>
       <div className="form-main">
@@ -654,6 +661,25 @@ export default function ProductForm({
                       style={{ display: "none" }}
                       onChange={(e) => handleImageChange(e, index)} // Handle image change
                     />
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => handleImageDelete(index)} // Delete the image
+                      style={{
+                        position: "absolute",
+                        top: "8px",
+                        right: "8px",
+                        width: "24px",
+                        height: "24px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        border: "none",
+                        borderRadius: "50%",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <img src={redCrossIcon} alt="Delete Icon" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -1080,69 +1106,76 @@ export default function ProductForm({
 
               {/* Saved Variants Display */}
               <div className="attributeCards_container">
-                {formData._attributes?.map((variant) => (
-                  <Paper
-                    key={variant.key}
-                    elevation={3}
-                    sx={{
-                      padding: 2,
+                {formData._attributes?.map(
+                  (variant) => (
+                    console.log("variant", variant),
+                    (
+                      <Paper
+                        key={variant.key}
+                        elevation={3}
+                        sx={{
+                          padding: 2,
 
-                      display: "flex",
-                      flexDirection: "column",
-                      flexWrap: "wrap",
-                      flex: 1,
-                      boxShadow: "none",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {variant.key}
-                      </Typography>
+                          display: "flex",
+                          flexDirection: "column",
+                          flexWrap: "wrap",
+                          flex: 1,
+                          boxShadow: "none",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            {variant.key}
+                          </Typography>
 
-                      <Box>
-                        <IconButton
-                          color="primary"
-                          size="small"
-                          onClick={() => handleOpenDialog(variant)} // Pass the variant to edit
+                          <Box>
+                            <IconButton
+                              color="primary"
+                              size="small"
+                              onClick={() => handleOpenDialog(variant)} // Pass the variant to edit
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              size="small"
+                              onClick={() =>
+                                handleDeleteSavedVariant(variant.key)
+                              } // Delete handler
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 1,
+                            marginTop: 1,
+                          }}
                         >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          color="error"
-                          size="small"
-                          onClick={() => handleDeleteSavedVariant(variant.key)} // Delete handler
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 1,
-                        marginTop: 1,
-                      }}
-                    >
-                      {variantValues?.map((value) => {
-                        return (
-                          <Chip
-                            key={value}
-                            label={value}
-                            color="primary"
-                            variant="outlined"
-                          />
-                        );
-                      })}
-                    </Box>
-                  </Paper>
-                ))}
+                          {variant.value?.map((value) => {
+                            return (
+                              <Chip
+                                key={value}
+                                label={value}
+                                color="primary"
+                                variant="outlined"
+                              />
+                            );
+                          })}
+                        </Box>
+                      </Paper>
+                    )
+                  )
+                )}
               </div>
 
               {/* Dialog for Add/Edit Variant */}
@@ -1368,7 +1401,8 @@ export default function ProductForm({
                   type="submit"
                   disabled={loadingStates.addProduct}
                   variant="contained"
-                  color="warning"
+                  style={{ backgroundColor: "#6C757D" }}
+                  // color="warning"
                   value="Draft"
                   onClick={(e) => {
                     productFormHandler(e, "Draft");
@@ -1379,11 +1413,11 @@ export default function ProductForm({
 
                 <LoadingButton
                   size="large"
-                  // loading={loadingStates.draftProduct}
+                  loading={loadingStates.addProduct}
                   type="submit"
-                  // disabled={loadingStates.addProduct}
+                  disabled={loadingStates.draftProduct}
                   variant="contained"
-                  color="success"
+                  style={{ backgroundColor: "#107C10" }}
                   value="Published"
                   onClick={(e) => productFormHandler(e, "Published")}
                 >
