@@ -122,7 +122,7 @@ const OrderSchema = new mongoose.Schema(
       enum: [
         "Credit Card",
         "PayPal",
-        "Cash on Delivery",
+        "COD",
         "UPI",
         "Bank Transfer",
       ],
