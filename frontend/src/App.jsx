@@ -42,6 +42,7 @@ import Admin from "./pages/admin/Admin";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
 import CustomerDetails from "./pages/admin/customers/CustomerDetails";
 import OrderCancel from "./pages/user/order/OrderCancel";
+import OrderDetailsPage from "./pages/user/profile/order/OrderDetailsPage";
 
 // Utility Functions
 const getRoutesConfig = () => ({
@@ -64,6 +65,7 @@ const getRoutesConfig = () => ({
   protectedRoutes: [
     { path: "", element: <Profile /> },
     { path: "orders", element: <Order /> },
+    { path: "orders/:orderId", element: <OrderDetailsPage /> },
     { path: "address", element: <Address /> },
     { path: "wishlist", element: <Wishlist /> },
     { path: "logout", element: <Logout /> },
@@ -73,7 +75,6 @@ const getRoutesConfig = () => ({
     { path: "customers", element: <Customers /> },
     { path: "customers/:id", element: <CustomerDetails /> },
     { path: "orders", element: <Orders /> },
-    { path: "orders/:id", element: <OrderDetails /> },
     { path: "settings", element: <Settings /> },
     { path: "products", element: <Products /> },
   ],
