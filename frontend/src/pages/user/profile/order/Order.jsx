@@ -2,24 +2,28 @@ import { useState } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import { Search, StarBorder } from "@mui/icons-material";
 import { InputBase } from "@mui/material";
+import { Link } from "react-router-dom";
 
 import TEST_01 from "../../../../assets/images/order-img.png";
 import TEST_02 from "../../../../assets/images/aboutBanner.png";
 import TEST_03 from "../../../../assets/images/artistry_1.png";
 import TEST_04 from "../../../../assets/images/ourCollections_2.png";
-import { OrderDetailsDialog } from "./OrderDetailsDialog";
 
 export default function Component() {
   const orders = [
     {
       id: 1,
-      status: "Delivered",
+      status: "Pending",
       date: "On Wed, 3 Apr 2024",
       product: "BANARSI SAARI",
       description:
         "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
       exchangeDate: "Wed, 10 Apr 2024",
       image: TEST_01,
+      subtotal: 20199.99,
+      discount: 2020.0,
+      paymentMethod: "Cash on Delivery",
+      shippingAddress: "John Doe, 123 Main St, Springfield, IL, 62704, USA",
     },
     {
       id: 2,
@@ -30,6 +34,10 @@ export default function Component() {
         "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
       exchangeDate: "Wed, 10 Apr 2024",
       image: TEST_02,
+      subtotal: 18999.0,
+      discount: 1800.0,
+      paymentMethod: "Credit Card (**** 1234)",
+      shippingAddress: "John Doe, 123 Main St, Springfield, IL, 62704, USA",
     },
     {
       id: 3,
@@ -40,6 +48,10 @@ export default function Component() {
         "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
       exchangeDate: "Wed, 10 Apr 2024",
       image: TEST_03,
+      subtotal: 15499.5,
+      discount: 1500.0,
+      paymentMethod: "UPI",
+      shippingAddress: "John Doe, 123 Main St, Springfield, IL, 62704, USA",
     },
     {
       id: 4,
@@ -50,6 +62,10 @@ export default function Component() {
         "Banarasi silk fabric is a fine quality silk variant originating from Varanasi, Uttar Pradesh. Banarasi silk has its roots deep in the rich history of India. Saree woven from silk is known as Banarasi silk Saree, which is an extremely famous fabric all over India and the world.",
       exchangeDate: "Wed, 10 Apr 2024",
       image: TEST_04,
+      subtotal: 24999.0,
+      discount: 3000.0,
+      paymentMethod: "Net Banking",
+      shippingAddress: "John Doe, 123 Main St, Springfield, IL, 62704, USA",
     },
   ];
 
@@ -73,117 +89,105 @@ export default function Component() {
   };
 
   return (
-    <>
-      <Box
-        sx={{
+    <Box
+      sx={{ display: "flex", width: "100%", justifyContent: "space-between" }}
+    >
+      <div
+        style={{
           display: "flex",
-          width: "100%",
-          justifyContent: "space-between",
+          height: breakpoints.max768 ? "auto" : "90vh",
+          padding: useMediaQuery("(max-width:425px)") ? "2rem" : "2rem 4rem",
+          gap: "56px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            height: breakpoints.max768 ? "auto" : "90vh",
-            padding: useMediaQuery("(max-width:425px)") ? "2rem" : "2rem 4rem",
-
-            gap: "56px",
-          }}
-        >
+        <div style={{ width: "100%", borderRadius: "8px", overflow: "hidden" }}>
           <div
             style={{
-              width: "100%",
-              borderRadius: "8px",
-              overflow: "hidden",
+              marginBottom: "1.5rem",
+              display: "flex",
+              justifyContent: "space-between",
+              flexDirection:
+                (breakpoints.max768 || breakpoints.min769Max1024) && "column",
             }}
           >
-            <div
-              style={{
-                marginBottom: "1.5rem",
-                display: "flex",
-                justifyContent: "space-between",
-                flexDirection:
-                  (breakpoints.max768 || breakpoints.min769Max1024) && "column",
-              }}
-            >
-              <Box
-                sx={{
-                  marginBottom: breakpoints.max768 ? "1rem" : "1rem",
+            <Box sx={{ marginBottom: breakpoints.max768 ? "1rem" : "1rem" }}>
+              <h2
+                style={{
+                  fontSize: "16px",
+                  fontWeight: 900,
+                  marginBottom: "4px",
+                  color: "rgba(56, 55, 55, 1)",
                 }}
               >
-                <h2
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 900,
-                    marginBottom: "4px",
-                    color: "rgba(56, 55, 55, 1)",
-                  }}
-                >
-                  All Orders
-                </h2>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(111, 111, 111, 1)",
-                    fontWeight: 400,
-                  }}
-                >
-                  from anytime
-                </p>
-              </Box>
-
+                All Orders
+              </h2>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(111, 111, 111, 1)",
+                  fontWeight: 400,
+                }}
+              >
+                from anytime
+              </p>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                alignItems: breakpoints.min769Max1024 ? "start" : "center",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
-                  gap: 2,
-                  alignItems: breakpoints.min769Max1024 ? "start" : "center",
+                  alignItems: "center",
+                  borderRadius: "4px",
+                  padding: "4px 0px",
+                  flex: 1,
                 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    borderRadius: "4px",
-                    padding: "4px 0px",
-                    flex: 1,
-                  }}
-                >
-                  <Search sx={{ color: "#60a487", mr: 1, fontSize: 28 }} />
-                  <InputBase
-                    sx={{ flex: 1, fontSize: "16px" }}
-                    placeholder="Search in orders"
-                  />
-                </Box>
+                <Search sx={{ color: "#60a487", mr: 1, fontSize: 28 }} />
+                <InputBase
+                  sx={{ flex: 1, fontSize: "16px" }}
+                  placeholder="Search in orders"
+                />
               </Box>
-            </div>
-            <div
-              style={{
-                height: breakpoints.max768 ? "72vh" : "77vh",
-                overflowY: "scroll",
-                scrollbarWidth: "none",
-              }}
-            >
-              {orders.map((order, index) => (
+            </Box>
+          </div>
+
+          <div
+            style={{
+              height: breakpoints.max768 ? "72vh" : "77vh",
+              overflowY: "scroll",
+              scrollbarWidth: "none",
+            }}
+          >
+            {orders.map((order, index) => (
+              <Link
+                key={order.id}
+                to={`/profile/orders/${order.id}`}
+                style={{ textDecoration: "none" }}
+              >
                 <div
-                  key={order.id}
                   style={{
                     paddingTop: "24px",
                     marginBottom: breakpoints.max768 ? "2rem" : "24px",
                     display: "flex",
                     padding: "2.4rem",
                     gap: "24px",
-                    transition: "box-shadow 0.3s ease, transform 0.3s ease", // Add transform to transition
+                    transition: "box-shadow 0.3s ease, transform 0.3s ease",
                     borderRadius: "8px",
                     cursor: "pointer",
                   }}
                   onClick={() => handleOrderClick(order, index)}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.border = "1.5px solid #60a487"; // Border on hover
-                    e.currentTarget.style.transform = "scale(.99)"; // Zoom in
+                    e.currentTarget.style.border = "1.5px solid #60a487";
+                    e.currentTarget.style.transform = "scale(.99)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.border = "1px solid #eee"; // Revert border
-                    e.currentTarget.style.transform = "scale(1)"; // Revert zoom
+                    e.currentTarget.style.border = "1px solid #eee";
+                    e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
                   <div style={{ flex: 1 }}>
@@ -208,9 +212,6 @@ export default function Component() {
                             height: "48px",
                             backgroundColor: "#60a487",
                             borderRadius: "50%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
                             overflow: "hidden",
                           }}
                         >
@@ -220,8 +221,8 @@ export default function Component() {
                               width: "100%",
                               height: "100%",
                             }}
-                            src={orders[index].image}
-                            alt={orders[index].product}
+                            src={order.image}
+                            alt={order.product}
                           />
                         </div>
                         <div>
@@ -267,7 +268,6 @@ export default function Component() {
                     >
                       {order.description}
                     </p>
-
                     <ul style={{ paddingLeft: "15px" }}>
                       <li
                         style={{
@@ -279,13 +279,7 @@ export default function Component() {
                         Exchange/Return window closed on {order.exchangeDate}
                       </li>
                     </ul>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        marginTop: "8px",
-                      }}
-                    >
+                    <div style={{ display: "flex", marginTop: "8px" }}>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <StarBorder
                           key={star}
@@ -305,18 +299,11 @@ export default function Component() {
                     </p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </Link>
+            ))}
           </div>
         </div>
-      </Box>
-
-      {/* Order Details Dialog */}
-      <OrderDetailsDialog
-        open={isOrderModalOpen}
-        handleClose={() => setIsOrderModalOpen(false)}
-        order={selectedOrder}
-      />
-    </>
+      </div>
+    </Box>
   );
 }
